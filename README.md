@@ -1,8 +1,9 @@
 # volatalk
-Messenger Peer-to- Peer PWA in React, only depending on Node with default PeerJS and WebPush service
+Messenger App, private & direct chat, call & video without central data capture. PWA in React, PeerJS and WebPush on Node.
 
 
-# Getting Started with Create React App
+
+# TODO Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
