@@ -1,4 +1,4 @@
-const pubKey = "";
+const pubKey = "BChZg2Ky1uKIDRdYWapWKZXZ19VvFedmK0bjqir9kMsyUK42cguvoAr4Pau4yQr2aY4IWGIsr3W1lWK5okZ6O84";
 
 export default function PushSubscribe() {
   return "serviceWorker" in navigator ? (

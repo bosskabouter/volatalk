@@ -3,18 +3,20 @@ const { ExpressPeerServer } = require("peer");
 const webpush = require("web-push");
 
 const path = require("path");
-
-const port = 5000;
+const http = require("http");
 
 const app = express();
-const server = app.listen(port);
+const server = http.createServer(app);
+
 
 const peerServer = ExpressPeerServer(server, {
+  debug: true,
   path: "/",
 });
 
-app.use(express.static(path.join(__dirname, "www")));
 app.use("/peerjs", peerServer);
+
+app.use(express.static(path.join(__dirname, "www")));
 
 app.use(express.json());
 // ./node_modules/.bin/web-push generate-vapid-keys
@@ -37,3 +39,7 @@ app.post("/subscribe", (req, res) => {
       res.status(418).json({});
     });
 });
+
+app.listen(5000);
+
+console.info("Server running...");
