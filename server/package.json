@@ -1,0 +1,24 @@
+{
+  "name": "volatalk-server",
+  "version": "1.0.0",
+  "description": "Peer and Push Subscription Server ",
+  "main": "App.js",
+  "scripts": {
+    "start": "node App.js",
+    "test": "echo \"Error: no te1st specified\" && exit 1"
+  },
+  "keywords": [
+    "VolaTALK",
+    "server",
+    "express",
+    "peerjs",
+    "web-push"
+  ],
+  "author": "Paul Kuit",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.3",
+    "peer": "^0.6.1",
+    "web-push": "^3.4.5"
+  }
+}

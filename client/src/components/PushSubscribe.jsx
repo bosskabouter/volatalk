@@ -33,7 +33,7 @@ async function send() {
 
   console.log("Push registered!", window.subscription);
 
-  console.log("Sending Push...");
+  console.log("Posting Push Subscribe...");
 
   await fetch("/subscribe", {
     method: "POST",
@@ -41,7 +41,7 @@ async function send() {
     headers: { "content-type": "application/json" },
   });
 
-  console.log("Push sent...");
+  console.log("Push Subscribe Posted.");
 }
 
 function urlBase64ToUint8Array(base64String) {

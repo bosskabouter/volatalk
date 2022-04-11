@@ -20,3 +20,7 @@ export default class UserManager extends React.Component {
     );
   }
 }
+
+export class User{
+
+}
