@@ -1,12 +1,22 @@
 import { identicon } from "minidenticons";
 
-export default function UserManager() {
-  let user = { nickname: "Paul", id: "29793" };
-  let identiconEl = identicon(user.id);
-  return (
-    <div>
-      <span>{user.nickname}</span>
-      <div>{identiconEl}</div>
-    </div>
-  );
+import React from "react";
+
+
+
+export default class UserManager extends React.Component {
+  user = { nickname: "Paul2", id: "297931" };
+  
+  constructor(props) {
+    super(props);
+    identicon(this.user.id);
+  }
+  render() {
+    return (
+      <div>
+        <span>{this.user.nickname}</span>
+        <identicon-svg username={this.user.id} />
+      </div>
+    );
+  }
 }
