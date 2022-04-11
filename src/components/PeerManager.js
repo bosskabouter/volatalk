@@ -1,25 +1,24 @@
 import React from "react";
 import Peer from "peerjs";
-
+export { PeerManager };
 var p;
 
-export default function PeerManager(props) {
-  p = new Peer(props.id, props.peerOpts);
-  console.info("Got PEER", p);
-  return <button className="square">{/* TODO */}</button>;
+function PeerManager(props) {
+  try {
+    p = new Peer(props.id, props.peerOpts);
+    console.info("Got PEER", p);
+    return <span>Online &#9989;</span>;
+  } catch (e) {
+    console.error("Error setting up peer: " + e, e);
+    return <span>Offline &#10060;</span>;
+  }
 }
 
-export  class PeerManager2 extends React.Component {
+class PeerManager2 extends React.Component {
   constructor(props) {
     super(props);
-    this.state.peer = new Peer(props.id);
-  }
+    this.state = { peer: new Peer(props.id) };
 
-  componentDidMount() {
-    console.info("PeerManager initialized");
-  }
-
-  componentWillMount() {
     this.state.peer.on("open", (id) => {
       console.log("My peer ID is: " + id);
       this.setState({
@@ -188,5 +187,9 @@ export  class PeerManager2 extends React.Component {
         </div>
       </div>
     );
+  }
+
+  componentDidMount() {
+    console.info("PeerManager initialized");
   }
 }
