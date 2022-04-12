@@ -4,14 +4,17 @@ const { ExpressPeerServer } = require("peer");
 const webpush = require("web-push");
 const path = require("path");
 const fs = require("fs");
+const os = require("os");
 
 //CONFIG ENVIRONMENT VARIABLE PARAMS
 const DEBUG = ENV_VAR("DEBUG", true);
 //HTTPS REQUIRED
 const PORT_HTTPS = ENV_VAR("PORT_HTTPS", 8443);
 //SSL KEYS
-const KEY_FILENAME = ENV_VAR("KEY_FILE", "./crt/localhost.key");
-const CERT_FILENAME = ENV_VAR("CERT_FILE", "./crt/localhost.crt");
+const HOSTNAME = os.hostname();
+//path.join(__dirname, DIR_PUB_STATIC)
+const KEY_FILENAME = ENV_VAR("KEY_FILE", "./crt/" + HOSTNAME + ".key");
+const CERT_FILENAME = ENV_VAR("CERT_FILE", "./crt/" + HOSTNAME + ".crt");
 
 //local directorty with static files to be served
 const DIR_PUB_STATIC = ENV_VAR("DIR_PUB_STATIC", "www");

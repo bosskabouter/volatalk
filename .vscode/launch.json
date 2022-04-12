@@ -6,7 +6,7 @@
     "configurations": [
         {
             "name": "Launch Server!",
-            "program": "${workspaceFolder}/server/App.js",
+            "program": "${workspaceFolder}/server/Server.js",
             "request": "launch",
             "skipFiles": [
                 "<node_internals>/**"
@@ -14,9 +14,10 @@
             "type": "node"
         },
         {
-            "name": "Launch via NPM",
+            "name": "Launch Server via NPM",
             "request": "launch",
             "runtimeArgs": [
+                "${fileBasename}/server/",
                 "run-script",
                 "debug"
             ],  

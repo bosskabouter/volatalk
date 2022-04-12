@@ -1,4 +1,5 @@
-const pubKey = "BChZg2Ky1uKIDRdYWapWKZXZ19VvFedmK0bjqir9kMsyUK42cguvoAr4Pau4yQr2aY4IWGIsr3W1lWK5okZ6O84";
+const pubKey =
+  "BChZg2Ky1uKIDRdYWapWKZXZ19VvFedmK0bjqir9kMsyUK42cguvoAr4Pau4yQr2aY4IWGIsr3W1lWK5okZ6O84";
 
 export default function PushSubscribe() {
   return "serviceWorker" in navigator ? (
@@ -11,19 +12,18 @@ export default function PushSubscribe() {
 //check for serviceworker
 function registerPush() {
   send().catch((err) => {
-    console.error(err);
+    console.error("Problem registering Push service: " + err, err);
   });
 }
 //register  SW, Register Push, Send Push
 async function send() {
   console.log("Registering service worker...");
-  const register = await navigator.serviceWorker
-    .register("./serviceWorker.js", {
+  const register = await navigator.serviceWorker.register(
+    "./serviceWorker.js",
+    {
       scope: "/",
-    })
-    .catch((err) => {
-      console.error(err);
-    });
+    }
+  );
   console.log("Service worker Registered...");
 
   window.subscription = await register.pushManager.subscribe({
