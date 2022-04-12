@@ -2,9 +2,9 @@
   "name": "volatalk-server",
   "version": "1.0.0",
   "description": "Peer and Push Subscription Server ",
-  "main": "App.js",
+  "main": "Server.js",
   "scripts": {
-    "start": "node App.js",
+    "start": "node Server.js",
     "test": "echo \"Error: no te1st specified\" && exit 1"
   },
   "keywords": [
