@@ -3,8 +3,8 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
-#client/build
-#server/www/
+client/build
+server/www/
 server/crt/*.crt
 server/crt/*.key
 
