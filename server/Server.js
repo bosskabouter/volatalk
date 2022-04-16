@@ -12,7 +12,7 @@ const DEBUG = ENV_VAR("DEBUG", true);
 const PORT_HTTPS = ENV_VAR("PORT_HTTPS", 8443);
 //SSL KEYS
 const HOSTNAME = os.hostname();
-//path.join(__dirname, DIR_PUB_STATIC)
+
 const KEY_FILENAME = ENV_VAR("KEY_FILE", "./crt/" + HOSTNAME + ".key");
 const CERT_FILENAME = ENV_VAR("CERT_FILE", "./crt/" + HOSTNAME + ".crt");
 
@@ -38,8 +38,8 @@ const VAPID_PRIVKEY = ENV_VAR(
   "CvQGYBs-AzSHF55J7mqTR8VE7l-qwiBiSslqeaMfx8o"
 );
 
-const KEY_FILE = fs.readFileSync(KEY_FILENAME);
-const CERT_FILE = fs.readFileSync(CERT_FILENAME);
+const KEY_FILE = fs.readFileSync(path.join(__dirname, KEY_FILENAME));
+const CERT_FILE = fs.readFileSync(path.join(__dirname, CERT_FILENAME));
 
 const HTTPS_OPTIONS = {
   key: KEY_FILE,
@@ -92,7 +92,7 @@ app.post(WEBPUSH_CONTEXT, (req, res) => {
 function ENV_VAR(varName, defaults) {
   let val = process.env[varName];
   console.log(
-    varName + (!val ? " [UNDEFINED]. Using default: " + defaults : val)
+    varName + (!val ? " [UNDEFINED]. Using default: " + defaults : ": " + val)
   );
   return val || defaults;
 }

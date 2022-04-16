@@ -2,7 +2,7 @@ import { identicon } from "minidenticons";
 
 import React from "react";
 
-export default class UserManager extends React.Component {
+export default class UserDisplay extends React.Component {
   user = { nickname: "Paul2", id: "297931" };
 
   constructor() {
@@ -28,5 +28,3 @@ export default class UserManager extends React.Component {
     );
   }
 }
-
-export class User {}

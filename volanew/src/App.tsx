@@ -1,6 +1,6 @@
-import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import UserDisplay from './components/UserDisplay';
 
 function App() {
   return (
@@ -16,8 +16,9 @@ function App() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Learn React.. New content!
+          Learn React
         </a>
+        <UserDisplay/>
       </header>
     </div>
   );
