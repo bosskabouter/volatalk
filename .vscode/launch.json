@@ -5,6 +5,33 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Launch via NPM",
+      "request": "launch",
+      "runtimeArgs": [
+        "run-script",
+        "debug"
+      ],
+      "runtimeExecutable": "npm",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "type": "node"
+    },
+    {
+      "name": "Launch Chrome",
+      "request": "launch",
+      "type": "chrome",
+      "url": "https://localhost:8443",
+      "webRoot": "${workspaceFolder}"
+    },
+  {
+    "name": "Attach to Chrome",
+    "port": 9222,
+    "request": "attach",
+    "type": "chrome",
+    "webRoot": "${workspaceFolder}"
+  },
+    {
       "name": "Attach",
       "port": 9229,
       "request": "attach",
@@ -28,13 +55,13 @@
     },
     {
       "name": "Launch Client via NPM",
-      "command": "cd client && npm run debug",
+      "command": "cd client2 && npm run debug",
       "request": "launch",
       "type": "node-terminal"
     },
 
     {
-      "name": "Launch Server VolaTALK Peer/Push ",
+      "name": "Launch VolaTALK HTTPS Peer & Push Server  ",
       "program": "${workspaceFolder}/server/Server.js",
       "request": "launch",
       "skipFiles": ["<node_internals>/**"],

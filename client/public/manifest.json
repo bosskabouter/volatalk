@@ -16,10 +16,49 @@
       "src": "android-chrome-256x256.png",
       "type": "image/png",
       "sizes": "256x256"
+    },
+    {
+      "src": "maskable_icon.png",
+      "type": "image/png",
+      "sizes": "336x336",  "purpose": "any maskable"
     }
+
+  
+
+
   ],
   "start_url": ".",
   "display": "standalone",
   "theme_color": "#343125",
-  "background_color": "#343125"
+  "background_color": "#343125",
+
+  "shortcuts": [
+    {
+      "name": "How's weather today?",
+      "short_name": "Today",
+      "description": "View weather information for today",
+      "url": "/today?source=pwa",
+      "icons": [{ "src": "android-chrome-256x256.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "How's weather tomorrow?",
+      "short_name": "Tomorrow",
+      "description": "View weather information for tomorrow",
+      "url": "/tomorrow?source=pwa",
+      "icons": [{ "src": "android-chrome-256x256.png", "sizes": "192x192" }]
+    }
+  ],
+  "description": "Weather forecast information",
+  "screenshots": [
+    {
+      "src": "android-chrome-256x256.png",
+      "type": "image/png",
+      "sizes": "540x720"
+    },
+    {
+      "src": "android-chrome-256x256.png",
+      "type": "image/jpg",
+      "sizes": "540x720"
+    }
+  ]
 }

@@ -1,29 +1,38 @@
 import { identicon } from "minidenticons";
 
 import React from "react";
-
+import { initUser } from "../services/UserService";
+import UserRegistration from "./UserRegistration";
 export default class UserDisplay extends React.Component {
-  user = { nickname: "Paul2", id: "297931" };
-
   constructor() {
     super();
+    let user = initUser();
     this.state = {
-      user: this.user,
+      user: user,
+      nickname: user.nickname,
+      iconStr: identicon(user.peerid),
     };
-
-    this.iconStr = identicon(this.user.id);
-    console.info("iconStr " + this.iconStr);
   }
+
   render() {
     return (
       <div>
-        <span>{this.user.nickname}</span>
-        <span style={{ width: "20px" }}>
+        <div>
+          Username
+          <br /> {this.state.user.nickname}
+        </div>
+        <div style={{ width: "90px" }}>
+          ID icon
+          <br />
           <img
-            src={`data:image/svg+xml;utf8,${this.iconStr}`}
-            alt={"Your personsal identification icon"}
+            src={`data:image/svg+xml;utf8,${this.state.iconStr}`}
+            alt={"Your personsal identification icon"} width={"90px" }
           />
-        </span>
+        </div>
+        <div >
+          <img src={`${this.state.user.avatar}`} alt={"Your Avatar"} width={"90px" }/>
+        </div>
+        <UserRegistration/>
       </div>
     );
   }

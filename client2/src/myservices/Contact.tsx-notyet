@@ -1,0 +1,77 @@
+import { loadContact, persistContact, queryContacts } from './DB';
+import { PeerManager } from './PeerManager';
+
+/**
+ */
+class Contact {
+  peerid: string;
+  signature: null|string;
+  userInfo: string;
+  dateCreated: Date;
+  dateResponded: null|Date;
+
+  accepted: null|boolean;
+  declined: null|boolean;
+
+  constructor(peerid: string, invitation: string) {
+    this.peerid = peerid;
+    this.userInfo = invitation;
+    this.signature = null;
+
+    this.dateCreated = new Date();
+    this.dateResponded = null;
+    this.accepted = true;
+    this.declined = false;
+  }
+
+}
+
+function checkContacts() {
+  const contacts = queryContacts();
+
+  for (const contact of contacts) {
+    if (!contact.declined) PeerManager.checkConnection(contact);
+  }
+}
+
+/**
+ */
+async function sendContactRequest(otherPeerId, invitationText) {
+  let contact = await loadContact(otherPeerId);
+
+  if (!contact || PeerManager.isConnectedWith(contact)) {
+    return;
+  }
+
+  PeerManager.genSignature(otherPeerId).then((signature) => {
+    contact = new Contact(otherPeerId);
+    //temporary identification for contact without userinfo
+    contact.userInfo = { nickname: invitationText };
+    contact.signature = signature;
+    contact.accepted = new Date();
+    persistContact(contact);
+    PeerManager.checkConnection(contact);
+    console.debug('Waiting for new contact to accept your connection...');
+  });
+}
+
+function declineContact(contact) {
+  contact.declined = new Date();
+  persistContact(contact);
+  PeerManager.disconnectFrom(contact);
+}
+
+function acceptNewContact(contact) {
+  console.log('Accepting New contact: ' + contact.nickname, contact);
+  PeerManager.genSignature(contact.peerid).then((signature) => {
+    contact.signature = signature;
+    contact.accepted = new Date();
+    contact.declined = null;
+    contact.dateResponded = new Date();
+    persistContact(contact);
+    //initiate new connection, sending over our newly generated key in metadata as usual.
+    PeerManager.initiateConnection(contact);
+  });
+}
+
+export { Contact, checkContacts, sendContactRequest, acceptNewContact, declineContact };

@@ -3,7 +3,7 @@ const pubKey =
 
 export default function PushSubscribe() {
   return "serviceWorker" in navigator ? (
-    <button onClick={registerPush}>Subscribe Push Notifications!</button>
+    <button onClick={registerPush}>Send yourself Notifications!</button>
   ) : (
     <span>No Push Messages Available.</span>
   );
@@ -17,9 +17,10 @@ function registerPush() {
 }
 //register  SW, Register Push, Send Push
 async function send() {
+  
   console.log("Registering service worker...");
   const register = await navigator.serviceWorker.register(
-    "./serviceWorker.js",
+    "./push-serviceWorker.js",
     {
       scope: "/",
     }

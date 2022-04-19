@@ -1,3 +1,4 @@
+
 import User from "../model/User";
 import {
   digestSHA256,
@@ -19,7 +20,7 @@ import { localLoad, localSave } from "./Generic";
 
 const USER_LOCAL_STORAGE_PARAM = "user";
 
-export async function initUser() {
+export function initUser() {
   let u = localLoad(USER_LOCAL_STORAGE_PARAM);
   if (!u) {
     console.log("No user found. Creating new KeyPair for new user...");
@@ -77,7 +78,7 @@ export async function login(nickname, password) {
   if (nickname !== u.nickname || pwHash !== u.pwHash) {
     throw Error("Invalid user/password");
   } else {
-    user = u;
+    return u;
   }
 }
 

@@ -69,4 +69,14 @@ self.addEventListener('message', (event) => {
   }
 });
 
+
 // Any other custom service worker logic can go here.
+
+
+self.addEventListener("push", (e) => {
+  const data = e.data.json();
+  self.registration.showNotification(data.title, {
+    body: "VolaTALK Pushed: " + data,
+    icon: "/mstile-150x150.png",
+  });
+});
