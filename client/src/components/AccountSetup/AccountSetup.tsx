@@ -2,13 +2,11 @@
 import { css } from '@emotion/react';
 import { useContext } from 'react';
 import {
-  Button,
-  Container,
+  Button, 
   Dialog,
   DialogContent,
   FormControl,
   FormControlLabel,
-  Grid,
   MenuItem,
   OutlinedInput,
   Select,
@@ -17,7 +15,7 @@ import {
   Typography,
   useTheme,
 } from '@mui/material';
-import { Formik, useFormik } from 'formik';
+import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { isMobile } from 'react-device-detect';
 import { DatabaseContext } from 'providers/DatabaseProvider';
@@ -25,7 +23,6 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from 'providers/AuthProvider';
 import { useDispatch } from 'react-redux';
 import { setCreated, setIsSecure } from 'store/slices/accountSlice';
-
 
 import { exportCryptoKey, generateKeyPair, peerIdFromPublicKey } from 'myservices/Crypto';
 import ImageUpload from 'util/ImageUpload';
@@ -139,36 +136,52 @@ const AccountSetup = () => {
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
-      generateKeyPair().then((keyPair) => {
-        if (!keyPair) {
-          return;
-        }
-        const publicCryptoKey: CryptoKey | undefined = keyPair.publicKey;
-        if (publicCryptoKey === undefined) return;
-        exportCryptoKey(publicCryptoKey).then((pubKey) => {
-          values.peerid = peerIdFromPublicKey(pubKey);
-          values.privateKey = JSON.stringify(keyPair.privateKey);
-          console.log('Peerid: ' + values.peerid);
-          // Save to database
-          if (db !== null) {
-            db.userProfile
-              .put(values, 1)
-              .then(() => {
-                dispatch(setCreated());
-                if (formik.values.isSecured) {
-                  dispatch(setIsSecure());
-                }
-                setAuthenticated(true);
-                navigate('/');
-              })
-              .catch((err) => {
-                console.error(err);
-              });
-          }
-        });
-      });
+      registerUser(values);
     },
   });
+
+  function registerUser(values: {
+    isSecured: boolean;
+    pin: string;
+    question1: string;
+    answer1: string;
+    question2: string;
+    answer2: string;
+    peerid: string;
+    privateKey: string;
+    nickname: string;
+    avatar: string;
+    dateRegistered: Date;
+  }) {
+    generateKeyPair().then((keyPair) => {
+      if (!keyPair) {
+        return;
+      }
+      const publicCryptoKey: CryptoKey | undefined = keyPair.publicKey;
+      if (publicCryptoKey === undefined) return;
+      exportCryptoKey(publicCryptoKey).then((pubKey) => {
+        values.peerid = peerIdFromPublicKey(pubKey);
+        values.privateKey = JSON.stringify(keyPair.privateKey);
+        console.log('Peerid: ' + values.peerid);
+        // Save to database
+        if (db !== null) {
+          db.userProfile
+            .put(values, 1)
+            .then(() => {
+              dispatch(setCreated());
+              if (formik.values.isSecured) {
+                dispatch(setIsSecure());
+              }
+              setAuthenticated(true);
+              navigate('/');
+            })
+            .catch((err) => {
+              console.error(err);
+            });
+        }
+      });
+    });
+  }
 
   const styles = {
     accountSetupDialogRoot: css`
@@ -361,7 +374,9 @@ const AccountSetup = () => {
           />
           <Typography variant="subtitle1">Avatar: </Typography>
           <ImageUpload></ImageUpload>
-          <Typography variant="subtitle1">Would you like to use a pin to secure your local data?</Typography>
+          <Typography variant="subtitle1">
+            Would you like to use a pin to secure your local data?
+          </Typography>
 
           <FormControlLabel
             control={
@@ -373,11 +388,7 @@ const AccountSetup = () => {
                 onChange={formik.handleChange}
               />
             }
-            label={
-              formik.values.isSecured
-                ? "Yes Please!"
-                : "I don't need a pin..."
-            }
+            label={formik.values.isSecured ? 'Yes Please!' : "I don't need a pin..."}
           />
           <AuthenticatedAccountSetup></AuthenticatedAccountSetup>
 
