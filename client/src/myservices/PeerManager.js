@@ -1,8 +1,8 @@
 import Peer from "peerjs";
 import { persistMessage } from "./DB.js";
 
-import { Message } from "./peerpm-msg.js";
-import { createNotification } from "./Notify.js";
+import { Message } from "./peerpm-msg.js.js";
+import { createNotification } from "./Notify.js.js";
 
 const ERR_CONTACT_RECUSED = 403;
 

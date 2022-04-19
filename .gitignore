@@ -4,6 +4,7 @@
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
 client/build
+client-old
 server/www/
 server/crt/*.crt
 server/crt/*.key

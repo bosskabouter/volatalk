@@ -1,0 +1,54 @@
+{
+  "short_name": "VolaTALK",
+  "name": "VolaTALK - the Private Direct Communication",
+  "description": "Private & Direct Video, Calling & Messenging.",
+  "icons": [
+    {
+      "src": "assets/logo512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#e5a50a",
+
+
+  "shortcuts": [
+    {
+      "name": "Messages",
+      "short_name": "(Unread) Messages",
+      "description": "View recent activity on Voltalk",
+      "url": "/Messages",
+      "icons": [{ "src": "assets/logo512.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "VolaTALK - All Contacts",
+      "short_name": "Show Contacts",
+      "description": "Open All VolaTalk contacts",
+      "url": "/Contacts",
+      "icons": [{ "src": "assets/logo512.png", "sizes": "192x192" }]
+    }
+  ],
+ 
+  "screenshots": [
+    {
+      "src": "assets/logo512.png",
+      "type": "image/png",
+      "sizes": "540x720"
+    },
+    {
+      "src": "assets/logo512.png",
+      "type": "image/jpg",
+      "sizes": "540x720"
+    }
+  ]
+
+}
