@@ -1,3 +1,4 @@
+const compression = require('compression');
 const https = require("https");
 const express = require("express");
 const { ExpressPeerServer } = require("peer");
@@ -5,6 +6,11 @@ const webpush = require("web-push");
 const path = require("path");
 const fs = require("fs");
 const os = require("os");
+
+
+const spdy = require('spdy')
+
+
 
 //CONFIG ENVIRONMENT VARIABLE PARAMS
 const DEBUG = ENV_VAR("DEBUG", true);
@@ -46,12 +52,18 @@ const HTTPS_OPTIONS = {
   cert: CERT_FILE,
 };
 
-//express server
+// express server
 const app = express();
+// https://webhint.io/docs/user-guide/hints/hint-no-disallowed-headers/?source=devtools
+app.disable('x-powered-by');
+
+// compress all responses
+// https://webhint.io/docs/user-guide/hints/hint-http-compression/
+app.use(compression());
 
 //serve static
 app.use(express.static(path.join(__dirname, DIR_PUB_STATIC)));
-const server = https.createServer(HTTPS_OPTIONS, app);
+const server = spdy.createServer(HTTPS_OPTIONS, app);
 server.listen(PORT_HTTPS);
 console.info("HTTPS started on port: " + PORT_HTTPS);
 
