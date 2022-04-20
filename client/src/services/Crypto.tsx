@@ -82,7 +82,7 @@ function importCryptoKey(jwk: JsonWebKey, isPrivate: boolean) {
 /**
  *
  * @param {*} key
- * @returns 
+ * @returns
  */
 function exportCryptoKey(key: CryptoKey) {
   return window.crypto.subtle.exportKey(ENC_FORMAT_JWK, key);

@@ -2,7 +2,7 @@
 import { css } from '@emotion/react';
 import { useContext } from 'react';
 import {
-  Button, 
+  Button,
   Dialog,
   DialogContent,
   FormControl,
@@ -24,7 +24,7 @@ import { AuthContext } from 'providers/AuthProvider';
 import { useDispatch } from 'react-redux';
 import { setCreated, setIsSecure } from 'store/slices/accountSlice';
 
-import { exportCryptoKey, generateKeyPair, peerIdFromPublicKey } from 'myservices/Crypto';
+import { exportCryptoKey, generateKeyPair, peerIdFromPublicKey } from 'services/Crypto';
 import ImageUpload from 'util/ImageUpload';
 
 const ITEM_HEIGHT = 48;

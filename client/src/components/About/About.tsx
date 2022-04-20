@@ -1,21 +1,17 @@
 /** @jsxImportSource @emotion/react */
 
-
 import { css } from '@emotion/react';
 import CssBaseline from '@mui/material/CssBaseline';
 import {
-  Box, Link,
+  Box,
+  Link,
   // useTheme
 } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Logo from '../../assets/images/volatalk-logo-336x280.webp';
 import packageJson from '../../../package.json';
-import {
-  List,
-  ListItem,
-  ListItemText,
-} from '@mui/material';
+import { List, ListItem, ListItemText } from '@mui/material';
 
 const About = () => {
   // const theme = useTheme();
@@ -61,12 +57,14 @@ const About = () => {
             />
           </ListItem>
           <ListItem key="4">
-            <ListItemText primary="Push notifications need to be send through a push-server. 
-            VolaTALK's push messenger doesn't collect any data about the messages being sent." />
+            <ListItemText
+              primary="Push notifications need to be send through a push-server. 
+            VolaTALK's push messenger doesn't collect any data about the messages being sent."
+            />
           </ListItem>
           <ListItem key="5">
             <ListItemText primary="All source code of this software is publicly available on " />
-            <Link href='https://github.com/bosskabouter/volatalk'>GitHub</Link>
+            <Link href="https://github.com/bosskabouter/volatalk">GitHub</Link>
           </ListItem>
         </List>
         <Typography css={styles.version}> v{packageJson.version}</Typography>

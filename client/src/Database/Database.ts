@@ -6,20 +6,20 @@ const table_name = 'userProfile';
 export interface IUserProfile {
   id?: string;
 
-  isSecured:boolean;
+  isSecured: boolean;
   pin: string;
   question1: string;
   answer1: string;
   question2: string;
   answer2: string;
 
-  peerid:string;  
-  privateKey:string;
+  peerid: string;
+  privateKey: string;
 
-  nickname:string;
-  avatar:string;
+  nickname: string;
+  avatar: string;
 
-  dateRegistered:Date;
+  dateRegistered: Date;
 }
 
 export class AppDatabase extends Dexie {

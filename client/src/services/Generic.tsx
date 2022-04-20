@@ -2,7 +2,6 @@
  * Generic shortcuts common used statements
  */
 
-
 const domain = document.location.host;
 
 /**
@@ -10,7 +9,7 @@ const domain = document.location.host;
 function localSave(param: string, value: any) {
   const objToJSON = JSON.stringify(value);
   localStorage.setItem(param, objToJSON);
-  console.debug("Saved to local storage param: " + param, objToJSON);
+  console.debug('Saved to local storage param: ' + param, objToJSON);
 }
 
 /**
@@ -18,18 +17,18 @@ function localSave(param: string, value: any) {
 function localLoad(param: string) {
   const item: any = localStorage.getItem(param);
   const obj = JSON.parse(item);
-  console.debug("Loaded from local storage param: " + param, obj);
+  console.debug('Loaded from local storage param: ' + param, obj);
   return obj;
 }
 
 /**
  */
-function getUrlParam(name: string, url: Document["location"]) {
+function getUrlParam(name: string, url: Document['location']) {
   if (!url) {
     url = document.location;
   }
-  name = name.replace(/[[]/, "\\[").replace(/[\]]/, "\\]");
-  const regexS = "[\\?&]" + name + "=([^&#]*)";
+  name = name.replace(/[[]/, '\\[').replace(/[\]]/, '\\]');
+  const regexS = '[\\?&]' + name + '=([^&#]*)';
   const regex = new RegExp(regexS);
   const results = regex.exec(url.toString());
   if (results == null) return null;
@@ -44,7 +43,7 @@ function readFileAsBase64(evt: any) {
   const file = files[0];
 
   return file.arrayBuffer().then((ab: Iterable<number>) => {
-    console.debug("File uploaded: " + ab);
+    console.debug('File uploaded: ' + ab);
     return convertAbToBase64(ab);
   });
 }
@@ -57,9 +56,9 @@ function readFileAsBase64(evt: any) {
  */
 function convertStringToHex(s: string) {
   return s
-    .split("")
-    .map((c) => c.charCodeAt(0).toString(16).padStart(2, "0"))
-    .join("");
+    .split('')
+    .map((c) => c.charCodeAt(0).toString(16).padStart(2, '0'))
+    .join('');
 }
 
 /**
@@ -74,13 +73,13 @@ function convertHexToString(hex: string) {
     .split(/(\w\w)/g)
     .filter((p) => !!p)
     .map((c) => String.fromCharCode(parseInt(c, 16)))
-    .join("");
+    .join('');
 }
 
 /**
  */
 function convertAb2str(buf: ArrayBufferLike) {
-  return new TextDecoder("utf-8").decode(new DataView(buf));
+  return new TextDecoder('utf-8').decode(new DataView(buf));
 }
 
 /**
@@ -88,7 +87,6 @@ function convertAb2str(buf: ArrayBufferLike) {
 function convertStr2ab(str: string) {
   return new TextEncoder().encode(str);
 }
-
 
 export function convertBase64ToAb(base64: string) {
   const binary_string = window.atob(base64);
@@ -101,7 +99,7 @@ export function convertBase64ToAb(base64: string) {
 }
 
 function convertAbToBase64(buffer: Iterable<number>) {
-  let binary = "";
+  let binary = '';
   const bytes = new Uint8Array(buffer);
   const len = bytes.byteLength;
   for (let i = 0; i < len; i++) {
@@ -124,18 +122,18 @@ function atou(str: string) {
  */
 export function resizeFileUpload(
   fileInput: any,
-  previewOutput:any,
-  MAX_WIDTH:number,
-  MAX_HEIGHT:number
+  previewOutput: any,
+  MAX_WIDTH: number,
+  MAX_HEIGHT: number
 ) {
-  fileInput.setAttribute("accept", "image/*");
+  fileInput.setAttribute('accept', 'image/*');
 
-  fileInput.addEventListener("change", function (e: any) {
+  fileInput.addEventListener('change', function (e: any) {
     if (e.target.files) {
       const imageFile = e.target.files[0];
       const reader = new FileReader();
       reader.onload = function (e) {
-        const img = document.createElement("img");
+        const img = document.createElement('img');
         img.onload = function (_event) {
           // Dynamically create a canvas element
           let width = img.width;
@@ -154,10 +152,10 @@ export function resizeFileUpload(
             }
           }
 
-          const canvas = document.createElement("canvas");
+          const canvas = document.createElement('canvas');
           canvas.width = width;
           canvas.height = height;
-          const ctx = canvas.getContext("2d");
+          const ctx = canvas.getContext('2d');
           ctx?.drawImage(img, 0, 0, width, height);
 
           // Show resized image in preview element

@@ -32,16 +32,11 @@
  * Government Agency Point of Contact for Original Software - Program Manager: robert.a.kayl.civ@mail.mil
  */
 import { css } from '@emotion/react';
-import { AppBar, Grid, Typography } from '@mui/material';
+import { AppBar, Grid } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import logo from 'assets/images/volatalk-logo-336x280.webp';
-import { FlatButton } from 'material-ui';
-
-import { useEffect, useState } from 'react';
-import packageJson from '../../../package.json';
+import PeerDisplay from 'components/PeerDisplay/PeerDisplay';
 
 const Footer = () => {
-  const [dateUpdated, setDateUpdated] = useState('');
   const theme = useTheme();
 
   const styles = {
@@ -54,28 +49,12 @@ const Footer = () => {
     `,
   };
 
-  useEffect(() => {
-    fetch('https://api.bitbucket.org/2.0/repositories/wmtp/pwa-starter/commits', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((res) => res.json())
-      .then((resJson) => {
-        setDateUpdated(resJson.values[0].date.split('T')[0]);
-      })
-      .catch((error: Error) => {
-        console.error('Error:', error);
-      });
-  });
-
   return (
     <AppBar css={styles.footerRoot} position="static">
       <Grid container alignItems="center" direction="column">
-        <button >Click me</button>
-
+        <button>Click me</button>
       </Grid>
+      <PeerDisplay></PeerDisplay>
     </AppBar>
   );
 };

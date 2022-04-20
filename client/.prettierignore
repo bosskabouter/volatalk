@@ -16,7 +16,9 @@ web.config
 .eslintcache
 README.md
 .npmrc
+browserconfig.xml
 
+*.webp
 *.ico
 *.gif
 *.jpg

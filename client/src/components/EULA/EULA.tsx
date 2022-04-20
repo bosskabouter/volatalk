@@ -135,10 +135,10 @@ const EULA = () => {
         </MobileView>
       </div>
       <DialogTitle id="dialog-title" css={styles.eulaTitleBackground}>
-        Welcome to VolaTALK. <em>Direct, Private Communication</em> 
+        Welcome to VolaTALK. <em>Direct, Private Communication</em>
       </DialogTitle>
       <DialogContent id="dialog-agreement" css={styles.eulaDialogContentRoot}>
-        <List >
+        <List>
           <ListItem key="1">
             <ListItemText primary="The new way to communicate directly with your contacts, without the need for any central authority to capture or censure your private data." />
           </ListItem>

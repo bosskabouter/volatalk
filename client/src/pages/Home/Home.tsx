@@ -1,4 +1,3 @@
-
 import { Button, Typography } from '@mui/material';
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -15,7 +14,6 @@ const Home = () => {
 
   return (
     <>
-     
       <Typography variant="h4">Example of React Component</Typography>
       <Typography gutterBottom>Redux Counter: {count}</Typography>
       <Button color="primary" onClick={handleIncrementClick} variant="contained">

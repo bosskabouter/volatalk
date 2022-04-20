@@ -16,7 +16,7 @@ import { isMobile } from 'react-device-detect';
 import { DatabaseContext } from 'providers/DatabaseProvider';
 import { useNavigate } from 'react-router-dom';
 
-const PinReset = () => {
+const NewPin = () => {
   const [created, setCreated] = useState(false);
   const theme = useTheme();
   const fullScreen = isMobile ? true : false;
@@ -28,7 +28,7 @@ const PinReset = () => {
       .string()
       .defined('Enter a valid pin')
       .min(6, 'Pin must be at least 6 characters')
-      .matches(new RegExp('^\\d+$'), 'Pin must only contain numbers')
+      .matches(/^\d+$/, 'Pin must only contain numbers')
       .trim(),
   });
 
@@ -144,4 +144,4 @@ const PinReset = () => {
   );
 };
 
-export default PinReset;
+export default NewPin;

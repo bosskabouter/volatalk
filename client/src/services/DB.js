@@ -1,19 +1,17 @@
-import { openDB } from "idb";
+import { openDB } from 'idb';
 
 const VERSION = 1;
-const dbName = () => "peerdb" + VERSION;
+const dbName = () => 'peerdb' + VERSION;
 
-const OBS_CONTACTS = "CONTACTS";
-const OBS_CONTACTS_ID = "peerid";
-const OBS_CONTACTS_NICKNAME = "user.nickname";
+const OBS_CONTACTS = 'CONTACTS';
+const OBS_CONTACTS_ID = 'peerid';
+const OBS_CONTACTS_NICKNAME = 'user.nickname';
 
-const OBS_MESSAGES = "MESSAGES";
+const OBS_MESSAGES = 'MESSAGES';
 
 const dBase = openDB(dbName(), VERSION, {
   upgrade(db, oldVersion, newVersion, _transaction) {
-    console.warn(
-      `db needs upgrade from version [${oldVersion}] to version[${newVersion}]`
-    );
+    console.warn(`db needs upgrade from version [${oldVersion}] to version[${newVersion}]`);
 
     switch (oldVersion) {
       case oldVersion:
@@ -29,13 +27,9 @@ const dBase = openDB(dbName(), VERSION, {
          * Create an index to search contacts by nickname. We may have duplicates
          * so we can't use a unique index.
          */
-        objstContacts.createIndex(
-          OBS_CONTACTS_NICKNAME,
-          OBS_CONTACTS_NICKNAME,
-          {
-            unique: false,
-          }
-        );
+        objstContacts.createIndex(OBS_CONTACTS_NICKNAME, OBS_CONTACTS_NICKNAME, {
+          unique: false,
+        });
 
         /**
          * FK to Contact's peerid
@@ -48,7 +42,7 @@ const dBase = openDB(dbName(), VERSION, {
         // finished before adding data into it.
         objstContacts.transaction.oncomplete = (e) => {
           // Store values in the newly created objectStore.
-          console.log("DB upgraded. ", e);
+          console.log('DB upgraded. ', e);
         };
         break;
       case VERSION:
@@ -61,13 +55,13 @@ const dBase = openDB(dbName(), VERSION, {
     }
   },
   blocked() {
-    throw Error("Database blocked");
+    throw Error('Database blocked');
   },
   blocking() {
-    throw Error("Database blocking");
+    throw Error('Database blocking');
   },
   terminated() {
-    throw Error("Database Terminated");
+    throw Error('Database Terminated');
   },
 });
 
@@ -75,7 +69,7 @@ const dBase = openDB(dbName(), VERSION, {
  * @returns all registered contacts
  */
 async function queryContacts() {
-  let transaction = dBase.transaction(OBS_CONTACTS, "readonly");
+  let transaction = dBase.transaction(OBS_CONTACTS, 'readonly');
   let contactStore = transaction.objectStore(OBS_CONTACTS);
   return contactStore.getAll();
 }
@@ -86,8 +80,8 @@ async function queryContacts() {
  */
 function persistContact(c) {
   //park transient connection outside while persisting
-  console.log("Persisting contact", c);
-  let transaction = dBase.transaction(OBS_CONTACTS, "readwrite");
+  console.log('Persisting contact', c);
+  let transaction = dBase.transaction(OBS_CONTACTS, 'readwrite');
   let contactStore = transaction.objectStore(OBS_CONTACTS);
   contactStore.put(c);
 }
@@ -98,24 +92,20 @@ function persistContact(c) {
  * @returns Contact with given peerid
  */
 function loadContact(peerid) {
-  console.debug("Loading contact", peerid);
-  let contactObjectstore = dBase
-    .transaction(OBS_CONTACTS, "readonly")
-    .objectStore(OBS_CONTACTS);
+  console.debug('Loading contact', peerid);
+  let contactObjectstore = dBase.transaction(OBS_CONTACTS, 'readonly').objectStore(OBS_CONTACTS);
   return contactObjectstore.get(peerid);
 }
 
 function queryMessages(contact) {
-  let transaction = dBase.transaction(OBS_MESSAGES, "readonly");
+  let transaction = dBase.transaction(OBS_MESSAGES, 'readonly');
   let msgStore = transaction.objectStore(OBS_MESSAGES);
 
   if (!contact) {
     //TODO search unread
     //return msgStore.getAll();
   } else {
-    return msgStore
-      .index(OBS_CONTACTS_ID)
-      .openCursor(IDBKeyRange.only(contact.peerid));
+    return msgStore.index(OBS_CONTACTS_ID).openCursor(IDBKeyRange.only(contact.peerid));
   }
 }
 
@@ -125,16 +115,10 @@ function queryMessages(contact) {
  */
 function persistMessage(m) {
   //park transient connection outside while persisting
-  console.log("Persisting message", m);
-  let transaction = dBase.transaction(OBS_MESSAGES, "readwrite");
+  console.log('Persisting message', m);
+  let transaction = dBase.transaction(OBS_MESSAGES, 'readwrite');
   let store = transaction.objectStore(OBS_MESSAGES);
   store.add(m);
 }
 
-export {
-  persistContact,
-  loadContact,
-  queryContacts,
-  persistMessage,
-  queryMessages,
-};
+export { persistContact, loadContact, queryContacts, persistMessage, queryMessages };
