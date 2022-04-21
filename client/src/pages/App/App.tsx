@@ -7,6 +7,7 @@ import { AuthProvider } from 'providers/AuthProvider';
 import { DatabaseProvider } from 'providers/DatabaseProvider';
 import DialogProvider from 'providers/DialogProvider';
 import { PeerProvider } from 'providers/PeerProvider';
+import { UserProvider } from 'providers/UserProvider';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import store, { persistor } from 'store/store';
@@ -22,11 +23,13 @@ const App = () => {
             <DatabaseProvider>
               <DialogProvider>
                 <AuthProvider>
-                  <PeerProvider>
-                    <Layout>
-                      <AppRoutes />
-                    </Layout>
-                  </PeerProvider>
+                  <UserProvider>
+                    <PeerProvider>
+                      <Layout>
+                        <AppRoutes />
+                      </Layout>
+                    </PeerProvider>
+                  </UserProvider>
                 </AuthProvider>
               </DialogProvider>
             </DatabaseProvider>

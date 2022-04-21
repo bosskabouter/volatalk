@@ -83,7 +83,7 @@ export default class TicTacToe extends React.Component {
 
     const moves = history.map((_step, move) => {
       const desc = move ? 'Go to move #' + move : 'Go to game start';
-      return (  
+      return (
         <li key={move}>
           <button onClick={() => this.jumpTo(move)}>{desc}</button>
         </li>

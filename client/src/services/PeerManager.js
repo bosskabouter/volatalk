@@ -7,9 +7,9 @@ export class PeerManager {
   myPeer;
   connections; //Map <contact.peerid, connection>
 
-  constructor() {
+  constructor(id) {
     //this.init();
-    this.myPeer = new Peer();
+    this.myPeer = new Peer(id);
     console.log('PeerManager created');
   }
 

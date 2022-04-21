@@ -26,13 +26,13 @@ export function usePrevious<T = any>(value: T) {
 }
 
 export type UserProviderProps = {
-  defaultUser?: boolean;
+  defaultUser?: { null };
   onLogin?: () => void;
   onLogout?: () => void;
 };
 
 export const UserProvider: React.FC<UserProviderProps> = ({
-  defaultUser = false,
+  defaultUser = null,
   onLogin,
   onLogout,
   children,
@@ -61,5 +61,5 @@ export const UserProvider: React.FC<UserProviderProps> = ({
     [user]
   );
 
-  return <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>;
+  return <UserContext.Provider value={contextValue}>User: {contextValue} {children}</UserContext.Provider>;
 };

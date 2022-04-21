@@ -1,17 +1,23 @@
-import { createContext, ReactNode, useEffect, useState } from 'react';
+import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { PeerManager } from '../services/PeerManager';
+import { UserContext } from './UserProvider';
 
 interface IPeerProviderProps {
   children: ReactNode;
 }
 
 export const PeerContext = createContext<PeerManager | null>(null);
-export const PeerProvider = ({ children }: IPeerProviderProps) => {
-  const [peer, setPeer] = useState<PeerManager | null>(null);
-  const setupPeer = () => {
-    const newPeer = new PeerManager();
 
-    setPeer(newPeer);
+export const PeerProvider = ({ children }: IPeerProviderProps) => {
+  const userContext = useContext(UserContext);
+
+  const [peer, setPeer] = useState<PeerManager | null>(null);
+
+  const setupPeer = () => {
+    if (userContext?.user) {
+      const newPeer = new PeerManager(userContext.user.peerid);
+      setPeer(newPeer);
+    }
   };
 
   useEffect(() => {

@@ -1,4 +1,3 @@
-import { render } from '@testing-library/react';
 import { IContact } from 'Database/Database';
 import { DatabaseContext } from 'providers/DatabaseProvider';
 import React, { useContext } from 'react';
