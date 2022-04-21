@@ -1,17 +1,18 @@
 /** @jsxImportSource @emotion/react */
 
 import { css } from '@emotion/react';
-import { AppBar, Grid, Typography } from '@mui/material';
+import { AppBar, Grid } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { PeerContext } from 'providers/PeerProvider';
 
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect } from 'react';
 
 const PeerDisplay = () => {
-  const [dateUpdated, setDateUpdated] = useState('');
+
+  
   const theme = useTheme();
 
-  const peer = useContext(PeerContext);
+  const peerManager = useContext(PeerContext);
 
   const styles = {
     footerRoot: css`
@@ -30,7 +31,9 @@ const PeerDisplay = () => {
   return (
     <AppBar css={styles.footerRoot} position="static">
       <Grid container alignItems="center" direction="column">
-        {peer && peer.myPeer ? peer.myPeer.peerid : 'off-line  '}
+        {peerManager && peerManager.myPeer
+          ? (peerManager.myPeer.disconnected ? ' 🚫 ' : ' ✅ ') + peerManager.myPeer.id
+          : 'no peer'}
       </Grid>
     </AppBar>
   );

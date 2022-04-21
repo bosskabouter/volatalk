@@ -34,7 +34,7 @@ export const DatabaseProvider = ({ children }: IDatabaseProviderProps) => {
       },
       (db) => clearAllTables(db)
     );
-    db.version(2);
+    db.version(3);
     setDatabase(db);
   };
 

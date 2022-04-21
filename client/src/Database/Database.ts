@@ -1,6 +1,6 @@
 import Dexie from 'dexie';
 
-const table_name = 'userProfile';
+const tableUser = 'userProfile';
 
 // defines the interface for the db
 export interface IUserProfile {
@@ -21,17 +21,38 @@ export interface IUserProfile {
 
   dateRegistered: Date;
 }
+const tableContacts = 'contacts';
+
+export interface IContact {
+  id?: string;
+
+  peerid: string;
+  nickname: string;
+  dateCreated: Date;
+
+  signature?: string;
+  avatar?: string;
+
+  dateResponded?: Date;
+
+  accepted?: boolean;
+  declined?: boolean;
+}
 
 export class AppDatabase extends Dexie {
   userProfile: Dexie.Table<IUserProfile, number>;
+
+  contacts: Dexie.Table<IContact, number>;
 
   constructor() {
     super('appDatabase');
     // Makes ID the only only index in the table indexable
     this.version(1).stores({
       userProfile: '++id',
+      contacts: '++id',
     });
 
-    this.userProfile = this.table(table_name);
+    this.userProfile = this.table(tableUser);
+    this.contacts = this.table(tableContacts);
   }
 }

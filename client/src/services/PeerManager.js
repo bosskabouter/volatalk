@@ -9,6 +9,7 @@ export class PeerManager {
 
   constructor() {
     //this.init();
+    this.myPeer = new Peer();
     console.log('PeerManager created');
   }
 

@@ -26,6 +26,7 @@ import { setCreated, setIsSecure } from 'store/slices/accountSlice';
 
 import { exportCryptoKey, generateKeyPair, peerIdFromPublicKey } from 'services/Crypto';
 import ImageUpload from 'util/ImageUpload';
+import { UserContext } from 'providers/UserProvider';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -76,6 +77,7 @@ const questions = [
 
 const AccountSetup = () => {
   const { setAuthenticated } = useContext(AuthContext);
+  const { setUser } = useContext(UserContext);
   const dispatch = useDispatch();
   const theme = useTheme();
   const fullScreen = isMobile ? true : false;
@@ -178,6 +180,10 @@ const AccountSetup = () => {
             .catch((err) => {
               console.error(err);
             });
+
+          db.userProfile.get(1).then((user) => {
+            if (user) setUser(user);
+          });
         }
       });
     });

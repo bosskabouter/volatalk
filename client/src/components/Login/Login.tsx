@@ -9,10 +9,13 @@ import { isMobile } from 'react-device-detect';
 import { DatabaseContext } from 'providers/DatabaseProvider';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from 'providers/AuthProvider';
+import { UserContext } from 'providers/UserProvider';
 
 const Login = () => {
   const [loggedIn, setLoggedIn] = useState(false);
   const { setAuthenticated } = useContext(AuthContext);
+  const { setUser } = useContext(UserContext);
+  
   const theme = useTheme();
   const fullScreen = isMobile ? true : false;
   const navigate = useNavigate();
@@ -43,6 +46,7 @@ const Login = () => {
               if (res.pin === values.pin) {
                 setLoggedIn(true);
                 setAuthenticated(true);
+                setUser(res);
                 navigate('/');
               } else {
                 setErrors({ pin: 'Pin does not match' });
@@ -149,3 +153,4 @@ const Login = () => {
 };
 
 export default Login;
+
