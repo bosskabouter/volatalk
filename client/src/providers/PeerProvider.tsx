@@ -15,7 +15,7 @@ export const PeerProvider = ({ children }: IPeerProviderProps) => {
 
   const setupPeer = () => {
     if (userContext?.user) {
-      const newPeer = new PeerManager(userContext.user.peerid);
+      const newPeer = new PeerManager(userContext.user);
       setPeer(newPeer);
     }
   };
