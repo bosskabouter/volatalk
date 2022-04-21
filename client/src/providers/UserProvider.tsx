@@ -61,5 +61,5 @@ export const UserProvider: React.FC<UserProviderProps> = ({
     [user]
   );
 
-  return <UserContext.Provider value={contextValue}>User: {contextValue} {children}</UserContext.Provider>;
+  return <UserContext.Provider value={contextValue}>User: {"something"} {children}</UserContext.Provider>;
 };
