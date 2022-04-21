@@ -7,32 +7,21 @@ export class PeerManager {
   myPeer;
   connections; //Map <contact.peerid, connection>
 
-  constructor(id) {
-    //this.init();
-    this.myPeer = new Peer(id);
-    console.log('PeerManager created');
-  }
-
-  init() {
+  constructor(peerid) {
     if (!this.myPeer) {
       this.connections = new Map();
-      if (!user) {
-        throw Error('No User');
-      }
-
-      let peerid = user.peerid;
 
       if (!peerid || peerid === '') {
         throw Error('User without peerid (public key)');
       }
 
       let connOpts = {
-        host: domain,
-        port: 8443,
-        path: '/pm',
+        host: "volatalk.org",
+        port: 443,
+        path: '/peerjs',
         secure: true,
         key: 'pmkey',
-        debug: 0,
+        debug: 3,
       };
 
       console.debug(`Connecting to peerserver with id and (options):`, peerid, connOpts);

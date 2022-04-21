@@ -9,7 +9,7 @@ export type IUserContext = {
   setUser: (getUser: IUserProfile) => void;
 };
 
-const noop = () => {};
+const noop = () => { /* TODO document why this arrow function is empty */ };
 export const UserContext = React.createContext<IUserContext>({
   user: null,
   setUser: noop,
@@ -61,5 +61,5 @@ export const UserProvider: React.FC<UserProviderProps> = ({
     [user]
   );
 
-  return <UserContext.Provider value={contextValue}>User: {"something"} {children}</UserContext.Provider>;
+  return <UserContext.Provider value={contextValue}>User: {user?.id} {children}</UserContext.Provider>;
 };
