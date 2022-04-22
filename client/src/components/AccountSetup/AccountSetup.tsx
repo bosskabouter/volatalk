@@ -120,6 +120,7 @@ const AccountSetup = () => {
   });
 
   const formik = useFormik({
+
     initialValues: {
       isSecured: false,
 
@@ -174,16 +175,17 @@ const AccountSetup = () => {
               if (formik.values.isSecured) {
                 dispatch(setIsSecure());
               }
+
+              db.userProfile.get(1).then((user) => {
+                if (user) dispatch(setUser(user));
+              });
+
               setAuthenticated(true);
               navigate('/');
             })
             .catch((err) => {
               console.error(err);
             });
-
-          db.userProfile.get(1).then((user) => {
-            if (user) setUser(user);
-          });
         }
       });
     });
@@ -257,7 +259,7 @@ const AccountSetup = () => {
   };
 
   const AuthenticatedAccountSetup = () => {
-    return !formik.values.isSecured ? null : (
+    return !formik.values.isSecured ? (<div></div>) : (
       <div>
         <Typography variant="subtitle1">Create a 6 digit security PIN</Typography>
 
@@ -364,7 +366,7 @@ const AccountSetup = () => {
 
         <form css={styles.form} onSubmit={formik.handleSubmit}>
           <Typography variant="subtitle1">Your nickname: </Typography>
-
+    
           <TextField
             required
             css={styles.accountQuestionAnswer}
@@ -379,7 +381,7 @@ const AccountSetup = () => {
             helperText={formik.touched.nickname && formik.errors.nickname}
           />
           <Typography variant="subtitle1">Avatar: </Typography>
-          <ImageUpload></ImageUpload>
+          <ImageUpload value={formik.values.avatar}/>
           <Typography variant="subtitle1">
             Would you like to use a pin to secure your local data?
           </Typography>

@@ -22,7 +22,7 @@ export const PeerProvider = ({ children }: IPeerProviderProps) => {
 
   useEffect(() => {
     setupPeer();
-  }, []);
+  }, [userContext]);
 
   return <PeerContext.Provider value={peer}>{children}</PeerContext.Provider>;
 };

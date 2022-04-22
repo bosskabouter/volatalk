@@ -11,7 +11,7 @@ import {
 } from './Crypto';
 import { convertStr2ab } from './Generic';
 
-const ERR_CONTACT_RECUSED = 403;
+const ERR_CONTACT_DECLINED_ = 403;
 
 const db = new AppDatabase();
 
@@ -37,7 +37,7 @@ export class PeerManager {
       debug: 3,
     };
 
-    console.debug(`Connecting to peerserver with id and (options):`, user.peerid, connOpts);
+    console.debug(`Connecting to peerserver using ID and (options):`, user.peerid, connOpts);
 
     this.myPeer = new Peer(user.peerid, connOpts);
 
@@ -68,7 +68,7 @@ export class PeerManager {
 
     this.myPeer.on('error', function (err) {
       if (err.type === 'peer-unavailable') {
-        console.warn('PEER offline:' + err);
+        console.warn('PEER UNREACHABLE:' + err);
       } else {
         console.warn(err);
       }

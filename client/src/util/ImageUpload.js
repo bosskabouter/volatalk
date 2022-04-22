@@ -1,26 +1,25 @@
 import React, { useState, useEffect } from 'react';
 
-export default function ImageUpload() {
-  const [images, setImages] = useState([]);
-  const [imageURLS, setImageURLS] = useState([]);
+export default function ImageUpload(props) {
+  const [image, setImage] = useState('');
+  const [imageURL, setImageURL] = useState('');
   useEffect(() => {
-    if (images.length < 1) return;
-    const newImageURLS = [];
-    images.forEach((image) => newImageURLS.push(URL.createObjectURL(image)));
-    setImageURLS(newImageURLS);
-  }, [images]);
+    if (!image) return;
+    const newImageURL = URL.createObjectURL(image);
+    setImageURL(newImageURL);
+  }, image);
 
   function onImageChange(e) {
-    setImages([...e.target.files]);
+    setImage(...e.target.files[0]);
   }
 
   return (
-    <>
-      <input type="file" multiple accept="image/*" onChange={onImageChange} />
-      {imageURLS.map((imageSrc) => (
-        <img width="200px" src={imageSrc} />
-      ))}
-    </>
+    <div>
+      <input type="file" accept="image/*" onChange={onImageChange} />
+      <img width="200px" src={props.value} />
+
+      <img width="200px" src={imageURL}  />
+    </div>
   );
 }
 

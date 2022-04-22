@@ -10,6 +10,7 @@ import { DatabaseContext } from 'providers/DatabaseProvider';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from 'providers/AuthProvider';
 import { UserContext } from 'providers/UserProvider';
+import { useDispatch } from 'react-redux';
 
 const Login = () => {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -20,6 +21,7 @@ const Login = () => {
   const fullScreen = isMobile ? true : false;
   const navigate = useNavigate();
   const db = useContext(DatabaseContext);
+  const dispatch = useDispatch();
 
   const validationSchema = yup.object({
     pin: yup
@@ -47,6 +49,9 @@ const Login = () => {
                 setLoggedIn(true);
                 setAuthenticated(true);
                 setUser(res);
+ //dispatch(setUser(res));
+             
+
                 navigate('/');
               } else {
                 setErrors({ pin: 'Pin does not match' });
