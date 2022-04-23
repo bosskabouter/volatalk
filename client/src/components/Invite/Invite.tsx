@@ -1,10 +1,12 @@
 /** @jsxImportSource @emotion/react */
 
-import React from 'react';
+import React, { useContext } from 'react';
 import { css } from '@emotion/react';
 import QrCode2Icon from '@mui/icons-material/QrCode2';
 import { Button, Dialog, DialogContent, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { QRCodeSVG } from 'qrcode.react';
+import { IUserContext, UserContext } from 'providers/UserProvider';
 
 interface IInvite {
   text: string | undefined;
@@ -13,18 +15,22 @@ interface IInvite {
   url: URL | undefined;
 }
 
+
 class Invite extends React.Component<Record<string, never>, IInvite> {
+
+
   render() {
+   
     return (
-      <Button color="secondary" variant="contained" onClick={() => this.openDialog()}>
-        <QrCode2Icon /> Share Invite
-      </Button>
+      <div>
+       
+        <QRCodeSVG value={this.context.user.peerid}/>
+       
+      </div>
     );
   }
 
   openDialog() {
-
-
     const styles = {
       accountSetupDialogRoot: css`
         display: flex;
@@ -53,4 +59,6 @@ class Invite extends React.Component<Record<string, never>, IInvite> {
   }
 }
 
+Invite.contextType = UserContext;
+  
 export default Invite;

@@ -16,7 +16,7 @@ const Login = () => {
   const [loggedIn, setLoggedIn] = useState(false);
   const { setAuthenticated } = useContext(AuthContext);
   const { setUser } = useContext(UserContext);
-  
+
   const theme = useTheme();
   const fullScreen = isMobile ? true : false;
   const navigate = useNavigate();
@@ -49,8 +49,7 @@ const Login = () => {
                 setLoggedIn(true);
                 setAuthenticated(true);
                 setUser(res);
- //dispatch(setUser(res));
-             
+                //dispatch(setUser(res));
 
                 navigate('/');
               } else {
@@ -158,4 +157,3 @@ const Login = () => {
 };
 
 export default Login;
-

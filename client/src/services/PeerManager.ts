@@ -31,7 +31,7 @@ export class PeerManager {
     const connOpts = {
       host: 'volatalk.org',
       port: 443,
-      path: '/peerjs',  
+      path: '/peerjs',
       secure: true,
       key: 'pmkey',
       debug: 3,
@@ -107,7 +107,7 @@ export class PeerManager {
     const conn = this.connections.get(contact.peerid);
     if (conn) {
       if (conn.open) {
-        console.debug('Connection is open with contact: ', contact.peerid);
+        console.debug('Connection open with contact: ', contact.peerid);
       } else {
         console.debug('Waiting to open connection with contact: ', contact.peerid);
       }
@@ -124,7 +124,7 @@ export class PeerManager {
     //persistMessage(m);
   }
 
-  online() {
+  isOnline() {
     try {
       return this.myPeer && !this.myPeer?.disconnected;
     } catch (error) {
@@ -204,7 +204,7 @@ function receiveUnverifiedPeerConnection(conn: DataConnection) {
  * Incoming connection with valid signature, find the contact
  */
 async function acceptTrustedConnection(conn: DataConnection) {
-  const contact = null; //await loadContact(conn.peer);
+  const contact = await db.contacts.get(conn.peer);
 
   if (!contact) {
     console.debug('Trusted connection with NEW contact', conn);
@@ -218,13 +218,24 @@ async function acceptTrustedConnection(conn: DataConnection) {
 /**
  */
 function acceptTrustedNewContact(conn: DataConnection) {
-  //let contact = new Contact(conn.peer);
-  //contact.userInfo = conn.metadata.userInfo;
-  //TODO notify
-
-  //persistContact(contact);
+  const md = conn.metadata;
+  const otherUser: IUserProfile = conn.metadata.userProfile;
+  const contact: IContact = {
+    peerid: conn.peer,
+    signature: md.signature,
+    nickname: otherUser.nickname,
+    avatar: otherUser.avatar,
+    dateCreated: new Date(),
+    dateResponded: new Date(),
+    accepted: true,
+    declined: false,
+  };
+  db.contacts.add(contact);
+  alert('Contact added: ' + contact.nickname);
+  //let's close for now and reestablish a connection from our side to send our signature
   conn.close();
 }
+
 /**
  * Contact is signature validated and known. Now Validate if we have accepted
  */
@@ -237,7 +248,8 @@ function receiveRegisteredContact(contact: IContact, conn: DataConnection) {
   } else if (contact.accepted) {
     conn.send('Hi!');
     console.debug('Accept peer connection', contact, conn);
-    //TODO NOTIFY USER : CONTACT ONLINE
+
+    alert('Contact online: ' + contact.nickname);
   }
 }
 

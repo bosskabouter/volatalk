@@ -31,7 +31,7 @@ export const RequireAuth = () => {
       return <Navigate to="/login" replace />;
     } else {
       //load user and set in context. Normally login would do this.
-      if (db && ! userCtx.user)
+      if (db && !userCtx.user)
         db.userProfile.get(1).then((user) => {
           if (user) userCtx.setUser(user);
         });

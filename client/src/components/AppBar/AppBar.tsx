@@ -145,8 +145,7 @@ export default function TemporaryDrawer() {
             {theme.direction === 'rtl' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
           </IconButton>
 
-    <PeerDisplay/>
-
+          <PeerDisplay />
         </div>
         <Divider />
         <List>

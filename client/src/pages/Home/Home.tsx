@@ -12,7 +12,6 @@ import { incrementCounter } from 'store/slices/counterSlice';
 const Home = () => {
   const usrCtx = React.useContext(UserContext);
 
-  
   const dispatch = useDispatch();
 
   const handleIncrementClick = (event: React.ChangeEvent<unknown>) => {

@@ -7,10 +7,10 @@ export default function ImageUpload(props) {
     if (!image) return;
     const newImageURL = URL.createObjectURL(image);
     setImageURL(newImageURL);
-  }, image);
+  }, [image]);
 
   function onImageChange(e) {
-    setImage(...e.target.files[0]);
+    setImage(e.target.files[0]);
   }
 
   return (
@@ -18,7 +18,7 @@ export default function ImageUpload(props) {
       <input type="file" accept="image/*" onChange={onImageChange} />
       <img width="200px" src={props.value} />
 
-      <img width="200px" src={imageURL}  />
+      <img width="200px" src={imageURL} />
     </div>
   );
 }

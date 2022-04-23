@@ -10,5 +10,5 @@ test('renders redux counter', () => {
     </Provider>
   );
 
-  expect(getByText(/Redux Counter: 0/i)).toBeInTheDocument();
+  expect(getByText(/Hi/i)).toBeInTheDocument();
 });

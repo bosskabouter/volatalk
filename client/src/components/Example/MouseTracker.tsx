@@ -1,15 +1,18 @@
 import React, { MouseEventHandler } from 'react';
 
-interface IMouseTrackerProps{
-    value:string;
+interface IMouseTrackerProps {
+  value: string;
 }
 interface IMouseTrackerState {
   x: number;
   y: number;
 }
 
-export default class MouseTracker extends React.Component<Record<string, never>, IMouseTrackerState> {
-  constructor(props:Record<string, never>) {
+export default class MouseTracker extends React.Component<
+  Record<string, never>,
+  IMouseTrackerState
+> {
+  constructor(props: Record<string, never>) {
     super(props);
     this.handleMouseMove = this.handleMouseMove.bind(this);
     this.state = { x: 0, y: 0 };

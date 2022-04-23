@@ -10,7 +10,6 @@ interface ContactListItemState {
 }
 
 class ContactListItem extends React.Component<ContactListItemProps, ContactListItemState> {
-  
   state = { contact: this.props.contact };
   render() {
     return <div>{this.state.contact}</div>;

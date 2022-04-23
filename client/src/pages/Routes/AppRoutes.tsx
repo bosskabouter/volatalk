@@ -4,7 +4,7 @@ import AccountSetup from 'components/AccountSetup/AccountSetup';
 import Login from 'components/Login/Login';
 import NewPin from 'components/NewPin/NewPin';
 import PinReset from 'components/PinReset/PinReset';
-import Invite from 'components/Invite/Invite'
+import Invite from 'components/Invite/Invite';
 
 import { Home } from 'pages';
 import { lazy, Suspense } from 'react';
@@ -52,7 +52,7 @@ const AppRoutes = () => (
       </Route>
       <Route element={<NewPin />} path="/newPin" />
       <Route element={<PinReset />} path="/pinReset" />
-      
+
       <Route element={<PageNotFound />} path="*" />
     </Routes>
   </Suspense>
