@@ -34,15 +34,13 @@ const PinReset = () => {
   });
 
   const formik = useFormik({
-
-
     initialValues: {
       answer1: '',
       answer2: '',
     },
     validationSchema: validationSchema,
     onSubmit: (values, { setErrors }) => {
-      if (db !== null) {  
+      if (db !== null) {
         db.userProfile
           .get(1)
           .then((res) => {

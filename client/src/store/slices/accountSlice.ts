@@ -26,5 +26,5 @@ const accountSlice = createSlice({
 const { actions, reducer } = accountSlice;
 export const { setCreated } = actions;
 export const { setIsSecure } = actions;
-
+  
 export default reducer;

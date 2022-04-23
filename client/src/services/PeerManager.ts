@@ -31,7 +31,7 @@ export class PeerManager {
     const connOpts = {
       host: 'volatalk.org',
       port: 443,
-      path: '/peerjs',
+      path: '/peerjs',  
       secure: true,
       key: 'pmkey',
       debug: 3,

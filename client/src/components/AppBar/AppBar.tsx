@@ -5,6 +5,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import HelpOutline from '@mui/icons-material/HelpOutline';
 import HomeIcon from '@mui/icons-material/Home';
 import AccountIcon from '@mui/icons-material/ManageAccounts';
+import QrCode2Icon from '@mui/icons-material/QrCode2';
 
 import PeopleIcon from '@mui/icons-material/People';
 
@@ -25,6 +26,7 @@ import logo from 'assets/images/volatalk-logo-336x280.webp';
 import { Rating } from 'dha-rating';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import PeerDisplay from 'components/PeerDisplay/PeerDisplay';
 
 const drawerWidth = 240;
 
@@ -142,6 +144,9 @@ export default function TemporaryDrawer() {
           <IconButton onClick={handleDrawerClose} size="large">
             {theme.direction === 'rtl' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
           </IconButton>
+
+    <PeerDisplay/>
+
         </div>
         <Divider />
         <List>
@@ -167,6 +172,14 @@ export default function TemporaryDrawer() {
                 <PeopleIcon />
               </ListItemIcon>
               <ListItemText primary="Contacts" />
+            </ListItem>
+          </Link>
+          <Link to="/Invite" css={styles.link}>
+            <ListItem button onClick={handleDrawerClose}>
+              <ListItemIcon>
+                <QrCode2Icon />
+              </ListItemIcon>
+              <ListItemText primary="Invite" />
             </ListItem>
           </Link>
           <Link to="/About" css={styles.link}>

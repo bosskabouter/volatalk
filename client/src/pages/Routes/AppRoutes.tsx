@@ -4,6 +4,8 @@ import AccountSetup from 'components/AccountSetup/AccountSetup';
 import Login from 'components/Login/Login';
 import NewPin from 'components/NewPin/NewPin';
 import PinReset from 'components/PinReset/PinReset';
+import Invite from 'components/Invite/Invite'
+
 import { Home } from 'pages';
 import { lazy, Suspense } from 'react';
 import FadeIn from 'react-fade-in';
@@ -46,9 +48,11 @@ const AppRoutes = () => (
       <Route element={<RequireAuth />}>
         <Route element={<Home />} path="/" />
         <Route element={<About />} path="/about" />
+        <Route element={<Invite />} path="/invite" />
       </Route>
       <Route element={<NewPin />} path="/newPin" />
       <Route element={<PinReset />} path="/pinReset" />
+      
       <Route element={<PageNotFound />} path="*" />
     </Routes>
   </Suspense>
