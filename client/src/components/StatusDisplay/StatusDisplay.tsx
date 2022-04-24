@@ -15,7 +15,7 @@ const StatusDisplay = () => {
   const peerCtx = useContext(PeerContext);
 
   useEffect(() => {
-    doGeo();
+   
     console.info('used effect StatusDsplay..');
   });
 
@@ -35,9 +35,6 @@ const StatusDisplay = () => {
     );
   }
 
-  function doGeo(){
-    Geolocation();
-  }
 
 
   function peerDiv() {

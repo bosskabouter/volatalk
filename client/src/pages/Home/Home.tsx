@@ -8,6 +8,7 @@ import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { State } from 'store/rootReducer';
 import { incrementCounter } from 'store/slices/counterSlice';
+import Geolocation from 'util/GeoLocation';
 
 const Home = () => {
   const usrCtx = React.useContext(UserContext);
@@ -22,7 +23,7 @@ const Home = () => {
     <>
       <Typography gutterBottom>Hi {usrCtx?.user?.nickname}</Typography>
      You are home
-
+<Geolocation></Geolocation>
       <TicTacToe></TicTacToe>
       <MouseTracker />
     </>
