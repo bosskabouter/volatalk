@@ -11,6 +11,7 @@ import { lazy, Suspense } from 'react';
 import FadeIn from 'react-fade-in';
 import { Route, Routes } from 'react-router-dom';
 import { RequireAuth } from './RequireAuth';
+import ContactsPage from 'pages/Contacts/ContactsPage';
 
 // We load each route, when lazy loading, only as they're
 // called by the user. The Home page is not lazily loaded
@@ -49,6 +50,7 @@ const AppRoutes = () => (
         <Route element={<Home />} path="/" />
         <Route element={<About />} path="/about" />
         <Route element={<Invite />} path="/invite" />
+        <Route element={<ContactsPage />} path="/contacts" />
       </Route>
       <Route element={<NewPin />} path="/newPin" />
       <Route element={<PinReset />} path="/pinReset" />
