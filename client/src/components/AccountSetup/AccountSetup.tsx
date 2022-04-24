@@ -132,7 +132,7 @@ const AccountSetup = () => {
       peerid: '',
       privateKey: '',
       nickname: 'Anonymous',
-      avatar: 'https://thispersondoesnotexists.com/image?reload=' + Math.random(),
+      avatar: 'https://thispersondoesnotexist.com/image?reload=' + Math.random(),
 
       dateRegistered: new Date(),
     },

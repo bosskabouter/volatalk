@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 
 import { Button } from '@mui/material';
 import { QRCodeSVG } from 'qrcode.react';
@@ -9,7 +9,11 @@ import { UserContext } from 'providers/UserProvider';
 import CloseIcon from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
 import Snackbar from '@mui/material/Snackbar';
+import { QrReader } from 'react-qr-reader';
 export default function Invite() {
+
+  const [data, setData] = useState('No result');
+
   const [open, setOpen] = React.useState(false);
   const { user } = useContext(UserContext);
 
@@ -40,7 +44,8 @@ export default function Invite() {
     <div>
       <Button onClick={(_e) => handleClick('clicked here!')}>Click</Button>
       <QRCodeSVG value={user?.peerid} />
-
+      <Test></Test>
+      <p>{data}</p>
       <Snackbar
         open={open}
         autoHideDuration={6000}
@@ -51,3 +56,27 @@ export default function Invite() {
     </div>
   );
 }
+
+
+
+const Test = () => {
+  const [data, setData] = useState('No result');
+
+  return (
+    <>
+      <QrReader
+        onResult={(result, error) => {
+          if (!!result) {
+            setData(result?.getText());
+          }
+
+          if (!!error) {
+            console.info("Nothing found: " + error);
+          }
+        } }
+        css={{ width: '100%' }} constraints={{noiseSuppression:true}} />
+      <p>{data}</p>
+    </>
+  );
+};
+

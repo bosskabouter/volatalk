@@ -39,8 +39,9 @@ const StatusDisplay = () => {
     Geolocation();
   }
 
+
   function peerDiv() {
-    return !peerCtx?.myPeer ? (
+    return !peerCtx?.myPeer && myPeerid()? (
       <div>User without peer</div>
     ) : (
       <div className="peerInfo">

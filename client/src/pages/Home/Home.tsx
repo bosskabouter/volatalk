@@ -21,13 +21,9 @@ const Home = () => {
   return (
     <>
       <Typography gutterBottom>Hi {usrCtx?.user?.nickname}</Typography>
-      <Button color="primary" onClick={handleIncrementClick} variant="contained">
-        Increment
-      </Button>
+     You are home
 
-      <Invite></Invite>
       <TicTacToe></TicTacToe>
-      <ContactList></ContactList>
       <MouseTracker />
     </>
   );
