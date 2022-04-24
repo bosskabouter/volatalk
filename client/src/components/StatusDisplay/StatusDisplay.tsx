@@ -7,6 +7,7 @@ import ICON_OFFLINE from '@mui/icons-material/CloudOffRounded';
 
 import { useContext, useEffect } from 'react';
 import { UserContext } from 'providers/UserProvider';
+import Geolocation from 'util/GeoLocation';
 
 const StatusDisplay = () => {
   const userCtx = useContext(UserContext);
@@ -14,6 +15,7 @@ const StatusDisplay = () => {
   const peerCtx = useContext(PeerContext);
 
   useEffect(() => {
+    doGeo();
     console.info('used effect StatusDsplay..');
   });
 
@@ -31,6 +33,10 @@ const StatusDisplay = () => {
     ) : (
       <div className="userInfo">Your nickname: {userCtx.user?.nickname}</div>
     );
+  }
+
+  function doGeo(){
+    Geolocation();
   }
 
   function peerDiv() {
