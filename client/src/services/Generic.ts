@@ -23,10 +23,8 @@ function localLoad(param: string) {
 
 /**
  */
-function getUrlParam(name: string, url: Document['location']) {
-  if (!url) {
-    url = document.location;
-  }
+function getUrlParam(name: string) {
+  const url = document.location;
   name = name.replace(/[[]/, '\\[').replace(/[\]]/, '\\]');
   const regexS = '[\\?&]' + name + '=([^&#]*)';
   const regex = new RegExp(regexS);
@@ -42,7 +40,7 @@ function readFileAsBase64(evt: any) {
   const files = evt?.target?.files;
   const file = files[0];
 
-  return file.arrayBuffer().then((ab: Iterable<number>) => {
+  return file.arrayBuffer().then((ab: ArrayBuffer) => {
     console.debug('File uploaded: ' + ab);
     return convertAbToBase64(ab);
   });
@@ -98,7 +96,7 @@ export function convertBase64ToAb(base64: string) {
   return bytes.buffer;
 }
 
-function convertAbToBase64(buffer: Iterable<number>) {
+function convertAbToBase64(buffer: ArrayBuffer) {
   let binary = '';
   const bytes = new Uint8Array(buffer);
   const len = bytes.byteLength;

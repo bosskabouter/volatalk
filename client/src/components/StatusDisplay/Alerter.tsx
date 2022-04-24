@@ -1,24 +1,20 @@
 /** @jsxImportSource @emotion/react */
 
-import React, { useContext } from 'react';
-
-import { Button } from '@mui/material';
-import { QRCodeSVG } from 'qrcode.react';
-import { UserContext } from 'providers/UserProvider';
+import React from 'react';
 
 import CloseIcon from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
 import Snackbar from '@mui/material/Snackbar';
-export default function Invite() {
-  const [open, setOpen] = React.useState(false);
-  const { user } = useContext(UserContext);
+import { Button } from '@mui/material';
+export default function Alerter() {
+  const [open, setOpen] = React.useState(true);
 
   const handleClick = (txt: string) => {
     console.log(txt);
     setOpen(true);
   };
 
-  const handleClose = (event: React.SyntheticEvent | Event, reason?: string) => {
+  const handleClose = (_event: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
       return;
     }
@@ -38,9 +34,6 @@ export default function Invite() {
 
   return (
     <div>
-      <Button onClick={(_e) => handleClick('clicked here!')}>Click</Button>
-      <QRCodeSVG value={user?.peerid} />
-
       <Snackbar
         open={open}
         autoHideDuration={6000}

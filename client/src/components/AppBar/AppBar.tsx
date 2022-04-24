@@ -26,7 +26,7 @@ import logo from 'assets/images/volatalk-logo-336x280.webp';
 import { Rating } from 'dha-rating';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import PeerDisplay from 'components/PeerDisplay/PeerDisplay';
+import StatusDisplay from 'components/StatusDisplay/StatusDisplay';
 
 const drawerWidth = 240;
 
@@ -145,7 +145,7 @@ export default function TemporaryDrawer() {
             {theme.direction === 'rtl' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
           </IconButton>
 
-          <PeerDisplay />
+          <StatusDisplay />
         </div>
         <Divider />
         <List>

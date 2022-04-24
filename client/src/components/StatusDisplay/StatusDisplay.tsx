@@ -8,7 +8,7 @@ import ICON_OFFLINE from '@mui/icons-material/CloudOffRounded';
 import { useContext, useEffect } from 'react';
 import { UserContext } from 'providers/UserProvider';
 
-const PeerDisplay = () => {
+const StatusDisplay = () => {
   const userCtx = useContext(UserContext);
 
   const peerCtx = useContext(PeerContext);
@@ -22,14 +22,13 @@ const PeerDisplay = () => {
   }
 
   function online() {
-    return peerCtx?.myPeer?.disconnected ? ICON_OFFLINE : ICON_ONLINE;
+    return peerCtx?.myPeer?.disconnected ? <ICON_OFFLINE /> : <ICON_ONLINE />;
   }
 
   function userDiv() {
     return !userCtx.user ? (
       <div>Not logged in</div>
     ) : (
-      //got user
       <div className="userInfo">Your nickname: {userCtx.user?.nickname}</div>
     );
   }
@@ -44,6 +43,7 @@ const PeerDisplay = () => {
           alt={'Your personsal identification icon'}
           width={'90px'}
         />
+        {online()}
       </div>
     );
   }
@@ -55,4 +55,4 @@ const PeerDisplay = () => {
   );
 };
 
-export default PeerDisplay;
+export default StatusDisplay;
