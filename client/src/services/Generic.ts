@@ -6,7 +6,7 @@ const domain = document.location.host;
 
 /**
  */
-function localSave(param: string, value: any) {
+function localSave(param: string, value: unknown) {
   const objToJSON = JSON.stringify(value);
   localStorage.setItem(param, objToJSON);
   console.debug('Saved to local storage param: ' + param, objToJSON);

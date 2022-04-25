@@ -11,60 +11,41 @@ export const WeatherInfo = ({ location }: WeatherInfoProps) => {
   const [weatherToday, setWeatherToday] = useState<string>('Cloudy, little rain');
   const [weatherForecast, setWeatherForecast] = useState<string>('Cloudy, little rain');
 
-  useEffect(() => {
-    if (!location) return;
+  const fetchOpenWeatherData = (urlPrefix: string) => {
+    if (!location) return null;
 
-    const openWeatherReverseLocation = `http://api.openweathermap.org/geo/1.0/reverse?lat=${location.coords.latitude}&lon=${location.coords.longitude}&limit=5&appid=${OPENWEATHER_APIKEY}`;
-    console.log('Fetching geo info: ' + openWeatherReverseLocation);
-    fetch(openWeatherReverseLocation).then((response) => {
+    const openWeatherURL =
+      urlPrefix +
+      `?lat=${location.coords.latitude}&lon=${location.coords.longitude}&limit=5&appid=${OPENWEATHER_APIKEY}`;
+    console.log('Fetching weather from: ' + openWeatherURL);
+    return fetch(openWeatherURL).then((response) => {
       if (response.ok) {
         // if HTTP-status is 200-299
         // get the response body (the method explained below)
         response.json().then((json) => {
           console.log('Response from Openweather: ' + json);
-          setLocationData(JSON.stringify(json));
+          return JSON.stringify(json);
         });
       } else {
-        alert('HTTP-Error: ' + response.status);
+        return null;
       }
+    });
+  };
+
+  useEffect(() => {
+    fetchOpenWeatherData('http://api.openweathermap.org/geo/1.0/reverse')?.then((response) => {
+      setLocationData(JSON.stringify(response));
+    });
+
+    fetchOpenWeatherData('http://api.openweathermap.org/data/2.5/weather')?.then((response) => {
+      setWeatherToday(JSON.stringify(response));
+    });
+
+    fetchOpenWeatherData('http://api.openweathermap.org/data/2.5/forecast')?.then((response) => {
+      setWeatherForecast(JSON.stringify(response));
     });
   });
-  useEffect(() => {
-    if (!location) return;
-    const openWeatherToday = `http://api.openweathermap.org/data/2.5/weather?lat=${location.coords.latitude}&lon=${location.coords.longitude}&limit=5&appid=${OPENWEATHER_APIKEY}`;
-    console.log('Fetching weather today: ' + openWeatherToday);
-    fetch(openWeatherToday).then((response) => {
-      if (response.ok) {
-        // if HTTP-status is 200-299
-        // get the response body (the method explained below)
-        response.json().then((json) => {
-          console.log('Response from Openweather: ' + json);
-          setWeatherToday(JSON.stringify(json));
-        });
-      } else {
-        alert('HTTP-Error: ' + response.status);
-      }
-    });
-  });
 
-  useEffect(() => {
-    if (!location) return;
-
-    const openWeatherForecast = `http://api.openweathermap.org/data/2.5/forecast?lat=${location.coords.latitude}&lon=${location.coords.longitude}&limit=5&appid=${OPENWEATHER_APIKEY}`;
-    console.log('Fetching weather forecast: ' + openWeatherForecast);
-    fetch(openWeatherForecast).then((response) => {
-      if (response.ok) {
-        // if HTTP-status is 200-299
-        // get the response body (the method explained below)
-        response.json().then((json) => {
-          console.log('Response from Openweather: ' + json);
-          setWeatherForecast(JSON.stringify(json));
-        });
-      } else {
-        alert('HTTP-Error: ' + response.status);
-      }
-    });
-  }, []);
   return (
     <>
       <div>{locationData}</div>

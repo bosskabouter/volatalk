@@ -88,7 +88,7 @@ const InviteScanner = () => {
 
   return (
     <>
-      <QrReader 
+      <QrReader
         onResult={(result, error) => {
           if (!!result) {
             checkReceivedInvite(result?.getText());
