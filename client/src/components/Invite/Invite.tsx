@@ -11,14 +11,14 @@ import IconButton from '@mui/material/IconButton';
 import Snackbar from '@mui/material/Snackbar';
 import { QrReader } from 'react-qr-reader';
 import { checkReceivedInvite, makeInvite } from 'services/InvitationService';
+import shareSomething from 'util/Share';
 
 export default function Invite() {
-  const [data, setData] = useState('No result');
   const [openSnackbar, setOpenSnackbar] = React.useState(false);
 
   const { user } = useContext(UserContext);
 
-  const [inviteData, setInviteData] = useState('');
+  const [inviteUrl, setInviteUrl] = useState('');
 
   const handleInviteTextChange = (
     event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
@@ -26,14 +26,15 @@ export default function Invite() {
     const inviteText = event?.target?.value ? event.target?.value : '';
 
     console.debug('Invitation text: ' + inviteText);
-    makeInvite(user, inviteText).then((inviteUrl) => {
-      console.log('Generated new inviteURL: ' + inviteUrl);
-      setInviteData(inviteUrl.text);
+    makeInvite(user, inviteText).then((iUrl) => {
+      console.log('Generated new inviteURL: ' + iUrl);
+      setInviteUrl(iUrl);
       setOpenSnackbar(true);
     });
   };
   const handleShareInvite = (txt: string) => {
     console.log(txt);
+    shareSomething('VolaTALK Invitation', 'Invitation from ' + user.nickname, inviteUrl);
     setOpenSnackbar(true);
   };
 
@@ -68,9 +69,9 @@ export default function Invite() {
       <br />
       <Button onClick={(_e) => handleShareInvite('clicked here!')}>Share Invite!</Button>
       <br />
-      <QRCodeSVG value={inviteData} />
+      <QRCodeSVG value={inviteUrl} size={300} />
       <InviteScanner></InviteScanner>
-      <p>{inviteData}</p>
+      <p>{inviteUrl}</p>
       <Snackbar
         open={openSnackbar}
         autoHideDuration={6000}
@@ -98,7 +99,7 @@ const InviteScanner = () => {
             console.info('Nothing found: ' + error);
           }
         }}
-        css={{ width: '100%' }}
+        css={{ width: '300px' }}
         constraints={{ noiseSuppression: true }}
       />
       <p>{scanResult}</p>

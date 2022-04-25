@@ -45,7 +45,7 @@ export function makeInvite(user: IUserProfile, inviteText: string) {
         '=' +
         sigEncoded;
       console.debug('Signed invitation: ' + url);
-      return { user: user, text: inviteText, signatureB64: sigEncoded, url: URL };
+      return url;
     });
   });
 }
