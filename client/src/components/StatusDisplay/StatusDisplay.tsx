@@ -15,7 +15,6 @@ const StatusDisplay = () => {
   const peerCtx = useContext(PeerContext);
 
   useEffect(() => {
-   
     console.info('used effect StatusDsplay..');
   });
 
@@ -35,10 +34,8 @@ const StatusDisplay = () => {
     );
   }
 
-
-
   function peerDiv() {
-    return !peerCtx?.myPeer && myPeerid()? (
+    return !peerCtx?.myPeer && myPeerid() ? (
       <div>User without peer</div>
     ) : (
       <div className="peerInfo">

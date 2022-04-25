@@ -2,7 +2,7 @@
 
 import React, { useContext, useState } from 'react';
 
-import { Button, Input, TextField } from '@mui/material';
+import { Button, TextField } from '@mui/material';
 import { QRCodeSVG } from 'qrcode.react';
 import { UserContext } from 'providers/UserProvider';
 
@@ -88,7 +88,7 @@ const InviteScanner = () => {
 
   return (
     <>
-      <QrReader
+      <QrReader 
         onResult={(result, error) => {
           if (!!result) {
             checkReceivedInvite(result?.getText());

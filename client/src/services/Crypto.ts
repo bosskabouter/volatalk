@@ -47,7 +47,7 @@ async function generateKeyPair() {
  * @param {*} jwk
  */
 function importPrivateKey(jwk: JsonWebKey) {
-   return importCryptoKey(jwk, true);
+  return importCryptoKey(jwk, true);
 }
 
 /**

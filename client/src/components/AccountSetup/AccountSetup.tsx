@@ -164,12 +164,12 @@ const AccountSetup = () => {
       exportCryptoKey(publicCryptoKey).then((pubKey) => {
         values.peerid = peerIdFromPublicKey(pubKey);
         console.log('Peerid: ' + values.peerid);
-        
+
         exportCryptoKey(keyPair.privateKey).then((jsonPrivateKey) => {
           console.log('jsonPrivateKey: ' + jsonPrivateKey);
 
           values.privateKey = JSON.stringify(jsonPrivateKey);
-       
+
           // Save to database
           if (db !== null) {
             db.userProfile

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { WeatherInfo } from './WeatherInfo';
 
 export default function Geolocation() {
   const [data, setData] = useState<GeolocationPosition | null>(null);
@@ -19,6 +20,7 @@ export default function Geolocation() {
     <>
       <div>{data?.coords?.latitude}</div>
       <div>{data?.coords?.longitude}</div>
+      <WeatherInfo location={data}></WeatherInfo>
     </>
   );
 }
