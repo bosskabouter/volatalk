@@ -1,24 +1,78 @@
-/** @jsxImportSource @emotion/react */
+import React, { useContext } from 'react';
 
-import React, { useContext, useState } from 'react';
+import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
+import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter';
 
-import { Button, TextField } from '@mui/material';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { QRCodeSVG } from 'qrcode.react';
-import { UserContext } from 'providers/UserProvider';
-
-import CloseIcon from '@mui/icons-material/Close';
-import IconButton from '@mui/material/IconButton';
-import Snackbar from '@mui/material/Snackbar';
 import { QrReader } from 'react-qr-reader';
 import { checkReceivedInvite, makeInvite } from 'services/InvitationService';
 import shareSomething from 'util/Share';
+import { Button } from '@mui/material';
+import { UserContext } from 'providers/UserProvider';
+import TextField from '@mui/material/TextField';
+
+import QrCode2Icon from '@mui/icons-material/QrCode2';
+import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 
 export default function Invite() {
-  const [openSnackbar, setOpenSnackbar] = React.useState(false);
+  const [scanOrShow, setScanOrShow] = React.useState<boolean>(true);
+
+  const handleScanOrShow = (_event: React.MouseEvent<HTMLElement>, newScanOrShow: boolean) => {
+    setScanOrShow(newScanOrShow);
+  };
+  const [inviteUrl, setInviteUrl] = React.useState('');
 
   const { user } = useContext(UserContext);
 
-  const [inviteUrl, setInviteUrl] = useState('');
+  const InviteShowQR = () => {
+    const handleShareInvite = (txt: string) => {
+      console.log(txt);
+      shareSomething('VolaTALK Invitation', 'Invitation from ' + user.nickname, inviteUrl);
+
+    };
+
+    return (
+      <>
+        <TextField
+          placeholder="Enter invitation text"
+          variant={'outlined'}
+          label={'Invitation text'}
+          onChange={(value) => handleInviteTextChange(value)}
+        ></TextField>
+
+        <Button onClick={(_e) => handleShareInvite('clicked here!')} variant="contained">
+          Share Invite!
+        </Button>
+        <br />
+        <QRCodeSVG value={inviteUrl} size={300} />
+      </>
+    );
+  };
+
+  const InviteScanner = () => {
+    const [scanResult, setScanResult] = React.useState('No result');
+
+    return (
+      <>
+        <QrReader
+          onResult={(result, error) => {
+            if (!!result) {
+              checkReceivedInvite(result?.getText());
+              setScanResult(result?.getText());
+            }
+
+            if (!!error) {
+              console.info('Nothing found: ' + error);
+            }
+          }}
+          constraints={{ noiseSuppression: true }}
+        />
+        <p>{scanResult}</p>
+      </>
+    );
+  };
 
   const handleInviteTextChange = (
     event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
@@ -29,80 +83,33 @@ export default function Invite() {
     makeInvite(user, inviteText).then((iUrl) => {
       console.log('Generated new inviteURL: ' + iUrl);
       setInviteUrl(iUrl);
-      setOpenSnackbar(true);
+      // setOpenSnackbar(true);
     });
   };
-  const handleShareInvite = (txt: string) => {
-    console.log(txt);
-    shareSomething('VolaTALK Invitation', 'Invitation from ' + user.nickname, inviteUrl);
-    setOpenSnackbar(true);
-  };
-
-  const handleCloseSnackbar = (_event: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-
-    setOpenSnackbar(false);
-  };
-
-  const actionSnackbar = (
-    <React.Fragment>
-      <Button color="secondary" size="small" onClick={handleCloseSnackbar}>
-        UNDO
-      </Button>
-      <IconButton size="small" aria-label="close" color="inherit" onClick={handleCloseSnackbar}>
-        <CloseIcon fontSize="small" />
-      </IconButton>
-    </React.Fragment>
-  );
-
-  return (
-    <div>
-      <TextField
-        placeholder="Enter invitation text"
-        variant={'outlined'}
-        label={'Invitation text'}
-        onChange={(value) => handleInviteTextChange(value)}
-      ></TextField>
-      <br />
-      <br />
-      <Button onClick={(_e) => handleShareInvite('clicked here!')}>Share Invite!</Button>
-      <br />
-      <QRCodeSVG value={inviteUrl} size={300} />
-      <InviteScanner></InviteScanner>
-      <p>{inviteUrl}</p>
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-        message="Note archived"
-        action={actionSnackbar}
-      />
-    </div>
-  );
-}
-
-const InviteScanner = () => {
-  const [scanResult, setScanResult] = useState('No result');
 
   return (
     <>
-      <QrReader
-        onResult={(result, error) => {
-          if (!!result) {
-            checkReceivedInvite(result?.getText());
-            setScanResult(result?.getText());
-          }
 
-          if (!!error) {
-            console.info('Nothing found: ' + error);
-          }
-        }}
-        css={{ width: '300px' }}
-        constraints={{ noiseSuppression: true }}
-      />
-      <p>{scanResult}</p>
+      <ToggleButtonGroup
+        value={scanOrShow}
+        exclusive
+        onChange={handleScanOrShow}
+        aria-label="text alignment"
+      >
+        <ToggleButton value="false">
+          <QrCode2Icon/> Show Your QR Invite
+        </ToggleButton>
+        <ToggleButton value="true">
+          
+          Read someone else Invite
+          <QrCodeScannerIcon />
+          
+        </ToggleButton>
+      </ToggleButtonGroup>
+
+      {scanOrShow ? <InviteShowQR /> : <InviteScanner />}
+
+
     </>
   );
-};
+}

@@ -7,7 +7,9 @@ import ICON_OFFLINE from '@mui/icons-material/CloudOffRounded';
 
 import { useContext, useEffect } from 'react';
 import { UserContext } from 'providers/UserProvider';
-import Geolocation from 'util/GeoLocation';
+import Avatar from '@mui/material/Avatar';
+import Badge from '@mui/material/Badge';
+import { BadgeRounded } from '@mui/icons-material';
 
 const StatusDisplay = () => {
   const userCtx = useContext(UserContext);
@@ -19,7 +21,7 @@ const StatusDisplay = () => {
   });
 
   function myPeerid() {
-    return peerCtx ? peerCtx.myPeer.id : '';
+    return peerCtx ? peerCtx.myPeer.id : '123';
   }
 
   function online() {
@@ -39,11 +41,28 @@ const StatusDisplay = () => {
       <div>User without peer</div>
     ) : (
       <div className="peerInfo">
-        <img
-          src={`data:image/svg+xml;utf8,${identicon(myPeerid())}`}
-          alt={'Your personsal identification icon'}
-          width={'90px'}
-        />
+        <Badge  color="info"
+          overlap="circular"
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          variant="dot"
+        >
+          <Avatar
+            src={`data:image/svg+xml;utf8,${identicon(myPeerid())}`}
+            alt={`${userCtx?.user?.nickname} 's personsal identification icon`}
+          ></Avatar>
+        </Badge>
+
+        <Badge
+        color="primary"
+          overlap="circular"
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          variant="dot"
+        >
+          <Avatar
+            src={`data:image/svg+xml;utf8,${userCtx?.user?.avatar}`}
+            alt={`${userCtx?.user?.nickname} 's personsal identification icon`}
+          ></Avatar>
+        </Badge>
         {online()}
       </div>
     );
