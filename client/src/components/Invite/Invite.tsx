@@ -23,8 +23,10 @@ export default function Invite() {
     event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => {
     const inviteText = event?.target?.value ? event.target?.value : '';
+
+    console.debug('Invitation text: ' + inviteText);
     const inviteUrl = makeInvite(user, inviteText);
-    console.log(inviteUrl);
+    console.log("Generated new inviteURL: " + inviteUrl);
     setData(inviteData);
     setOpen(true);
   };

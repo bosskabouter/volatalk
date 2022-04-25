@@ -1,7 +1,7 @@
 import { DatabaseContext } from 'providers/DatabaseProvider';
 import { UserContext } from 'providers/UserProvider';
 import React, { useContext } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { Navigate, Outlet } from 'react-router';
 import { State } from 'store/rootReducer';
 import { AuthContext } from '../../providers/AuthProvider';

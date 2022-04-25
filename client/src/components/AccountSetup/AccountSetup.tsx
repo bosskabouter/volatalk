@@ -159,33 +159,39 @@ const AccountSetup = () => {
       if (!keyPair) {
         return;
       }
-      const publicCryptoKey: CryptoKey | undefined = keyPair.publicKey;
+      const publicCryptoKey: CryptoKey = keyPair.publicKey;
       if (publicCryptoKey === undefined) return;
       exportCryptoKey(publicCryptoKey).then((pubKey) => {
         values.peerid = peerIdFromPublicKey(pubKey);
-        values.privateKey = JSON.stringify(keyPair.privateKey);
         console.log('Peerid: ' + values.peerid);
-        // Save to database
-        if (db !== null) {
-          db.userProfile
-            .put(values, 1)
-            .then(() => {
-              dispatch(setCreated());
-              if (formik.values.isSecured) {
-                dispatch(setIsSecure());
-              }
+        
+        exportCryptoKey(keyPair.privateKey).then((jsonPrivateKey) => {
+          console.log('jsonPrivateKey: ' + jsonPrivateKey);
 
-              db.userProfile.get(1).then((user) => {
-                if (user) dispatch(setUser(user));
+          values.privateKey = JSON.stringify(jsonPrivateKey);
+       
+          // Save to database
+          if (db !== null) {
+            db.userProfile
+              .put(values, 1)
+              .then(() => {
+                dispatch(setCreated());
+                if (formik.values.isSecured) {
+                  dispatch(setIsSecure());
+                }
+
+                db.userProfile.get(1).then((user) => {
+                  if (user) dispatch(setUser(user));
+                });
+
+                setAuthenticated(true);
+                navigate('/');
+              })
+              .catch((err) => {
+                console.error(err);
               });
-
-              setAuthenticated(true);
-              navigate('/');
-            })
-            .catch((err) => {
-              console.error(err);
-            });
-        }
+          }
+        });
       });
     });
   }
