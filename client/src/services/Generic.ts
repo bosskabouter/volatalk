@@ -23,8 +23,8 @@ function localLoad(param: string) {
 
 /**
  */
-function getUrlParam(name: string) {
-  const url = document.location;
+function getUrlParam(name: string, u: string | null) {
+  const url = !u ? document.location : u;
   name = name.replace(/[[]/, '\\[').replace(/[\]]/, '\\]');
   const regexS = '[\\?&]' + name + '=([^&#]*)';
   const regex = new RegExp(regexS);

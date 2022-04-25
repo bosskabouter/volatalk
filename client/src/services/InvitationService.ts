@@ -53,12 +53,12 @@ export function makeInvite(user: IUserProfile, inviteText: string) {
 
 /**Did we receive an invite from someone, let's 'try to connect
  */
-export function checkReceivedInvite() {
-  const otherPeerId = getUrlParam(URL_PARAM_INVITE_FROM_PEERID);
-  const sigEncoded = getUrlParam(URL_PARAM_INVITE_SIGNATURE);
+export function checkReceivedInvite(url:string) {
+  const otherPeerId = getUrlParam(URL_PARAM_INVITE_FROM_PEERID, url);
+  const sigEncoded = getUrlParam(URL_PARAM_INVITE_SIGNATURE, url);
   if (!otherPeerId || !sigEncoded) return;
 
-  let invitationText = getUrlParam(URL_PARAM_INVITE_KEY);
+  let invitationText = getUrlParam(URL_PARAM_INVITE_KEY, url);
   if (invitationText) invitationText = decodeURI(invitationText);
 
   console.debug('sigEncoded', sigEncoded);
