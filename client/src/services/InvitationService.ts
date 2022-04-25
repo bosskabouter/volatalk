@@ -30,21 +30,20 @@ export function makeInvite(user: IUserProfile, inviteText: string) {
       const sigEncoded = convertAbToBase64(signature);
       console.debug('sigEncoded', sigEncoded);
       const hostEnvUrl = window.location.origin + window.location.pathname;
-      const url: URL = new URL(
+      const url: string =
         hostEnvUrl +
-          '?' +
-          URL_PARAM_INVITE_FROM_PEERID +
-          '=' +
-          user.peerid +
-          '&' +
-          URL_PARAM_INVITE_KEY +
-          '=' +
-          encodeURI(inviteText) +
-          '&' +
-          URL_PARAM_INVITE_SIGNATURE +
-          '=' +
-          sigEncoded
-      );
+        '?' +
+        URL_PARAM_INVITE_FROM_PEERID +
+        '=' +
+        user.peerid +
+        '&' +
+        URL_PARAM_INVITE_KEY +
+        '=' +
+        encodeURI(inviteText) +
+        '&' +
+        URL_PARAM_INVITE_SIGNATURE +
+        '=' +
+        sigEncoded;
       console.debug('Signed invitation: ' + url);
       return { user: user, text: inviteText, signatureB64: sigEncoded, url: URL };
     });
@@ -53,7 +52,7 @@ export function makeInvite(user: IUserProfile, inviteText: string) {
 
 /**Did we receive an invite from someone, let's 'try to connect
  */
-export function checkReceivedInvite(url:string) {
+export function checkReceivedInvite(url: string) {
   const otherPeerId = getUrlParam(URL_PARAM_INVITE_FROM_PEERID, url);
   const sigEncoded = getUrlParam(URL_PARAM_INVITE_SIGNATURE, url);
   if (!otherPeerId || !sigEncoded) return;
@@ -83,4 +82,3 @@ export function checkReceivedInvite(url:string) {
     });
   });
 }
-

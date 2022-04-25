@@ -14,10 +14,11 @@ import { checkReceivedInvite, makeInvite } from 'services/InvitationService';
 
 export default function Invite() {
   const [data, setData] = useState('No result');
-  const [open, setOpen] = React.useState(false);
-  const [inviteData, setInviteData] = useState('No result');
+  const [openSnackbar, setOpenSnackbar] = React.useState(false);
 
   const { user } = useContext(UserContext);
+
+  const [inviteData, setInviteData] = useState('');
 
   const handleInviteTextChange = (
     event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
@@ -25,29 +26,31 @@ export default function Invite() {
     const inviteText = event?.target?.value ? event.target?.value : '';
 
     console.debug('Invitation text: ' + inviteText);
-    const inviteUrl = makeInvite(user, inviteText);
-    console.log("Generated new inviteURL: " + inviteUrl);
-    setData(inviteData);
-    setOpen(true);
+    makeInvite(user, inviteText).then((inviteUrl) => {
+      console.log('Generated new inviteURL: ' + inviteUrl);
+      setInviteData(inviteUrl.text);
+      setOpenSnackbar(true);
+    });
   };
   const handleShareInvite = (txt: string) => {
     console.log(txt);
-    setOpen(true);
+    setOpenSnackbar(true);
   };
 
-  const handleClose = (_event: React.SyntheticEvent | Event, reason?: string) => {
+  const handleCloseSnackbar = (_event: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
       return;
     }
 
-    setOpen(false);
+    setOpenSnackbar(false);
   };
-  const action = (
+
+  const actionSnackbar = (
     <React.Fragment>
-      <Button color="secondary" size="small" onClick={handleClose}>
+      <Button color="secondary" size="small" onClick={handleCloseSnackbar}>
         UNDO
       </Button>
-      <IconButton size="small" aria-label="close" color="inherit" onClick={handleClose}>
+      <IconButton size="small" aria-label="close" color="inherit" onClick={handleCloseSnackbar}>
         <CloseIcon fontSize="small" />
       </IconButton>
     </React.Fragment>
@@ -65,22 +68,22 @@ export default function Invite() {
       <br />
       <Button onClick={(_e) => handleShareInvite('clicked here!')}>Share Invite!</Button>
       <br />
-      <QRCodeSVG value={user?.peerid} />
-      <Test></Test>
-      <p>{data}</p>
+      <QRCodeSVG value={inviteData} />
+      <InviteScanner></InviteScanner>
+      <p>{inviteData}</p>
       <Snackbar
-        open={open}
+        open={openSnackbar}
         autoHideDuration={6000}
-        onClose={handleClose}
+        onClose={handleCloseSnackbar}
         message="Note archived"
-        action={action}
+        action={actionSnackbar}
       />
     </div>
   );
 }
 
-const Test = () => {
-  const [data, setData] = useState('No result');
+const InviteScanner = () => {
+  const [scanResult, setScanResult] = useState('No result');
 
   return (
     <>
@@ -88,7 +91,7 @@ const Test = () => {
         onResult={(result, error) => {
           if (!!result) {
             checkReceivedInvite(result?.getText());
-            setData(result?.getText());
+            setScanResult(result?.getText());
           }
 
           if (!!error) {
@@ -98,7 +101,7 @@ const Test = () => {
         css={{ width: '100%' }}
         constraints={{ noiseSuppression: true }}
       />
-      <p>{data}</p>
+      <p>{scanResult}</p>
     </>
   );
 };
