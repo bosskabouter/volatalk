@@ -29,7 +29,7 @@ export function makeInvite(user: IUserProfile, inviteText: string) {
       console.debug('signature', signature);
       const sigEncoded = convertAbToBase64(signature);
       console.debug('sigEncoded', sigEncoded);
-      const hostEnvUrl = window.location.origin + window.location.pathname;
+      const hostEnvUrl = window.location.origin + "/accepInvite";
       const url: string =
         hostEnvUrl +
         '?' +
@@ -52,19 +52,22 @@ export function makeInvite(user: IUserProfile, inviteText: string) {
 
 /**Did we receive an invite from someone, let's 'try to connect
  */
-export function checkReceivedInvite(url: string) {
-  const otherPeerId = getUrlParam(URL_PARAM_INVITE_FROM_PEERID, url);
-  const sigEncoded = getUrlParam(URL_PARAM_INVITE_SIGNATURE, url);
-  if (!otherPeerId || !sigEncoded) return;
+export function checkReceivedInvite(params: URLSearchParams ) {
+  const otherPeerId = params.get(URL_PARAM_INVITE_FROM_PEERID);
+  const sigEncoded = params.get(URL_PARAM_INVITE_SIGNATURE);
+  if (!otherPeerId || !sigEncoded){
+    console.error("No invite identified: " + params.getAll);
+    return;
+  }
 
-  let invitationText = getUrlParam(URL_PARAM_INVITE_KEY, url);
+  let invitationText = params.get(URL_PARAM_INVITE_KEY);
   if (invitationText) invitationText = decodeURI(invitationText);
 
   console.debug('sigEncoded', sigEncoded);
   const signature = convertBase64ToAb(sigEncoded);
   console.debug('signature', signature);
 
-  importPublicKey(peerIdToPublicKey(otherPeerId)).then((pk) => {
+    importPublicKey(peerIdToPublicKey(otherPeerId)).then((pk) => {
     verifyMessage(otherPeerId + invitationText, signature, pk).then((valid) => {
       if (valid) {
         console.info(

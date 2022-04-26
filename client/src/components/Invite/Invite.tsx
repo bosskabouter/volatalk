@@ -4,7 +4,7 @@ import React, { useContext, useRef } from 'react';
 
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 import { QRCodeSVG } from 'qrcode.react';
 import { QrReader } from 'react-qr-reader';
@@ -93,12 +93,14 @@ export default function Invite() {
         <QrReader
           onResult={(result, error) => {
             if (!!result) {
-              checkReceivedInvite(result?.getText());
-              setScanResult(result?.getText());
+              const url = result?.getText();
+              setScanResult(url);
+              const u = new URL(url);
+              checkReceivedInvite(u.searchParams);
             }
 
             if (!!error) {
-              console.info('Nothing found: ' + error);
+              console.info('Scanned nothing... ' + error);
             }
           }}
           constraints={{ noiseSuppression: true }}

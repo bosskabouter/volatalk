@@ -19,7 +19,7 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { isMobile } from 'react-device-detect';
 import { DatabaseContext } from 'providers/DatabaseProvider';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { AuthContext } from 'providers/AuthProvider';
 import { useDispatch } from 'react-redux';
 import { setCreated, setIsSecure } from 'store/slices/accountSlice';
@@ -27,6 +27,7 @@ import { setCreated, setIsSecure } from 'store/slices/accountSlice';
 import { exportCryptoKey, generateKeyPair, peerIdFromPublicKey } from 'services/Crypto';
 import ImageUpload from 'util/ImageUpload';
 import { UserContext } from 'providers/UserProvider';
+import { NoPhotographyTwoTone } from '@mui/icons-material';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -83,6 +84,8 @@ const AccountSetup = () => {
   const fullScreen = isMobile ? true : false;
   const navigate = useNavigate();
   const db = useContext(DatabaseContext);
+  
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const validationSchema = yup.object({
     nickname: yup
@@ -142,6 +145,7 @@ const AccountSetup = () => {
     },
   });
 
+
   function registerUser(values: {
     isSecured: boolean;
     pin: string;
@@ -185,7 +189,8 @@ const AccountSetup = () => {
                 });
 
                 setAuthenticated(true);
-                navigate('/');
+                  
+                navigate('/',  { replace: false });
               })
               .catch((err) => {
                 console.error(err);

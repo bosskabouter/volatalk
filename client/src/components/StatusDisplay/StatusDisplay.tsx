@@ -32,7 +32,7 @@ const StatusDisplay = () => {
     return !userCtx.user ? (
       <div>Not logged in</div>
     ) : (
-      <div className="userInfo">Your nickname: {userCtx.user?.nickname}</div>
+      <div className="userInfo">{userCtx.user?.nickname}</div>
     );
   }
 

@@ -1,30 +1,30 @@
 import { IContact } from 'Database/Database';
+import Avatar from '@mui/material/Avatar';
 import { DatabaseContext } from 'providers/DatabaseProvider';
-import React, { useContext } from 'react';
-
-interface ContactListState {
-  contacts: Array<IContact>;
-}
+import React, { useContext, useState } from 'react';
 
 const ContactList = () => {
   const db = useContext(DatabaseContext);
+  const [contactList, setContactList] = useState<IContact[]>();
 
   if (db !== null) {
-    const contactList =
-      db.contacts.count.length > 1 ? (
-        db.contacts.each((contact) => {
-          return <li key={contact.peerid}> {contact.nickname}</li>;
-        })
-      ) : (
-        <li>No Contacts</li>
-      );
-    return (
-      <div>
-        <ol>{contactList}</ol>
-      </div>
-    );
+    db.contacts.toArray().then((cts) => {
+      setContactList(cts);
+    });
   }
-  return <></>;
-};
 
+  return (
+    <div>
+      <ul>
+        {contactList &&
+          contactList.map((contact) => (
+            <li key={contact.peerid}>
+              <Avatar src="{contact.avatar}"></Avatar>
+              {contact.nickname}
+            </li>
+          ))}
+      </ul>
+    </div>
+  );
+};
 export default ContactList;

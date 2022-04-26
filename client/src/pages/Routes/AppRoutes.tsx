@@ -9,9 +9,10 @@ import Invite from 'components/Invite/Invite';
 import { Home } from 'pages';
 import { lazy, Suspense } from 'react';
 import FadeIn from 'react-fade-in';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useParams } from 'react-router-dom';
 import { RequireAuth } from './RequireAuth';
 import ContactsPage from 'pages/Contacts/ContactsPage';
+import AcceptInvite from 'components/Invite/AcceptInvite';
 
 // We load each route, when lazy loading, only as they're
 // called by the user. The Home page is not lazily loaded
@@ -23,7 +24,14 @@ import ContactsPage from 'pages/Contacts/ContactsPage';
 const About = lazy(() => import('components/About/About'));
 // const Home = lazy(() => import('../../pages/Home/Home'));
 
+
+
 const AppRoutes = () => (
+  
+  //CHECK FOR INVITE PARAMS TO PASS ALONG EULA AND AccountSetup
+  
+
+
   // Suspense tells React that the data a component is reading
   // needs some time to wait. It does not tie your network logic
   // to React components.
@@ -42,9 +50,12 @@ const AppRoutes = () => (
     }
   >
     <Routes>
+      <Route element={<AcceptInvite />} path="/acceptInvite" />
+  
       <Route element={<EULA />} path="/eula" />
       <Route element={<Login />} path="/login" />
-      <Route element={<AccountSetup />} path="/accountSetup" />
+      <Route element={<AccountSetup />} path="/accountSetup"  />
+      
       {/* The RequireAuth component is a wrapper for all the routes that require authentication */}
       <Route element={<RequireAuth />}>
         <Route element={<Home />} path="/" />
