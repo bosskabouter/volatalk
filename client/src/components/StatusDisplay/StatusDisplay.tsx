@@ -41,7 +41,8 @@ const StatusDisplay = () => {
       <div>User without peer</div>
     ) : (
       <div className="peerInfo">
-        <Badge  color="info"
+        <Badge
+          color="info"
           overlap="circular"
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
           variant="dot"
@@ -53,7 +54,7 @@ const StatusDisplay = () => {
         </Badge>
 
         <Badge
-        color="primary"
+          color="primary"
           overlap="circular"
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
           variant="dot"

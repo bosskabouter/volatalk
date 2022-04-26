@@ -84,7 +84,7 @@ const AccountSetup = () => {
   const fullScreen = isMobile ? true : false;
   const navigate = useNavigate();
   const db = useContext(DatabaseContext);
-  
+
   const [searchParams, setSearchParams] = useSearchParams();
 
   const validationSchema = yup.object({
@@ -145,7 +145,6 @@ const AccountSetup = () => {
     },
   });
 
-
   function registerUser(values: {
     isSecured: boolean;
     pin: string;
@@ -189,8 +188,8 @@ const AccountSetup = () => {
                 });
 
                 setAuthenticated(true);
-                  
-                navigate('/',  { replace: false });
+
+                navigate('/', { replace: false });
               })
               .catch((err) => {
                 console.error(err);

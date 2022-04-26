@@ -1,4 +1,4 @@
-import { checkReceivedInvite, makeInvite } from 'services/InvitationService';
+import { extractInvite, IInvite, makeInviteURL } from 'services/InvitationService';
 
 import React, { useContext, useRef } from 'react';
 
@@ -19,6 +19,7 @@ import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import Dialog from '@mui/material/Dialog';
 
 import Close from '@mui/icons-material/Close';
+import NavigationFullscreenExit from 'material-ui/svg-icons/navigation/fullscreen-exit';
 
 export default function Invite() {
   const inputRef = useRef();
@@ -46,9 +47,9 @@ export default function Invite() {
       const inviteText = event.target.value;
 
       console.debug('Invitation text: ' + inviteText);
-      makeInvite(user, inviteText).then((iUrl) => {
+      makeInviteURL(user, inviteText).then((iUrl) => {
         console.log('Generated new inviteURL: ' + iUrl);
-        setInviteUrl(iUrl);
+        setInviteUrl(iUrl.toString());
       });
     };
 
@@ -87,16 +88,20 @@ export default function Invite() {
 
   const DisplayScanner = () => {
     const [scanResult, setScanResult] = React.useState('No result');
+    const [invite, setInvite] = React.useState<IInvite | null>();
 
     return (
       <>
+        {invite ?? <br />}
         <QrReader
           onResult={(result, error) => {
             if (!!result) {
               const url = result?.getText();
               setScanResult(url);
               const u = new URL(url);
-              checkReceivedInvite(u.searchParams);
+              extractInvite(u.searchParams).then((inv) => {
+                setInvite(inv);
+              });
             }
 
             if (!!error) {

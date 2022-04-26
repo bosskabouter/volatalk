@@ -5,23 +5,20 @@ import {
   signMessage,
   verifyMessage,
 } from './Crypto';
-import { convertAbToBase64, convertBase64ToAb, getUrlParam } from './Generic';
+import { convertAbToBase64, convertBase64ToAb } from './Generic';
 import { IUserProfile } from 'Database/Database';
 
-const URL_PARAM_INVITE_FROM_PEERID = 'f';
-const URL_PARAM_INVITE_KEY = 'w';
-const URL_PARAM_INVITE_SIGNATURE = 's';
+export const INVITE_PARAM = { FROM: 'f', KEY: 'k', SIGNATURE: 's' };
 
-interface IInvite {
-  readonly user: IUserProfile;
-  readonly signatureB64: string;
-  readonly url: URL;
-  text?: string;
+export interface IInvite {
+  peerId: string;
+  text: string;
+  signature: ArrayBuffer;
 }
 /**
  * TODO: add expiration date
  */
-export function makeInvite(user: IUserProfile, inviteText: string) {
+export function makeInviteURL(user: IUserProfile, inviteText: string) {
   return importPrivateKey(JSON.parse(user.privateKey)).then((pk) => {
     const signedMessage = user.peerid + inviteText;
     console.debug('Signing message: ' + signedMessage);
@@ -29,58 +26,53 @@ export function makeInvite(user: IUserProfile, inviteText: string) {
       console.debug('signature', signature);
       const sigEncoded = convertAbToBase64(signature);
       console.debug('sigEncoded', sigEncoded);
-      const hostEnvUrl = window.location.origin + "/accepInvite";
-      const url: string =
-        hostEnvUrl +
-        '?' +
-        URL_PARAM_INVITE_FROM_PEERID +
-        '=' +
-        user.peerid +
-        '&' +
-        URL_PARAM_INVITE_KEY +
-        '=' +
-        encodeURI(inviteText) +
-        '&' +
-        URL_PARAM_INVITE_SIGNATURE +
-        '=' +
-        sigEncoded;
-      console.debug('Signed invitation: ' + url);
-      return url;
+      const hostEnvUrl = window.location.origin + '/acceptInvite';
+
+      const realURL = new URL(hostEnvUrl);
+      realURL.searchParams.append(INVITE_PARAM.FROM, user.peerid);
+
+      realURL.searchParams.append(INVITE_PARAM.KEY, inviteText);
+
+      realURL.searchParams.append(INVITE_PARAM.SIGNATURE, sigEncoded);
+
+      console.debug('Signed invitation: ' + realURL);
+      return realURL;
     });
   });
 }
 
 /**Did we receive an invite from someone, let's 'try to connect
  */
-export function checkReceivedInvite(params: URLSearchParams ) {
-  const otherPeerId = params.get(URL_PARAM_INVITE_FROM_PEERID);
-  const sigEncoded = params.get(URL_PARAM_INVITE_SIGNATURE);
-  if (!otherPeerId || !sigEncoded){
-    console.error("No invite identified: " + params.getAll);
-    return;
+export async function extractInvite(params: URLSearchParams) {
+  const otherPeerId = params.get(INVITE_PARAM.FROM);
+  const sigEncoded = params.get(INVITE_PARAM.SIGNATURE);
+  if (!otherPeerId || !sigEncoded) {
+    console.error('No invite identified: ' + params.getAll);
+    return null;
   }
 
-  let invitationText = params.get(URL_PARAM_INVITE_KEY);
+  let invitationText = params.get(INVITE_PARAM.KEY);
+
   if (invitationText) invitationText = decodeURI(invitationText);
+  if (!invitationText) invitationText = '';
 
   console.debug('sigEncoded', sigEncoded);
   const signature = convertBase64ToAb(sigEncoded);
   console.debug('signature', signature);
 
-    importPublicKey(peerIdToPublicKey(otherPeerId)).then((pk) => {
-    verifyMessage(otherPeerId + invitationText, signature, pk).then((valid) => {
+  const invite: IInvite = { peerId: otherPeerId, signature: signature, text: invitationText };
+
+  return importPublicKey(peerIdToPublicKey(otherPeerId)).then((pk) => {
+    return verifyMessage(otherPeerId + invitationText, signature, pk).then((valid) => {
       if (valid) {
-        console.info(
-          'Invitation verified. Sending contact request: ' +
-            invitationText +
-            ', peerid: ' +
-            otherPeerId
-        );
-        //sendContactRequest(otherPeerId, invitationText);
+        console.info('Invitation verified.');
+        return invite;
       } else {
         const msg = 'Invalid signature in invitation: ' + invitationText;
         console.warn(msg);
         alert(msg);
+
+        return null;
       }
     });
   });

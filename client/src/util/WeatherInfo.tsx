@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-
+//import axios from "Axios";
 interface WeatherInfoProps {
   location: GeolocationPosition | null;
 }
@@ -44,7 +44,7 @@ export const WeatherInfo = ({ location }: WeatherInfoProps) => {
     fetchOpenWeatherData('http://api.openweathermap.org/data/2.5/forecast')?.then((response) => {
       setWeatherForecast(JSON.stringify(response));
     });
-  });
+  }, [locationData]);
 
   return (
     <>

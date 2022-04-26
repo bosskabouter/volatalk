@@ -24,13 +24,8 @@ import AcceptInvite from 'components/Invite/AcceptInvite';
 const About = lazy(() => import('components/About/About'));
 // const Home = lazy(() => import('../../pages/Home/Home'));
 
-
-
 const AppRoutes = () => (
-  
   //CHECK FOR INVITE PARAMS TO PASS ALONG EULA AND AccountSetup
-  
-
 
   // Suspense tells React that the data a component is reading
   // needs some time to wait. It does not tie your network logic
@@ -51,11 +46,11 @@ const AppRoutes = () => (
   >
     <Routes>
       <Route element={<AcceptInvite />} path="/acceptInvite" />
-  
+
       <Route element={<EULA />} path="/eula" />
       <Route element={<Login />} path="/login" />
-      <Route element={<AccountSetup />} path="/accountSetup"  />
-      
+      <Route element={<AccountSetup />} path="/accountSetup" />
+
       {/* The RequireAuth component is a wrapper for all the routes that require authentication */}
       <Route element={<RequireAuth />}>
         <Route element={<Home />} path="/" />
