@@ -46,34 +46,40 @@ export function makeInviteURL(user: IUserProfile, inviteText: string) {
 export async function extractInvite(params: URLSearchParams) {
   const otherPeerId = params.get(INVITE_PARAM.FROM);
   const sigEncoded = params.get(INVITE_PARAM.SIGNATURE);
-  if (!otherPeerId || !sigEncoded) {
-    console.error('No invite identified: ' + params.getAll);
+  const invitationText = params.get(INVITE_PARAM.KEY);
+
+  if (
+    !params.has(INVITE_PARAM.FROM) ||
+    !otherPeerId ||
+    !params.has(INVITE_PARAM.SIGNATURE) ||
+    !sigEncoded ||
+    !params.has(INVITE_PARAM.KEY) ||
+    !invitationText
+  ) {
+    alert('Incomplete invitation data.');
     return null;
   }
 
-  let invitationText = params.get(INVITE_PARAM.KEY);
-
-  if (invitationText) invitationText = decodeURI(invitationText);
-  if (!invitationText) invitationText = '';
-
   console.debug('sigEncoded', sigEncoded);
-  const signature = convertBase64ToAb(sigEncoded);
-  console.debug('signature', signature);
+  const sig = sigEncoded ? convertBase64ToAb(sigEncoded) : new ArrayBuffer(0);
+  console.debug('signature', sig);
 
-  const invite: IInvite = { peerId: otherPeerId, signature: signature, text: invitationText };
+  const invite: IInvite = {
+    peerId: otherPeerId,
+    signature: sig,
+    text: invitationText,
+  };
+  const pk = await importPublicKey(peerIdToPublicKey(otherPeerId));
 
-  return importPublicKey(peerIdToPublicKey(otherPeerId)).then((pk) => {
-    return verifyMessage(otherPeerId + invitationText, signature, pk).then((valid) => {
-      if (valid) {
-        console.info('Invitation verified.');
-        return invite;
-      } else {
-        const msg = 'Invalid signature in invitation: ' + invitationText;
-        console.warn(msg);
-        alert(msg);
+  const verified = await verifyMessage(otherPeerId + invitationText, sig, pk);
 
-        return null;
-      }
-    });
-  });
+  if (verified) {
+    console.info('Invitation verified.');
+    return invite;
+  } else {
+    const msg = 'Invalid signature in invitation: ' + invitationText;
+    console.warn(msg);
+    alert(msg);
+    return null;
+  }
 }
