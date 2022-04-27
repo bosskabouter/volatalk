@@ -29,7 +29,7 @@ export interface IContact {
   nickname: string;
   dateCreated: Date;
 
-  signature?: string;
+  signature: ArrayBuffer;
   avatar?: string;
 
   dateResponded?: Date;

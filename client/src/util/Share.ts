@@ -2,14 +2,14 @@
  */
 export default function shareSomething(title: string, inviteText: string, url: string) {
   function shareMobile() {
-    const shareData = {
+    const share: ShareData = {
       title: title,
       text: inviteText,
       url: url,
     };
 
-    navigator.share(shareData);
-    console.log('Shared data: ' + shareData);
+    navigator.share(share);
+    console.log('Shared data: ' + share);
   }
 
   /**

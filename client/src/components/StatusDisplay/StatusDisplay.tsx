@@ -9,7 +9,6 @@ import { useContext, useEffect } from 'react';
 import { UserContext } from 'providers/UserProvider';
 import Avatar from '@mui/material/Avatar';
 import Badge from '@mui/material/Badge';
-import { BadgeRounded } from '@mui/icons-material';
 
 const StatusDisplay = () => {
   const userCtx = useContext(UserContext);

@@ -18,8 +18,9 @@ const db = new AppDatabase();
 export class PeerManager {
   user: IUserProfile;
   myPeer: Peer;
+
   connections: Map<string, DataConnection>;
-  //static user = UserContext.Consumer;
+
   constructor(user: IUserProfile) {
     this.user = user;
     this.connections = new Map();
@@ -34,7 +35,7 @@ export class PeerManager {
       path: '/peerjs',
       secure: true,
       key: 'pmkey',
-      debug: 3,
+      debug: 1,
     };
 
     console.debug(`Connecting to peerserver using ID and (options):`, user.peerid, connOpts);
@@ -83,11 +84,13 @@ export class PeerManager {
   initiateConnection(contact: IContact) {
     //do not send private key / passwordhash to other side
 
-    const signature: Uint8Array = convertStr2ab(contact.signature ? contact.signature : '');
-
     const options = {
       metadata: {
-        signature: JSON.stringify(Array.from(new Uint32Array(signature))),
+        signature: JSON.stringify(contact.signature),
+        nickname: JSON.stringify(this.user.nickname),
+        avatar: JSON.stringify(this.user.avatar),
+        dateRegistered: JSON.stringify(this.user.dateRegistered),
+        peerid: JSON.stringify(this.user.peerid),
       },
     };
 
@@ -99,8 +102,8 @@ export class PeerManager {
       console.debug('Connection ' + contact + ' Received DATA: ', data);
       receiveMessage(data, contact);
     });
-
     console.debug('Connecting to: ' + connection.metadata, connection);
+    return connection;
   }
 
   checkConnection(contact: IContact) {

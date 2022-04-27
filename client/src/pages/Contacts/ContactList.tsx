@@ -1,7 +1,9 @@
 import { IContact } from 'Database/Database';
-import Avatar from '@mui/material/Avatar';
+
 import { DatabaseContext } from 'providers/DatabaseProvider';
-import React, { useContext, useState } from 'react';
+import { useContext, useState } from 'react';
+import Badge from '@mui/material/Badge';
+import Avatar from '@mui/material/Avatar';
 
 const ContactList = () => {
   const db = useContext(DatabaseContext);
@@ -19,7 +21,19 @@ const ContactList = () => {
         {contactList &&
           contactList.map((contact) => (
             <li key={contact.peerid}>
-              <Avatar src="{contact.avatar}"></Avatar>
+              <Badge
+                color="info"
+                overlap="circular"
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                variant="dot"
+              >
+                <Avatar
+                  src={`data:image/svg+xml;utf8,${contact.peerid}`}
+                  alt={`${contact.nickname} 's personsal identification icon`}
+                ></Avatar>
+              </Badge>
+
+              <Avatar src={contact.avatar}></Avatar>
               {contact.nickname}
             </li>
           ))}
