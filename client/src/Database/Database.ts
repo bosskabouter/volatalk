@@ -8,7 +8,15 @@ const tableMessages = 'messages';
 export interface IUserProfile {
   id?: string;
 
+  /**
+   * Indicates if user uses a pin secured context
+   */
   isSecured: boolean;
+  /**
+   * Indicates if user wants to be be searchable by nickname. PeerManager will instantiate a second peer connection using the user's nickname.
+   */
+  isSearchable: boolean;
+
   pin: string;
   question1: string;
   answer1: string;

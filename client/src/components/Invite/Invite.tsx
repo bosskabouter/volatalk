@@ -10,13 +10,12 @@ import { QRCodeSVG } from 'qrcode.react';
 import { QrReader } from 'react-qr-reader';
 
 import shareSomething from 'util/Share';
-import { Box, Button } from '@mui/material';
+import { Box, Button, Dialog } from '@mui/material';
 import { UserContext } from 'providers/UserProvider';
 import TextField from '@mui/material/TextField';
 
 import QrCode2Icon from '@mui/icons-material/QrCode';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
-import Dialog from '@mui/material/Dialog';
 
 import Close from '@mui/icons-material/Close';
 import NavigationFullscreenExit from 'material-ui/svg-icons/navigation/fullscreen-exit';

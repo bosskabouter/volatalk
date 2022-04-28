@@ -48,6 +48,7 @@
     "@mui/material": "^5.2.8",
     "@reduxjs/toolkit": "^1.7.1",
     "@typescript-eslint/eslint-plugin-tslint": "^5.9.1",
+    "axios": "^0.27.2",
     "dexie": "^3.2.0",
     "dha-dexie-encrypted": "^0.2.0",
     "dha-encryption": "^2.0.0",

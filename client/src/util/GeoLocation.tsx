@@ -18,8 +18,6 @@ export default function Geolocation() {
 
   return (
     <>
-      <div>{data?.coords?.latitude}</div>
-      <div>{data?.coords?.longitude}</div>
       <WeatherInfo location={data}></WeatherInfo>
     </>
   );
