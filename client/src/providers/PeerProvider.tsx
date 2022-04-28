@@ -11,13 +11,13 @@ export const PeerContext = createContext<PeerManager | null>(null);
 export const PeerProvider = ({ children }: IPeerProviderProps) => {
   const userContext = useContext(UserContext);
 
-  const [peer, setPeer] = useState<PeerManager | null>(null);
+  const [peerManager, setPeerManager] = useState<PeerManager | null>(null);
 
   useEffect(() => {
     if (userContext?.user) {
-      setPeer(new PeerManager(userContext.user));
+      setPeerManager(new PeerManager({ user: userContext.user }));
     }
   }, [userContext]);
 
-  return <PeerContext.Provider value={peer}>{children}</PeerContext.Provider>;
+  return <PeerContext.Provider value={peerManager}>{children}</PeerContext.Provider>;
 };

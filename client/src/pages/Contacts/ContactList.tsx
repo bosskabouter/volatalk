@@ -1,5 +1,6 @@
 import { IContact } from 'Database/Database';
 
+import { PeerContext } from 'providers/PeerProvider';
 import { DatabaseContext } from 'providers/DatabaseProvider';
 import { useContext, useState } from 'react';
 import Badge from '@mui/material/Badge';
@@ -7,6 +8,7 @@ import Avatar from '@mui/material/Avatar';
 
 const ContactList = () => {
   const db = useContext(DatabaseContext);
+  const peerManager = useContext(PeerContext);
   const [contactList, setContactList] = useState<IContact[]>();
 
   if (db !== null) {
@@ -22,7 +24,7 @@ const ContactList = () => {
           contactList.map((contact) => (
             <li key={contact.peerid}>
               <Badge
-                color="info"
+                color={peerManager?.isConnectedWith(contact) ? 'success' : 'default'}
                 overlap="circular"
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                 variant="dot"
