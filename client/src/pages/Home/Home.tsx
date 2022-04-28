@@ -10,8 +10,8 @@ const Home = () => {
 
   return (
     <>
-      <Typography gutterBottom>Hi {usrCtx?.user?.nickname}<Geolocation></Geolocation></Typography>
-          
+      <Typography gutterBottom>Hi {usrCtx?.user?.nickname}</Typography>
+      <Geolocation></Geolocation>
 
     </>
   );
