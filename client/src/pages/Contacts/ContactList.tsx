@@ -2,7 +2,7 @@ import { IContact } from 'Database/Database';
 
 import { PeerContext } from 'providers/PeerProvider';
 import { DatabaseContext } from 'providers/DatabaseProvider';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import Badge from '@mui/material/Badge';
 import Avatar from '@mui/material/Avatar';
 
@@ -11,11 +11,16 @@ const ContactList = () => {
   const peerManager = useContext(PeerContext);
   const [contactList, setContactList] = useState<IContact[]>();
 
-  if (db !== null) {
-    db.contacts.toArray().then((cts) => {
-      setContactList(cts);
-    });
-  }
+  useEffect(() => {
+    if (db !== null) {
+      db.contacts.toArray().then((cts) => {
+        setContactList(cts);
+        cts.forEach((contact) => {
+          peerManager?.initiateConnection(contact);
+        });
+      });
+    }
+  }, [db, peerManager]);
 
   return (
     <div>

@@ -18,6 +18,14 @@ import { PeerContext } from 'providers/PeerProvider';
 
 const ERR_CONTACT_DECLINED_ = 403;
 
+export interface ConnectionMetadata {
+  peerid: string;
+  signature: string;
+  nickname: string;
+  avatar: string;
+  dateRegistered: Date;
+}
+
 //const db = new AppDatabase();
 interface PeerManagerProps {
   user: IUserProfile;
@@ -29,8 +37,6 @@ interface PeerManagerState {
 }
 
 export class PeerManager extends React.Component<PeerManagerProps, PeerManagerState> {
-
-  
   constructor(props: PeerManagerProps) {
     super(props);
 
@@ -42,7 +48,7 @@ export class PeerManager extends React.Component<PeerManagerProps, PeerManagerSt
       key: 'pmkey',
       debug: 1,
     };
-   //const db = React.useContext(DatabaseContext);
+    //const db = React.useContext(DatabaseContext);
     console.debug(
       `Connecting to peerserver using ID and (options):`,
       this.props.user.peerid,
@@ -52,7 +58,7 @@ export class PeerManager extends React.Component<PeerManagerProps, PeerManagerSt
     const myPeer = new Peer(this.props.user.peerid, connOpts);
 
     myPeer.on('open', (pid) => {
-     // this.setState({ online: true });
+      // this.setState({ online: true });
       console.log('connected: ' + myPeer.id);
 
       if (pid !== props.user.peerid) {
@@ -95,16 +101,20 @@ export class PeerManager extends React.Component<PeerManagerProps, PeerManagerSt
    * Public info and the signature to other peer for validation.
    * @param {*} contact
    */
+
   initiateConnection(contact: IContact) {
     //do not send private key / passwordhash to other side
+    const md: ConnectionMetadata = {
+      signature: JSON.stringify(contact.signature),
+      nickname: JSON.stringify(this.props.user.nickname),
+      avatar: JSON.stringify(this.props.user.avatar),
+      dateRegistered: this.props.user.dateRegistered,
+      peerid: JSON.stringify(this.props.user.peerid),
+    };
 
     const options = {
       metadata: {
-        signature: JSON.stringify(contact.signature),
-        nickname: JSON.stringify(this.props.user.nickname),
-        avatar: JSON.stringify(this.props.user.avatar),
-        dateRegistered: JSON.stringify(this.props.user.dateRegistered),
-        peerid: JSON.stringify(this.props.user.peerid),
+        md,
       },
     };
 
