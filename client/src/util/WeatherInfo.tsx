@@ -45,8 +45,9 @@ export const WeatherInfo = ({ location }: WeatherInfoProps) => {
       setWeatherIcon(iconURL);
     });
     fetchOpenWeatherData('http://api.openweathermap.org/data/2.5/forecast').then((res) => {
-      const fc = res.data.list[39].main.feels_like;
-      setWeatherForecast(fc);
+      const fahrenheitNextWeek = res.data.list[39].main.feels_like;
+      const celciusNextWeek = toCelsius(fahrenheitNextWeek) + " c"; 
+      setWeatherForecast(celciusNextWeek);
     });
   }, [location]);
 
@@ -63,3 +64,10 @@ export const WeatherInfo = ({ location }: WeatherInfoProps) => {
     </>
   );
 };
+function toCelsius(fahrenheit:number) {
+  return (fahrenheit - 32) * 5 / 9;
+}
+
+function toFahrenheit(celsius:number) {
+  return (celsius * 9 / 5) + 32;
+}

@@ -126,7 +126,7 @@ const AccountSetup = () => {
   const formik = useFormik({
     initialValues: {
       isSecured: false,
-      isSearchable:true,
+      isSearchable: true,
       pin: '',
       question1: '',
       answer1: '',
@@ -148,7 +148,7 @@ const AccountSetup = () => {
 
   function registerUser(values: {
     isSecured: boolean;
-    isSearchable:boolean;
+    isSearchable: boolean;
     pin: string;
     question1: string;
     answer1: string;
@@ -368,7 +368,7 @@ const AccountSetup = () => {
     <Dialog
       css={styles.accountSetupDialogRoot}
       open={true}
-      disableEscapeKeyDown 
+      disableEscapeKeyDown
       maxWidth="lg"
       fullScreen={fullScreen}
     >
@@ -396,31 +396,28 @@ const AccountSetup = () => {
           <Typography variant="subtitle1">Avatar: </Typography>
           <ImageUpload value={formik.values.avatar} />
 
-
-
           <FormControlLabel
             control={
               <Checkbox
-               
-               
                 id="isSearchable"
                 value={formik.values.isSearchable}
                 onChange={formik.handleChange}
               />
             }
-            label={formik.values.isSearchable ? 'Let anyone find me by my nickname' : "I prefer to invite people manually "}
+            label={
+              formik.values.isSearchable
+                ? 'Let anyone find me by my nickname'
+                : 'I prefer to invite people manually '
+            }
           />
-
 
           <Typography variant="subtitle1">
             Would you like to use a pin to secure your local data?
           </Typography>
 
-
           <FormControlLabel
             control={
               <Switch
-               
                 defaultChecked={false}
                 id="isSecured"
                 value={formik.values.isSecured}

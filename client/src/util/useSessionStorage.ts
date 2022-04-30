@@ -1,5 +1,9 @@
 import { useState } from 'react';
-import { decrypt, encrypt, generateKeyFromString } from 'dha-encryption';
+import {
+  decryptString as decrypt,
+  encryptString as encrypt,
+  generateKeyFromString,
+} from 'dha-encryption';
 
 export function useSessionStorage<T>(key: string, initialValue: T, ttl?: number) {
   // State to store our value
