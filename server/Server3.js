@@ -1,4 +1,4 @@
-const compression = require('compression');
+const compression = require("compression");
 const https = require("https");
 
 const { ExpressPeerServer } = require("peer");
@@ -7,13 +7,11 @@ const path = require("path");
 const fs = require("fs");
 const os = require("os");
 
-const express = require('express');
+const express = require("express");
 
 const app = express();
 
-const spdy = require('spdy')
-
-
+const spdy = require("spdy");
 
 //CONFIG ENVIRONMENT VARIABLE PARAMS
 const DEBUG = ENV_VAR("DEBUG", true);
@@ -55,9 +53,8 @@ const HTTPS_OPTIONS = {
   cert: CERT_FILE,
 };
 
-
 // https://webhint.io/docs/user-guide/hints/hint-no-disallowed-headers/?source=devtools
-app.disable('x-powered-by');
+app.disable("x-powered-by");
 
 // compress all responses
 // https://webhint.io/docs/user-guide/hints/hint-http-compression/
@@ -67,69 +64,82 @@ app.use(compression());
 app.use(express.static(path.join(__dirname, DIR_PUB_STATIC)));
 
 
-app.set('view engine', 'ejs') // Tell Express we are using EJS
-
 const server = spdy.createServer(HTTPS_OPTIONS, app);
 server.listen(PORT_HTTPS);
 console.info("HTTPS started on port: " + PORT_HTTPS);
 
-//serve peerjs
-const PEERJS_OPTIONS = {
-  port: PORT_HTTPS,
-  path: "/",
-  key: PEERJS_KEY,
-  debug: DEBUG,
-  ssl: {
-    key: KEY_FILE,
-    cert: CERT_FILE,
-  },
-};
-/*
-const peerServer = ExpressPeerServer(server, PEERJS_OPTIONS);
-app.use(PEERJS_CONTEXT, peerServer);
+const DO_PEERJS = true;
 
-//serve web-push
-app.use(express.json());
+const DO_WEBPUSH = true;
+const DO_SOCKETIO = true;
 
-webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBKEY, VAPID_PRIVKEY);
 
-app.post(WEBPUSH_CONTEXT, (req, res) => {
-  const subscription = req.body;
 
-  //pass on complete request to receiver?? :)
-  const payload = JSON.stringify(req);
-  webpush
-    .sendNotification(subscription, payload)
-    .then(() => {
-      res.status(201).json({});
-    })
-    .catch((err) => {
-      console.warn("Invalid subscription request: " + err, req, err);
-      res.status(418).json({});
-    });
-});
+if (DO_PEERJS) {
+  //serve peerjs
+  const PEERJS_OPTIONS = {
+    port: PORT_HTTPS,
+    path: "/",
+    key: PEERJS_KEY,
+    debug: DEBUG,
+    ssl: {
+      key: KEY_FILE,
+      cert: CERT_FILE,
+    },
+  };
 
-*/
+  const peerServer = ExpressPeerServer(server, PEERJS_OPTIONS);
+  app.use(PEERJS_CONTEXT, peerServer);
+}
 
-const io = require('socket.io')(server);
-// If they join a specific room, then render that room
-app.get('/:room', (req, res) => {
-  res.render('room', {roomId: req.params.room})
-})
-// When someone connects to the server
-io.on('connection', socket => {
-  // When someone attempts to join the room
-  socket.on('join-room', (roomId, userId) => {
-      socket.join(roomId)  // Join the room
-      socket.broadcast.emit('user-connected', userId) // Tell everyone else in the room that we joined
-      
-      // Communicate the disconnection
-      socket.on('disconnect', () => {
-          socket.broadcast.emit('user-disconnected', userId)
+if (DO_WEBPUSH) {
+  //serve web-push
+  app.use(express.json());
+
+  webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBKEY, VAPID_PRIVKEY);
+
+  app.post(WEBPUSH_CONTEXT, (req, res) => {
+    const subscription = req.body;
+
+    //pass on complete request to receiver?? :)
+    const payload = JSON.stringify(req);
+    webpush
+      .sendNotification(subscription, payload)
+      .then(() => {
+        res.status(201).json({});
       })
-  })
-})
+      .catch((err) => {
+        console.warn("Invalid subscription request: " + err, req, err);
+        res.status(418).json({});
+      });
+  });
+}
 
+
+
+if (DO_SOCKETIO) {
+
+  const io = require("socket.io")(server);
+  // If they join a specific room, then render that room
+  app.set("view engine", "ejs"); // Tell Express we are using EJS
+
+  app.get("/:room", (req, res) => {
+    res.render("room", { roomId: req.params.room });
+  });
+  // When someone connects to the server
+  io.on("connection", (socket) => {
+    // When someone attempts to join the room
+    socket.on("join-room", (roomId, userId) => {
+      socket.join(roomId); // Join the room
+      socket.broadcast.emit("user-connected", userId); // Tell everyone else in the room that we joined
+
+      // Communicate the disconnection
+      socket.on("disconnect", () => {
+        socket.broadcast.emit("user-disconnected", userId);
+      });
+    });
+  });
+}
 function ENV_VAR(varName, defaults) {
   let val = process.env[varName];
   console.log(

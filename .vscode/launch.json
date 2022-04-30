@@ -32,10 +32,27 @@
       "request": "launch",
       "type": "node-terminal"
     },
-
+    {
+      "name": "Launch Server3",
+      "command": "cd server && node Server3.js",
+      "request": "launch",
+      "type": "node-terminal"
+    },
+    {
+      "name": "Launch Server4",
+      "command": "cd server && node Server4.js",
+      "request": "launch",
+      "type": "node-terminal"
+    },
+    {
+      "name": "Launch Server5",
+      "command": "cd server && node Server5.js",
+      "request": "launch",
+      "type": "node-terminal"
+    },
     {
       "name": "Launch VolaTALK HTTPS Peer & Push Server  ",
-      "program": "${workspaceFolder}/server/Server.js",
+      "program": "${workspaceFolder}/server/Server3.js",
       "request": "launch",
       "skipFiles": ["<node_internals>/**"],
       "type": "node",

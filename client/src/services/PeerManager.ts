@@ -29,10 +29,8 @@ interface PeerManagerState {
 }
 
 export class PeerManager extends React.Component<PeerManagerProps, PeerManagerState> {
-  //db = useContext(DatabaseContext);
-  sometihing(s: string) {
-    return s;
-  }
+
+  
   constructor(props: PeerManagerProps) {
     super(props);
 
@@ -44,7 +42,7 @@ export class PeerManager extends React.Component<PeerManagerProps, PeerManagerSt
       key: 'pmkey',
       debug: 1,
     };
-
+   //const db = React.useContext(DatabaseContext);
     console.debug(
       `Connecting to peerserver using ID and (options):`,
       this.props.user.peerid,
@@ -54,8 +52,8 @@ export class PeerManager extends React.Component<PeerManagerProps, PeerManagerSt
     const myPeer = new Peer(this.props.user.peerid, connOpts);
 
     myPeer.on('open', (pid) => {
-      //this.setState({ online: true });
-      console.log('Online. ID: ' + pid);
+     // this.setState({ online: true });
+      console.log('connected: ' + myPeer.id);
 
       if (pid !== props.user.peerid) {
         throw Error('Broker assigned different id: ' + pid);
@@ -74,7 +72,7 @@ export class PeerManager extends React.Component<PeerManagerProps, PeerManagerSt
       });
     });
     myPeer.on('disconnected', () => {
-      this.setState({ online: false });
+      //this.setState({ online: false });
       console.warn('Peer disconnected.');
     });
     myPeer.on('close', function () {
@@ -89,11 +87,7 @@ export class PeerManager extends React.Component<PeerManagerProps, PeerManagerSt
       }
     });
 
-
-
     this.state = { peer: myPeer, connections: new Map(), online: !myPeer.disconnected };
-
-
   }
 
   /**

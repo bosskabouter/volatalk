@@ -30,23 +30,23 @@ export const WeatherInfo = ({ location }: WeatherInfoProps) => {
     }
 
     function makeIconURL(iconName: string) {
-      return 'http://openweathermap.org/img/wn/' + iconName + '@2x.png';
+      return 'https://openweathermap.org/img/wn/' + iconName + '@2x.png';
     }
 
-    fetchOpenWeatherData('http://api.openweathermap.org/geo/1.0/reverse').then((res) => {
+    fetchOpenWeatherData('https://api.openweathermap.org/geo/1.0/reverse').then((res) => {
       const localeInfo =
         res.data[0].name + ' (' + res.data[0].state + ',' + res.data[0].country + ')';
       setLocationData(localeInfo);
     });
-    fetchOpenWeatherData('http://api.openweathermap.org/data/2.5/weather').then((res) => {
+    fetchOpenWeatherData('https://api.openweathermap.org/data/2.5/weather').then((res) => {
       const weatherInfo = res.data.weather[0].main + ', ' + res.data.weather[0].description;
       const iconURL = makeIconURL(res.data.weather[0].icon);
       setWeatherToday(weatherInfo);
       setWeatherIcon(iconURL);
     });
-    fetchOpenWeatherData('http://api.openweathermap.org/data/2.5/forecast').then((res) => {
+    fetchOpenWeatherData('https://api.openweathermap.org/data/2.5/forecast').then((res) => {
       const fahrenheitNextWeek = res.data.list[39].main.feels_like;
-      const celciusNextWeek = toCelsius(fahrenheitNextWeek) + " c"; 
+      const celciusNextWeek = Math.round(toCelsius(fahrenheitNextWeek)/10) + ' Celcius';
       setWeatherForecast(celciusNextWeek);
     });
   }, [location]);
@@ -54,20 +54,22 @@ export const WeatherInfo = ({ location }: WeatherInfoProps) => {
   return (
     <>
       , near {locationData}
-     <br/> 
-      Weather today: {weatherToday} 
-<br/>
+      <br />
+      Weather today: {weatherToday}
+      <br />
       Next week forecast: 
       {weatherForecast}
-      <Avatar src={weatherIcon} alt="Current Weather Image"></Avatar>
-      
+      <Avatar src={weatherIcon} alt="Current Weather Image" variant='rounded'></Avatar>
     </>
   );
 };
-function toCelsius(fahrenheit:number) {
-  return (fahrenheit - 32) * 5 / 9;
+function toCelsius(fahrenheit: number) {
+  const celcius = (fahrenheit - 32)  / 1.8; 
+  console.log(`toCelcius(fahrenheit: ${fahrenheit}) : ${celcius}`);
+  return celcius;
 }
 
-function toFahrenheit(celsius:number) {
-  return (celsius * 9 / 5) + 32;
+function toFahrenheit(celsius: number) {
+  
+  return (celsius * 1.8) + 32;
 }

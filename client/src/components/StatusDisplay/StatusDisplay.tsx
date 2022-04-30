@@ -9,6 +9,7 @@ import { useContext, useEffect } from 'react';
 import { UserContext } from 'providers/UserProvider';
 import Avatar from '@mui/material/Avatar';
 import Badge from '@mui/material/Badge';
+import { Box } from '@mui/material';
 
 const StatusDisplay = () => {
   const userCtx = useContext(UserContext);
@@ -39,7 +40,7 @@ const StatusDisplay = () => {
     return !peerCtx?.state.peer && myPeerid() ? (
       <div>User without peer</div>
     ) : (
-      <div className="peerInfo">
+      <Box className="peerInfo">
         <Badge
           color="info"
           overlap="circular"
@@ -64,7 +65,7 @@ const StatusDisplay = () => {
           ></Avatar>
         </Badge>
         {online()}
-      </div>
+      </Box>
     );
   }
 

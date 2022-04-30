@@ -2,17 +2,25 @@
   "name": "volatalk-server",
   "version": "1.0.0",
   "description": "Peer and Push Subscription Server ",
-  "main": "Server.js",
+  "main": "Server5.js",
   "scripts": {
-    "start": "node Server.js",
+    "start": "node Server5.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "VolaTALK",
-    "server",
-    "express",
-    "peerjs",
-    "web-push"
+    "VolaTALK Server",
+    "Private",
+    "Direct",
+    "Messaging",
+    "Communication",
+    "Video",
+    "Chat",
+    "Privacy",
+    "Encrypted",
+    "Peer-to-Peer",
+    "Decentralized",
+    "Invite",
+    "Personal"
   ],
   "author": "Paul Kuit",
   "license": "ISC",
