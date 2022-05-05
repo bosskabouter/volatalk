@@ -30,7 +30,6 @@ export class PeerManager extends Peer {
     this.user = user;
     this.db = db;
     this.on('open', (pid) => {
-      // this.setState({ online: true });
       console.log('connected: ' + this.id);
 
       if (pid !== user.peerid) {
@@ -42,6 +41,7 @@ export class PeerManager extends Peer {
         console.log('Connection open', conn);
         this.hasValidSignatureMetadata(conn).then((valid) => {
           if (valid) this.acceptTrustedConnection(conn);
+          else alert('Invalid signature from contact: ' + conn.metadata);
         });
       });
     });
@@ -70,6 +70,9 @@ export class PeerManager extends Peer {
 
   initiateConnection(contact: IContact) {
     //do not send private key / passwordhash to other side
+    if (!contact.signature) {
+      throw Error('No signature for contact: ' + contact.nickname);
+    }
     console.info('Initiate connection: ' + JSON.stringify(contact));
     const md: IConnectionMetadata = {
       signature: convertAbToBase64(contact.signature),
@@ -78,7 +81,7 @@ export class PeerManager extends Peer {
       dateRegistered: this.user.dateRegistered,
       peerid: JSON.stringify(this.user.peerid),
     };
-
+    alert('convert Ab ToBase64 signature for contact: ' + contact.nickname + '=' + md.signature);
     const options = {
       metadata: md,
     };
@@ -151,9 +154,10 @@ export class PeerManager extends Peer {
 
     console.debug('PubKey imported', contactPubKey);
 
-    const sigEncoded: Uint32Array = new Uint32Array(convertBase64ToAb(conn.metadata.signature));
+    alert('Received signature from contact: ' + conn.peer + ' => ' + conn.metadata.signature);
+    const sigDecoded = convertBase64ToAb(conn.metadata.signature);
 
-    return verifyMessage(conn.peer, sigEncoded, contactPubKey);
+    return verifyMessage(this.user.peerid, sigDecoded, contactPubKey);
   }
 
   /**
@@ -162,11 +166,11 @@ export class PeerManager extends Peer {
   async acceptTrustedConnection(conn: DataConnection) {
     const contact = await this.db.contacts.get(conn.peer);
 
-    if (!contact) {
-      console.debug('Trusted connection with NEW contact', conn);
+    if (!contact || !contact.signature) {
+      alert('Trusted connection with NEW contact' + conn.peer);
       this.acceptTrustedNewContact(conn);
     } else {
-      console.debug('Trusted connection with KNOWN contact', contact, conn);
+      console.info('Trusted connection with KNOWN contact', contact, conn);
       this.receiveRegisteredContact(contact, conn);
     }
   }
@@ -175,6 +179,7 @@ export class PeerManager extends Peer {
    */
   acceptTrustedNewContact(conn: DataConnection) {
     const md: IConnectionMetadata = conn.metadata;
+
     const contact: IContact = {
       peerid: conn.peer,
       signature: convertBase64ToAb(md.signature),
@@ -186,7 +191,7 @@ export class PeerManager extends Peer {
       declined: false,
     };
     this.db.contacts.add(contact);
-    alert('Contact added: ' + contact.nickname);
+    alert('Contact added: ' + contact.nickname + ' with signature: ' + md.signature);
     //let's close for now and reestablish a connection from our side to send our signature
     conn.close();
   }

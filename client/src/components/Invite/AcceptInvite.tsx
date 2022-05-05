@@ -32,6 +32,8 @@ export default function AcceptInvite() {
       let contact = await db.contacts.get(receivedInvite.peerId);
       if (contact) setResult('Invite already accepted.. Still trying to connect... ');
       else {
+
+        //generate signature with other peers id 
         const sig = await peerCtx.genSignature(receivedInvite.peerId);
 
         contact = {
