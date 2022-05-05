@@ -4,7 +4,7 @@ import { extractInvite, IInvite, INVITE_PARAM } from 'services/InvitationService
 import { identicon } from 'minidenticons';
 import Avatar from '@mui/material/Avatar';
 import Badge from '@mui/material/Badge';
-import { Button } from '@mui/material';
+import { Button, TextField } from '@mui/material';
 import { DatabaseContext } from 'providers/DatabaseProvider';
 import { PeerContext } from 'providers/PeerProvider';
 
@@ -12,6 +12,7 @@ export default function AcceptInvite() {
   const [queryParams] = useState<URLSearchParams>(new URLSearchParams(useLocation().search));
 
   const [senderOnline, setSenderOnline] = useState<boolean>(false);
+  const [result, setResult] = useState<string>('');
 
   const [receivedInvite, setReceivedInvite] = useState<IInvite | null>(null);
 
@@ -23,21 +24,25 @@ export default function AcceptInvite() {
     extractInvite(queryParams).then((invite) => {
       setReceivedInvite(invite);
     });
-  }, [queryParams]);
+  }, [queryParams, result]);
 
   //handler
   const handleSendConnectRequest = async () => {
     if (db && receivedInvite && peerCtx) {
-      const sig = await peerCtx.genSignature(receivedInvite.peerId);
+      let contact = await db.contacts.get(receivedInvite.peerId);
+      if (contact) setResult('Invite already accepted.. Still trying to connect... ');
+      else {
+        const sig = await peerCtx.genSignature(receivedInvite.peerId);
 
-      const contact = {
-        nickname: receivedInvite.text,
-        peerid: receivedInvite.peerId,
-        dateCreated: new Date(),
-        accepted: true,
-        signature: sig,
-      };
-      db.contacts.add(contact);
+        contact = {
+          nickname: receivedInvite.text,
+          peerid: receivedInvite.peerId,
+          dateCreated: new Date(),
+          accepted: true,
+          signature: sig,
+        };
+        db.contacts.add(contact);
+      }
 
       const connection = peerCtx.initiateConnection(contact);
 
@@ -69,6 +74,7 @@ export default function AcceptInvite() {
       >
         Accept the Invitation and send a contact request?
       </Button>
+      <TextField>${result}</TextField>
     </div>
   );
 }

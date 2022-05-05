@@ -6,7 +6,7 @@ import {
   verifyMessage,
 } from './Crypto';
 import { convertAbToBase64, convertBase64ToAb } from './Generic';
-import { IUserProfile } from 'Database/Database';
+import { IUserProfile } from 'types';
 
 export const INVITE_PARAM = { FROM: 'f', KEY: 'k', SIGNATURE: 's' };
 

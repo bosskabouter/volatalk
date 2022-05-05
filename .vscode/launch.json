@@ -4,12 +4,19 @@
   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
- 
+    {
+      "name": "Launch Chrome 3000",
+      "request": "launch",
+      "type": "chrome",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}"
+    },
+   
     {
       "name": "Launch Chrome 8443",
       "request": "launch",
       "type": "chrome",
-      "url": "http://localhost:8443",
+      "url": "https://localhost:8443",
       "webRoot": "${workspaceFolder}"
     },
    

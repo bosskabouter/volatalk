@@ -1,16 +1,6 @@
-import { IContact, IUserProfile } from 'Database/Database';
+import { IUserProfile } from 'types';
 
-import Peer, { DataConnection } from 'peerjs';
-
-import {
-  importPrivateKey,
-  importPublicKey,
-  peerIdToPublicKey,
-  signMessage,
-  verifyMessage,
-} from './Crypto';
-
-const ERR_CONTACT_DECLINED_ = 403;
+import Peer from 'peerjs';
 
 const connOpts = {
   host: 'volatalk.org',

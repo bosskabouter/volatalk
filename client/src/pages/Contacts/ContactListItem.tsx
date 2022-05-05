@@ -1,4 +1,4 @@
-import { IContact } from 'Database/Database';
+import { IContact } from 'types';
 import React from 'react';
 
 interface ContactListItemProps {

@@ -21,11 +21,11 @@ const StatusDisplay = () => {
   });
 
   function myPeerid() {
-    return peerCtx?.state.peer.id ? peerCtx.state.peer.id : '123';
+    return peerCtx?.id  ? peerCtx.id : '123';
   }
 
   function online() {
-    return peerCtx?.state.peer.disconnected ? <ICON_OFFLINE /> : <ICON_ONLINE />;
+    return peerCtx?.disconnected ? <ICON_OFFLINE /> : <ICON_ONLINE />;
   }
 
   function userDiv() {
@@ -37,9 +37,7 @@ const StatusDisplay = () => {
   }
 
   function peerDiv() {
-    return !peerCtx?.state.peer && myPeerid() ? (
-      <div>User without peer</div>
-    ) : (
+    return peerCtx?.isOnline() ? (
       <Box className="peerInfo">
         <Badge
           color="info"
@@ -66,6 +64,8 @@ const StatusDisplay = () => {
         </Badge>
         {online()}
       </Box>
+    ) : (
+      <div>User without peer</div>
     );
   }
 

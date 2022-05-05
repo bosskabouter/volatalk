@@ -4,7 +4,7 @@ import React, { useContext, useRef } from 'react';
 
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import { QRCodeSVG } from 'qrcode.react';
 import { QrReader } from 'react-qr-reader';
@@ -18,7 +18,6 @@ import QrCode2Icon from '@mui/icons-material/QrCode';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 
 import Close from '@mui/icons-material/Close';
-import NavigationFullscreenExit from 'material-ui/svg-icons/navigation/fullscreen-exit';
 
 export default function Invite() {
   const inputRef = useRef();

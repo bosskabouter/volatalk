@@ -3,9 +3,10 @@
 export default function shareSomething(title: string, inviteText: string, url: string) {
   function shareMobile() {
     const share: ShareData = {
+      url: url,
       title: title,
       text: inviteText,
-      url: url,
+     
     };
 
     navigator.share(share);

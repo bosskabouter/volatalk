@@ -1,5 +1,5 @@
 import { applyEncryptionMiddleware, clearAllTables, NON_INDEXED_FIELDS } from 'dha-dexie-encrypted';
-import { createContext, ReactNode, useEffect, useState } from 'react';
+import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { AppDatabase } from '../Database/Database';
 
 interface IDatabaseProviderProps {
@@ -7,6 +7,8 @@ interface IDatabaseProviderProps {
 }
 
 export const DatabaseContext = createContext<AppDatabase | null>(null);
+export const useDatabase = () => useContext(DatabaseContext);
+
 export const DatabaseProvider = ({ children }: IDatabaseProviderProps) => {
   const [database, setDatabase] = useState<AppDatabase | null>(null);
   const setupDatabase = () => {
@@ -32,7 +34,7 @@ export const DatabaseProvider = ({ children }: IDatabaseProviderProps) => {
       {
         userProfile: NON_INDEXED_FIELDS,
       },
-      (db) => clearAllTables(db)
+      (db2) => clearAllTables(db2)
     );
     db.version(4);
     setDatabase(db);
