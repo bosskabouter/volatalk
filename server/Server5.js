@@ -1,101 +1,107 @@
-// https://www.webrtc-experiment.com/
-
+// Includes
+var https = require('https');
+var express = require('express');
+var tls = require('tls');
+var vhost = require('vhost');
 var fs = require('fs');
-let express = require('express');
-let http = require('http');
 
-let cors = require('cors');
-let server = http.createServer(app);
+const local = true;
+const env = local?"dev":"";
+// Express objects
+var appVolatalk = express();
+var appPeer = express();
 
-// don't forget to use your own keys!
-var options = {
-    key: fs.readFileSync('crt/xpsdeb.key'),
-    cert: fs.readFileSync('crt/xpsdeb.crt')
-    //key: fs.readFileSync('/etc/letsencrypt/live/webrtcweb.com/privkey.pem'),
-    //cert: fs.readFileSync('/etc/letsencrypt/live/webrtcweb.com/fullchain.pem')
+// SSL Constants
+const siteVolatalk = {
+    app: appVolatalk,
+    context: tls.createSecureContext({
+        key: fs.readFileSync(__dirname + '/crt/volatalk.org.key').toString(),
+        cert: fs.readFileSync(__dirname + '/crt/volatalk.org.crt').toString()
+    }).context
 };
 
-// HTTPs server
-var app = require('https').createServer(options, function(request, response) {
-    response.writeHead(200, {
-        'Content-Type': 'text/html'
-    });
-    var link = 'https://github.com/muaz-khan/WebRTC-Experiment/tree/master/socketio-over-nodejs';
-    response.write('<title>socketio-over-nodejs</title><h1><a href="'+ link + '">socketio-over-nodejs</a></h1><pre>var socket = io.connect("https://webrtcweb.com:9559/");</pre>');
-    response.end();
-});
+const sitePeer = {
+    app: appPeer,
+    context: tls.createSecureContext({
+        key: fs.readFileSync(__dirname + '/crt/peer.pm.key').toString(),
+        cert: fs.readFileSync(__dirname + '/crt/peer.pm.crt').toString()
+    }).context
+};
 
+// Sites
+var sitesDev = {
+    'www.volatalk.dev': siteVolatalk,
+    'volatalk.org.dev': siteVolatalk,
+    'peer.pm.dev': sitePeer
+}
+var sitesProd = {
+    'www.volatalk.org': siteVolatalk,
+    'volatalk.org': siteVolatalk,
+    'peer.pm': sitePeer,
+    'peered.me': sitePeer
+}
+var sites = sitesProd;   
 
-// socket.io goes below
-let socketio = require('socket.io');
-let io = socketio.listen(server);
-
-io.set('transports', [
-    // 'websocket',
-    'xhr-polling',
-    'jsonp-polling'
-]);
-
-var channels = {};
-
-io.sockets.on('connection', function (socket) {
-    var initiatorChannel = '';
-    if (!io.isConnected) {
-        io.isConnected = true;
-    }
-
-    socket.on('new-channel', function (data) {
-        if (!channels[data.channel]) {
-            initiatorChannel = data.channel;
-        }
-
-        channels[data.channel] = data.channel;
-        onNewNamespace(data.channel, data.sender);
-    });
-
-    socket.on('presence', function (channel) {
-        var isChannelPresent = !! channels[channel];
-        socket.emit('presence', isChannelPresent);
-    });
-
-    socket.on('disconnect', function (channel) {
-        if (initiatorChannel) {
-            delete channels[initiatorChannel];
-        }
-    });
-});
-
-function onNewNamespace(channel, sender) {
-    io.of('/' + channel).on('connection', function (socket) {
-        var username;
-        if (io.isConnected) {
-            io.isConnected = false;
-            socket.emit('connect', true);
-        }
-
-        socket.on('message', function (data) {
-            if (data.sender == sender) {
-                if(!username) username = data.data.sender;
-                
-                socket.broadcast.emit('message', data.data);
-            }
-        });
-        
-        socket.on('disconnect', function() {
-            if(username) {
-                socket.broadcast.emit('user-left', username);
-                username = null;
-            }
-        });
-    });
+// Setup vhosts
+var exp = express();
+for (var s in sites) {
+    console.log("add app for " + s);
+    exp.use(vhost(s, sites[s].app));
 }
 
-// run app
+// Redirect from http port  to https
+var http = require('http');
+http.createServer(function (req, res) {
+    res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
+    console.log(req.headers['host']);
+    console.log(req.url);
+    res.end();
+}).listen(80);
 
-app.listen(process.env.PORT || 9559);
+// HTTPS Server
+var secureOpts = {
+    SNICallback: function (domain, cb) {
+        if (typeof sites[domain] === "undefined") {
+            cb(new Error("domain not found"), null);
+            console.log("Error: domain not found: " + domain);
 
-process.on('unhandledRejection', (reason, promise) => {
-  process.exit(1);
+        } else {
+            cb(null, sites[domain].context);
+        }
+    },
+    key: siteVolatalk.context.key,
+    cert: siteVolatalk.context.cert
+};
+
+const PORT_HTTPS = 443;
+
+var httpsServer = https.createServer(secureOpts, exp);
+httpsServer.listen(PORT_HTTPS, function () {
+    console.log("Listening https on port: " + + this.address().port);
 });
 
-console.log('Please open SSL URL: https://localhost:'+(process.env.PORT || 9559)+'/');
+appVolatalk.use(express.static("www"));
+
+
+{ //SETUP PEER
+    const { ExpressPeerServer } = require("peer");
+    const PEERJS_CONTEXT = "/";
+    const PEERJS_KEY = "pmkey";
+    //serve peerjs
+    const PEERJS_OPTIONS = {
+      port: PORT_HTTPS,
+      path: PEERJS_CONTEXT,
+      key: PEERJS_KEY,
+      debug: true,
+      ssl: {
+        key: sitePeer.context.key,
+        cert: sitePeer.context.peer,
+      },
+    };
+  
+    const peerServer = ExpressPeerServer(exp, PEERJS_OPTIONS);
+    var cors = require("cors");
+    //appPeer.use(cors());
+    peerServer.use(cors());
+    appPeer.use(peerServer);
+  }

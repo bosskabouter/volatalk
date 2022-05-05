@@ -1,9 +1,8 @@
-import { AppDatabase, IContact, IUserProfile } from 'Database/Database';
+import {  IContact, IUserProfile } from 'Database/Database';
 
 import Peer, { DataConnection } from 'peerjs';
-import { DatabaseContext } from 'providers/DatabaseProvider';
-import React, { useContext, useState } from 'react';
-import PropTypes from 'prop-types';
+import React from 'react';
+
 
 import {
   importPrivateKey,
@@ -12,11 +11,6 @@ import {
   signMessage,
   verifyMessage,
 } from './Crypto';
-import { convertStr2ab } from './Generic';
-import { UserContext } from 'providers/UserProvider';
-import { PeerContext } from 'providers/PeerProvider';
-
-const ERR_CONTACT_DECLINED_ = 403;
 
 export interface ConnectionMetadata {
   peerid: string;
@@ -41,12 +35,12 @@ export class PeerManager extends React.Component<PeerManagerProps, PeerManagerSt
     super(props);
 
     const connOpts = {
-      host: 'volatalk.org',
-      port: 443,
-      path: '/peerjs',
+      host: 'peer.pm',
+      port: 999,
+      path: '/',
       secure: true,
-      key: 'pmkey',
-      debug: 1,
+      key: 'volakey',
+      debug: 3,
     };
     //const db = React.useContext(DatabaseContext);
     console.debug(

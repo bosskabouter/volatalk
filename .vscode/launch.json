@@ -6,10 +6,10 @@
   "configurations": [
  
     {
-      "name": "Launch Chrome",
+      "name": "Launch Chrome 8443",
       "request": "launch",
       "type": "chrome",
-      "url": "http://localhost:3000/pwa",
+      "url": "http://localhost:8443",
       "webRoot": "${workspaceFolder}"
     },
    
@@ -36,7 +36,13 @@
       "name": "Launch Server3",
       "command": "cd server && node Server3.js",
       "request": "launch",
-      "type": "node-terminal"
+      "type": "node-terminal",
+      "env": {
+        "DEBUG": "true",
+        "PORT_HTTPS": "8443",
+        "DIR_PUB_STATIC":"../client/public",
+        "DIR_RENDER_EJS":"/views"
+      }
     },
     {
       "name": "Launch Server4",
@@ -58,7 +64,9 @@
       "type": "node",
       "env": {
         "DEBUG": "true",
-        "PORT_HTTPS": "8443"
+        "PORT_HTTPS": "8443",
+        "DIR_PUB_STATIC":"../client/public",
+        "DIR_RENDER_EJS":"/views"
       }
     }
   ]

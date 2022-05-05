@@ -4,17 +4,17 @@ import { css } from '@emotion/react';
 import CssBaseline from '@mui/material/CssBaseline';
 import {
   Box,
-  Link,
-  // useTheme
+  Link,List, ListItem, ListItemText,
+  
 } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Logo from '../../assets/images/volatalk-logo-336x280.webp';
 import packageJson from '../../../package.json';
-import { List, ListItem, ListItemText } from '@mui/material';
+
 
 const About = () => {
-  // const theme = useTheme();
+ 
 
   const styles = {
     box: css`
@@ -38,7 +38,8 @@ const About = () => {
     <Container component="main" maxWidth="xl">
       <CssBaseline />
       <Box css={styles.box}>
-        <img alt="DHA" src={Logo} css={styles.logo} />
+        <img alt="logo" src={Logo} css={styles.logo} />
+
         <List>
           <ListItem key="1">
             <ListItemText primary="If you lose your device or access to your account, your identity cannot be recovered." />

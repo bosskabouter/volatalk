@@ -1,9 +1,9 @@
 const compression = require("compression");
 const https = require("https");
 
-const { ExpressPeerServer } = require("peer");
 const webpush = require("web-push");
 const path = require("path");
+
 const fs = require("fs");
 const os = require("os");
 
@@ -12,6 +12,13 @@ const express = require("express");
 const app = express();
 
 const spdy = require("spdy");
+
+const DO_CORS = true;
+const DO_EJS = false;
+const DO_PEERJS = true;
+
+const DO_WEBPUSH = false;
+const DO_SOCKETIO = true;
 
 //CONFIG ENVIRONMENT VARIABLE PARAMS
 const DEBUG = ENV_VAR("DEBUG", true);
@@ -25,25 +32,6 @@ const CERT_FILENAME = ENV_VAR("CERT_FILE", "./crt/" + HOSTNAME + ".crt");
 
 //local directorty with static files to be served
 const DIR_PUB_STATIC = ENV_VAR("DIR_PUB_STATIC", "www");
-
-const PEERJS_CONTEXT = ENV_VAR("PEER_CONTEXT", "/peerjs");
-const PEERJS_KEY = ENV_VAR("PEERJS_KEY", "pmkey");
-
-//SUBSCRIPTION SERVICE
-const WEBPUSH_CONTEXT = ENV_VAR("WEBPUSH_CONTEXT", "/subscribe");
-//WEB-PUSH VAPID KEYS; generate USING ./node_modules/.bin/web-push generate-vapid-keys
-const VAPID_SUBJECT = ENV_VAR(
-  "VAPID_SUBJECT",
-  "mailto:subscription@volatalk.org"
-);
-const VAPID_PUBKEY = ENV_VAR(
-  "VAPID_PUBKEY",
-  "BChZg2Ky1uKIDRdYWapWKZXZ19VvFedmK0bjqir9kMsyUK42cguvoAr4Pau4yQr2aY4IWGIsr3W1lWK5okZ6O84"
-);
-const VAPID_PRIVKEY = ENV_VAR(
-  "VAPID_PRIVKEY",
-  "CvQGYBs-AzSHF55J7mqTR8VE7l-qwiBiSslqeaMfx8o"
-);
 
 const KEY_FILE = fs.readFileSync(path.join(__dirname, KEY_FILENAME));
 const CERT_FILE = fs.readFileSync(path.join(__dirname, CERT_FILENAME));
@@ -63,23 +51,23 @@ app.use(compression());
 //serve static
 app.use(express.static(path.join(__dirname, DIR_PUB_STATIC)));
 
+if (DO_CORS) {
+  var cors = require("cors");
+  app.use(cors());
+}
 
 const server = spdy.createServer(HTTPS_OPTIONS, app);
 server.listen(PORT_HTTPS);
 console.info("HTTPS started on port: " + PORT_HTTPS);
 
-const DO_PEERJS = true;
-
-const DO_WEBPUSH = true;
-const DO_SOCKETIO = true;
-
-
-
 if (DO_PEERJS) {
+  const { ExpressPeerServer } = require("peer");
+  const PEERJS_CONTEXT = ENV_VAR("PEER_CONTEXT", "/vtpeer");
+  const PEERJS_KEY = ENV_VAR("PEERJS_KEY", "pmkey");
   //serve peerjs
   const PEERJS_OPTIONS = {
     port: PORT_HTTPS,
-    path: "/",
+    path: PEERJS_CONTEXT,
     key: PEERJS_KEY,
     debug: DEBUG,
     ssl: {
@@ -93,7 +81,22 @@ if (DO_PEERJS) {
 }
 
 if (DO_WEBPUSH) {
-  //serve web-push
+  //SUBSCRIPTION SERVICE
+  const WEBPUSH_CONTEXT = ENV_VAR("WEBPUSH_CONTEXT", "/subscribe");
+  //WEB-PUSH VAPID KEYS; generate USING ./node_modules/.bin/web-push generate-vapid-keys
+  const VAPID_SUBJECT = ENV_VAR(
+    "VAPID_SUBJECT",
+    "mailto:subscription@volatalk.org"
+  );
+  const VAPID_PUBKEY = ENV_VAR(
+    "VAPID_PUBKEY",
+    "BChZg2Ky1uKIDRdYWapWKZXZ19VvFedmK0bjqir9kMsyUK42cguvoAr4Pau4yQr2aY4IWGIsr3W1lWK5okZ6O84"
+  );
+  const VAPID_PRIVKEY = ENV_VAR(
+    "VAPID_PRIVKEY",
+    "CvQGYBs-AzSHF55J7mqTR8VE7l-qwiBiSslqeaMfx8o"
+  );
+
   app.use(express.json());
 
   webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBKEY, VAPID_PRIVKEY);
@@ -115,28 +118,43 @@ if (DO_WEBPUSH) {
   });
 }
 
+if (DO_EJS) {
+  //local directorty with static files to be served
+  const DIR_RENDER_EJS = ENV_VAR("DIR_RENDER_EJS", "views");
 
-
-if (DO_SOCKETIO) {
-
-  const io = require("socket.io")(server);
   // If they join a specific room, then render that room
+
+  app.set("views", path.join(__dirname, DIR_RENDER_EJS));
   app.set("view engine", "ejs"); // Tell Express we are using EJS
 
-  app.get("/:room", (req, res) => {
+  app.get("/room/:room", (req, res) => {
+    console.log("Request from: " + req);
     res.render("room", { roomId: req.params.room });
+  });
+}
+
+if (DO_SOCKETIO) {
+  const io = require("socket.io")(server, {
+    cors: {
+      origin: "*",
+    },
   });
   // When someone connects to the server
   io.on("connection", (socket) => {
     // When someone attempts to join the room
     socket.on("join-room", (roomId, userId) => {
-      socket.join(roomId); // Join the room
-      socket.broadcast.emit("user-connected", userId); // Tell everyone else in the room that we joined
+      // Tell everyone else in the room that we joined
 
       // Communicate the disconnection
       socket.on("disconnect", () => {
         socket.broadcast.emit("user-disconnected", userId);
       });
+
+      socket.broadcast.emit("user-connected", userId);
+
+      socket.join(roomId); // Join the room
+
+      console.log(`user ${userId} joins room ${roomId}`);
     });
   });
 }
