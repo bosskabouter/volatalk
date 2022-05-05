@@ -1,10 +1,11 @@
-
 import { PeerContext } from 'providers/PeerProvider';
 import { DatabaseContext } from 'providers/DatabaseProvider';
-import { useContext, useEffect, useState } from 'react';
-import Badge from '@mui/material/Badge';
-import Avatar from '@mui/material/Avatar';
 import { IContact } from 'types';
+
+import { ContactListItem } from './ContactListItem';
+
+import { useContext, useEffect, useState } from 'react';
+import { List, ListSubheader } from '@mui/material';
 
 const ContactList = () => {
   const db = useContext(DatabaseContext);
@@ -24,27 +25,19 @@ const ContactList = () => {
 
   return (
     <div>
-      <ul>
+      <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}
+        dense={true}
+        subheader={
+          <ListSubheader component="div" id="nested-list-subheader">
+            Contacts
+          </ListSubheader>
+        }
+      >
         {contactList &&
           contactList.map((contact) => (
-            <li key={contact.peerid}>
-              <Badge
-                color={peerManager?.isConnectedWith(contact) ? 'success' : 'default'}
-                overlap="circular"
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                variant="dot"
-              >
-                <Avatar
-                  src={`data:image/svg+xml;utf8,${contact.peerid}`}
-                  alt={`${contact.nickname} 's personsal identification icon`}
-                ></Avatar>
-              </Badge>
-
-              <Avatar src={contact.avatar}></Avatar>
-              {contact.nickname}
-            </li>
+            <ContactListItem contact={contact} key={contact.peerid}></ContactListItem>
           ))}
-      </ul>
+      </List>
     </div>
   );
 };

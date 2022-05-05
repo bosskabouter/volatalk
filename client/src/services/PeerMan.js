@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Peer from 'peerjs';
-
+import { usePeer } from 'providers/PeerProvider';
 
 class PeerMan extends Component {
   state = {
@@ -39,7 +39,7 @@ class PeerMan extends Component {
       let getUserMedia =
         navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
-      getUserMedia({ video: true, audio: true }, (stream) => {
+      getUserMedia({ video: true, audio: false }, (stream) => {
         this.myVideo.srcObject = stream;
         this.myVideo.play();
 

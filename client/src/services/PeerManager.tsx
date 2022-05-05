@@ -81,7 +81,7 @@ export class PeerManager extends Peer {
       dateRegistered: this.user.dateRegistered,
       peerid: JSON.stringify(this.user.peerid),
     };
-    alert('convert Ab ToBase64 signature for contact: ' + contact.nickname + '=' + md.signature);
+    console.debug('convert Ab ToBase64 signature for contact: ', contact.nickname, md.signature);
     const options = {
       metadata: md,
     };
@@ -154,8 +154,10 @@ export class PeerManager extends Peer {
 
     console.debug('PubKey imported', contactPubKey);
 
-    alert('Received signature from contact: ' + conn.peer + ' => ' + conn.metadata.signature);
     const sigDecoded = convertBase64ToAb(conn.metadata.signature);
+    console.debug(
+      'Received signature from contact: ' + conn.peer + ' => ' + conn.metadata.signature
+    );
 
     return verifyMessage(this.user.peerid, sigDecoded, contactPubKey);
   }
