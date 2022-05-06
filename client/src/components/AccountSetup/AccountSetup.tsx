@@ -2,6 +2,7 @@
 import { css } from '@emotion/react';
 import { useContext } from 'react';
 import {
+  Avatar,
   Button,
   Checkbox,
   Dialog,
@@ -26,9 +27,10 @@ import { useDispatch } from 'react-redux';
 import { setCreated, setIsSecure } from 'store/slices/accountSlice';
 
 import { exportCryptoKey, generateKeyPair, peerIdFromPublicKey } from 'services/Crypto';
-import ImageUpload from 'util/ImageUpload';
+
 import { UserContext } from 'providers/UserProvider';
-import { userInfo } from 'os';
+import ImageUpload2 from 'util/ImageUpload2';
+import { convertAbToBase64 } from 'services/Generic';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -121,29 +123,62 @@ const AccountSetup = () => {
     }),
   });
 
+  const userCtx = useContext(UserContext);
+
   const formik = useFormik({
-    initialValues: {
-      isSecured: false,
-      isSearchable: true,
-      pin: '',
-      question1: '',
-      answer1: '',
-      question2: '',
-      answer2: '',
+    initialValues: userCtx.user
+      ? userCtx.user
+      : {
+          nickname: 'Anonymous',
+          avatar: 'https://thispersondoesnotexist.com/image?reload=' + Math.random(),
 
-      peerid: '',
-      privateKey: '',
-      nickname: 'Anonymous',
-      avatar: 'https://thispersondoesnotexist.com/image?reload=' + Math.random(),
+          isSecured: false,
+          isSearchable: true,
+          pin: '',
+          question1: '',
+          answer1: '',
+          question2: '',
+          answer2: '',
 
-      dateRegistered: new Date(),
-    },
+          peerid: '',
+          privateKey: '',
+
+          dateRegistered: new Date(),
+        },
     validationSchema: validationSchema,
     onSubmit: (values) => {
-      registerUser(values);
+      if (authenticated) updateUser(values);
+      else registerUser(values);
     },
   });
 
+  function updateUser(values: {
+    isSecured: boolean;
+    isSearchable: boolean;
+    pin: string;
+    question1: string;
+    answer1: string;
+    question2: string;
+    answer2: string;
+    peerid: string;
+    privateKey: string;
+    nickname: string;
+    avatar: string;
+    dateRegistered: Date;
+  }) {
+    // Save to database
+    if (db !== null) {
+      db.userProfile.put(values, 1);
+      setUser(values);
+      navigate('/', { replace: false });
+
+    }
+  }
+
+  /**
+   *
+   * @param values
+   */
   function registerUser(values: {
     isSecured: boolean;
     isSearchable: boolean;
@@ -366,7 +401,7 @@ const AccountSetup = () => {
     <Dialog
       css={styles.accountSetupDialogRoot}
       open={true}
-      disableEscapeKeyDown={!authenticated}
+      disableEscapeKeyDown
       maxWidth="lg"
       fullScreen={fullScreen}
     >
@@ -385,15 +420,28 @@ const AccountSetup = () => {
             variant="outlined"
             type="text"
             inputMode="text"
-            inputProps={{ maxLength: 18 }}
+            inputProps={{ maxLength: 60 }}
             value={formik.values.nickname}
             onChange={formik.handleChange}
             error={formik.touched.nickname && Boolean(formik.errors.nickname)}
             helperText={formik.touched.nickname && formik.errors.nickname}
           />
           <Typography variant="subtitle1">Avatar: </Typography>
-          <ImageUpload value={formik.values.avatar} />
 
+          <input
+            id="file"
+            name="avatar"
+            type="file"
+            onChange={(event) => {
+              if (!event.target.files) return;
+              const file = event.target.files[0];
+              file.arrayBuffer().then((ab) => {
+                formik.setFieldValue('avatar', 'data:image/png;base64,' + convertAbToBase64(ab));
+              });
+            }}
+            multiple={false}
+          />
+          <Avatar src={formik.values.avatar} sx={{ width: 300 }}></Avatar>
           <FormControlLabel
             control={<Checkbox id="isSearchable" value={formik.values.isSearchable} />}
             label={

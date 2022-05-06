@@ -54,7 +54,7 @@ const StatusDisplay = () => {
           variant="dot"
         >
           <Avatar
-            src={`data:image/svg+xml;utf8,${userCtx?.user?.avatar}`}
+            src={userCtx?.user?.avatar}
             alt={`${userCtx?.user?.nickname} 's personsal identification icon`}
           ></Avatar>
         </Badge>

@@ -1,39 +1,47 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ChangeEvent } from 'react';
+import { convertAbToBase64 } from 'services/Generic';
 
-export default function ImageUpload(props) {
-  const [image, setImage] = useState('');
-  const [imageURL, setImageURL] = useState('');
+export default function ImageUpload2(props: { value: string }) {
+  const [image, setImage] = useState<File | null>();
+  const [imageURL, setImageURL] = useState(props.value);
+
   useEffect(() => {
     if (!image) return;
     const newImageURL = URL.createObjectURL(image);
     setImageURL(newImageURL);
   }, [image]);
 
-  function onImageChange(e) {
-    setImage(e.target.files[0]);
+  function onImageChange(e: ChangeEvent<HTMLInputElement>) {
+    if (!e.target.files) return;
+    const uploadFile = e.target.files[0];
+    uploadFile.arrayBuffer().then((ab) => {
+      const base64Img = convertAbToBase64(ab);
+      setImageURL('data:image/png;base64,' + base64Img);
+    });
+
+    setImage(uploadFile);
   }
 
   return (
     <div>
       <input type="file" accept="image/*" onChange={onImageChange} />
-      <img width="200px" src={props.value} />
 
-      <img width="200px" src={imageURL} />
+      <img width="200px" src={imageURL}></img>
     </div>
   );
 }
 
 /**
  * @see https://imagekit.io/blog/how-to-resize-image-in-javascript/
- */
+
 export function resizeFileUpload(uploadTargetFile, previewOutput, MAX_WIDTH, MAX_HEIGHT) {
-  var reader = new FileReader();
+  const reader = new FileReader();
   reader.onload = function (e) {
-    var img = document.createElement('img');
+    const img = document.createElement('img');
     img.onload = function (_event) {
       // Dynamically create a canvas element
-      var width = img.width;
-      var height = img.height;
+      let width = img.width;
+      let height = img.height;
 
       // Change the resizing logic
       if (width > height) {
@@ -48,17 +56,18 @@ export function resizeFileUpload(uploadTargetFile, previewOutput, MAX_WIDTH, MAX
         }
       }
 
-      var canvas = document.createElement('canvas');
+      const canvas = document.createElement('canvas');
       canvas.width = width;
       canvas.height = height;
-      var ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, width, height);
+      const ctx = canvas.getContext('2d');
+      ctx?.drawImage(img, 0, 0, width, height);
 
       // Show resized image in preview element
-      var dataurl = canvas.toDataURL(imageFile.type);
+      const dataurl = canvas.toDataURL(imageFile.type);
       previewOutput.src = dataurl;
     };
     img.src = e.target.result;
   };
   reader.readAsDataURL(uploadTargetFile);
 }
+ */
