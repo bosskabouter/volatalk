@@ -1,7 +1,8 @@
 import { IContact } from 'types';
 import { PeerContext } from 'providers/PeerProvider';
 import React, { useContext, useEffect, useState } from 'react';
-
+import CallIcon from '@mui/icons-material/Call';
+import VideoCameraFrontIcon from '@mui/icons-material/VideoCameraFront';
 import CommentIcon from '@mui/icons-material/Comment';
 import Badge from '@mui/material/Badge';
 import Avatar from '@mui/material/Avatar';
@@ -16,6 +17,9 @@ import {
   ListItemIcon,
   ListItemText,
 } from '@mui/material';
+import { VideoCameraFront } from '@mui/icons-material';
+import { getLocalDateString } from 'services/Generic';
+
 interface ContactListItemProps {
   contact: IContact;
 }
@@ -26,35 +30,57 @@ export const ContactListItem = (props: ContactListItemProps) => {
   const [declined, setDeclined] = useState(props.contact.declined);
   const [online, setOnline] = useState(peer?.isConnectedWith(props.contact));
 
-  useEffect(() => {
-    return () => {
-      <></>;
-    };
-  }, [
-    accepted,
-    declined,
-    online,
-    props.contact.avatar,
-    props.contact.nickname,
-    props.contact.peerid,
-  ]);
+  const handleClickContact = (action: string) => () => {
+    alert(action + ' contact ' + props.contact.nickname);
+  };
+
+  const secondaryOptions = () => {
+    return (
+      <>
+        <IconButton
+          onClick={handleClickContact('videocall')}
+          edge="end"
+          aria-label="Video Call"
+          color="success"
+        >
+          <VideoCameraFront />
+        </IconButton>
+        <IconButton
+          onClick={handleClickContact('audiocall')}
+          edge="end"
+          aria-label="Audio Call"
+          color="success"
+        >
+          <CallIcon />
+        </IconButton>
+      </>
+    );
+  };
 
   return (
     <>
       <ListItem
-        alignItems="flex-start"
         key={props.contact.peerid}
-        secondaryAction={
-          <IconButton edge="end" aria-label="comments">
-            <CommentIcon />
-          </IconButton>
-        }
+        onClick={handleClickContact('messages')}
+        alignItems="flex-start"
+        secondaryAction={secondaryOptions()}
         disablePadding
       >
         <Badge
+          about={online ? 'user online' : 'user off-line'}
           color={online ? 'success' : 'default'}
           overlap="circular"
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          variant="dot"
+        >
+          <ListItemAvatar>
+            <Avatar src={props.contact.avatar}></Avatar>
+          </ListItemAvatar>
+        </Badge>
+        <Badge
+          color={declined ? 'error' : accepted ? 'default' : 'warning'}
+          overlap="circular"
+          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
           variant="dot"
         >
           <ListItemAvatar>
@@ -64,20 +90,11 @@ export const ContactListItem = (props: ContactListItemProps) => {
             ></Avatar>
           </ListItemAvatar>
         </Badge>
-        <ListItemAvatar>
-          <Avatar src={props.contact.avatar}></Avatar>
-        </ListItemAvatar>
-
-        <ListItemButton role={undefined} onClick={undefined} dense>
-          <ListItemIcon>
-            <IconButton edge="end" aria-label="comments">
-              <CommentIcon />
-            </IconButton>
-          </ListItemIcon>
-        </ListItemButton>
-        <ListItemText>
-          {props.contact.nickname} - {props.contact.avatar}
-        </ListItemText>
+        <ListItemText
+          id={props.contact.peerid}
+          primary={props.contact.nickname}
+          secondary={`since ${getLocalDateString(props.contact.dateCreated)}`}
+        />
       </ListItem>
       <Divider variant="inset" component="li" />
     </>

@@ -5,7 +5,6 @@ import * as React from 'react';
 const ContactsPage = () => {
   return (
     <>
-      <Typography gutterBottom>Contacts</Typography>
       <ContactList></ContactList>
     </>
   );

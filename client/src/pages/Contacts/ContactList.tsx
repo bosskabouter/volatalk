@@ -25,7 +25,8 @@ const ContactList = () => {
 
   return (
     <div>
-      <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}
+      <List
+        sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}
         dense={true}
         subheader={
           <ListSubheader component="div" id="nested-list-subheader">
@@ -34,9 +35,9 @@ const ContactList = () => {
         }
       >
         {contactList &&
-          contactList.map((contact) => (
-            <ContactListItem contact={contact} key={contact.peerid}></ContactListItem>
-          ))}
+          contactList.map((contact) => {
+            return <ContactListItem contact={contact} key={contact.peerid} />;
+          })}
       </List>
     </div>
   );

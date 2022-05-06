@@ -167,6 +167,13 @@ export function resizeFileUpload(
     }
   });
 }
+export function getLocalDateString(date: Date) {
+  const dateFormat = new Intl.DateTimeFormat(navigator.languages[0]);
+
+  console.log(dateFormat.format(date));
+
+  return dateFormat.format(date);
+}
 
 export {
   domain,

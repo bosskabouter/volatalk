@@ -1,6 +1,6 @@
 import { extractInvite, IInvite, makeInviteURL } from 'services/InvitationService';
 
-import React, { useContext, useRef } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
@@ -18,19 +18,31 @@ import QrCode2Icon from '@mui/icons-material/QrCode';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 
 import Close from '@mui/icons-material/Close';
+import { identicon } from 'minidenticons';
 
 export default function Invite() {
   const inputRef = useRef();
   const { user } = useContext(UserContext);
 
-  const [showOrScan, setShowOrScan] = React.useState<boolean>(true);
+  const [toggle, setToggle] = React.useState<boolean>(true);
+  const [inviteText, setInviteText] = React.useState<string>('Invitation from ' + user.nickname);
+  const [inviteUrl, setInviteUrl] = React.useState('');
 
-  const handleShowOrScan = (_event: React.MouseEvent<HTMLElement>, newScanOrShow: boolean) => {
-    setShowOrScan(newScanOrShow);
+  const handleToggle = (_event: React.MouseEvent<HTMLElement>, _newScanOrShow: boolean) => {
+    if (_newScanOrShow === !toggle) setToggle(_newScanOrShow);
   };
 
-  function DisplayQR() {
-    const [inviteUrl, setInviteUrl] = React.useState('');
+  useEffect(() => {
+    makeInviteURL(user, inviteText).then((iUrl) => {
+      console.log('Generated new inviteURL: ' + iUrl);
+      setInviteUrl(iUrl.toString());
+    });
+    return () => {
+      console.log('used effect');
+    };
+  }, [inviteText, user]);
+
+  function DisplayQRCode() {
     const handleShareInvite = (txt: string) => {
       console.log(txt);
       shareSomething('VolaTALK Invitation', 'Invitation from ' + user.nickname, inviteUrl);
@@ -42,10 +54,12 @@ export default function Invite() {
       if (!event || !event.target || !event.target.value) {
         return;
       }
-      const inviteText = event.target.value;
+      const iText = event.target.value;
+      setInviteText(iText);
+      //event.target.focus();
 
-      console.debug('Invitation text: ' + inviteText);
-      makeInviteURL(user, inviteText).then((iUrl) => {
+      console.debug('Invitation text: ' + iText);
+      makeInviteURL(user, iText).then((iUrl) => {
         console.log('Generated new inviteURL: ' + iUrl);
         setInviteUrl(iUrl.toString());
       });
@@ -54,15 +68,16 @@ export default function Invite() {
     return (
       <>
         <Box>
-          <br />
           <TextField
             spellCheck
+            autoFocus
             inputRef={inputRef}
             fullWidth
             placeholder="Enter invitation text"
             variant={'outlined'}
             label={'Invitation text'}
-            onChange={(value) => handleInviteTextChange(value)}
+            value={inviteText}
+            onChange={(e) => handleInviteTextChange(e)}
           ></TextField>
           <br />
           <br />
@@ -84,22 +99,21 @@ export default function Invite() {
     );
   }
 
-  const DisplayScanner = () => {
+  const DisplayQRScanner = () => {
     const [scanResult, setScanResult] = React.useState('No result');
     const [invite, setInvite] = React.useState<IInvite | null>();
 
     return (
       <>
-        {invite ?? <br />}
+        {invite ?? <>wat gebeurt hier</>}
         <QrReader
+          videoStyle={{ width: '100%', align: 'center' }}
           onResult={(result, error) => {
             if (!!result) {
               const url = result?.getText();
               setScanResult(url);
               const u = new URL(url);
-              extractInvite(u.searchParams).then((inv) => {
-                setInvite(inv);
-              });
+              document.location = document.location.origin + '/acceptInvite'+ u.search;
             }
 
             if (!!error) {
@@ -108,7 +122,7 @@ export default function Invite() {
           }}
           constraints={{ noiseSuppression: true }}
         />
-        <em>{scanResult}</em>
+        {(invite)? identicon(invite.peerId):'' }
       </>
     );
   };
@@ -119,9 +133,9 @@ export default function Invite() {
         <Close />
       </Link>
       <>
-        {showOrScan ? <DisplayQR /> : <DisplayScanner />}
+        {toggle ? <DisplayQRCode /> : <DisplayQRScanner />}
 
-        <ToggleButtonGroup value={showOrScan} fullWidth exclusive onChange={handleShowOrScan}>
+        <ToggleButtonGroup value={toggle} fullWidth exclusive onChange={handleToggle}>
           <ToggleButton value={true}>
             <QrCode2Icon /> SHOW INVITE
           </ToggleButton>

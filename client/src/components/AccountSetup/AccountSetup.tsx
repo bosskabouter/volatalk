@@ -28,6 +28,7 @@ import { setCreated, setIsSecure } from 'store/slices/accountSlice';
 import { exportCryptoKey, generateKeyPair, peerIdFromPublicKey } from 'services/Crypto';
 import ImageUpload from 'util/ImageUpload';
 import { UserContext } from 'providers/UserProvider';
+import { userInfo } from 'os';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -77,15 +78,13 @@ const questions = [
 ];
 
 const AccountSetup = () => {
-  const { setAuthenticated } = useContext(AuthContext);
+  const { authenticated, setAuthenticated } = useContext(AuthContext);
   const { setUser } = useContext(UserContext);
   const dispatch = useDispatch();
   const theme = useTheme();
   const fullScreen = isMobile ? true : false;
-  const navigate = useNavigate();
+  const navigate   = useNavigate();
   const db = useContext(DatabaseContext);
-
-
 
   const validationSchema = yup.object({
     nickname: yup
@@ -367,8 +366,8 @@ const AccountSetup = () => {
     <Dialog
       css={styles.accountSetupDialogRoot}
       open={true}
-      disableEscapeKeyDown
-      maxWidth="lg"
+      disableEscapeKeyDown={!authenticated}
+      maxWidth="lg" 
       fullScreen={fullScreen}
     >
       <DialogContent id="dialog-agreement" css={styles.accountSetupDialogContent}>
@@ -396,13 +395,7 @@ const AccountSetup = () => {
           <ImageUpload value={formik.values.avatar} />
 
           <FormControlLabel
-            control={
-              <Checkbox
-                id="isSearchable"
-                value={formik.values.isSearchable}
-                onChange={formik.handleChange}
-              />
-            }
+            control={<Checkbox id="isSearchable" value={formik.values.isSearchable} />}
             label={
               formik.values.isSearchable
                 ? 'Let anyone find me by my nickname'

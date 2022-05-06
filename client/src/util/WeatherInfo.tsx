@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 
 import axios from 'axios';
-import { Avatar } from '@mui/material';
+import { Avatar, Typography } from '@mui/material';
+import { getLocalDateString } from 'services/Generic';
 
 interface WeatherInfoProps {
   location: GeolocationPosition | null;
@@ -53,13 +54,12 @@ export const WeatherInfo = ({ location }: WeatherInfoProps) => {
 
   return (
     <>
-      , near {locationData}
-      <br />
-      Weather today: {weatherToday}
-      <br />
-      Next week forecast:
-      {weatherForecast}
-      <Avatar src={weatherIcon} alt="Current Weather Image" variant="rounded"></Avatar>
+    
+      <Avatar src={weatherIcon} alt="Current Weather Image" variant="square"></Avatar>
+      <Typography variant='subtitle2'>
+        {weatherToday} today {getLocalDateString(new Date())}, near {locationData}
+        Next week {weatherForecast}
+      </Typography>
     </>
   );
 };
