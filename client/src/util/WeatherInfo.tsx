@@ -54,9 +54,8 @@ export const WeatherInfo = ({ location }: WeatherInfoProps) => {
 
   return (
     <>
-    
       <Avatar src={weatherIcon} alt="Current Weather Image" variant="square"></Avatar>
-      <Typography variant='subtitle2'>
+      <Typography variant="subtitle2">
         {weatherToday} today {getLocalDateString(new Date())}, near {locationData}
         Next week {weatherForecast}
       </Typography>

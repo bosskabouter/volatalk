@@ -113,7 +113,7 @@ export default function Invite() {
               const url = result?.getText();
               setScanResult(url);
               const u = new URL(url);
-              document.location = document.location.origin + '/acceptInvite'+ u.search;
+              document.location = document.location.origin + '/acceptInvite' + u.search;
             }
 
             if (!!error) {
@@ -122,7 +122,7 @@ export default function Invite() {
           }}
           constraints={{ noiseSuppression: true }}
         />
-        {(invite)? identicon(invite.peerId):'' }
+        {invite ? identicon(invite.peerId) : ''}
       </>
     );
   };

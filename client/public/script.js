@@ -5,8 +5,8 @@ const socket = io('/'); // Create our socket
 const videoGrid = document.getElementById('video-grid'); // Find the Video-Grid element
 
 const connOpts = {
-  host: "peer.pm",
-  port: "999",
+  host: 'peer.pm',
+  port: '999',
   path: '/',
   secure: true,
   key: 'volakey',

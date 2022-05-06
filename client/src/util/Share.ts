@@ -6,7 +6,6 @@ export default function shareSomething(title: string, inviteText: string, url: s
       url: url,
       title: title,
       text: inviteText,
-     
     };
 
     navigator.share(share);

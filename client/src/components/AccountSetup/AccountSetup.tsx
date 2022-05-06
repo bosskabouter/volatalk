@@ -83,7 +83,7 @@ const AccountSetup = () => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const fullScreen = isMobile ? true : false;
-  const navigate   = useNavigate();
+  const navigate = useNavigate();
   const db = useContext(DatabaseContext);
 
   const validationSchema = yup.object({
@@ -367,7 +367,7 @@ const AccountSetup = () => {
       css={styles.accountSetupDialogRoot}
       open={true}
       disableEscapeKeyDown={!authenticated}
-      maxWidth="lg" 
+      maxWidth="lg"
       fullScreen={fullScreen}
     >
       <DialogContent id="dialog-agreement" css={styles.accountSetupDialogContent}>

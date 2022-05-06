@@ -2,20 +2,13 @@
 
 import { css } from '@emotion/react';
 import CssBaseline from '@mui/material/CssBaseline';
-import {
-  Box,
-  Link,List, ListItem, ListItemText,
-  
-} from '@mui/material';
+import { Box, Link, List, ListItem, ListItemText } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Logo from '../../assets/images/volatalk-logo-336x280.webp';
 import packageJson from '../../../package.json';
 
-
 const About = () => {
- 
-
   const styles = {
     box: css`
       display: flex;

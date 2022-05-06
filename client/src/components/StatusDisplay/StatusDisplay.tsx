@@ -21,7 +21,7 @@ const StatusDisplay = () => {
   });
 
   function myPeerid() {
-    return peerCtx?.id  ? peerCtx.id : '123';
+    return peerCtx?.id ? peerCtx.id : '123';
   }
 
   function online() {
