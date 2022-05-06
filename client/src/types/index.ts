@@ -3,7 +3,7 @@ export type WebRTCUser = {
   email: string;
   stream: MediaStream;
 };
-//TODO incluide interfaces here
+
 export type IConnectionMetadata = {
   peerid: string;
   signature: string;

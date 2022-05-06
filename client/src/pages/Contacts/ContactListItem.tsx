@@ -2,11 +2,14 @@ import { IContact } from 'types';
 import { PeerContext } from 'providers/PeerProvider';
 import React, { useContext, useEffect, useState } from 'react';
 import CallIcon from '@mui/icons-material/Call';
-import VideoCameraFrontIcon from '@mui/icons-material/VideoCameraFront';
-import CommentIcon from '@mui/icons-material/Comment';
+import AddTaskIcon from '@mui/icons-material/AddTask';
+
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
+
 import Badge from '@mui/material/Badge';
 import Avatar from '@mui/material/Avatar';
 import { identicon } from 'minidenticons';
+
 import {
   Checkbox,
   Divider,
@@ -34,9 +37,41 @@ export const ContactListItem = (props: ContactListItemProps) => {
     alert(action + ' contact ' + props.contact.nickname);
   };
 
+  const AcceptContactButton = () => {
+    return !props.contact.accepted ? (
+      <IconButton
+        onClick={handleClickContact('accept')}
+        edge="start"
+        aria-label="Accept Contact?"
+        color="success"
+      >
+        <AddTaskIcon />
+      </IconButton>
+    ) : (
+      <></>
+    );
+  };
+
+  const BlockContactButton = () => {
+    return !props.contact.declined ? (
+      <IconButton
+        onClick={handleClickContact('block')}
+        edge="start"
+        aria-label="Block Contact"
+        color="error"
+      >
+        <RemoveCircleOutlineIcon />
+      </IconButton>
+    ) : (
+      <></>
+    );
+  };
+
   const secondaryOptions = () => {
     return (
       <>
+        <AcceptContactButton></AcceptContactButton>
+        <BlockContactButton></BlockContactButton>
         <IconButton
           onClick={handleClickContact('videocall')}
           edge="end"
@@ -74,6 +109,7 @@ export const ContactListItem = (props: ContactListItemProps) => {
           variant="dot"
         >
           <ListItemAvatar>
+            <img src={props.contact.avatar} />
             <Avatar src={props.contact.avatar}></Avatar>
           </ListItemAvatar>
         </Badge>

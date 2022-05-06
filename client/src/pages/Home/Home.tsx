@@ -5,7 +5,11 @@ import * as React from 'react';
 
 const Home = () => {
   const usrCtx = React.useContext(UserContext);
-  return (<><Typography  variant="h1">Hi {usrCtx?.user?.nickname}</Typography></>);
+  return (
+    <>
+      <Typography variant="h5">Hi {usrCtx?.user?.nickname}</Typography>
+    </>
+  );
 };
 
 export default Home;

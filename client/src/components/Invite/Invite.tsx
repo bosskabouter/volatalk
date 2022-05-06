@@ -19,6 +19,7 @@ import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 
 import Close from '@mui/icons-material/Close';
 import { identicon } from 'minidenticons';
+import { isMobile } from 'react-device-detect';
 
 export default function Invite() {
   const inputRef = useRef();
@@ -37,9 +38,7 @@ export default function Invite() {
       console.log('Generated new inviteURL: ' + iUrl);
       setInviteUrl(iUrl.toString());
     });
-    return () => {
-      console.log('used effect');
-    };
+  
   }, [inviteText, user]);
 
   function DisplayQRCode() {
@@ -106,7 +105,9 @@ export default function Invite() {
     return (
       <>
         {invite ?? <>wat gebeurt hier</>}
-        <QrReader
+        <QrReader ViewFinder={ViewFinder}   
+  videoId= 'video'
+         
           videoStyle={{ width: '100%', align: 'center' }}
           onResult={(result, error) => {
             if (!!result) {
@@ -117,10 +118,10 @@ export default function Invite() {
             }
 
             if (!!error) {
-              console.info('Scanned nothing... ' + error);
+              console.debug('Scanned nothing... ' + error);
             }
           }}
-          constraints={{ noiseSuppression: true }}
+          constraints={{ noiseSuppression: true, facingMode: isMobile ? 'environment' : 'user' }}
         />
         {invite ? identicon(invite.peerId) : ''}
       </>
@@ -148,3 +149,49 @@ export default function Invite() {
     </Dialog>
   );
 }
+
+
+
+export const ViewFinder = () => (
+  <>
+    <svg
+      width="50px"
+      viewBox="0 0 100 100"
+      style={{
+        top: 0,
+        left: 0,
+        zIndex: 1,
+        boxSizing: 'border-box',
+        border: '50px solid rgba(0, 0, 0, 0.3)',
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+      }}
+    >
+      <path
+        fill="none"
+        d="M13,0 L0,0 L0,13"
+        stroke="rgba(255, 0, 0, 0.5)"
+        strokeWidth="5"
+      />
+      <path
+        fill="none"
+        d="M0,87 L0,100 L13,100"
+        stroke="rgba(255, 0, 0, 0.5)"
+        strokeWidth="5"
+      />
+      <path
+        fill="none"
+        d="M87,100 L100,100 L100,87"
+        stroke="rgba(255, 0, 0, 0.5)"
+        strokeWidth="5"
+      />
+      <path
+        fill="none"
+        d="M100,13 L100,0 87,0"
+        stroke="rgba(255, 0, 0, 0.5)"
+        strokeWidth="5"
+      />
+    </svg>
+  </>
+);

@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { extractInvite, IInvite, INVITE_PARAM } from 'services/InvitationService';
 import { identicon } from 'minidenticons';
 import Avatar from '@mui/material/Avatar';
@@ -19,7 +19,7 @@ export default function AcceptInvite() {
   const db = useContext(DatabaseContext);
 
   const peerCtx = useContext(PeerContext);
-
+  const navigate = useNavigate();
   useEffect(() => {
     extractInvite(queryParams).then((invite) => {
       setReceivedInvite(invite);
@@ -28,27 +28,29 @@ export default function AcceptInvite() {
 
   //handler
   const handleSendConnectRequest = async () => {
-    if (db && receivedInvite && peerCtx) {
-      let contact = await db.contacts.get(receivedInvite.peerId);
-      if (contact) setResult('Invite already accepted.. Still trying to connect... ');
-      else {
-        //generate signature with other peers id
-        const sig = await peerCtx.genSignature(receivedInvite.peerId);
+    if (!(db && receivedInvite && peerCtx)) return;
 
-        contact = {
-          nickname: receivedInvite.text,
-          peerid: receivedInvite.peerId,
-          dateCreated: new Date(),
-          accepted: true,
-          signature: sig,
-        };
-        db.contacts.add(contact);
-      }
+    let contact = await db.contacts.get(receivedInvite.peerId);
+    if (contact) setResult(`Invite already accepted.. Still trying to connect... `);
+    else {
+      //generate signature with other peers id
+      const sig = await peerCtx.genSignature(receivedInvite.peerId);
 
-      const connection = peerCtx.initiateConnection(contact);
-
-      setSenderOnline(connection.open);
+      contact = {
+        nickname: receivedInvite.text,
+        peerid: receivedInvite.peerId,
+        dateCreated: new Date(),
+        accepted: true,
+        signature: sig,
+      };
+      db.contacts.add(contact);
     }
+
+    const connection = peerCtx.initiateConnection(contact);
+    setSenderOnline(connection.open);
+    
+    navigate(`/Contacts`);
+
   };
 
   return !receivedInvite ? (

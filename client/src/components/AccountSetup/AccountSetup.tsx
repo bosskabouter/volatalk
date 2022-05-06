@@ -28,9 +28,9 @@ import { setCreated, setIsSecure } from 'store/slices/accountSlice';
 
 import { exportCryptoKey, generateKeyPair, peerIdFromPublicKey } from 'services/Crypto';
 
-import { UserContext } from 'providers/UserProvider';
-import ImageUpload2 from 'util/ImageUpload2';
+import { IUserContext, UserContext } from 'providers/UserProvider';
 import { convertAbToBase64 } from 'services/Generic';
+import { IUserProfile } from 'types';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -152,26 +152,12 @@ const AccountSetup = () => {
     },
   });
 
-  function updateUser(values: {
-    isSecured: boolean;
-    isSearchable: boolean;
-    pin: string;
-    question1: string;
-    answer1: string;
-    question2: string;
-    answer2: string;
-    peerid: string;
-    privateKey: string;
-    nickname: string;
-    avatar: string;
-    dateRegistered: Date;
-  }) {
+  function updateUser(values: IUserProfile) {
     // Save to database
     if (db !== null) {
       db.userProfile.put(values, 1);
       setUser(values);
       navigate('/', { replace: false });
-
     }
   }
 
@@ -179,20 +165,7 @@ const AccountSetup = () => {
    *
    * @param values
    */
-  function registerUser(values: {
-    isSecured: boolean;
-    isSearchable: boolean;
-    pin: string;
-    question1: string;
-    answer1: string;
-    question2: string;
-    answer2: string;
-    peerid: string;
-    privateKey: string;
-    nickname: string;
-    avatar: string;
-    dateRegistered: Date;
-  }) {
+  function registerUser(values: IUserProfile) {
     generateKeyPair().then((keyPair) => {
       if (!keyPair) {
         return;
@@ -210,6 +183,7 @@ const AccountSetup = () => {
 
           // Save to database
           if (db !== null) {
+            //only 1 user, for now
             db.userProfile
               .put(values, 1)
               .then(() => {
@@ -217,14 +191,10 @@ const AccountSetup = () => {
                 if (formik.values.isSecured) {
                   dispatch(setIsSecure());
                 }
-
-                db.userProfile.get(1).then((user) => {
-                  if (user) dispatch(setUser(user));
-                });
+                setUser(values);
 
                 setAuthenticated(true);
-
-                navigate('/', { replace: false });
+                navigate('/');
               })
               .catch((err) => {
                 console.error(err);

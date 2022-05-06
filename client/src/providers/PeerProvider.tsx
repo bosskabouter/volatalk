@@ -19,10 +19,12 @@ export default function PeerProvider({ children }: IPeerProviderProps) {
 
   useEffect(() => {
     if (userContext?.user && db) {
-      const pm = new PeerManager(userContext.user, db);
-      setPeerManager(pm);
+      if (!peerManager || peerManager.disconnected) {
+        const pm = new PeerManager(userContext.user, db);
+        setPeerManager(pm);
+      }
     }
-  }, [userContext, db]);
+  }, [userContext, db, peerManager]);
 
   return <PeerContext.Provider value={peerManager}>{children}</PeerContext.Provider>;
 }

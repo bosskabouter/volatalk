@@ -83,7 +83,7 @@ const EULA = () => {
 
   /*
    * Contains the search result text from Google in <ListItem key="1">
-   * 
+   *
    * Added some screen best practices.
    * This allows blind users to know where they're at on the page.
    * https://github.com/mui-org/material-ui/issues/9158
