@@ -1,7 +1,7 @@
 {
   "short_name": "VolaTALK",
-  "name": "VolaTALK - the Private Direct Communication",
-  "description": "Private & Direct Video, Calling & Messenging.",
+  "name": "VolaTALK - the Private Direct Messenger",
+  "description": "Private & Direct Video, Calling & Messenging. The new way to communicate directly with your contacts, without the need for any central authority to capture or censure your private data.",
   "icons": [
     {
       "src": "assets/volatalk-logo-336x280.webp",

@@ -13,7 +13,7 @@ export const WeatherInfo = ({ location }: WeatherInfoProps) => {
 
   const [locationData, setLocationData] = useState<string>(JSON.stringify({ name: 'Lutjebroek' }));
   const [weatherToday, setWeatherToday] = useState<string>('Cloudy, little rain');
-  const [weatherIcon, setWeatherIcon] = useState<string>('Cloudy, little rain');
+  const [weatherIcon, setWeatherIcon] = useState<string>('');
   const [weatherForecast, setWeatherForecast] = useState<string>('Sunshine, after the rain');
 
   useEffect(() => {
@@ -54,11 +54,11 @@ export const WeatherInfo = ({ location }: WeatherInfoProps) => {
 
   return (
     <>
-      <Avatar src={weatherIcon} alt="Current Weather Image" variant="square"></Avatar>
-      <Typography variant="subtitle2">
+      {<Avatar src={weatherIcon} alt="Current Weather Image" variant="square"></Avatar>}
+      <Typography variant="subtitle1">
         {weatherToday} today {getLocalDateString(new Date())}, near {locationData}
-        Next week {weatherForecast}
       </Typography>
+      <Typography variant="subtitle2">Next week {weatherForecast}</Typography>
     </>
   );
 };

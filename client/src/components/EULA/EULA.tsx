@@ -82,6 +82,8 @@ const EULA = () => {
   };
 
   /*
+   * Contains the search result text from Google in <ListItem key="1">
+   * 
    * Added some screen best practices.
    * This allows blind users to know where they're at on the page.
    * https://github.com/mui-org/material-ui/issues/9158
@@ -104,12 +106,12 @@ const EULA = () => {
         </MobileView>
       </div>
       <DialogTitle id="dialog-title" css={styles.eulaTitleBackground}>
-        Welcome to VolaTALK. <em>Direct, Private Communication</em>
+        Welcome to VolaTALK.
       </DialogTitle>
       <DialogContent id="dialog-agreement" css={styles.eulaDialogContentRoot}>
         <List>
           <ListItem key="1">
-            <ListItemText primary="The new way to communicate directly with your contacts, without the need for any central authority to capture or censure your private data." />
+            <ListItemText primary="Private, Direct Video, Calling and Messenging. The new way to communicate directly with your contacts, without the need for any central authority to capture or censure your private data." />
           </ListItem>
           <ListItem key="2">
             <ListItemText primary="All information is encrypted on your local device and no personal data is send to any server." />

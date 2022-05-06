@@ -167,11 +167,10 @@ export function resizeFileUpload(
     }
   });
 }
+
+const dateFormat = new Intl.DateTimeFormat(navigator.languages[0]);
+
 export function getLocalDateString(date: Date) {
-  const dateFormat = new Intl.DateTimeFormat(navigator.languages[0]);
-
-  console.log(dateFormat.format(date));
-
   return dateFormat.format(date);
 }
 

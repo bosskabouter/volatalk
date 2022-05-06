@@ -7,8 +7,7 @@ export default function Geolocation() {
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((position: GeolocationPosition) => {
-        console.info('Latitude: ' + position.coords.latitude);
-        console.info('Longitude: ' + position.coords.longitude);
+        console.debug(`long(${position.coords.longitude}) lang(${position.coords.latitude})`);
         setData(position);
       });
     } else {

@@ -21,7 +21,9 @@ const Footer = () => {
 
   return (
     <AppBar css={styles.footerRoot} position="static">
+      
       <Geolocation></Geolocation>
+      
     </AppBar>
   );
 };

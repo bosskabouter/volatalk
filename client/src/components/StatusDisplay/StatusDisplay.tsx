@@ -5,7 +5,7 @@ import { identicon } from 'minidenticons';
 import ICON_ONLINE from '@mui/icons-material/ConnectWithoutContactRounded';
 import ICON_OFFLINE from '@mui/icons-material/CloudOffRounded';
 
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 import { UserContext } from 'providers/UserProvider';
 import Avatar from '@mui/material/Avatar';
 import Badge from '@mui/material/Badge';
@@ -15,10 +15,6 @@ const StatusDisplay = () => {
   const userCtx = useContext(UserContext);
 
   const peerCtx = useContext(PeerContext);
-
-  useEffect(() => {
-    console.info('used effect StatusDsplay..');
-  });
 
   function myPeerid() {
     return peerCtx?.id ? peerCtx.id : '123';
