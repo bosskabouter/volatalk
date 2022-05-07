@@ -22,6 +22,7 @@ import {
 } from '@mui/material';
 import { VideoCameraFront } from '@mui/icons-material';
 import { getLocalDateString } from 'services/Generic';
+import { DatabaseContext } from 'providers/DatabaseProvider';
 
 interface ContactListItemProps {
   contact: IContact;
@@ -29,6 +30,8 @@ interface ContactListItemProps {
 
 export const ContactListItem = (props: ContactListItemProps) => {
   const peer = useContext(PeerContext);
+  const db = useContext(DatabaseContext);
+
   const [accepted, setAccepted] = useState(props.contact.accepted);
   const [declined, setDeclined] = useState(props.contact.declined);
   const [online, setOnline] = useState(peer?.isConnectedWith(props.contact));
@@ -38,12 +41,19 @@ export const ContactListItem = (props: ContactListItemProps) => {
   };
 
   const AcceptContactButton = () => {
+    const acceptContact = () => () => {
+      props.contact.accepted = true;
+      db?.contacts.put(props.contact);
+      setOnline(peer?.checkConnection(props.contact));
+      setAccepted(true);
+    };
     return !props.contact.accepted ? (
       <IconButton
-        onClick={handleClickContact('accept')}
+        onClick={acceptContact()}
         edge="start"
         aria-label="Accept Contact?"
         color="success"
+        size="small"
       >
         <AddTaskIcon />
       </IconButton>
@@ -53,12 +63,19 @@ export const ContactListItem = (props: ContactListItemProps) => {
   };
 
   const BlockContactButton = () => {
+    const blockContact = () => () => {
+      props.contact.declined = true;
+      db?.contacts.put(props.contact);
+      setOnline(peer?.checkConnection(props.contact));
+      setDeclined(true)
+    };
     return !props.contact.declined ? (
       <IconButton
         onClick={handleClickContact('block')}
         edge="start"
         aria-label="Block Contact"
         color="error"
+        size="small"
       >
         <RemoveCircleOutlineIcon />
       </IconButton>
@@ -77,6 +94,7 @@ export const ContactListItem = (props: ContactListItemProps) => {
           edge="end"
           aria-label="Video Call"
           color="success"
+          size="small"
         >
           <VideoCameraFront />
         </IconButton>
@@ -85,6 +103,7 @@ export const ContactListItem = (props: ContactListItemProps) => {
           edge="end"
           aria-label="Audio Call"
           color="success"
+          size="small"
         >
           <CallIcon />
         </IconButton>
@@ -109,7 +128,6 @@ export const ContactListItem = (props: ContactListItemProps) => {
           variant="dot"
         >
           <ListItemAvatar>
-            <img src={props.contact.avatar} />
             <Avatar src={props.contact.avatar}></Avatar>
           </ListItemAvatar>
         </Badge>
@@ -120,16 +138,16 @@ export const ContactListItem = (props: ContactListItemProps) => {
           variant="dot"
         >
           <ListItemAvatar>
-            <Avatar
+            <Avatar sizes='small'
               src={`data:image/svg+xml;utf8,${identicon(props.contact.peerid)}`}
               alt={`${props.contact.nickname} 's personsal identification icon`}
             ></Avatar>
           </ListItemAvatar>
         </Badge>
-        <ListItemText
+        <ListItemText 
           id={props.contact.peerid}
           primary={props.contact.nickname}
-          secondary={`since ${getLocalDateString(props.contact.dateCreated)}`}
+          secondary={`connected since ${getLocalDateString(props.contact.dateCreated)}`}
         />
       </ListItem>
       <Divider variant="inset" component="li" />

@@ -8,7 +8,7 @@ import {
 import { convertAbToBase64, convertBase64ToAb } from './Generic';
 import { IUserProfile } from 'types';
 
-export const INVITE_PARAM = { FROM: 'f', KEY: 'k', SIGNATURE: 's' };
+export const INVITE_PARAMKEYS = { FROM: 'f', KEY: 'k', SIGNATURE: 's' };
 
 export interface IInvite {
   peerId: string;
@@ -29,11 +29,11 @@ export function makeInviteURL(user: IUserProfile, inviteText: string) {
       const hostEnvUrl = window.location.origin + '/acceptInvite';
 
       const realURL = new URL(hostEnvUrl);
-      realURL.searchParams.append(INVITE_PARAM.FROM, user.peerid);
+      realURL.searchParams.append(INVITE_PARAMKEYS.FROM, user.peerid);
 
-      realURL.searchParams.append(INVITE_PARAM.KEY, inviteText);
+      realURL.searchParams.append(INVITE_PARAMKEYS.KEY, inviteText);
 
-      realURL.searchParams.append(INVITE_PARAM.SIGNATURE, sigEncoded);
+      realURL.searchParams.append(INVITE_PARAMKEYS.SIGNATURE, sigEncoded);
 
       console.debug('Signed invitation: ' + realURL);
       return realURL;
@@ -44,19 +44,19 @@ export function makeInviteURL(user: IUserProfile, inviteText: string) {
 /**Did we receive an invite from someone, let's 'try to connect
  */
 export async function extractInvite(params: URLSearchParams) {
-  const otherPeerId = params.get(INVITE_PARAM.FROM);
-  const sigEncoded = params.get(INVITE_PARAM.SIGNATURE);
-  const invitationText = params.get(INVITE_PARAM.KEY);
+  const otherPeerId = params.get(INVITE_PARAMKEYS.FROM);
+  const sigEncoded = params.get(INVITE_PARAMKEYS.SIGNATURE);
+  const invitationText = params.get(INVITE_PARAMKEYS.KEY);
 
   if (
-    !params.has(INVITE_PARAM.FROM) ||
+    !params.has(INVITE_PARAMKEYS.FROM) ||
     !otherPeerId ||
-    !params.has(INVITE_PARAM.SIGNATURE) ||
+    !params.has(INVITE_PARAMKEYS.SIGNATURE) ||
     !sigEncoded ||
-    !params.has(INVITE_PARAM.KEY) ||
+    !params.has(INVITE_PARAMKEYS.KEY) ||
     !invitationText
   ) {
-    alert('Incomplete invitation data.');
+    console.warn('Incomplete invitation data.');
     return null;
   }
 

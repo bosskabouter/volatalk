@@ -1,12 +1,13 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { extractInvite, IInvite, INVITE_PARAM } from 'services/InvitationService';
+import { extractInvite, IInvite } from 'services/InvitationService';
 import { identicon } from 'minidenticons';
 import Avatar from '@mui/material/Avatar';
 import Badge from '@mui/material/Badge';
 import { Button, TextField } from '@mui/material';
 import { DatabaseContext } from 'providers/DatabaseProvider';
 import { PeerContext } from 'providers/PeerProvider';
+import { Alerter } from 'components/StatusDisplay/Alerter';
 
 export default function AcceptInvite() {
   const [queryParams] = useState<URLSearchParams>(new URLSearchParams(useLocation().search));
@@ -46,15 +47,14 @@ export default function AcceptInvite() {
       db.contacts.add(contact);
     }
 
-    const connection = peerCtx.initiateConnection(contact);
-    setSenderOnline(connection.open);
-    
-    navigate(`/Contacts`);
+    const online = peerCtx?.checkConnection(contact);
+    setSenderOnline(online);
 
+    navigate(`/Contacts`);
   };
 
   return !receivedInvite ? (
-    <div>No invitation available</div>
+    <Alerter message="No invite in URL" type="error" />
   ) : (
     <div>
       Received invite: {receivedInvite.text}

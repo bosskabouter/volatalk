@@ -9,7 +9,7 @@ import {
   signMessage,
   verifyMessage,
 } from './Crypto';
-import { convertBase64ToAb, convertAbToBase64 } from './Generic';
+
 
 export class PeerManager extends Peer {
   user: IUserProfile;
@@ -77,7 +77,7 @@ export class PeerManager extends Peer {
 
     console.debug('Contact PubKey imported', contactPubKey);
 
-    const sigDecoded = new Uint8Array(JSON.parse(conn.metadata.signature)).buffer;
+    const sigDecoded = new Uint8Array(JSON.parse(md.signature)).buffer;
 
     const valid = await verifyMessage(this.user.peerid, sigDecoded, contactPubKey);
     console.debug(`Signature valid: ` + valid);
@@ -90,12 +90,11 @@ export class PeerManager extends Peer {
   async acceptTrustedConnection(conn: DataConnection) {
     const contact = await this.db.contacts.get(conn.peer);
 
-    if (!contact || !contact.signature) {
+    if (!contact) {
       alert('Trusted connection with NEW contact' + conn.peer);
       //just save for now, then notify react somehow, user will decide to accept or not
 
-      this.createContactAndHandshake(conn);
-      
+      this.registerContactForAproval(conn);
     } else {
       console.info('Trusted connection with KNOWN contact', contact, conn);
       this.receiveRegisteredContact(contact, conn);
@@ -104,12 +103,15 @@ export class PeerManager extends Peer {
 
   /**
    */
-  createContactAndHandshake(conn: DataConnection) {
+  async registerContactForAproval(conn: DataConnection) {
     const md: IConnectionMetadata = conn.metadata;
+
+    //create signature for contact
+    const sig = await this.genSignature(conn.peer);
 
     const contact: IContact = {
       peerid: conn.peer,
-      signature: convertBase64ToAb(md.signature),
+      signature: sig,
       nickname: md.nickname,
       avatar: md.avatar,
       dateCreated: new Date(),
@@ -117,21 +119,26 @@ export class PeerManager extends Peer {
       accepted: false,
       declined: false,
     };
-    this.db.contacts.add(contact);
-    alert('Contact added: ' + contact.nickname + ' with signature: ' + md.signature);
+    await this.db.contacts.add(contact);
+    //alert('Contact added: ' + contact.nickname + ' with signature: ' + md.signature);
     //let's close for now and reestablish a connection from our side to send our signature
+    console.debug(`Created contact. Closing connection and wait user aproval.`, contact, conn);
     conn.close();
-    this.initiateConnection(contact);
   }
 
   /**
-   * Contact is signature validated and known. Now Validate if we have accepted
+   * Know contact incoming. Validate if we have 1. accepted 2. not declined 3.
    */
   receiveRegisteredContact(contact: IContact, conn: DataConnection) {
-    contact.nickname = conn.metadata.nickname; //update user info
+    const md: IConnectionMetadata = conn.metadata;
+    contact.nickname = md.nickname;
+    contact.avatar = md.avatar;
     this.db.contacts.put(contact);
-    if (contact.declined) {
-      console.warn('Declined contact connecting. Aborting connection.', contact);
+    if (!contact.accepted) {
+      console.warn('Unaccepted contact trying to connect. Aborting.', contact);
+      conn.close();
+    } else if (contact.declined) {
+      console.warn('Declined contact trying to connect. Aborting connection.', contact);
       conn.close();
     } else if (contact.accepted) {
       conn.send('Hi!');
@@ -159,27 +166,29 @@ export class PeerManager extends Peer {
    */
 
   initiateConnection(contact: IContact) {
+    if (contact.declined) {
+      console.debug(
+        'Not initiating connection with declined contact: ' + contact.nickname,
+        contact
+      );
+      return;
+    }
     //do not send private key / passwordhash to other side
     if (!contact.signature) {
       throw Error('No signature for contact: ' + contact.nickname);
     }
     const md: IConnectionMetadata = {
       signature: JSON.stringify(Array.from(new Uint8Array(contact.signature))),
-      nickname: JSON.stringify(this.user.nickname),
-      avatar: JSON.stringify(this.user.avatar),
+      nickname: this.user.nickname,
+      avatar: this.user.avatar,
       dateRegistered: this.user.dateRegistered,
       peerid: JSON.stringify(this.user.peerid),
     };
-    console.info('Initiate connection with contact: ' + contact.nickname, contact, {
+
+    const connection = this.connect(contact.peerid, {
       metadata: md,
     });
-
-    const options = {
-      metadata: md,
-    };
-
-    const connection = this.connect(contact.peerid, options);
-    console.info('Connecting to: ' + connection.metadata, connection);
+    console.info('Connecting with: ' + contact.nickname, connection);
 
     this.connectedContacts.set(connection.peer, connection);
 
@@ -191,16 +200,19 @@ export class PeerManager extends Peer {
   }
 
   checkConnection(contact: IContact) {
-    const conn = this.connectedContacts.get(contact.peerid);
+    let conn = this.connectedContacts.get(contact.peerid);
     if (conn) {
       if (conn.open) {
-        console.info('Connection open with contact: ', contact.peerid);
+        console.debug('Connection open with: ' + contact.nickname, contact);
+        return true;
       } else {
-        console.info('Waiting to open connection with contact: ', contact.peerid);
+        console.debug('Waiting for connection to open with contact: ' + contact.nickname, contact, conn);
+        return false;
       }
     } else {
       console.info('Opening connection with contact: ' + contact.nickname, contact);
-      this.initiateConnection(contact);
+      conn = this.initiateConnection(contact);
+      return conn && conn.open;
     }
   }
 

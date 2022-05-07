@@ -6,7 +6,10 @@ import CloseIcon from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
 import Snackbar from '@mui/material/Snackbar';
 import { Button } from '@mui/material';
-export default function Alerter() {
+
+
+
+export   const Alerter = (props: {message:string,type:string}) => {
   const [open, setOpen] = React.useState(true);
 
   const handleClick = (txt: string) => {
@@ -38,7 +41,7 @@ export default function Alerter() {
         open={open}
         autoHideDuration={6000}
         onClose={handleClose}
-        message="Note archived"
+        message={props.message}
         action={action}
       />
     </div>

@@ -28,7 +28,7 @@ import { setCreated, setIsSecure } from 'store/slices/accountSlice';
 
 import { exportCryptoKey, generateKeyPair, peerIdFromPublicKey } from 'services/Crypto';
 
-import { IUserContext, UserContext } from 'providers/UserProvider';
+import { UserContext } from 'providers/UserProvider';
 import { convertAbToBase64 } from 'services/Generic';
 import { IUserProfile } from 'types';
 

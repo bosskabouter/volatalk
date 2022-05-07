@@ -1,4 +1,4 @@
-import { extractInvite, IInvite, makeInviteURL } from 'services/InvitationService';
+import { IInvite, makeInviteURL } from 'services/InvitationService';
 
 import React, { useContext, useEffect, useRef } from 'react';
 
@@ -38,7 +38,6 @@ export default function Invite() {
       console.log('Generated new inviteURL: ' + iUrl);
       setInviteUrl(iUrl.toString());
     });
-  
   }, [inviteText, user]);
 
   function DisplayQRCode() {
@@ -104,10 +103,10 @@ export default function Invite() {
 
     return (
       <>
-        {invite ?? <>wat gebeurt hier</>}
-        <QrReader ViewFinder={ViewFinder}   
-  videoId= 'video'
-         
+        {invite ?? <></>}
+        <QrReader
+          ViewFinder={ViewFinder}
+          videoId="video"
           videoStyle={{ width: '100%', align: 'center' }}
           onResult={(result, error) => {
             if (!!result) {
@@ -129,7 +128,7 @@ export default function Invite() {
   };
 
   return (
-    <Dialog open fullWidth>
+    <Dialog open fullWidth  >
       <Link to="/">
         <Close />
       </Link>
@@ -138,10 +137,10 @@ export default function Invite() {
 
         <ToggleButtonGroup value={toggle} fullWidth exclusive onChange={handleToggle}>
           <ToggleButton value={true}>
-            <QrCode2Icon /> SHOW INVITE
+            <QrCode2Icon /> SHOW MY QR
           </ToggleButton>
           <ToggleButton value={false}>
-            READ INVITE
+             SCAN OTHER QR
             <QrCodeScannerIcon />
           </ToggleButton>
         </ToggleButtonGroup>
@@ -150,9 +149,7 @@ export default function Invite() {
   );
 }
 
-
-
-export const ViewFinder = () => (
+const ViewFinder = () => (
   <>
     <svg
       width="50px"
@@ -168,30 +165,15 @@ export const ViewFinder = () => (
         height: '100%',
       }}
     >
-      <path
-        fill="none"
-        d="M13,0 L0,0 L0,13"
-        stroke="rgba(255, 0, 0, 0.5)"
-        strokeWidth="5"
-      />
-      <path
-        fill="none"
-        d="M0,87 L0,100 L13,100"
-        stroke="rgba(255, 0, 0, 0.5)"
-        strokeWidth="5"
-      />
+      <path fill="none" d="M13,0 L0,0 L0,13" stroke="rgba(255, 0, 0, 0.5)" strokeWidth="5" />
+      <path fill="none" d="M0,87 L0,100 L13,100" stroke="rgba(255, 0, 0, 0.5)" strokeWidth="5" />
       <path
         fill="none"
         d="M87,100 L100,100 L100,87"
         stroke="rgba(255, 0, 0, 0.5)"
         strokeWidth="5"
       />
-      <path
-        fill="none"
-        d="M100,13 L100,0 87,0"
-        stroke="rgba(255, 0, 0, 0.5)"
-        strokeWidth="5"
-      />
+      <path fill="none" d="M100,13 L100,0 87,0" stroke="rgba(255, 0, 0, 0.5)" strokeWidth="5" />
     </svg>
   </>
 );
