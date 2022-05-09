@@ -8,6 +8,7 @@ import { Button, TextField } from '@mui/material';
 import { DatabaseContext } from 'providers/DatabaseProvider';
 import { PeerContext } from 'providers/PeerProvider';
 import { Alerter } from 'components/StatusDisplay/Alerter';
+import { ContactService } from 'services/ContactService';
 
 export default function AcceptInvite() {
   const [queryParams] = useState<URLSearchParams>(new URLSearchParams(useLocation().search));
@@ -28,29 +29,22 @@ export default function AcceptInvite() {
   }, [queryParams, result]);
 
   //handler
-  const handleSendConnectRequest = async () => {
+  const handleAcceptContact = async () => {
     if (!(db && receivedInvite && peerCtx)) return;
 
     let contact = await db.contacts.get(receivedInvite.peerId);
-    if (contact) setResult(`Invite already accepted.. Still trying to connect... `);
+    if (contact) setResult(`Invite already accepted.. Still waiting to connect... `);
     else {
-      //generate signature with other peers id
-      const sig = await peerCtx.genSignature(receivedInvite.peerId);
-
       contact = {
         nickname: receivedInvite.text,
         peerid: receivedInvite.peerId,
         dateCreated: new Date(),
         accepted: true,
-        signature: sig,
+        signature: new ArrayBuffer(0),
       };
-      db.contacts.add(contact);
+      new ContactService(db, peerCtx).acceptContact(contact);
+      navigate(`/Contacts`);
     }
-
-    const online = peerCtx?.checkConnection(contact);
-    setSenderOnline(online);
-
-    navigate(`/Contacts`);
   };
 
   return !receivedInvite ? (
@@ -72,7 +66,7 @@ export default function AcceptInvite() {
       <Button
         variant="contained"
         onClick={() => {
-          handleSendConnectRequest();
+          handleAcceptContact();
         }}
       >
         Accept the Invitation and send a contact request?

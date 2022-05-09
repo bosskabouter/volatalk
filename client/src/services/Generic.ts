@@ -119,8 +119,8 @@ function atou(str: string) {
  * @see https://imagekit.io/blog/how-to-resize-image-in-javascript/
  */
 export function resizeFileUpload(
-  fileInput: any,
-  previewOutput: any,
+  fileInput: HTMLInputElement,
+  previewOutput: HTMLImageElement,
   MAX_WIDTH: number,
   MAX_HEIGHT: number
 ) {
@@ -156,9 +156,11 @@ export function resizeFileUpload(
           const ctx = canvas.getContext('2d');
           ctx?.drawImage(img, 0, 0, width, height);
 
-          // Show resized image in preview element
-          const dataurl = canvas.toDataURL(imageFile.type);
-          previewOutput.src = dataurl;
+          // Show resized image in preview element, if present
+          if (previewOutput) {
+            const dataurl = canvas.toDataURL(imageFile.type);
+            previewOutput.src = dataurl;
+          }
         };
 
         if (e.target?.result) img.src = e.target.result.toString();
@@ -168,12 +170,26 @@ export function resizeFileUpload(
   });
 }
 
-const dateFormat = new Intl.DateTimeFormat(navigator.languages[0]);
+const dateFormat = new Intl.DateTimeFormat(navigator.languages[0], {
+//  dateStyle: 'full',
+
+  weekday: 'long',
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+
+const timeFormat = new Intl.DateTimeFormat(navigator.languages[0], {
+  timeStyle: 'short',
+ // timeZoneName: 'short',
+});
 
 export function getLocalDateString(date: Date) {
   return dateFormat.format(date);
 }
-
+export function getLocalTimeString(date: Date) {
+  return timeFormat.format(date);
+}
 export {
   domain,
   localLoad,

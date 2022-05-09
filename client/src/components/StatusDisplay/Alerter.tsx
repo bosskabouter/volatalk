@@ -7,9 +7,7 @@ import IconButton from '@mui/material/IconButton';
 import Snackbar from '@mui/material/Snackbar';
 import { Button } from '@mui/material';
 
-
-
-export   const Alerter = (props: {message:string,type:string}) => {
+export const Alerter = (props: { message: string; type: string }) => {
   const [open, setOpen] = React.useState(true);
 
   const handleClick = (txt: string) => {
@@ -46,4 +44,4 @@ export   const Alerter = (props: {message:string,type:string}) => {
       />
     </div>
   );
-}
+};

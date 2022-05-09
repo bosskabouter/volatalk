@@ -4,7 +4,7 @@ import React, { useContext, useEffect, useRef } from 'react';
 
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { QRCodeSVG } from 'qrcode.react';
 import { QrReader } from 'react-qr-reader';
@@ -100,7 +100,7 @@ export default function Invite() {
   const DisplayQRScanner = () => {
     const [scanResult, setScanResult] = React.useState('No result');
     const [invite, setInvite] = React.useState<IInvite | null>();
-
+    const navigate = useNavigate();
     return (
       <>
         {invite ?? <></>}
@@ -113,7 +113,8 @@ export default function Invite() {
               const url = result?.getText();
               setScanResult(url);
               const u = new URL(url);
-              document.location = document.location.origin + '/acceptInvite' + u.search;
+              navigate('/acceptInvite' + u.search);
+              //document.location = document.location.origin + '/acceptInvite' + u.search;
             }
 
             if (!!error) {
@@ -128,7 +129,7 @@ export default function Invite() {
   };
 
   return (
-    <Dialog open fullWidth  >
+    <Dialog open fullWidth>
       <Link to="/">
         <Close />
       </Link>
@@ -140,7 +141,7 @@ export default function Invite() {
             <QrCode2Icon /> SHOW MY QR
           </ToggleButton>
           <ToggleButton value={false}>
-             SCAN OTHER QR
+            SCAN OTHER QR
             <QrCodeScannerIcon />
           </ToggleButton>
         </ToggleButtonGroup>

@@ -71,6 +71,7 @@
     "redux-thunk": "^2.4.1",
     "sass": "^1.48.0",
     "socket.io-client": "^4.5.0",
+    "strict-event-emitter-types": "^2.0.0",
     "typeface-roboto": "1.1.13",
     "yup": "^0.32.11"
   },
