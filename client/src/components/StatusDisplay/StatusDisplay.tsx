@@ -19,17 +19,19 @@ const StatusDisplay = () => {
   const [online, setOnline] = useState(false);
 
   useEffect(() => {
-    peerCtx?.on('statusChange', (status) => {
+    function handleStatusChange(status: boolean) {
+      //alert('Status change;' + status);
       setOnline(status);
-    });
+    }
+    peerCtx?.on('statusChange', handleStatusChange);
 
     return () => {
-      console.log('When?');
+      peerCtx?.removeListener('statusChange', handleStatusChange);
     };
-  }, [peerCtx]);
+  }, [peerCtx, online]);
 
   function myPeerid() {
-    return peerCtx?.peer.id ? peerCtx.peer.id : '123';
+    return peerCtx?._peer.id ? peerCtx._peer.id : '123';
   }
 
   function OnlineDiv() {
@@ -45,7 +47,7 @@ const StatusDisplay = () => {
   }
 
   function peerDiv() {
-    return  (
+    return (
       <Box className="peerInfo">
         <Badge
           color="info"
@@ -72,7 +74,7 @@ const StatusDisplay = () => {
         </Badge>
         {OnlineDiv()}
       </Box>
-    ) 
+    );
   }
 
   return (

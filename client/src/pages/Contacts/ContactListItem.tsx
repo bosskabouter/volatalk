@@ -1,6 +1,6 @@
-import { IContact } from 'types';
-import { PeerContext } from 'providers/PeerProvider';
-import React, { useContext, useState } from 'react';
+import { IContact, IMessage } from 'types';
+import { PeerContext, usePeer } from 'providers/PeerProvider';
+import React, { useContext, useEffect, useState } from 'react';
 import CallIcon from '@mui/icons-material/Call';
 import AddTaskIcon from '@mui/icons-material/AddTask';
 
@@ -15,6 +15,9 @@ import { VideoCameraFront } from '@mui/icons-material';
 import { getLocalDateString } from 'services/Generic';
 import { DatabaseContext } from 'providers/DatabaseProvider';
 import { ContactService } from 'services/ContactService';
+import { UserContext } from 'providers/UserProvider';
+import { PeerManager, PeerManagerEvents } from 'services/PeerManager';
+import StrictEventEmitter from 'strict-event-emitter-types/types/src';
 
 interface ContactListItemProps {
   contact: IContact;
@@ -22,6 +25,7 @@ interface ContactListItemProps {
 
 export const ContactListItem = (props: ContactListItemProps) => {
   const peer = useContext(PeerContext);
+  const user = useContext(UserContext);
   const db = useContext(DatabaseContext);
 
   const [accepted, setAccepted] = useState(props.contact.accepted);
@@ -32,17 +36,34 @@ export const ContactListItem = (props: ContactListItemProps) => {
     alert(action + ' contact ' + props.contact.nickname);
   };
 
+  useEffect(() => {
+    function messageHandler(message: IMessage) {
+      console.log('Message received in messageHandler: ' + message);
+    }
+    function contactStatusHandle(contact: IContact, statusChange: boolean) {
+      console.log('contactStatusHandle Handler: ' + contact);
+      setOnline(statusChange);
+    }
+    peer?.on('onMessage', messageHandler);
+    peer?.on('onContactStatusChange', contactStatusHandle);
+
+    return () => {
+      peer?.removeListener('onMessage', messageHandler);
+      peer?.removeListener('onContactStatusChange', contactStatusHandle);
+    };
+  }, [peer]);
+
   const AcceptContactButton = () => {
-    const acceptContact = () => () => {
+    const acceptContact = () => {
       if (db && peer) {
-        new ContactService(db, peer).acceptContact(props.contact);
+        new ContactService(user.user, db).acceptContact(props.contact);
         //setOnline();
         setAccepted(true);
       }
     };
     return !props.contact.accepted ? (
       <IconButton
-        onClick={acceptContact()}
+        onClick={acceptContact}
         edge="start"
         aria-label="Accept Contact?"
         color="success"
@@ -56,15 +77,15 @@ export const ContactListItem = (props: ContactListItemProps) => {
   };
 
   const BlockContactButton = () => {
-    const blockContact = () => () => {
+    const blockContact = () => {
       props.contact.declined = true;
       db?.contacts.put(props.contact);
-      setOnline(peer?.checkConnection(props.contact));
+      setOnline(peer?._checkConnection(props.contact));
       setDeclined(true);
     };
     return !props.contact.declined ? (
       <IconButton
-        onClick={handleClickContact('block')}
+        onClick={blockContact}
         edge="start"
         aria-label="Block Contact"
         color="error"
@@ -115,7 +136,7 @@ export const ContactListItem = (props: ContactListItemProps) => {
       >
         <Badge
           about={online ? 'user online' : 'user off-line'}
-          color={online ? 'success' : 'default'}
+          color={online ? 'success' : 'error'}
           overlap="circular"
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
           variant="dot"

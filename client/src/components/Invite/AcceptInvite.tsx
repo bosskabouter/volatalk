@@ -9,6 +9,7 @@ import { DatabaseContext } from 'providers/DatabaseProvider';
 import { PeerContext } from 'providers/PeerProvider';
 import { Alerter } from 'components/StatusDisplay/Alerter';
 import { ContactService } from 'services/ContactService';
+import { UserContext } from 'providers/UserProvider';
 
 export default function AcceptInvite() {
   const [queryParams] = useState<URLSearchParams>(new URLSearchParams(useLocation().search));
@@ -20,6 +21,7 @@ export default function AcceptInvite() {
 
   const db = useContext(DatabaseContext);
 
+  const user = useContext(UserContext);
   const peerCtx = useContext(PeerContext);
   const navigate = useNavigate();
   useEffect(() => {
@@ -35,8 +37,8 @@ export default function AcceptInvite() {
     const contact = await db.contacts.get(receivedInvite.peerId);
     if (contact) setResult(`Invite already accepted.. Still waiting to connect... `);
     else {
-      new ContactService(db, peerCtx).acceptInvite(receivedInvite).then((contact) => {
-        console.info('Invitation accepted:  ' + contact.nickname);
+      new ContactService(user.user, db).acceptInvite(receivedInvite).then((c) => {
+        console.info('Invitation accepted:  ' + c.nickname);
       });
       navigate(`/Contacts`);
     }

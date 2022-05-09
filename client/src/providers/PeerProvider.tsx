@@ -1,5 +1,6 @@
 import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
 import StrictEventEmitter from 'strict-event-emitter-types/types/src';
+import { IContact, IMessage } from 'types';
 
 import { PeerManager, PeerManagerEvents } from '../services/PeerManager';
 import { DatabaseContext } from './DatabaseProvider';
@@ -19,19 +20,28 @@ export default function PeerProvider({ children }: IPeerProviderProps) {
   const [peerManager, setPeerManager] = useState<PeerManager | null>(null);
 
   useEffect(() => {
+    function messageHandler(message: IMessage) {
+      console.log('Message received in messageHandler: ' + message);
+    }
+    function newContactHandle(contact: IContact) {
+      console.log('New Contact Handler: ' + contact);
+    }
     if (userContext?.user && db) {
-      if (!peerManager || peerManager.peer.disconnected) {
+      if (!peerManager || peerManager._peer.disconnected) {
         const pm: StrictEventEmitter<PeerManager, PeerManagerEvents> = new PeerManager(
           userContext.user,
           db
         );
 
-        pm.on('onMessage', (message) => {
-          console.log('Message received in Peerprovider: ' + message);
-        });
+        pm.on('onMessage', messageHandler);
+        pm.on('onNewContact', newContactHandle);
         setPeerManager(pm);
       }
     }
+    return () => {
+      peerManager?.removeListener('onMessage', messageHandler);
+      peerManager?.removeListener('onNewContact', newContactHandle);
+    };
   }, [userContext, db, peerManager]);
 
   return <PeerContext.Provider value={peerManager}>{children}</PeerContext.Provider>;

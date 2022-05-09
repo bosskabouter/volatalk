@@ -29,7 +29,7 @@ import { setCreated, setIsSecure } from 'store/slices/accountSlice';
 import { exportCryptoKey, generateKeyPair, peerIdFromPublicKey } from 'services/Crypto';
 
 import { UserContext } from 'providers/UserProvider';
-import { convertAbToBase64, resizeFileUpload } from 'services/Generic';
+import { resizeFileUpload } from 'services/Generic';
 import { IUserProfile } from 'types';
 
 const ITEM_HEIGHT = 48;
