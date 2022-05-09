@@ -117,61 +117,53 @@ function atou(str: string) {
 
 /**
  * @see https://imagekit.io/blog/how-to-resize-image-in-javascript/
+ *
  */
-export function resizeFileUpload(
-  fileInput: HTMLInputElement,
-  previewOutput: HTMLImageElement,
-  MAX_WIDTH: number,
-  MAX_HEIGHT: number
-) {
-  fileInput.setAttribute('accept', 'image/*');
+export function resizeFileUpload(imageFile: File, MAX_WIDTH: number, MAX_HEIGHT: number) {
+  return new Promise((resolve, reject) => {
+    // DO DIRTY JOB
+    //reject(err);
 
-  fileInput.addEventListener('change', function (e: any) {
-    if (e.target.files) {
-      const imageFile = e.target.files[0];
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        const img = document.createElement('img');
-        img.onload = function (_event) {
-          // Dynamically create a canvas element
-          let width = img.width;
-          let height = img.height;
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const img = document.createElement('img');
+      img.onload = function (_event) {
+        // Dynamically create a canvas element
+        let width = img.width;
+        let height = img.height;
 
-          // Change the resizing logic
-          if (width > height) {
-            if (width > MAX_WIDTH) {
-              height = height * (MAX_WIDTH / width);
-              width = MAX_WIDTH;
-            }
-          } else {
-            if (height > MAX_HEIGHT) {
-              width = width * (MAX_HEIGHT / height);
-              height = MAX_HEIGHT;
-            }
+        // Change the resizing logic
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height = height * (MAX_WIDTH / width);
+            width = MAX_WIDTH;
           }
-
-          const canvas = document.createElement('canvas');
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          ctx?.drawImage(img, 0, 0, width, height);
-
-          // Show resized image in preview element, if present
-          if (previewOutput) {
-            const dataurl = canvas.toDataURL(imageFile.type);
-            previewOutput.src = dataurl;
+        } else {
+          if (height > MAX_HEIGHT) {
+            width = width * (MAX_HEIGHT / height);
+            height = MAX_HEIGHT;
           }
-        };
+        }
 
-        if (e.target?.result) img.src = e.target.result.toString();
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+
+        // Show resized image in preview element, if present
+
+        const dataurl = canvas.toDataURL(imageFile.type);
+        resolve(dataurl);
       };
-      reader.readAsDataURL(imageFile);
-    }
+      if (e.target?.result) img.src = e.target.result.toString();
+    };
+    reader.readAsDataURL(imageFile);
   });
 }
 
 const dateFormat = new Intl.DateTimeFormat(navigator.languages[0], {
-//  dateStyle: 'full',
+  //  dateStyle: 'full',
 
   weekday: 'long',
   year: 'numeric',
@@ -181,7 +173,7 @@ const dateFormat = new Intl.DateTimeFormat(navigator.languages[0], {
 
 const timeFormat = new Intl.DateTimeFormat(navigator.languages[0], {
   timeStyle: 'short',
- // timeZoneName: 'short',
+  // timeZoneName: 'short',
 });
 
 export function getLocalDateString(date: Date) {

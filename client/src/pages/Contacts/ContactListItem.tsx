@@ -1,6 +1,6 @@
 import { IContact } from 'types';
 import { PeerContext } from 'providers/PeerProvider';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import CallIcon from '@mui/icons-material/Call';
 import AddTaskIcon from '@mui/icons-material/AddTask';
 
@@ -10,19 +10,11 @@ import Badge from '@mui/material/Badge';
 import Avatar from '@mui/material/Avatar';
 import { identicon } from 'minidenticons';
 
-import {
-  Checkbox,
-  Divider,
-  IconButton,
-  ListItem,
-  ListItemAvatar,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-} from '@mui/material';
+import { Divider, IconButton, ListItem, ListItemAvatar, ListItemText } from '@mui/material';
 import { VideoCameraFront } from '@mui/icons-material';
 import { getLocalDateString } from 'services/Generic';
 import { DatabaseContext } from 'providers/DatabaseProvider';
+import { ContactService } from 'services/ContactService';
 
 interface ContactListItemProps {
   contact: IContact;
@@ -42,10 +34,11 @@ export const ContactListItem = (props: ContactListItemProps) => {
 
   const AcceptContactButton = () => {
     const acceptContact = () => () => {
-      props.contact.accepted = true;
-      db?.contacts.put(props.contact);
-      setOnline(peer?.checkConnection(props.contact));
-      setAccepted(true);
+      if (db && peer) {
+        new ContactService(db, peer).acceptContact(props.contact);
+        //setOnline();
+        setAccepted(true);
+      }
     };
     return !props.contact.accepted ? (
       <IconButton
@@ -67,7 +60,7 @@ export const ContactListItem = (props: ContactListItemProps) => {
       props.contact.declined = true;
       db?.contacts.put(props.contact);
       setOnline(peer?.checkConnection(props.contact));
-      setDeclined(true)
+      setDeclined(true);
     };
     return !props.contact.declined ? (
       <IconButton
@@ -138,13 +131,14 @@ export const ContactListItem = (props: ContactListItemProps) => {
           variant="dot"
         >
           <ListItemAvatar>
-            <Avatar sizes='small'
+            <Avatar
+              sizes="small"
               src={`data:image/svg+xml;utf8,${identicon(props.contact.peerid)}`}
               alt={`${props.contact.nickname} 's personsal identification icon`}
             ></Avatar>
           </ListItemAvatar>
         </Badge>
-        <ListItemText 
+        <ListItemText
           id={props.contact.peerid}
           primary={props.contact.nickname}
           secondary={`connected since ${getLocalDateString(props.contact.dateCreated)}`}

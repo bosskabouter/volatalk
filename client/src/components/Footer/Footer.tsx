@@ -3,7 +3,7 @@
 import { css } from '@emotion/react';
 import { AppBar } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import PeerMan from 'services/PeerMan';
+
 import Geolocation from 'util/GeoLocation';
 
 const Footer = () => {

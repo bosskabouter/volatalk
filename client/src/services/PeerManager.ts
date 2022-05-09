@@ -1,5 +1,7 @@
 import { AppDatabase } from 'Database/Database';
+import EventEmitter from 'events';
 import Peer, { DataConnection } from 'peerjs';
+
 import { IConnectionMetadata, IContact, IMessage, IUserProfile } from 'types';
 
 import {
@@ -10,15 +12,24 @@ import {
   verifyMessage,
 } from './Crypto';
 
+export interface PeerManagerEvents {
+  statusChange: (status: boolean) => void;
+  onContactStatusChange: (contact: IContact, status: boolean) => void;
+  onMessage: (message: IMessage) => void;
+  onNewContact: (contact: IContact) => void;
+}
 
-export class PeerManager extends Peer {
+export class PeerManager extends EventEmitter {
   user: IUserProfile;
   db: AppDatabase;
-
+  peer: Peer;
   connectedContacts = new Map();
 
   constructor(user: IUserProfile, db: AppDatabase) {
-    super(user.peerid, {
+    super();
+
+    //TODO connect several peers
+    this.peer = new Peer(user.peerid, {
       host: 'peer.pm',
       port: 999,
       path: '/',
@@ -29,33 +40,43 @@ export class PeerManager extends Peer {
 
     this.user = user;
     this.db = db;
-    this.on('open', (pid) => {
-      console.log('connected: ' + this.id);
+
+    this.peer.on('open', (pid) => {
+      console.log('connected: ' + this.peer.id);
       if (pid !== user.peerid) {
-        throw Error('Broker assigned different id: ' + pid);
+        throw Error('Signaller assigned different id: ' + pid);
       }
+      this.emit('statusChange', true);
     });
-    this.on('connection', (conn: DataConnection) => {
+    this.peer.on('connection', (conn: DataConnection) => {
       conn.on('open', () => {
         console.debug('Connection open', conn);
         this.hasValidSignatureMetadata(conn).then((valid) => {
-          if (valid) this.acceptTrustedConnection(conn);
-          else alert('Invalid signature from contact: ' + conn.metadata);
+          if (valid) {
+            this.acceptTrustedConnection(conn).then((contact) => {
+              console.info('Contact connected:' + contact.nickname, contact);
+            });
+          } else alert('Invalid signature: ' + JSON.stringify(conn.metadata));
         });
       });
     });
-    this.on('disconnected', () => {
+    this.peer.on('disconnected', () => {
       console.warn('Peer disconnected.');
+
+      this.emit('statusChange', false);
     });
-    this.on('close', function () {
+    this.peer.on('close', () => {
       console.warn('Peer closed.');
+      this.emit('statusChange', false);
     });
 
-    this.on('error', function (err) {
+    this.peer.on('error', (err) => {
       if (err.type === 'peer-unavailable') {
         console.warn('PEER UNREACHABLE:' + err);
       } else {
-        alert('Peer error: ' + err);
+        //alert('Peer error: ' + err);
+
+        this.emit('statusChange', true);
         console.warn(err);
       }
     });
@@ -94,10 +115,10 @@ export class PeerManager extends Peer {
       alert('Trusted connection with NEW contact' + conn.peer);
       //just save for now, then notify react somehow, user will decide to accept or not
 
-      this.registerContactForAproval(conn);
+      return this.registerContactForAproval(conn);
     } else {
       console.info('Trusted connection with KNOWN contact', contact, conn);
-      this.receiveRegisteredContact(contact, conn);
+      return this.receiveRegisteredContact(contact, conn);
     }
   }
 
@@ -122,12 +143,15 @@ export class PeerManager extends Peer {
     await this.db.contacts.add(contact);
     //alert('Contact added: ' + contact.nickname + ' with signature: ' + md.signature);
     //let's close for now and reestablish a connection from our side to send our signature
+
+    this.emit('');
     console.debug(`Created contact. Closing connection and wait user aproval.`, contact, conn);
     conn.close();
+    return contact;
   }
 
   /**
-   * Know contact incoming. Validate if we have 1. accepted 2. not declined 3.
+   * Known contact incoming. Validate if we have 1. accepted 2. not declined 3.
    */
   receiveRegisteredContact(contact: IContact, conn: DataConnection) {
     const md: IConnectionMetadata = conn.metadata;
@@ -142,9 +166,13 @@ export class PeerManager extends Peer {
       conn.close();
     } else if (contact.accepted) {
       conn.send('Hi!');
+      this.connectedContacts.set(contact.peerid, conn);
       console.debug('Accept peer connection', contact, conn);
       alert('Contact online: ' + contact.nickname);
+
+      this.emit('newContactRequest', contact);
     }
+    return contact;
   }
 
   receiveMessage(msg: string, contact: IContact) {
@@ -182,10 +210,10 @@ export class PeerManager extends Peer {
       nickname: this.user.nickname,
       avatar: this.user.avatar,
       dateRegistered: this.user.dateRegistered,
-      peerid: JSON.stringify(this.user.peerid),
+      peerid: this.user.peerid,
     };
 
-    const connection = this.connect(contact.peerid, {
+    const connection = this.peer.connect(contact.peerid, {
       metadata: md,
     });
     console.info('Connecting with: ' + contact.nickname, connection);
@@ -206,14 +234,13 @@ export class PeerManager extends Peer {
         console.debug('Connection open with: ' + contact.nickname, contact);
         return true;
       } else {
-        console.debug('Waiting for connection to open with contact: ' + contact.nickname, contact, conn);
-        return false;
+        console.debug('Reopening connection with contact: ' + contact.nickname, contact);
+        conn.close();
       }
-    } else {
-      console.info('Opening connection with contact: ' + contact.nickname, contact);
-      conn = this.initiateConnection(contact);
-      return conn && conn.open;
     }
+    console.info('Opening connection with contact: ' + contact.nickname, contact);
+    conn = this.initiateConnection(contact);
+    return conn && conn.open;
   }
 
   sendMessage(m: IMessage) {
@@ -222,7 +249,7 @@ export class PeerManager extends Peer {
   }
 
   isOnline() {
-    return !this.disconnected;
+    return !this.peer.disconnected;
   }
 
   isConnectedWith(contact: IContact) {

@@ -32,17 +32,12 @@ export default function AcceptInvite() {
   const handleAcceptContact = async () => {
     if (!(db && receivedInvite && peerCtx)) return;
 
-    let contact = await db.contacts.get(receivedInvite.peerId);
+    const contact = await db.contacts.get(receivedInvite.peerId);
     if (contact) setResult(`Invite already accepted.. Still waiting to connect... `);
     else {
-      contact = {
-        nickname: receivedInvite.text,
-        peerid: receivedInvite.peerId,
-        dateCreated: new Date(),
-        accepted: true,
-        signature: new ArrayBuffer(0),
-      };
-      new ContactService(db, peerCtx).acceptContact(contact);
+      new ContactService(db, peerCtx).acceptInvite(receivedInvite).then((contact) => {
+        console.info('Invitation accepted:  ' + contact.nickname);
+      });
       navigate(`/Contacts`);
     }
   };
@@ -70,6 +65,8 @@ export default function AcceptInvite() {
         }}
       >
         Accept the Invitation and send a contact request?
+        <br></br>
+        Sender is {senderOnline ? 'online' : 'offline'}
       </Button>
       <TextField>${result}</TextField>
     </div>

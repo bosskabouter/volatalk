@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 
 import axios from 'axios';
-import { Avatar, Typography } from '@mui/material';
-import { getLocalDateString } from 'services/Generic';
+import { Box, Typography } from '@mui/material';
+import { getLocalDateString, getLocalTimeString } from 'services/Generic';
 
 interface WeatherInfoProps {
   location: GeolocationPosition | null;
@@ -11,10 +11,11 @@ interface WeatherInfoProps {
 export const WeatherInfo = ({ location }: WeatherInfoProps) => {
   const OPENWEATHER_APIKEY = '420408196cb33ae10825f1019e75bcb2';
 
+  const [time, setTime] = useState<Date>(new Date());
   const [locationData, setLocationData] = useState<string>(JSON.stringify({ name: 'Lutjebroek' }));
   const [weatherToday, setWeatherToday] = useState<string>('Cloudy, little rain');
   const [weatherIcon, setWeatherIcon] = useState<string>('');
-  const [weatherForecast, setWeatherForecast] = useState<string>('Sunshine, after the rain');
+  const [weatherFeelslike, setWeatherForecast] = useState<string>('Sunshine, after the rain');
 
   useEffect(() => {
     if (!location) return;
@@ -31,7 +32,7 @@ export const WeatherInfo = ({ location }: WeatherInfoProps) => {
     }
 
     function makeIconURL(iconName: string) {
-      return 'https://openweathermap.org/img/wn/' + iconName + '@2x.png';
+      return 'https://openweathermap.org/img/wn/' + iconName + '.png';
     }
 
     fetchOpenWeatherData('https://api.openweathermap.org/geo/1.0/reverse').then((res) => {
@@ -46,21 +47,40 @@ export const WeatherInfo = ({ location }: WeatherInfoProps) => {
       setWeatherIcon(iconURL);
     });
     fetchOpenWeatherData('https://api.openweathermap.org/data/2.5/forecast').then((res) => {
-      const fahrenheitNextWeek = res.data.list[39].main.feels_like;
+      const fahrenheitNextWeek = res.data.list[0].main.feels_like;
       const celciusNextWeek = Math.round(toCelsius(fahrenheitNextWeek) / 10) + ' Celcius';
       setWeatherForecast(celciusNextWeek);
     });
   }, [location]);
 
+  useEffect(() => {
+    const interval = setInterval(() => setTime(new Date()), 10000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [time]);
+
   return (
-    <>
-      {<Avatar src={weatherIcon} alt="Current Weather Image" variant="square"></Avatar>}
-      <Typography variant="subtitle1">
-        {weatherToday} today {getLocalDateString(new Date())},
-      </Typography>
-      <Typography variant="subtitle1">near {locationData}</Typography>
-      <Typography variant="subtitle2">Next week {weatherForecast}</Typography>
-    </>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'flex-end',
+        justifyContent: 'right',
+      }}
+    >
+      <img src={weatherIcon} alt="Current Weather" />
+      <div>
+        <Typography variant="subtitle1">
+          {weatherToday},{weatherFeelslike}
+        </Typography>
+        <Typography variant="subtitle2">{locationData}</Typography>
+        <Typography variant="subtitle2">
+          {getLocalTimeString(new Date())} -{getLocalDateString(time)}
+        </Typography>
+      </div>
+    </Box>
   );
 };
 function toCelsius(fahrenheit: number) {

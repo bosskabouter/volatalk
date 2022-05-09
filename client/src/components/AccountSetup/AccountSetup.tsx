@@ -29,7 +29,7 @@ import { setCreated, setIsSecure } from 'store/slices/accountSlice';
 import { exportCryptoKey, generateKeyPair, peerIdFromPublicKey } from 'services/Crypto';
 
 import { UserContext } from 'providers/UserProvider';
-import { convertAbToBase64 } from 'services/Generic';
+import { convertAbToBase64, resizeFileUpload } from 'services/Generic';
 import { IUserProfile } from 'types';
 
 const ITEM_HEIGHT = 48;
@@ -402,16 +402,17 @@ const AccountSetup = () => {
             id="file"
             name="avatar"
             type="file"
+            accept="image/*"
             onChange={(event) => {
               if (!event.target.files) return;
-              const file = event.target.files[0];
-              file.arrayBuffer().then((ab) => {
-                formik.setFieldValue('avatar', 'data:image/png;base64,' + convertAbToBase64(ab));
+              resizeFileUpload(event.target.files[0], 300, 300).then((src) => {
+                formik.setFieldValue('avatar', src);
               });
             }}
             multiple={false}
           />
           <Avatar src={formik.values.avatar} sx={{ width: 300 }}></Avatar>
+
           <FormControlLabel
             control={<Checkbox id="isSearchable" value={formik.values.isSearchable} />}
             label={

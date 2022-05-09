@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import Peer from 'peerjs';
-import { UserContext } from 'providers/UserProvider';
+
 import { IMessage, IUserProfile } from 'types';
 import { getLocalDateString } from './Generic';
 import { PeerManager } from './PeerManager';
@@ -32,7 +31,7 @@ class PeerMan2 extends Component<PeerManProps, PeerManState> {
 
   componentDidMount() {
     this.props.peer.on('connection', (conn) => {
-      conn.on('data', (data) => {
+      conn.on('data', (data: IMessage) => {
         this.setState({
           messages: [...this.state.messages, data],
         });

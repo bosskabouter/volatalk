@@ -5,7 +5,7 @@ import { identicon } from 'minidenticons';
 import ICON_ONLINE from '@mui/icons-material/ConnectWithoutContactRounded';
 import ICON_OFFLINE from '@mui/icons-material/CloudOffRounded';
 
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { UserContext } from 'providers/UserProvider';
 import Avatar from '@mui/material/Avatar';
 import Badge from '@mui/material/Badge';
@@ -16,12 +16,24 @@ const StatusDisplay = () => {
 
   const peerCtx = useContext(PeerContext);
 
+  const [online, setOnline] = useState(false);
+
+  useEffect(() => {
+    peerCtx?.on('statusChange', (status) => {
+      setOnline(status);
+    });
+
+    return () => {
+      console.log('When?');
+    };
+  }, [peerCtx]);
+
   function myPeerid() {
-    return peerCtx?.id ? peerCtx.id : '123';
+    return peerCtx?.peer.id ? peerCtx.peer.id : '123';
   }
 
-  function online() {
-    return peerCtx?.disconnected ? <ICON_OFFLINE /> : <ICON_ONLINE />;
+  function OnlineDiv() {
+    return online ? <ICON_ONLINE /> : <ICON_OFFLINE />;
   }
 
   function userDiv() {
@@ -33,7 +45,7 @@ const StatusDisplay = () => {
   }
 
   function peerDiv() {
-    return peerCtx?.isOnline() ? (
+    return  (
       <Box className="peerInfo">
         <Badge
           color="info"
@@ -58,11 +70,9 @@ const StatusDisplay = () => {
             alt={`${userCtx?.user?.nickname} 's personsal identification icon`}
           ></Avatar>
         </Badge>
-        {online()}
+        {OnlineDiv()}
       </Box>
-    ) : (
-      <div>User without peer</div>
-    );
+    ) 
   }
 
   return (

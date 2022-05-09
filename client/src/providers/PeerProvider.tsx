@@ -1,6 +1,7 @@
 import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
+import StrictEventEmitter from 'strict-event-emitter-types/types/src';
 
-import { PeerManager } from '../services/PeerManager';
+import { PeerManager, PeerManagerEvents } from '../services/PeerManager';
 import { DatabaseContext } from './DatabaseProvider';
 import { UserContext } from './UserProvider';
 
@@ -19,8 +20,15 @@ export default function PeerProvider({ children }: IPeerProviderProps) {
 
   useEffect(() => {
     if (userContext?.user && db) {
-      if (!peerManager || peerManager.disconnected) {
-        const pm = new PeerManager(userContext.user, db);
+      if (!peerManager || peerManager.peer.disconnected) {
+        const pm: StrictEventEmitter<PeerManager, PeerManagerEvents> = new PeerManager(
+          userContext.user,
+          db
+        );
+
+        pm.on('onMessage', (message) => {
+          console.log('Message received in Peerprovider: ' + message);
+        });
         setPeerManager(pm);
       }
     }
