@@ -56,7 +56,6 @@ export class PeerManager
         this._hasValidSignatureMetadata(conn).then((valid) => {
           if (valid) {
             this._acceptTrustedConnection(conn).then((contact) => {
-              
               console.info('Contact connected:' + contact.nickname, contact);
             });
           } else alert('Invalid signature: ' + JSON.stringify(conn.metadata));
@@ -172,21 +171,20 @@ export class PeerManager
     if (!contact.signature) {
       throw Error('No signature for contact: ' + contact.nickname);
     }
-    const md: IConnectionMetadata = {
-      signature: JSON.stringify(Array.from(new Uint8Array(contact.signature))),
-      nickname: this.user.nickname,
-      avatar: this.user.avatar,
-      dateRegistered: this.user.dateRegistered,
-      peerid: this.user.peerid,
-    };
 
     const connection = this._peer.connect(contact.peerid, {
-      metadata: md,
+      metadata: {
+        signature: JSON.stringify(Array.from(new Uint8Array(contact.signature))),
+        nickname: this.user.nickname,
+        avatar: this.user.avatar,
+        dateRegistered: this.user.dateRegistered,
+        peerid: this.user.peerid,
+      },
     });
     console.info('Connecting with: ' + contact.nickname, connection);
 
     if (connection.open) this.connectedContacts.set(connection.peer, connection);
-
+    else alert('Conn is still closed?!');
     connection.on('data', (data) => {
       console.info(`received DATA message from contact:` + contact.nickname, data);
       this._receiveMessageData(data, contact);
@@ -194,7 +192,7 @@ export class PeerManager
     return connection;
   }
 
-  _checkConnection(contact: IContact) {
+  checkConnection(contact: IContact) {
     let conn = this.connectedContacts.get(contact.peerid);
     if (conn) {
       if (conn.open) {

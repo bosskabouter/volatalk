@@ -5,13 +5,21 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch Chrome 3000",
+      "name": "Launch Firefox 3000",
+      "type": "firefox",
       "request": "launch",
-      "type": "chrome",
+      "reAttach": true,
       "url": "http://localhost:3000",
       "webRoot": "${workspaceFolder}"
     },
-   
+    {
+      "name": "Launch Chrome 3000",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}"
+    },
+
     {
       "name": "Launch Chrome 8443",
       "request": "launch",
@@ -19,18 +27,13 @@
       "url": "https://localhost:8443",
       "webRoot": "${workspaceFolder}"
     },
-   
+
     {
       "name": "Launch via NPM",
       "request": "launch",
-      "runtimeArgs": [
-        "run-script",
-        "debug"
-      ],
+      "runtimeArgs": ["run-script", "debug"],
       "runtimeExecutable": "npm",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
+      "skipFiles": ["<node_internals>/**"],
       "type": "node"
     },
     {
@@ -47,8 +50,8 @@
       "env": {
         "DEBUG": "true",
         "PORT_HTTPS": "8443",
-        "DIR_PUB_STATIC":"../client/public",
-        "DIR_RENDER_EJS":"/views"
+        "DIR_PUB_STATIC": "../client/public",
+        "DIR_RENDER_EJS": "/views"
       }
     },
     {
@@ -72,8 +75,8 @@
       "env": {
         "DEBUG": "true",
         "PORT_HTTPS": "8443",
-        "DIR_PUB_STATIC":"../client/public",
-        "DIR_RENDER_EJS":"/views"
+        "DIR_PUB_STATIC": "../client/public",
+        "DIR_RENDER_EJS": "/views"
       }
     }
   ]

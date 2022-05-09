@@ -18,7 +18,7 @@ const ContactList = () => {
       db.contacts.toArray().then((cts) => {
         setContactList(cts);
         cts.forEach((contact) => {
-          peerManager?._checkConnection(contact);
+          peerManager?.checkConnection(contact);
         });
       });
     }

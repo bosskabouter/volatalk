@@ -44,13 +44,20 @@ export default function AcceptInvite() {
     }
   };
 
+  function isOnlineDesc() {
+    return senderOnline ? 'online' : 'offline';
+  }
+
+  function BadgeColor() {
+    return senderOnline ? 'success' : 'error';
+  }
   return !receivedInvite ? (
     <Alerter message="No invite in URL" type="error" />
   ) : (
     <div>
       Received invite: {receivedInvite.text}
       <Badge
-        color={!senderOnline ? 'default' : 'success'}
+        color={BadgeColor()}
         overlap="circular"
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         variant="dot"
@@ -60,15 +67,10 @@ export default function AcceptInvite() {
           alt={`Sender's Identification icon`}
         ></Avatar>
       </Badge>
-      <Button
-        variant="contained"
-        onClick={() => {
-          handleAcceptContact();
-        }}
-      >
+      <Button variant="contained" onClick={handleAcceptContact}>
         Accept the Invitation and send a contact request?
         <br></br>
-        Sender is {senderOnline ? 'online' : 'offline'}
+        Sender is {isOnlineDesc()}
       </Button>
       <TextField>${result}</TextField>
     </div>

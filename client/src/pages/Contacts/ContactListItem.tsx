@@ -33,7 +33,7 @@ export const ContactListItem = (props: ContactListItemProps) => {
   const [online, setOnline] = useState(peer?.isConnectedWith(props.contact));
 
   const handleClickContact = (action: string) => () => {
-    alert(action + ' contact ' + props.contact.nickname);
+    console.log(action + ' contact ' + props.contact.nickname);
   };
 
   useEffect(() => {
@@ -42,7 +42,7 @@ export const ContactListItem = (props: ContactListItemProps) => {
     }
     function contactStatusHandle(contact: IContact, statusChange: boolean) {
       console.log('contactStatusHandle Handler: ' + contact);
-      setOnline(statusChange);
+      if (contact === props.contact) setOnline(statusChange);
     }
     peer?.on('onMessage', messageHandler);
     peer?.on('onContactStatusChange', contactStatusHandle);
@@ -51,7 +51,7 @@ export const ContactListItem = (props: ContactListItemProps) => {
       peer?.removeListener('onMessage', messageHandler);
       peer?.removeListener('onContactStatusChange', contactStatusHandle);
     };
-  }, [peer]);
+  }, [peer, props.contact]);
 
   const AcceptContactButton = () => {
     const acceptContact = () => {
@@ -78,23 +78,25 @@ export const ContactListItem = (props: ContactListItemProps) => {
 
   const BlockContactButton = () => {
     const blockContact = () => {
-      props.contact.declined = true;
+      props.contact.declined = !props.contact.declined;
       db?.contacts.put(props.contact);
-      setOnline(peer?._checkConnection(props.contact));
-      setDeclined(true);
+      setOnline(peer?.checkConnection(props.contact));
+      setDeclined(props.contact.declined);
+      db?.contacts.put(props.contact);
     };
-    return !props.contact.declined ? (
+    function getIconColor() {
+      return props.contact.declined ? 'error' : 'success';
+    }
+    return (
       <IconButton
         onClick={blockContact}
         edge="start"
         aria-label="Block Contact"
-        color="error"
+        color={getIconColor()}
         size="small"
       >
         <RemoveCircleOutlineIcon />
       </IconButton>
-    ) : (
-      <></>
     );
   };
 
@@ -135,8 +137,7 @@ export const ContactListItem = (props: ContactListItemProps) => {
         disablePadding
       >
         <Badge
-          about={online ? 'user online' : 'user off-line'}
-          color={online ? 'success' : 'error'}
+          color={(online) ? 'success': 'default'}
           overlap="circular"
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
           variant="dot"
@@ -146,7 +147,7 @@ export const ContactListItem = (props: ContactListItemProps) => {
           </ListItemAvatar>
         </Badge>
         <Badge
-          color={declined ? 'error' : accepted ? 'default' : 'warning'}
+          color={(declined) ?  'error':'default'}
           overlap="circular"
           anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
           variant="dot"
