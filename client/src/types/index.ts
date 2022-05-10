@@ -3,14 +3,18 @@ export type WebRTCUser = {
   email: string;
   stream: MediaStream;
 };
-
-export type IConnectionMetadata = {
+export interface IInvite {
+  peerId: string;
+  text: string;
+  signature: ArrayBuffer;
+}
+export interface IConnectionMetadata  {
   peerid: string;
   signature: string;
   nickname: string;
   avatar: string;
   dateRegistered: Date;
-};
+}
 
 // defines the interface for the db
 export interface IUserProfile {

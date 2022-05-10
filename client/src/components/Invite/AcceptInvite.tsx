@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { extractInvite, IInvite } from 'services/InvitationService';
+import { extractInvite } from 'services/InvitationService';
 import { identicon } from 'minidenticons';
 import Avatar from '@mui/material/Avatar';
 import Badge from '@mui/material/Badge';
@@ -10,6 +10,7 @@ import { PeerContext } from 'providers/PeerProvider';
 import { Alerter } from 'components/StatusDisplay/Alerter';
 import { ContactService } from 'services/ContactService';
 import { UserContext } from 'providers/UserProvider';
+import { IInvite } from 'types';
 
 export default function AcceptInvite() {
   const [queryParams] = useState<URLSearchParams>(new URLSearchParams(useLocation().search));
@@ -24,11 +25,21 @@ export default function AcceptInvite() {
   const user = useContext(UserContext);
   const peerCtx = useContext(PeerContext);
   const navigate = useNavigate();
+
   useEffect(() => {
-    extractInvite(queryParams).then((invite) => {
-      setReceivedInvite(invite);
-    });
-  }, [queryParams, result]);
+    if (receivedInvite) {
+      setTimeout(() => {
+        const conn = peerCtx?._peer?.connect(receivedInvite.peerId);
+        conn?.on('open', () => {
+          setSenderOnline(true);
+        });
+      }, 10000);
+    } else
+      extractInvite(queryParams).then((invite) => {
+        if (invite) setReceivedInvite(invite);
+        else setResult('Invalid invitation');
+      });
+  }, [peerCtx, queryParams, result, receivedInvite]);
 
   //handler
   const handleAcceptContact = async () => {

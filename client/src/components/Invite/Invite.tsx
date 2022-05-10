@@ -1,4 +1,4 @@
-import { IInvite, makeInviteURL } from 'services/InvitationService';
+import { makeInviteURL } from 'services/InvitationService';
 
 import React, { useContext, useEffect, useRef } from 'react';
 
@@ -20,6 +20,7 @@ import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import Close from '@mui/icons-material/Close';
 import { identicon } from 'minidenticons';
 import { isMobile } from 'react-device-detect';
+import { IInvite } from 'types';
 
 export default function Invite() {
   const inputRef = useRef();
@@ -98,33 +99,24 @@ export default function Invite() {
   }
 
   const DisplayQRScanner = () => {
-    const [scanResult, setScanResult] = React.useState('No result');
-    const [invite, setInvite] = React.useState<IInvite | null>();
     const navigate = useNavigate();
     return (
-      <>
-        {invite ?? <></>}
-        <QrReader
-          ViewFinder={ViewFinder}
-          videoId="video"
-          videoStyle={{ width: '100%', align: 'center' }}
-          onResult={(result, error) => {
-            if (!!result) {
-              const url = result?.getText();
-              setScanResult(url);
-              const u = new URL(url);
-              navigate('/acceptInvite' + u.search);
-              //document.location = document.location.origin + '/acceptInvite' + u.search;
-            }
-
-            if (!!error) {
-              console.debug('Scanned nothing... ' + error);
-            }
-          }}
-          constraints={{ noiseSuppression: true, facingMode: isMobile ? 'environment' : 'user' }}
-        />
-        {invite ? identicon(invite.peerId) : ''}
-      </>
+      <QrReader
+        ViewFinder={ViewFinder}
+        videoId="video"
+        videoStyle={{ width: '100%', align: 'center' }}
+        onResult={(result, error) => {
+          if (!!result) {
+            const url = result?.getText();
+            const u = new URL(url);
+            navigate('/acceptInvite' + u.search);
+          }
+          if (!!error) {
+            console.debug('Scanned nothing... ' + error);
+          }
+        }}
+        constraints={{  facingMode: isMobile ? 'environment' : 'user' }}
+      />
     );
   };
 

@@ -1,7 +1,6 @@
 import { AppDatabase } from 'Database/Database';
-import { IConnectionMetadata, IContact, IUserProfile } from 'types';
+import { IConnectionMetadata, IContact, IInvite, IUserProfile } from 'types';
 import { importPrivateKey, signMessage } from './Crypto';
-import { IInvite } from './InvitationService';
 
 export class ContactService {
   _db: AppDatabase;

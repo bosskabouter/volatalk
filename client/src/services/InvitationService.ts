@@ -6,15 +6,11 @@ import {
   verifyMessage,
 } from './Crypto';
 import { convertAbToBase64, convertBase64ToAb } from './Generic';
-import { IUserProfile } from 'types';
+import { IConnectionMetadata, IInvite, IUserProfile } from 'types';
 
 export const INVITE_PARAMKEYS = { FROM: 'f', KEY: 'k', SIGNATURE: 's' };
 
-export interface IInvite {
-  peerId: string;
-  text: string;
-  signature: ArrayBuffer;
-}
+
 /**
  * TODO: add expiration date
  */
@@ -41,7 +37,8 @@ export function makeInviteURL(user: IUserProfile, inviteText: string) {
   });
 }
 
-/**Did we receive an invite from someone, let's 'try to connect
+/**
+ * Extracts and Verifies invite parameters from URL search
  */
 export async function extractInvite(params: URLSearchParams) {
   const otherPeerId = params.get(INVITE_PARAMKEYS.FROM);
@@ -75,6 +72,7 @@ export async function extractInvite(params: URLSearchParams) {
 
   if (verified) {
     console.info('Invitation verified.');
+    
     return invite;
   } else {
     const msg = 'Invalid signature in invitation: ' + invitationText;

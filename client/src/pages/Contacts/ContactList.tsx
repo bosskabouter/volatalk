@@ -11,29 +11,26 @@ import { PeerManagerEvents } from 'services/PeerManager';
 const ContactList = () => {
   const db = useContext(DatabaseContext);
   const peerManager = useContext(PeerContext);
-  const [contactList, setContactList] = useState<IContact[]>();
+  const [contactList, setContactList] = useState<IContact[]>([]);
 
   useEffect(() => {
-    if (db !== null && peerManager) {
-      db.contacts.toArray().then((cts) => {
-        setContactList(cts);
-        cts.forEach((contact) => {
-          peerManager?.checkConnection(contact);
-        });
-      });
-    }
-  }, [db, peerManager]);
-  /*
-  const updateContact = (event:PeerManagerEvents["onNewContact"]) => {
-    const newContacts = contactList.map(c => {
-      if (event[peerId] == c.peerId) {
-        return { ...c, name: event.target.value}
-      }
-      return item;
+    db?.contacts.toArray().then((cts) => {
+      setContactList(cts);
     });
-    setItems(newItems);
-  }
-  */
+  }, [db]);
+
+  useEffect(() => {
+    if (!peerManager) return;
+    const updateContactList = (newContactEvent: PeerManagerEvents['onNewContact']) => {
+      contactList.push(newContactEvent.arguments);
+      setContactList(contactList);
+    };
+    peerManager.addListener('onNewContact', updateContactList);
+    return () => {
+      peerManager.removeListener('onNewContact', updateContactList);
+    };
+  }, [contactList, peerManager]);
+
   return (
     <div>
       <List

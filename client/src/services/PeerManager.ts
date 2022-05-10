@@ -1,13 +1,12 @@
+import { IConnectionMetadata, IContact, IMessage, IUserProfile } from 'types';
 import { AppDatabase } from 'Database/Database';
-import EventEmitter from 'events';
+import { ContactService } from './ContactService';
+import { importPublicKey, peerIdToPublicKey, verifyMessage } from './Crypto';
+
 import Peer, { DataConnection } from 'peerjs';
 
+import EventEmitter from 'events';
 import StrictEventEmitter from 'strict-event-emitter-types/types/src';
-
-import { IConnectionMetadata, IContact, IMessage, IUserProfile } from 'types';
-import { ContactService } from './ContactService';
-
-import { importPublicKey, peerIdToPublicKey, verifyMessage } from './Crypto';
 
 export interface PeerManagerEvents {
   statusChange: (status: boolean) => void;
@@ -50,22 +49,23 @@ export class PeerManager
       }
       this.emit('statusChange', true);
     });
-    this._peer.on('connection', (conn: DataConnection) => {
-      conn.on('open', () => {
+    this._peer.on('connection', async (conn: DataConnection) => {
+      conn.on('open', async () => {
         console.debug('Connection open', conn);
-        this._hasValidSignatureMetadata(conn).then((valid) => {
-          if (valid) {
-            this._acceptTrustedConnection(conn).then((contact) => {
-              console.info('Contact connected:' + contact.nickname, contact);
-            });
-          } else alert('Invalid signature: ' + JSON.stringify(conn.metadata));
-        });
+        if (await this._hasValidSignatureMetadata(conn)) {
+          const contact = await this._acceptTrustedConnection(conn);
+          console.info('Contact connected:' + contact.nickname, contact);
+          this.connectedContacts.set(contact.peerid, conn);
+          this.emit('onContactStatusChange', contact, true);
+        } else {
+          alert('Invalid signature: ' + JSON.stringify(conn.metadata));
+          conn.close();
+        }
       });
     });
     this._peer.on('disconnected', () => {
       console.warn('Peer disconnected.');
       this.emit('statusChange', false);
-
       setTimeout(() => this._peer.reconnect(), 5000);
     });
     this._peer.on('close', () => {
@@ -77,7 +77,7 @@ export class PeerManager
       if (err.type === 'peer-unavailable') {
         console.warn('PEER UNREACHABLE:' + err);
       } else {
-        this.emit('statusChange', true);
+        this.emit('statusChange', false);
         console.warn(err);
       }
     });
@@ -98,7 +98,7 @@ export class PeerManager
   }
 
   /**
-   * Incoming connection with valid signature, find the contact
+   * Incoming connection with valid signature, find the contact or create a new one 
    */
   async _acceptTrustedConnection(conn: DataConnection) {
     const contact = await this._db.contacts.get(conn.peer);
@@ -109,7 +109,8 @@ export class PeerManager
         conn.metadata
       );
       this.emit('newContactRequest', newContact);
-      conn.close();
+      
+      //keep connection open 
       return newContact;
     } else {
       console.info('Trusted connection with KNOWN contact', contact, conn);
@@ -126,14 +127,12 @@ export class PeerManager
     contact.avatar = md.avatar;
     this._db.contacts.put(contact);
     if (!contact.accepted) {
-      console.warn('Unaccepted contact trying to connect. Aborting.', contact);
-      conn.close();
+      console.info('Unaccepted contact trying to connect.', contact);
     } else if (contact.declined) {
       console.warn('Declined contact trying to connect. Aborting connection.', contact);
       conn.close();
     } else {
       conn.send('Hi!');
-      this.connectedContacts.set(contact.peerid, conn);
       console.debug('Accept peer connection', contact, conn);
       this.emit('onContactStatusChange', contact, conn.open);
     }
