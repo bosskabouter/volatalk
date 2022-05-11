@@ -6,7 +6,7 @@ import Avatar from '@mui/material/Avatar';
 import Badge from '@mui/material/Badge';
 import { Button, TextField } from '@mui/material';
 import { DatabaseContext } from 'providers/DatabaseProvider';
-import { PeerContext } from 'providers/PeerProvider';
+import { PeerContext, usePeer } from 'providers/PeerProvider';
 import { Alerter } from 'components/StatusDisplay/Alerter';
 import { ContactService } from 'services/ContactService';
 import { UserContext } from 'providers/UserProvider';
@@ -32,6 +32,8 @@ export default function AcceptInvite() {
         const conn = peerCtx?._peer?.connect(receivedInvite.peerId);
         conn?.on('open', () => {
           setSenderOnline(true);
+          //just a test (without signature to see if peer is online)
+          conn.close();
         });
       }, 10000);
     } else
@@ -49,6 +51,7 @@ export default function AcceptInvite() {
     if (contact) setResult(`Invite already accepted.. Still waiting to connect... `);
     else {
       new ContactService(user.user, db).acceptInvite(receivedInvite).then((c) => {
+        peerCtx?.checkConnection(c);
         console.info('Invitation accepted:  ' + c.nickname);
       });
       navigate(`/Contacts`);

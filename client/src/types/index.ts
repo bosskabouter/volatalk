@@ -8,7 +8,7 @@ export interface IInvite {
   text: string;
   signature: ArrayBuffer;
 }
-export interface IConnectionMetadata  {
+export interface IConnectionMetadata {
   peerid: string;
   signature: string;
   nickname: string;

@@ -106,21 +106,12 @@ function convertAbToBase64(buffer: ArrayBuffer) {
   return window.btoa(binary);
 }
 
-// ucs-2 string to base64 encoded ascii
-function utoa(str: string) {
-  return window.btoa(unescape(encodeURIComponent(str)));
-}
-// base64 encoded ascii to ucs-2 string
-function atou(str: string) {
-  return decodeURIComponent(escape(window.atob(str)));
-}
-
 /**
  * @see https://imagekit.io/blog/how-to-resize-image-in-javascript/
  *
  */
 export function resizeFileUpload(imageFile: File, MAX_WIDTH: number, MAX_HEIGHT: number) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve, _reject) => {
     // DO DIRTY JOB
     //reject(err);
 
@@ -172,7 +163,7 @@ const dateFormat = new Intl.DateTimeFormat(navigator.languages[0], {
 });
 
 const timeFormat = new Intl.DateTimeFormat(navigator.languages[0], {
-  timeStyle: 'short',
+    timeStyle: 'short',
   // timeZoneName: 'short',
 });
 

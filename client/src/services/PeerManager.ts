@@ -3,10 +3,10 @@ import { AppDatabase } from 'Database/Database';
 import { ContactService } from './ContactService';
 import { importPublicKey, peerIdToPublicKey, verifyMessage } from './Crypto';
 
-import Peer, { DataConnection } from 'peerjs';
 
 import EventEmitter from 'events';
 import StrictEventEmitter from 'strict-event-emitter-types/types/src';
+import Peer, { DataConnection } from 'peerjs';
 
 export interface PeerManagerEvents {
   statusChange: (status: boolean) => void;
@@ -48,6 +48,13 @@ export class PeerManager
         throw Error('Signaller assigned different id: ' + pid);
       }
       this.emit('statusChange', true);
+      this._db.contacts.each((contact: IContact) => {
+        if (!contact.declined) {
+          this.checkConnection(contact);
+        } else {
+          console.info('Not checking declined contact', contact);
+        }
+      });
     });
     this._peer.on('connection', async (conn: DataConnection) => {
       conn.on('open', async () => {
@@ -58,7 +65,7 @@ export class PeerManager
           this.connectedContacts.set(contact.peerid, conn);
           this.emit('onContactStatusChange', contact, true);
         } else {
-          alert('Invalid signature: ' + JSON.stringify(conn.metadata));
+          console.warn('Invalid signature, closing connection.', conn);
           conn.close();
         }
       });
@@ -98,7 +105,7 @@ export class PeerManager
   }
 
   /**
-   * Incoming connection with valid signature, find the contact or create a new one 
+   * Incoming connection with valid signature, find the contact or create a new one
    */
   async _acceptTrustedConnection(conn: DataConnection) {
     const contact = await this._db.contacts.get(conn.peer);
@@ -109,8 +116,8 @@ export class PeerManager
         conn.metadata
       );
       this.emit('newContactRequest', newContact);
-      
-      //keep connection open 
+
+      //keep connection open
       return newContact;
     } else {
       console.info('Trusted connection with KNOWN contact', contact, conn);
@@ -181,9 +188,9 @@ export class PeerManager
       },
     });
     console.info('Connecting with: ' + contact.nickname, connection);
-
-    if (connection.open) this.connectedContacts.set(connection.peer, connection);
-    else alert('Conn is still closed?!');
+    connection.on('open', () => {
+      this.connectedContacts.set(connection.peer, connection);
+    });
     connection.on('data', (data) => {
       console.info(`received DATA message from contact:` + contact.nickname, data);
       this._receiveMessageData(data, contact);

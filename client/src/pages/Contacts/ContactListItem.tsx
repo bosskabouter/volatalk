@@ -41,15 +41,16 @@ export const ContactListItem = (props: ContactListItemProps) => {
       console.log('Message received in messageHandler: ' + message);
     }
     function contactStatusHandle(contact: IContact, statusChange: boolean) {
-      console.log('contactStatusHandle Handler: ' + contact);
-      if (contact === props.contact) setOnline(statusChange);
+      console.log('contactStatusHandle Handler: ' , contact);
+      if (contact.peerid === props.contact.peerid) setOnline(statusChange);
     }
     peer?.on('onMessage', messageHandler);
     peer?.on('onContactStatusChange', contactStatusHandle);
 
     return () => {
+  
       peer?.removeListener('onMessage', messageHandler);
-      peer?.removeListener('onContactStatusChange', contactStatusHandle);
+     // peer?.removeListener('onContactStatusChange', contactStatusHandle);
     };
   }, [peer, props.contact]);
 
@@ -58,6 +59,7 @@ export const ContactListItem = (props: ContactListItemProps) => {
       if (db && peer) {
         new ContactService(user.user, db).acceptContact(props.contact);
         //setOnline();
+        peer.checkConnection(props.contact);
         setAccepted(true);
       }
     };
@@ -137,7 +139,7 @@ export const ContactListItem = (props: ContactListItemProps) => {
         disablePadding
       >
         <Badge
-          color={(online) ? 'success': 'default'}
+          color={online ? 'success' : 'default'}
           overlap="circular"
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
           variant="dot"
@@ -147,7 +149,7 @@ export const ContactListItem = (props: ContactListItemProps) => {
           </ListItemAvatar>
         </Badge>
         <Badge
-          color={(declined) ?  'error':'default'}
+          color={declined ? 'error' : 'default'}
           overlap="circular"
           anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
           variant="dot"

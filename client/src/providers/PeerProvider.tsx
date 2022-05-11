@@ -1,4 +1,5 @@
 import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
+
 import StrictEventEmitter from 'strict-event-emitter-types/types/src';
 import { IContact, IMessage } from 'types';
 
@@ -54,14 +55,18 @@ export default function PeerProvider({ children }: IPeerProviderProps) {
       pm.on('statusChange', handleStatusChange);
       pm.on('onMessage', messageHandler);
       pm.on('onNewContact', newContactHandle);
-      return () => {
-        //pm.removeListener('statusChange', handleStatusChange);
-        pm.removeListener('onMessage', messageHandler);
-        pm.removeListener('onNewContact', newContactHandle);
-        pm._peer.disconnect();
-      };
     }
+    return function cleanup() {
+      alert('Cleaning up!');
+      // peerManager?.removeListener('statusChange', handleStatusChange);
+      peerManager?.removeListener('onMessage', messageHandler);
+      peerManager?.removeListener('onNewContact', newContactHandle);
+      //pm._peer.disconnect();
+    };
   }, [userContext, db, peerManager]);
-
+/*
+  useBeforeunload(() => {
+    peerManager?._peer.disconnect();
+  });*/
   return <PeerContext.Provider value={peerManager}>{children}</PeerContext.Provider>;
 }

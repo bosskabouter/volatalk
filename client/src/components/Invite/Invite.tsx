@@ -115,7 +115,7 @@ export default function Invite() {
             console.debug('Scanned nothing... ' + error);
           }
         }}
-        constraints={{  facingMode: isMobile ? 'environment' : 'user' }}
+        constraints={{ facingMode: isMobile ? 'environment' : 'user' }}
       />
     );
   };
