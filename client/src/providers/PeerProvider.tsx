@@ -57,7 +57,7 @@ export default function PeerProvider({ children }: IPeerProviderProps) {
       pm.on('onNewContact', newContactHandle);
     }
     return function cleanup() {
-      alert('Cleaning up!');
+      //alert('Cleaning up!');
       // peerManager?.removeListener('statusChange', handleStatusChange);
       peerManager?.removeListener('onMessage', messageHandler);
       peerManager?.removeListener('onNewContact', newContactHandle);

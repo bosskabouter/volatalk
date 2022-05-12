@@ -28,9 +28,9 @@ export const ContactListItem = (props: ContactListItemProps) => {
   const user = useContext(UserContext);
   const db = useContext(DatabaseContext);
 
-  const [accepted, setAccepted] = useState(props.contact.accepted);
-  const [declined, setDeclined] = useState(props.contact.declined);
+  const [contact, setContact] = useState<IContact>(props.contact);
   const [online, setOnline] = useState(peer?.isConnectedWith(props.contact));
+  const [connection, setConnection] = useState(peer?.connectedContacts.get(props.contact.peerid));
 
   const handleClickContact = (action: string) => () => {
     console.log(action + ' contact ' + props.contact.nickname);
@@ -41,16 +41,18 @@ export const ContactListItem = (props: ContactListItemProps) => {
       console.log('Message received in messageHandler: ' + message);
     }
     function contactStatusHandle(contact: IContact, statusChange: boolean) {
-      console.log('contactStatusHandle Handler: ' , contact);
-      if (contact.peerid === props.contact.peerid) setOnline(statusChange);
+      console.log('contactStatusHandle Handler: ', contact);
+      if (contact.peerid === props.contact.peerid) {
+        setContact(contact);
+        setOnline(statusChange);
+      }
     }
     peer?.on('onMessage', messageHandler);
     peer?.on('onContactStatusChange', contactStatusHandle);
 
     return () => {
-  
       peer?.removeListener('onMessage', messageHandler);
-     // peer?.removeListener('onContactStatusChange', contactStatusHandle);
+      // peer?.removeListener('onContactStatusChange', contactStatusHandle);
     };
   }, [peer, props.contact]);
 
@@ -58,9 +60,9 @@ export const ContactListItem = (props: ContactListItemProps) => {
     const acceptContact = () => {
       if (db && peer) {
         new ContactService(user.user, db).acceptContact(props.contact);
-        //setOnline();
+        props.contact.accepted = true;
+        setContact(props.contact);
         peer.checkConnection(props.contact);
-        setAccepted(true);
       }
     };
     return !props.contact.accepted ? (
@@ -83,8 +85,7 @@ export const ContactListItem = (props: ContactListItemProps) => {
       props.contact.declined = !props.contact.declined;
       db?.contacts.put(props.contact);
       setOnline(peer?.checkConnection(props.contact));
-      setDeclined(props.contact.declined);
-      db?.contacts.put(props.contact);
+      setContact(props.contact);
     };
     function getIconColor() {
       return props.contact.declined ? 'error' : 'success';
@@ -149,7 +150,7 @@ export const ContactListItem = (props: ContactListItemProps) => {
           </ListItemAvatar>
         </Badge>
         <Badge
-          color={declined ? 'error' : 'default'}
+          color={props.contact.declined ? 'error' : 'default'}
           overlap="circular"
           anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
           variant="dot"

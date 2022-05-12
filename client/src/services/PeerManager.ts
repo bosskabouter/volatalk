@@ -43,7 +43,7 @@ export class PeerManager
       debug: 1,
     });
     this._peer.on('open', (pid) => {
-      console.log('connected: ' + this._peer.id);
+      console.log('Peer connected: ' + this._peer.id);
       if (pid !== user.peerid) {
         throw Error('Signaller assigned different id: ' + pid);
       }
@@ -187,7 +187,7 @@ export class PeerManager
         peerid: this.user.peerid,
       },
     });
-    console.info('Connecting with: ' + contact.nickname, connection);
+    console.info('Trying to connecting with: ' + contact.nickname, connection);
     connection.on('open', () => {
       this.connectedContacts.set(connection.peer, connection);
     });

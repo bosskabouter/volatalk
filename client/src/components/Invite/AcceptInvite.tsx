@@ -13,7 +13,7 @@ import { Button, Badge, Avatar, TextField } from '@mui/material';
 export default function AcceptInvite() {
   const [queryParams] = useState<URLSearchParams>(new URLSearchParams(useLocation().search));
 
-  const [senderOnline, setSenderOnline] = useState<boolean>(false);
+  const [senderOnline, setSenderOnline] = useState<boolean | undefined>(undefined);
   const [result, setResult] = useState<string>('');
 
   const [receivedInvite, setReceivedInvite] = useState<IInvite | null>(null);
@@ -25,21 +25,29 @@ export default function AcceptInvite() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (receivedInvite) {
-      setTimeout(() => {
-        const conn = peerCtx?._peer?.connect(receivedInvite.peerId);
-        conn?.on('open', () => {
-          setSenderOnline(true);
-          //just a test (without signature to see if peer is online)
-          conn.close();
-        });
-      }, 10000);
-    } else
+    if (!receivedInvite && !result) {
       extractInvite(queryParams).then((invite) => {
         if (invite) setReceivedInvite(invite);
         else setResult('Invalid invitation');
       });
-  }, [peerCtx, queryParams, result, receivedInvite]);
+    } else if (receivedInvite && peerCtx && senderOnline === undefined) {
+      setSenderOnline(false);
+      // we just entered the page from url. wait for our own peer to connect
+      //TODO include listener for peer start if closed of null
+      const timeout = 10000;
+      setTimeout(() => {
+        const conn = peerCtx._peer.connect(receivedInvite.peerId);
+        conn?.on('open', () => {
+          setSenderOnline(true);
+          /* Just a quick test (without signature to see if peer is online)
+           * once the  invitation is accepted, we'll reconnect with a real signature.
+           * Other side will bounce and close since we didn't send signature.
+           */
+          conn.close();
+        });
+      }, timeout);
+    }
+  }, [peerCtx, queryParams, result, receivedInvite, senderOnline]);
 
   //handler
   const handleAcceptContact = async () => {
@@ -57,11 +65,16 @@ export default function AcceptInvite() {
   };
 
   function isOnlineDesc() {
-    return senderOnline ? 'online' : 'offline';
+    if (senderOnline === undefined) return 'Trying to connect with invitor... ';
+    else if (senderOnline) return 'Invitator is online right now!';
+    else
+      return 'Invitor seems to be offline right now. Go ahead and accept and save the new contact for now. We`ll try to connect later again. Once the other accepts your connection, you will get notified!';
   }
 
   function BadgeColor() {
-    return senderOnline ? 'success' : 'error';
+    if (senderOnline === undefined) return 'default';
+    else if (senderOnline) return 'success';
+    else return 'error';
   }
   return !receivedInvite ? (
     <Alerter message="No invite in URL" type="error" />
