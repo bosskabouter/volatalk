@@ -6,7 +6,7 @@ import { importPublicKey, peerIdToPublicKey, verifyMessage } from './Crypto';
 
 import EventEmitter from 'events';
 import StrictEventEmitter from 'strict-event-emitter-types/types/src';
-import Peer, { DataConnection } from 'peerjs';
+import { default as Peer, DataConnection } from 'peerjs';
 
 export interface PeerManagerEvents {
   statusChange: (status: boolean) => void;

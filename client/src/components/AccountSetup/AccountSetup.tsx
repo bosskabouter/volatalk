@@ -398,7 +398,7 @@ const AccountSetup = () => {
           />
           <Typography variant="subtitle1">Avatar: </Typography>
 
-          <input
+          <input aria-label='avatar'
             id="file"
             name="avatar"
             type="file"

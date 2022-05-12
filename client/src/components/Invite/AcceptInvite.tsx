@@ -2,15 +2,13 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { extractInvite } from 'services/InvitationService';
 import { identicon } from 'minidenticons';
-import Avatar from '@mui/material/Avatar';
-import Badge from '@mui/material/Badge';
-import { Button, TextField } from '@mui/material';
 import { DatabaseContext } from 'providers/DatabaseProvider';
-import { PeerContext, usePeer } from 'providers/PeerProvider';
+import { PeerContext } from 'providers/PeerProvider';
 import { Alerter } from 'components/StatusDisplay/Alerter';
 import { ContactService } from 'services/ContactService';
 import { UserContext } from 'providers/UserProvider';
 import { IInvite } from 'types';
+import { Button, Badge, Avatar, TextField } from '@mui/material';
 
 export default function AcceptInvite() {
   const [queryParams] = useState<URLSearchParams>(new URLSearchParams(useLocation().search));
@@ -76,10 +74,7 @@ export default function AcceptInvite() {
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         variant="dot"
       >
-        <Avatar
-          src={`data:image/svg+xml;utf8,${identicon(receivedInvite.peerId)}`}
-          alt={`Sender's Identification icon`}
-        ></Avatar>
+        <Avatar src={`data:image/svg+xml;utf8,${identicon(receivedInvite.peerId)}`}></Avatar>
       </Badge>
       <Button variant="contained" onClick={handleAcceptContact}>
         Accept the Invitation and send a contact request?

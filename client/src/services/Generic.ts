@@ -15,7 +15,8 @@ function localSave(param: string, value: unknown) {
 /**
  */
 function localLoad(param: string) {
-  const item: any = localStorage.getItem(param);
+  const item: string | null = localStorage.getItem(param);
+  if (!item) throw Error('No local storage. Boohoooo.. for param: ' + param);
   const obj = JSON.parse(item);
   console.debug('Loaded from local storage param: ' + param, obj);
   return obj;
@@ -163,7 +164,7 @@ const dateFormat = new Intl.DateTimeFormat(navigator.languages[0], {
 });
 
 const timeFormat = new Intl.DateTimeFormat(navigator.languages[0], {
-    timeStyle: 'short',
+  timeStyle: 'short',
   // timeZoneName: 'short',
 });
 

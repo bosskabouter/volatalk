@@ -3,8 +3,8 @@
 import { css } from '@emotion/react';
 import { Container } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import TemporaryDrawer from 'components/AppBar/TemporaryDrawer';
 import * as React from 'react';
-import AppBar from '../AppBar/AppBar';
 import Footer from '../Footer/Footer';
 
 interface IProps {
@@ -42,7 +42,7 @@ const Layout = ({ children }: IProps) => {
 
   return (
     <>
-      <AppBar />
+      <TemporaryDrawer />
       <Container css={styles.containerRoot}>
         <main css={styles.root}>{children}</main>
       </Container>

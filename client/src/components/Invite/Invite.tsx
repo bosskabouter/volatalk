@@ -18,9 +18,7 @@ import QrCode2Icon from '@mui/icons-material/QrCode';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 
 import Close from '@mui/icons-material/Close';
-import { identicon } from 'minidenticons';
 import { isMobile } from 'react-device-detect';
-import { IInvite } from 'types';
 
 export default function Invite() {
   const inputRef = useRef();

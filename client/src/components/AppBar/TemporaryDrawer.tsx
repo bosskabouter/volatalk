@@ -15,18 +15,13 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
 import { useTheme } from '@mui/material/styles';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
 import logo from 'assets/images/volatalk-logo-336x280.webp';
 import { Rating } from 'dha-rating';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import StatusDisplay from 'components/StatusDisplay/StatusDisplay';
+import { Typography, ListItemText, ListItemIcon, List, ListItem, Toolbar } from '@mui/material';
 
 const drawerWidth = 240;
 
