@@ -1,14 +1,14 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import  { useContext, useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { extractInvite } from 'services/InvitationService';
 import { identicon } from 'minidenticons';
 import { DatabaseContext } from 'providers/DatabaseProvider';
 import { PeerContext } from 'providers/PeerProvider';
 import { Alerter } from 'components/StatusDisplay/Alerter';
-import { ContactService } from 'services/ContactService';
 import { UserContext } from 'providers/UserProvider';
+import { Button, Badge, Avatar } from '@mui/material';
+import { genSignature } from 'services/Crypto';
 import { IInvite } from 'types';
-import { Button, Badge, Avatar, TextField } from '@mui/material';
 
 export default function AcceptInvite() {
   const [queryParams] = useState<URLSearchParams>(new URLSearchParams(useLocation().search));
@@ -22,7 +22,6 @@ export default function AcceptInvite() {
 
   const user = useContext(UserContext);
   const peerCtx = useContext(PeerContext);
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (!receivedInvite && !result) {
@@ -53,15 +52,25 @@ export default function AcceptInvite() {
   const handleAcceptContact = async () => {
     if (!(db && receivedInvite && peerCtx)) return;
 
-    const contact = await db.contacts.get(receivedInvite.peerId);
-    if (contact) setResult(`Invite already accepted.. Still waiting to connect... `);
-    else {
-      new ContactService(user.user, db).acceptInvite(receivedInvite).then((c) => {
-        peerCtx?.checkConnection(c);
-        console.info('Invitation accepted:  ' + c.nickname);
-      });
-      navigate(`/Contacts`);
+    let contact = await db.contacts.get(receivedInvite.peerId);
+    if (contact) {
+      setResult(`Invite already accepted.. Still waiting to connect... `);
+    } else {
+      const sig = await genSignature(receivedInvite.peerId, user.user.privateKey);
+      contact = {
+        peerid: receivedInvite.peerId,
+        signature: sig,
+        nickname: receivedInvite.text,
+        avatar: '',
+        dateCreated: new Date(),
+        accepted: true,
+        declined: false,
+      };
+      db.contacts.put(contact);
+      console.info('Contact created', contact);
+      setResult('Contact added!');
     }
+    peerCtx?.checkConnection(contact);
   };
 
   function isOnlineDesc() {
@@ -94,7 +103,7 @@ export default function AcceptInvite() {
         <br></br>
         Sender is {isOnlineDesc()}
       </Button>
-      <TextField>${result}</TextField>
+      {result ?? <Alerter message={result} type="error" />}
     </div>
   );
 }

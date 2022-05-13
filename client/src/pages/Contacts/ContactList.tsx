@@ -27,18 +27,25 @@ const ContactList = () => {
     };
     peerManager.addListener('onNewContact', updateContactList);
     return () => {
-      peerManager.removeListener('onNewContact', updateContactList);
+      //peerManager.removeListener('onNewContact', updateContactList);
     };
   }, [contactList, peerManager]);
 
   return (
     <div>
       <List
-        sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}
-        dense={false}
+        sx={{
+          width: '100%',
+          bgcolor: 'background.paper',
+          position: 'relative',
+          overflow: 'auto',
+          maxHeight: 300,
+          '& ul': { padding: 0 },
+        }}
+        dense={true}
         subheader={
           <ListSubheader component="div" id="nested-list-subheader">
-            Contacts
+            Contact List
           </ListSubheader>
         }
       >

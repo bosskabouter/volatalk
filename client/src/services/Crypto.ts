@@ -5,6 +5,13 @@ const ENC_FORMAT_JWK = 'jwk';
 const ENC_ALGORITHM_ECDSA = 'ECDSA';
 const ENC_ALGORITHM_ECDSA_HASH = 'SHA-384';
 const ENC_ALGORITHM_ECDSA_NAMEDCURVE = 'P-384';
+
+export function genSignature(peerid: string, userJsonPrivateKey: string) {
+  return importPrivateKey(JSON.parse(userJsonPrivateKey)).then((privKey) => {
+    return signMessage(peerid, privKey);
+  });
+}
+
 /**
  *
  * @param {*} publicKey

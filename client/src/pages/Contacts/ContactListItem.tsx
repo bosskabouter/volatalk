@@ -1,5 +1,5 @@
 import { IContact, IMessage } from 'types';
-import { PeerContext, usePeer } from 'providers/PeerProvider';
+import { PeerContext } from 'providers/PeerProvider';
 import React, { useContext, useEffect, useState } from 'react';
 import CallIcon from '@mui/icons-material/Call';
 import AddTaskIcon from '@mui/icons-material/AddTask';
@@ -14,10 +14,6 @@ import { Divider, IconButton, ListItem, ListItemAvatar, ListItemText } from '@mu
 import { VideoCameraFront } from '@mui/icons-material';
 import { getLocalDateString } from 'services/Generic';
 import { DatabaseContext } from 'providers/DatabaseProvider';
-import { ContactService } from 'services/ContactService';
-import { UserContext } from 'providers/UserProvider';
-import { PeerManager, PeerManagerEvents } from 'services/PeerManager';
-import StrictEventEmitter from 'strict-event-emitter-types/types/src';
 
 interface ContactListItemProps {
   contact: IContact;
@@ -25,47 +21,61 @@ interface ContactListItemProps {
 
 export const ContactListItem = (props: ContactListItemProps) => {
   const peer = useContext(PeerContext);
-  const user = useContext(UserContext);
   const db = useContext(DatabaseContext);
 
   const [contact, setContact] = useState<IContact>(props.contact);
-  const [online, setOnline] = useState(peer?.isConnectedWith(props.contact));
-  const [connection, setConnection] = useState(peer?.connectedContacts.get(props.contact.peerid));
+
+  const [cntUnread, setCntUnread] = useState(0);
+  const [online, setOnline] = useState(peer?.connectedContacts.get(props.contact.peerid)?.open);
 
   const handleClickContact = (action: string) => () => {
     console.log(action + ' contact ' + props.contact.nickname);
   };
+  useEffect(() => {
+    if (db) {
+      db.messages
+        .where('sender')
+        .equals(contact.peerid)
+        .count()
+        .then((cnt) => {
+          setCntUnread(cnt);
+        });
+    }
+  }, [db, contact.peerid]);
 
   useEffect(() => {
     function messageHandler(message: IMessage) {
-      console.log('Message received in messageHandler: ' + message);
+      console.log('Message received in messageHandler', message);
+      setCntUnread(cntUnread+1);
     }
-    function contactStatusHandle(contact: IContact, statusChange: boolean) {
-      console.log('contactStatusHandle Handler: ', contact);
-      if (contact.peerid === props.contact.peerid) {
-        setContact(contact);
-        setOnline(statusChange);
+    async function contactStatusHandle(c: IContact) {
+      if (c.peerid === contact.peerid) {
+        setContact(c);
+        setOnline(true);
       }
     }
     peer?.on('onMessage', messageHandler);
-    peer?.on('onContactStatusChange', contactStatusHandle);
+    peer?.on('onContactOnline', contactStatusHandle);
 
     return () => {
       peer?.removeListener('onMessage', messageHandler);
-      // peer?.removeListener('onContactStatusChange', contactStatusHandle);
+      // peer?.removeListener('onContactOnline', contactStatusHandle);
     };
-  }, [peer, props.contact]);
+  }, [peer, contact, cntUnread]);
 
   const AcceptContactButton = () => {
     const acceptContact = () => {
-      if (db && peer) {
-        new ContactService(user.user, db).acceptContact(props.contact);
-        props.contact.accepted = true;
-        setContact(props.contact);
-        peer.checkConnection(props.contact);
+      if (db) {
+        contact.accepted = true;
+        db.contacts.put(contact);
+        setContact(contact);
+        if (peer) {
+          peer.checkConnection(contact);
+          setOnline(peer.connectedContacts.get(contact.peerid)?.open);
+        }
       }
     };
-    return !props.contact.accepted ? (
+    return !contact.accepted ? (
       <IconButton
         onClick={acceptContact}
         edge="start"
@@ -81,14 +91,22 @@ export const ContactListItem = (props: ContactListItemProps) => {
   };
 
   const BlockContactButton = () => {
-    const blockContact = () => {
-      props.contact.declined = !props.contact.declined;
-      db?.contacts.put(props.contact);
-      setOnline(peer?.checkConnection(props.contact));
-      setContact(props.contact);
+    const blockContact = async () => {
+      contact.declined = !contact.declined;
+      db?.contacts.put(contact);
+
+      if (contact.declined) {
+        const conn = peer?.connectedContacts.get(contact.peerid);
+        conn?.send('bye');
+        conn?.close();
+      } else {
+        peer?.checkConnection(contact);
+        setOnline(peer?.connectedContacts.get(contact.peerid)?.open);
+      }
+      setContact(contact);
     };
     function getIconColor() {
-      return props.contact.declined ? 'error' : 'success';
+      return contact.declined ? 'error' : 'success';
     }
     return (
       <IconButton
@@ -131,42 +149,38 @@ export const ContactListItem = (props: ContactListItemProps) => {
   };
 
   return (
-    <>
+    <> <Divider variant="inset" component="li" />
       <ListItem
-        key={props.contact.peerid}
+        key={contact.peerid}
         onClick={handleClickContact('messages')}
         alignItems="flex-start"
         secondaryAction={secondaryOptions()}
         disablePadding
       >
+        <ListItemAvatar>
+          <Avatar
+            sizes="small"
+            src={`data:image/svg+xml;utf8,${identicon(contact.peerid)}`}
+            alt={`${contact.nickname} 's personsal identification icon`}
+          ></Avatar>
+        </ListItemAvatar>
+
         <Badge
-          color={online ? 'success' : 'default'}
+          variant="standard"
+          color={online ? 'success' : 'primary'}
           overlap="circular"
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-          variant="dot"
+          badgeContent={cntUnread}
         >
           <ListItemAvatar>
-            <Avatar src={props.contact.avatar}></Avatar>
+            <Avatar src={contact.avatar}></Avatar>
           </ListItemAvatar>
         </Badge>
-        <Badge
-          color={props.contact.declined ? 'error' : 'default'}
-          overlap="circular"
-          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-          variant="dot"
-        >
-          <ListItemAvatar>
-            <Avatar
-              sizes="small"
-              src={`data:image/svg+xml;utf8,${identicon(props.contact.peerid)}`}
-              alt={`${props.contact.nickname} 's personsal identification icon`}
-            ></Avatar>
-          </ListItemAvatar>
-        </Badge>
+
         <ListItemText
-          id={props.contact.peerid}
-          primary={props.contact.nickname}
-          secondary={`connected since ${getLocalDateString(props.contact.dateCreated)}`}
+          id={contact.peerid}
+          primary={contact.nickname}
+          secondary={`connected since ${getLocalDateString(contact.dateCreated)}`}
         />
       </ListItem>
       <Divider variant="inset" component="li" />

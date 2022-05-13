@@ -1,8 +1,6 @@
 import { IConnectionMetadata, IContact, IMessage, IUserProfile } from 'types';
 import { AppDatabase } from 'Database/Database';
-import { ContactService } from './ContactService';
-import { importPublicKey, peerIdToPublicKey, verifyMessage } from './Crypto';
-
+import { genSignature, importPublicKey, peerIdToPublicKey, verifyMessage } from './Crypto';
 
 import EventEmitter from 'events';
 import StrictEventEmitter from 'strict-event-emitter-types/types/src';
@@ -10,7 +8,7 @@ import { default as Peer, DataConnection } from 'peerjs';
 
 export interface PeerManagerEvents {
   statusChange: (status: boolean) => void;
-  onContactStatusChange: (contact: IContact, status: boolean) => void;
+  onContactOnline: (contact: IContact) => void;
   onMessage: (message: IMessage) => void;
   onNewContact: (contact: IContact) => void;
 }
@@ -24,6 +22,10 @@ export class PeerManager
   user: IUserProfile;
   _db: AppDatabase;
   _peer: Peer;
+  /*
+ * https://peerjs.com/docs/#peerconnections
+ We recommend keeping track of connections yourself rather than relying on this hash.
+ */
   connectedContacts = new Map<string, DataConnection>();
 
   constructor(user: IUserProfile, db: AppDatabase) {
@@ -49,21 +51,16 @@ export class PeerManager
       }
       this.emit('statusChange', true);
       this._db.contacts.each((contact: IContact) => {
-        if (!contact.declined) {
-          this.checkConnection(contact);
-        } else {
-          console.info('Not checking declined contact', contact);
-        }
+        !contact.declined
+          ? this.checkConnection(contact)
+          : console.info('Not checking declined contact', contact);
       });
     });
     this._peer.on('connection', async (conn: DataConnection) => {
       conn.on('open', async () => {
         console.debug('Connection open', conn);
         if (await this._hasValidSignatureMetadata(conn)) {
-          const contact = await this._acceptTrustedConnection(conn);
-          console.info('Contact connected:' + contact.nickname, contact);
-          this.connectedContacts.set(contact.peerid, conn);
-          this.emit('onContactStatusChange', contact, true);
+          this._acceptTrustedConnection(conn);
         } else {
           console.warn('Invalid signature, closing connection.', conn);
           conn.close();
@@ -73,7 +70,7 @@ export class PeerManager
     this._peer.on('disconnected', () => {
       console.warn('Peer disconnected.');
       this.emit('statusChange', false);
-      setTimeout(() => this._peer.reconnect(), 5000);
+      setTimeout(() => this._peer.reconnect(), 15000);
     });
     this._peer.on('close', () => {
       console.warn('Peer closed.');
@@ -110,44 +107,59 @@ export class PeerManager
   async _acceptTrustedConnection(conn: DataConnection) {
     const contact = await this._db.contacts.get(conn.peer);
     if (!contact) {
-      //just save for now, notify react, user will decide to accept or not
-      const newContact = await new ContactService(this.user, this._db).registerContactForAproval(
-        conn.peer,
-        conn.metadata
-      );
-      this.emit('newContactRequest', newContact);
+      //just save for now, notify, user will decide to accept or not
 
-      //keep connection open
+      const sig = await genSignature(conn.peer, this.user.privateKey);
+
+      const newContact: IContact = {
+        peerid: conn.peer,
+        signature: sig,
+        nickname: conn.metadata.nickname,
+        avatar: conn.metadata.avatar,
+        dateCreated: new Date(),
+        accepted: false,
+        declined: false,
+      };
+      await this._db.contacts.add(newContact);
+      console.info('Emitting onNewContact request!', newContact);
+      this.emit('onNewContact', newContact);
+      //TODO keep connection open?
+      conn.close();
       return newContact;
     } else {
-      console.info('Trusted connection with KNOWN contact', contact, conn);
+      console.info('Emitting onContactOnline', contact, conn);
+      this.emit('onContactOnline', contact);
       return this._receiveRegisteredContact(contact, conn);
     }
   }
 
   /**
-   * Known contact incoming. Validate if we have 1. accepted 2. not declined 3.
+   * Known contact incoming. First Update his metadata, the Validate if we have 1. accepted 2. not declined.
+   *
+   *
+   *
    */
   _receiveRegisteredContact(contact: IContact, conn: DataConnection) {
     const md: IConnectionMetadata = conn.metadata;
     contact.nickname = md.nickname;
     contact.avatar = md.avatar;
     this._db.contacts.put(contact);
+    console.debug('Updated metadata', contact);
     if (!contact.accepted) {
-      console.info('Unaccepted contact trying to connect.', contact);
+      console.info('Unaccepted contact trying to connect. Closing connection', contact, conn);
+      conn.close();
     } else if (contact.declined) {
-      console.warn('Declined contact trying to connect. Aborting connection.', contact);
+      console.warn('Declined contact trying to connect. Closing connection.', contact, conn);
       conn.close();
     } else {
       conn.send('Hi!');
-      console.debug('Accept peer connection', contact, conn);
-      this.emit('onContactStatusChange', contact, conn.open);
+      console.info('Accepted known peer', contact, conn);
     }
     return contact;
   }
 
   _receiveMessageData(msg: string, contact: IContact) {
-    console.log('Received message: ' + msg + ' from contact: ' + contact);
+    console.debug('Persist message', msg);
     const m: IMessage = {
       dateCreated: new Date(),
       receiver: this.user.peerid,
@@ -156,6 +168,7 @@ export class PeerManager
       payload: msg,
     };
     this._db.messages.put(m);
+    console.debug('Emitting onMessage', msg);
     this.emit('onMessage', m);
   }
 
@@ -173,7 +186,6 @@ export class PeerManager
       );
       return;
     }
-    //do not send private key / passwordhash to other side
     if (!contact.signature) {
       throw Error('No signature for contact: ' + contact.nickname);
     }
@@ -190,6 +202,7 @@ export class PeerManager
     console.info('Trying to connecting with: ' + contact.nickname, connection);
     connection.on('open', () => {
       this.connectedContacts.set(connection.peer, connection);
+      this.emit('onContactOnline', contact);
     });
     connection.on('data', (data) => {
       console.info(`received DATA message from contact:` + contact.nickname, data);
@@ -224,8 +237,9 @@ export class PeerManager
     return conn && conn.open;
   }
 
+
   disconnectFrom(contact: IContact) {
-    const conn = this.connectedContacts.get(contact.peerid);
+    const conn = this._peer.connections[contact.peerid];
     if (conn && conn.open) conn.close();
   }
 }
