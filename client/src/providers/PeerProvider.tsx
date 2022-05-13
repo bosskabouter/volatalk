@@ -50,7 +50,7 @@ export default function PeerProvider({ children }: IPeerProviderProps) {
         userContext.user,
         db
       );
-      
+
       pm.on('statusChange', handleStatusChange);
       pm.on('onMessage', messageHandler);
       pm.on('onNewContact', newContactHandle);

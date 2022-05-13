@@ -27,7 +27,7 @@ const ContactList = () => {
     };
     peerManager.addListener('onNewContact', updateContactList);
     return () => {
-      //peerManager.removeListener('onNewContact', updateContactList);
+      peerManager.removeListener('onNewContact', updateContactList);
     };
   }, [contactList, peerManager]);
 

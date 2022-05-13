@@ -61,7 +61,7 @@ class PeerMan2 extends Component<PeerManProps, PeerManState> {
   }
 
   send = () => {
-    this.props.peer?.sendMessage(this.state.message);
+    this.props.peer?.sendMessage(this.state.message.payload, this.state.message.receiver);
     this.setState({
       messages: [...this.state.messages, this.state.message],
       message: cleanMessage,

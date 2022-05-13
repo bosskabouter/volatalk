@@ -8,13 +8,18 @@ import PeerMan2 from 'services/PeerMan2';
 const Home = () => {
   const usrCtx = React.useContext(UserContext);
   const peer = React.useContext(PeerContext);
-  return !peer ? (
-    <>Not connected</>
-  ) : (
-    <>
-      <Typography variant="h5">Hi {usrCtx?.user?.nickname}</Typography>
 
-      <PeerMan2 peer={peer} user={usrCtx.user}></PeerMan2>
+  const greeting = <Typography variant="h5">Hi {usrCtx?.user?.nickname}</Typography>;
+  const peerMan = peer ? (
+    <PeerMan2 peer={peer} user={usrCtx.user}></PeerMan2>
+  ) : (
+    <em>Not connected</em>
+  );
+
+  return (
+    <>
+      {greeting}
+      {peerMan}
     </>
   );
 };

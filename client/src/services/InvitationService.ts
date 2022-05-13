@@ -10,7 +10,6 @@ import { IConnectionMetadata, IInvite, IUserProfile } from 'types';
 
 export const INVITE_PARAMKEYS = { FROM: 'f', KEY: 'k', SIGNATURE: 's' };
 
-
 /**
  * TODO: add expiration date
  */
@@ -72,7 +71,7 @@ export async function extractInvite(params: URLSearchParams) {
 
   if (verified) {
     console.info('Invitation verified.');
-    
+
     return invite;
   } else {
     const msg = 'Invalid signature in invitation: ' + invitationText;

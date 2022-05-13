@@ -152,7 +152,7 @@ export class PeerManager
       console.warn('Declined contact trying to connect. Closing connection.', contact, conn);
       conn.close();
     } else {
-      conn.send('Hi!');
+      conn.send('Hi ' + contact.nickname + ', ' + this.user.nickname + ' is online!');
       console.info('Accepted known peer', contact, conn);
     }
     return contact;
@@ -227,16 +227,34 @@ export class PeerManager
     return conn && conn.open;
   }
 
-  sendMessage(m: IMessage) {
-    console.info('Sending message: ' + m.payload + ' to: ' + m.receiver);
-    this.connectedContacts.get(m.receiver)?.send(m.payload);
+  sendMessage(text: string, contactId: string) {
+    const msg: IMessage = {
+      dateCreated: new Date(),
+      receiver: contactId,
+      payload: text,
+      sender: this.user.peerid,
+    };
+    this._db.messages.put(msg);
+    console.debug('New message saved', msg);
+
+    const conn = this.connectedContacts.get(contactId);
+
+    if (conn && conn.open) {
+      console.info('Sending message: ' + text + ' to: ' + contactId);
+
+      conn.send(text);
+      msg.dateSent = new Date();
+      this._db.messages.put(msg);
+      console.info('Message delivered: ' + text + ' to: ' + contactId);
+      
+    }
+    return msg;
   }
 
   isConnectedWith(contact: IContact) {
     const conn = this.connectedContacts.get(contact.peerid);
     return conn && conn.open;
   }
-
 
   disconnectFrom(contact: IContact) {
     const conn = this._peer.connections[contact.peerid];

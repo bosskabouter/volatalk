@@ -10,10 +10,18 @@ import Badge from '@mui/material/Badge';
 import Avatar from '@mui/material/Avatar';
 import { identicon } from 'minidenticons';
 
-import { Divider, IconButton, ListItem, ListItemAvatar, ListItemText } from '@mui/material';
+import {
+  Divider,
+  IconButton,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  Tooltip,
+} from '@mui/material';
 import { VideoCameraFront } from '@mui/icons-material';
 import { getLocalDateString } from 'services/Generic';
 import { DatabaseContext } from 'providers/DatabaseProvider';
+import { useNavigate } from 'react-router-dom';
 
 interface ContactListItemProps {
   contact: IContact;
@@ -22,14 +30,15 @@ interface ContactListItemProps {
 export const ContactListItem = (props: ContactListItemProps) => {
   const peer = useContext(PeerContext);
   const db = useContext(DatabaseContext);
-
+  const navigate = useNavigate();
   const [contact, setContact] = useState<IContact>(props.contact);
 
   const [cntUnread, setCntUnread] = useState(0);
   const [online, setOnline] = useState(peer?.connectedContacts.get(props.contact.peerid)?.open);
 
-  const handleClickContact = (action: string) => () => {
-    console.log(action + ' contact ' + props.contact.nickname);
+  const handleClickContact = (_action: string) => () => {
+    //    console.log(action + ' contact ' + props.contact.nickname);
+    navigate('/messages/' + props.contact.peerid);
   };
   useEffect(() => {
     if (db) {
@@ -46,7 +55,7 @@ export const ContactListItem = (props: ContactListItemProps) => {
   useEffect(() => {
     function messageHandler(message: IMessage) {
       console.log('Message received in messageHandler', message);
-      setCntUnread(cntUnread+1);
+      setCntUnread(cntUnread + 1);
     }
     async function contactStatusHandle(c: IContact) {
       if (c.peerid === contact.peerid) {
@@ -59,7 +68,7 @@ export const ContactListItem = (props: ContactListItemProps) => {
 
     return () => {
       peer?.removeListener('onMessage', messageHandler);
-      // peer?.removeListener('onContactOnline', contactStatusHandle);
+      peer?.removeListener('onContactOnline', contactStatusHandle);
     };
   }, [peer, contact, cntUnread]);
 
@@ -109,23 +118,25 @@ export const ContactListItem = (props: ContactListItemProps) => {
       return contact.declined ? 'error' : 'success';
     }
     return (
-      <IconButton
-        onClick={blockContact}
-        edge="start"
-        aria-label="Block Contact"
-        color={getIconColor()}
-        size="small"
-      >
-        <RemoveCircleOutlineIcon />
-      </IconButton>
+      <Tooltip title="Block this user">
+        <IconButton
+          onClick={blockContact}
+          edge="start"
+          aria-label="Block Contact"
+          color={getIconColor()}
+          size="small"
+        >
+          <RemoveCircleOutlineIcon />
+        </IconButton>
+      </Tooltip>
     );
   };
 
   const secondaryOptions = () => {
     return (
       <>
-        <AcceptContactButton></AcceptContactButton>
-        <BlockContactButton></BlockContactButton>
+        <AcceptContactButton />
+        <BlockContactButton />
         <IconButton
           onClick={handleClickContact('videocall')}
           edge="end"
@@ -149,20 +160,23 @@ export const ContactListItem = (props: ContactListItemProps) => {
   };
 
   return (
-    <> <Divider variant="inset" component="li" />
+    <>
+      <Divider variant="inset" component="li" />
       <ListItem
+        alignItems="flex-start"
         key={contact.peerid}
         onClick={handleClickContact('messages')}
-        alignItems="flex-start"
         secondaryAction={secondaryOptions()}
         disablePadding
       >
         <ListItemAvatar>
-          <Avatar
-            sizes="small"
-            src={`data:image/svg+xml;utf8,${identicon(contact.peerid)}`}
-            alt={`${contact.nickname} 's personsal identification icon`}
-          ></Avatar>
+          <Tooltip title="Personal Identification Icon">
+            <Avatar
+              sizes="small"
+              src={`data:image/svg+xml;utf8,${identicon(contact.peerid)}`}
+              alt={`${contact.nickname} 's personsal identification icon`}
+            ></Avatar>
+          </Tooltip>
         </ListItemAvatar>
 
         <Badge

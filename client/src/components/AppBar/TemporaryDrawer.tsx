@@ -21,7 +21,15 @@ import { Rating } from 'dha-rating';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import StatusDisplay from 'components/StatusDisplay/StatusDisplay';
-import { Typography, ListItemText, ListItemIcon, List, ListItem, Toolbar } from '@mui/material';
+import {
+  Typography,
+  ListItemText,
+  ListItemIcon,
+  List,
+  ListItem,
+  Toolbar,
+  Button,
+} from '@mui/material';
 
 const drawerWidth = 240;
 
@@ -116,16 +124,9 @@ export default function TemporaryDrawer() {
               <img alt="VolaTALK logo" css={styles.toolbarLogo} src={logo} />
             </Link>
           </Typography>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="end"
-            onClick={handleDrawerOpen}
-            css={styles.hide(open)}
-            size="large"
-          >
-            <MenuIcon />
-          </IconButton>
+          <Button onClick={handleDrawerOpen} css={styles.hide(open)}>
+            <StatusDisplay />
+          </Button>
         </Toolbar>
       </AppBar>
       <Drawer

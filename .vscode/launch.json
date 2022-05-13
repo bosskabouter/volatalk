@@ -5,17 +5,17 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch Firefox 3000",
-      "type": "firefox",
+      "name": "Launch Chrome 3000",
+      "type": "chrome",
       "request": "launch",
-      "reAttach": true,
       "url": "http://localhost:3000",
       "webRoot": "${workspaceFolder}"
     },
     {
-      "name": "Launch Chrome 3000",
-      "type": "chrome",
+      "name": "Launch Firefox 3000",
+      "type": "firefox",
       "request": "launch",
+      "reAttach": true,
       "url": "http://localhost:3000",
       "webRoot": "${workspaceFolder}"
     },
@@ -28,7 +28,6 @@
       "webRoot": "${workspaceFolder}"
     },
 
-   
     {
       "name": "Launch Client via NPM",
       "command": "cd client && npm start",
