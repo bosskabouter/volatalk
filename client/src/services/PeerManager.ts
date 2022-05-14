@@ -83,7 +83,7 @@ export class PeerManager
 
     this._peer.on('error', (err) => {
       if (err.type === 'peer-unavailable') {
-        console.warn('Peer unavailable. Will try again later...', err);
+        console.warn('Peer unavailable. Will try again later...');
 
         //TODO find peer id to reconnect
         //"Error: Could not connect to peer 7b0a2022637276223a2022502d333834222c0a2022657874223a20747275652c0a20226b65795f6f7073223a205b0a202022766572696679220a205d2c0a20226b7479223a20224543222c0a202278223a2022586f434b5278484e6230764c58437634695f5a42422d776c4d415277444d61714a6f74306d4d416b503268353430734859666a6d6239504269564438484d5843222c0a202279223a202235356552323878514a5179425235756a514c457049656a6978515550365244335749436c776c5f4764486149694c4f5443746d4730697856555f6d6172695230220a7d"
@@ -169,7 +169,7 @@ export class PeerManager
     return contact;
   }
 
-  _receiveMessageData(msg: string, contact: IContact) {
+  async _receiveMessageData(msg: string, contact: IContact) {
     console.debug('Persist message', msg);
     const justNow = new Date();
     const m: IMessage = {
@@ -181,7 +181,7 @@ export class PeerManager
 
       payload: msg,
     };
-    this._db.messages.put(m);
+    m.id = await this._db.messages.put(m);
     console.debug('Emitting onMessage', msg);
     this.emit('onMessage', m);
   }
@@ -196,6 +196,13 @@ export class PeerManager
     if (contact.declined) {
       console.debug(
         'Not initiating connection with declined contact: ' + contact.nickname,
+        contact
+      );
+      return;
+    }
+    if (!contact.accepted) {
+      console.debug(
+        'Not initiating connection with not yet accepted contact: ' + contact.nickname,
         contact
       );
       return;
@@ -218,8 +225,9 @@ export class PeerManager
       console.info('Connected with: ' + contact.nickname, connection);
       this.connectedContacts.set(contact.peerid, connection);
       this.emit('onContactOnline', contact);
+      this.handleConnectionData(connection, contact);
     });
-    this.handleConnectionData(connection, contact);
+
     return connection;
   }
 

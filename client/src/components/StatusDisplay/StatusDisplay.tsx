@@ -3,18 +3,25 @@
 import { PeerContext } from 'providers/PeerProvider';
 import { identicon } from 'minidenticons';
 
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+
 import { useContext, useEffect, useState } from 'react';
 import { UserContext } from 'providers/UserProvider';
 import Avatar from '@mui/material/Avatar';
 import Badge from '@mui/material/Badge';
 import { Box } from '@mui/material';
+import { DatabaseContext } from 'providers/DatabaseProvider';
 
 const StatusDisplay = () => {
   const userCtx = useContext(UserContext);
 
+  const db = useContext(DatabaseContext);
   const peerCtx = useContext(PeerContext);
 
   const [online, setOnline] = useState(false);
+  const [contactRequests, setContactRequests] = useState(
+    db?.contacts.where({ accepted: false, declined: false }).count()
+  );
 
   useEffect(() => {
     function handleStatusChange(status: boolean) {
@@ -26,7 +33,7 @@ const StatusDisplay = () => {
     return () => {
       peerCtx?.removeListener('statusChange', handleStatusChange);
     };
-  }, [peerCtx, online]);
+  }, [peerCtx]);
 
   function myPeerid() {
     return peerCtx?._peer.id ? peerCtx._peer.id : '123';
@@ -40,7 +47,10 @@ const StatusDisplay = () => {
     );
   }
 
-  function peerDiv() {
+  const ContactRequestInfo = () => {
+    return <><PersonAddIcon/></>;
+  };
+  const PeerInfo = () => {
     return (
       <Box
         className="peerInfo"
@@ -52,7 +62,7 @@ const StatusDisplay = () => {
         }}
       >
         <Badge
-          color={online?"success":"error"}
+          color={online ? 'success' : 'error'}
           overlap="circular"
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
           variant="dot"
@@ -69,11 +79,13 @@ const StatusDisplay = () => {
         ></Avatar>
       </Box>
     );
-  }
+  };
 
   return (
     <div>
-      {userDiv()} {peerDiv()}
+      <ContactRequestInfo/>{userDiv()} 
+      <PeerInfo/>
+
     </div>
   );
 };

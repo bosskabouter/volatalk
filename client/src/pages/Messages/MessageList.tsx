@@ -69,8 +69,7 @@ const MessageList = () => {
   }, [contactId, db]);
 
   useEffect(() => {
-    const updateMessageList = (newMsgEvent: PeerManagerEvents['onMessage']) => {
-      const msg = newMsgEvent.arguments;
+    const updateMessageList = (msg: IMessage) => {
       if (msg.sender === contactId) {
         setMessageList((prevMessageList) => [...prevMessageList, msg]);
       }
@@ -83,13 +82,12 @@ const MessageList = () => {
       }
     };
     if (peerManager) {
-
-      //peerManager.addListener('onNewMessage', updateMessageList);
+      peerManager.addListener('onMessage', updateMessageList);
       peerManager.addListener('onContactOnline', updateContactStatus);
     }
     return () => {
-      //peerManager?.removeListener('onNewMessage', updateMessageList);
-      //peerManager?.removeListener('onContactOnline', updateContactStatus);
+      peerManager?.removeListener('onMessage', updateMessageList);
+      peerManager?.removeListener('onContactOnline', updateContactStatus);
     };
   }, [contactId, messageList, peerManager]);
 
@@ -100,11 +98,7 @@ const MessageList = () => {
       if (peerManager && sndMessageText.trim().length > 0) {
         console.log('Sending text: ' + sndMessageText);
         const msg = await peerManager.sendMessage(sndMessageText, contactId);
-        // messageList.push(msg);
-        // setMessageList(messageList);
         setSndMessageText('');
-        <Alerter message="Message sent" type="success" />;
-
         setMessageList((prevMessageList) => [...prevMessageList, msg]);
       }
     };
@@ -198,6 +192,7 @@ const MessageList = () => {
       boxShadow={15}
       //height={"100%"}
       //minHeight={600}
+      maxHeight={.8}
     >
       <List
         //disablePadding
@@ -210,7 +205,7 @@ const MessageList = () => {
           // overflow: visible | hidden | clip | scroll | auto
           overflow: 'auto',
           // height: auto | <length> | <percentage> | min-content | max-content | fit-content | fit-content(<length-percentage>)
-          height: '90%',
+          //height: '90%',
           // maxHeight: none | <length-percentage> | min-content | max-content | fit-content | fit-content(<length-percentage>)
           maxHeight: '60%',
           '& ul': { padding: 10 },
