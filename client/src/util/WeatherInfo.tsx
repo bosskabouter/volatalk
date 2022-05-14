@@ -12,10 +12,10 @@ export const WeatherInfo = ({ location }: WeatherInfoProps) => {
   const OPENWEATHER_APIKEY = '420408196cb33ae10825f1019e75bcb2';
 
   const [time, setTime] = useState<Date>(new Date());
-  const [locationData, setLocationData] = useState<string>(JSON.stringify({ name: 'Lutjebroek' }));
+  const [locationData, setLocationData] = useState<string>('Lutjebroek');
   const [weatherToday, setWeatherToday] = useState<string>('Cloudy, little rain');
-  const [weatherIcon, setWeatherIcon] = useState<string>('');
-  const [weatherFeelslike, setWeatherForecast] = useState<string>('Sunshine, after the rain');
+  const [weatherIcon, setWeatherIcon] = useState<string>(makeIconURL('03n'));
+  const [weatherFeelslike, setWeatherForecast] = useState<string>('5');
 
   useEffect(() => {
     if (!location) return;
@@ -29,10 +29,6 @@ export const WeatherInfo = ({ location }: WeatherInfoProps) => {
           appid: OPENWEATHER_APIKEY,
         },
       });
-    }
-
-    function makeIconURL(iconName: string) {
-      return 'https://openweathermap.org/img/wn/' + iconName + '.png';
     }
 
     fetchOpenWeatherData('https://api.openweathermap.org/geo/1.0/reverse').then((res) => {
@@ -66,18 +62,17 @@ export const WeatherInfo = ({ location }: WeatherInfoProps) => {
       sx={{
         display: 'flex',
         flexDirection: 'row',
-        alignItems: 'flex-end',
-        justifyContent: 'right',
+        alignItems: 'flex-start',
+        justifyContent: 'left',
       }}
     >
       <img src={weatherIcon} alt="Current Weather" />
       <div>
-        <Typography variant="subtitle1">
-          {weatherToday},{weatherFeelslike}
+        <Typography variant="subtitle1" noWrap>
+          {weatherToday},{weatherFeelslike}, near {locationData}
         </Typography>
-        <Typography variant="subtitle2">{locationData}</Typography>
         <Typography variant="subtitle2">
-          {getLocalTimeString(new Date())} -{getLocalDateString(time)}
+          {getLocalDateString(time)} - {getLocalTimeString(new Date())}
         </Typography>
       </div>
     </Box>
@@ -85,10 +80,16 @@ export const WeatherInfo = ({ location }: WeatherInfoProps) => {
 };
 function toCelsius(fahrenheit: number) {
   const celcius = (fahrenheit - 32) / 1.8;
-  console.log(`toCelcius(fahrenheit: ${fahrenheit}) : ${celcius}`);
+  console.log(`fahrenheit: ${fahrenheit} -> celcius ${celcius}`);
+  const fahren = toFahrenheit(celcius);
+  console.log(`celcius:  ${celcius} -> fahrenheit ${fahren}`);
   return celcius;
 }
 
 function toFahrenheit(celsius: number) {
   return celsius * 1.8 + 32;
+}
+
+function makeIconURL(iconName: string) {
+  return 'https://openweathermap.org/img/wn/' + iconName + '.png';
 }

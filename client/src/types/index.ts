@@ -58,7 +58,7 @@ export interface IContact {
   declined?: boolean;
 }
 export interface IMessage {
-  id?: string;
+  id?: number;
 
   sender: string;
   receiver: string;

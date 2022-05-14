@@ -1,12 +1,13 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 
-import { IMessage, IUserProfile } from 'types';
+import { IContact, IMessage, IUserProfile } from 'types';
 import { getLocalDateString } from './Generic';
 import { PeerManager } from './PeerManager';
 
 interface PeerManProps {
   user: IUserProfile;
   peer: PeerManager;
+  contact: IContact;
 }
 interface PeerManState {
   message: IMessage;

@@ -2,24 +2,48 @@ import { PeerContext } from 'providers/PeerProvider';
 import { DatabaseContext } from 'providers/DatabaseProvider';
 import { IContact, IMessage } from 'types';
 
-import { MessageListItem } from './MessageListItem';
-
 import { useContext, useEffect, useState } from 'react';
-import { Box, InputAdornment, List, ListSubheader, TextField } from '@mui/material';
-import { PeerManagerEvents } from 'services/PeerManager';
-import { useParams } from 'react-router-dom';
+import {
+  Avatar,
+  Badge,
+  Box,
+  InputAdornment,
+  List,
+  ListItem,
+  ListItemText,
+  ListSubheader,
+  Snackbar,
+  TextField,
+  Tooltip,
+} from '@mui/material';
+import { PeerManager, PeerManagerEvents } from 'services/PeerManager';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import IconButton from '@mui/material/IconButton';
+import CallIcon from '@mui/icons-material/Call';
 
+import CheckIcon from '@mui/icons-material/Check';
+import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
+
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import SendIcon from '@mui/icons-material/Send';
 import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
-import Picker from 'emoji-picker-react';
+import EmoPicker from 'emoji-picker-react';
+import { Alerter } from 'components/StatusDisplay/Alerter';
+import { identicon } from 'minidenticons';
+import { UserContext } from 'providers/UserProvider';
+import { descriptiveTimeAgo } from 'services/Generic';
+import StrictEventEmitter from 'strict-event-emitter-types/types/src';
 
 const MessageList = () => {
   const db = useContext(DatabaseContext);
+  const userCtx = useContext(UserContext);
   const peerManager = useContext(PeerContext);
+  const navigate = useNavigate();
 
   const contactId = useParams().contactid ?? '';
+
+  const [contactOnline, setContactOnline] = useState(false);
   const [contact, setContact] = useState<IContact>({
     peerid: '0',
     nickname: 'unknown contact',
@@ -29,55 +53,66 @@ const MessageList = () => {
   const [messageList, setMessageList] = useState<IMessage[]>([]);
 
   useEffect(() => {
-    if (!db) return;
-    if (!contactId) return;
-    db.contacts.get(contactId).then((ctc) => {
-      if (ctc) {
-        setContact(ctc);
-        db.messages
-          .where('sender')
-          .equals(contactId)
-          .or('receiver')
-          .equals(contactId)
-          .sortBy('dateSent')
-          .then((msgs) => {
-            setMessageList(msgs);
-          });
-      }
+    db?.messages
+      .where('receiver')
+      .equals(contactId)
+      .or('sender')
+      .equals(contactId)
+      .sortBy('dateCreated')
+      .then((msgs) => {
+        setMessageList(msgs);
+      });
+
+    db?.contacts.get(contactId).then((ctc) => {
+      if (ctc) setContact(ctc);
     });
   }, [contactId, db]);
 
   useEffect(() => {
     const updateMessageList = (newMsgEvent: PeerManagerEvents['onMessage']) => {
-      if (newMsgEvent.arguments.sender === contactId) {
-        messageList.push(newMsgEvent.arguments);
-        setMessageList(messageList);
+      const msg = newMsgEvent.arguments;
+      if (msg.sender === contactId) {
+        setMessageList((prevMessageList) => [...prevMessageList, msg]);
       }
     };
-    if (peerManager) peerManager.addListener('onNewMessage', updateMessageList);
+    const updateContactStatus = (ctc:IContact) => {
+      console.info("Someone online", ctc);      
+      if (ctc.peerid === contactId) {
+        console.info("Contact online!", contactId);
+        setContactOnline(true);
+      }
+    };
+    if (peerManager) {
+
+      //peerManager.addListener('onNewMessage', updateMessageList);
+      peerManager.addListener('onContactOnline', updateContactStatus);
+    }
     return () => {
-      peerManager?.removeListener('onNewMessage', updateMessageList);
+      //peerManager?.removeListener('onNewMessage', updateMessageList);
+      //peerManager?.removeListener('onContactOnline', updateContactStatus);
     };
   }, [contactId, messageList, peerManager]);
 
   const ComposeMessageField = () => {
     const [sndMessageText, setSndMessageText] = useState<string>('');
 
-    const sendText = () => {
-      if (sndMessageText.trim().length > 0) {
-        console.log('Sending text' + sndMessageText);
-        peerManager?.sendMessage(sndMessageText, contactId);
+    const sendText = async () => {
+      if (peerManager && sndMessageText.trim().length > 0) {
+        console.log('Sending text: ' + sndMessageText);
+        const msg = await peerManager.sendMessage(sndMessageText, contactId);
+        // messageList.push(msg);
+        // setMessageList(messageList);
+        setSndMessageText('');
+        <Alerter message="Message sent" type="success" />;
+
+        setMessageList((prevMessageList) => [...prevMessageList, msg]);
       }
     };
-    const handleTyping = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      //event.preventDefault();
-      setSndMessageText(event.target.value);
-      //event.target.focus();
-    };
+
     const [open, setOpen] = useState(false);
     const EmojiButton = () => {
       return open ? (
-        <Picker
+        <EmoPicker
           native
           onEmojiClick={(_e, picked) => {
             setSndMessageText(sndMessageText + picked.emoji);
@@ -101,22 +136,22 @@ const MessageList = () => {
             spellCheck
             label={'Send ' + contact.nickname + ' a message'}
             placeholder={'Hi ' + contact.nickname + '!'}
-            sx={{ width: '80%' }}
+            sx={{ width: '90%' }}
             variant="filled"
-            onChange={handleTyping}
+            onChange={(e) => {
+              setSndMessageText(e.target.value);
+            }}
             value={sndMessageText}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
-                  <IconButton onClick={EmojiButton} size="small">
-                    <EmojiButton />
-                  </IconButton>
+                  <EmojiButton></EmojiButton>
                 </InputAdornment>
               ),
             }}
           ></TextField>
 
-          <IconButton onClick={sendText} size="large" color='secondary'>
+          <IconButton onClick={sendText} size="medium" color="secondary">
             <SendIcon />
           </IconButton>
         </Box>
@@ -124,31 +159,104 @@ const MessageList = () => {
     );
   };
 
+  const MessageListItem = (props: { message: IMessage }) => {
+    const isMine = props.message.sender === userCtx.user.peerid;
+
+    const [delivered] = useState(props.message.dateSent instanceof Date);
+
+    function secondaryText() {
+      return (isMine ? 'Sent ' : 'Received ') + descriptiveTimeAgo(props.message.dateCreated);
+    }
+    return (
+      <>
+        <ListItem
+          key={props.message.id}
+          //    disablePadding
+          alignItems={'center'}
+          divider
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'flex-start',
+            justifyContent: 'right',
+          }}
+        >
+          {delivered ? <CheckIcon /> : <HourglassBottomIcon />}
+
+          <ListItemText
+            id={'id-' + props.message.id}
+            primary={(isMine ? 'You' : contact.nickname) + ': ' + props.message.payload}
+            secondary={secondaryText()}
+          />
+        </ListItem>
+      </>
+    );
+  };
+
   return (
-    <div>
+    <Box
+      boxShadow={15}
+      //height={"100%"}
+      //minHeight={600}
+    >
       <List
+        //disablePadding
         sx={{
-          width: '100%',
+          //  width: '100%',
           bgcolor: 'background.paper',
+          padding: 10,
           // position: static | relative | absolute | sticky | fixed
-          //position: 'static',
+          //  position: 'relative',
           // overflow: visible | hidden | clip | scroll | auto
           overflow: 'auto',
           // height: auto | <length> | <percentage> | min-content | max-content | fit-content | fit-content(<length-percentage>)
-          //height: '100%',
+          height: '90%',
           // maxHeight: none | <length-percentage> | min-content | max-content | fit-content | fit-content(<length-percentage>)
-          maxHeight: '50vh',
-          '& ul': { padding: 0 },
+          maxHeight: '60%',
+          '& ul': { padding: 10 },
         }}
-        dense={true}
+        // dense={true}
+        subheader={
+          <ListSubheader component="div" id="nested-list-subheader">
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                //flexDirection: 'column-reverse',
+                alignItems: 'flex-start',
+                justifyContent: 'left',
+              }}
+            >
+              <IconButton onClick={() => navigate('/contacts')}>
+                <ChevronLeftIcon />
+              </IconButton>
+              {contact.nickname}
+              <Tooltip title="Personal Identification Icon">
+                <Avatar
+                  sizes="small"
+                  src={`data:image/svg+xml;utf8,${identicon(contact.peerid)}`}
+                  alt={`${contact.nickname} 's personsal identification icon`}
+                ></Avatar>
+              </Tooltip>
+              <Badge
+                variant="standard"
+                color={contactOnline ? 'success' : 'error'}
+                overlap="circular"
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+              >
+                <Avatar src={contact.avatar}></Avatar>
+              </Badge>
+            </Box>
+          </ListSubheader>
+        }
       >
         {messageList &&
           messageList.map((msg) => {
-            return <MessageListItem contact={contact} message={msg} key={msg.id} />;
+            return <MessageListItem message={msg} key={msg.id} />;
           })}
       </List>
       <ComposeMessageField />
-    </div>
+    </Box>
   );
 };
 

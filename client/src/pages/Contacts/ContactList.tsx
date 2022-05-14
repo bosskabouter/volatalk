@@ -21,8 +21,8 @@ const ContactList = () => {
 
   useEffect(() => {
     if (!peerManager) return;
-    const updateContactList = (newContactEvent: PeerManagerEvents['onNewContact']) => {
-      contactList.push(newContactEvent.arguments);
+    const updateContactList = (newContact: IContact) => {
+      contactList.push(newContact);
       setContactList(contactList);
     };
     peerManager.addListener('onNewContact', updateContactList);

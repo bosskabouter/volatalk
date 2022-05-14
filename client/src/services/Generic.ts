@@ -167,6 +167,29 @@ const timeFormat = new Intl.DateTimeFormat(navigator.languages[0], {
   timeStyle: 'short',
   // timeZoneName: 'short',
 });
+export function descriptiveTimeAgo(date: Date) {
+  const oneSec = 1000;
+  const oneMin = 60 * oneSec;
+  const oneHour = 60 * oneMin;
+  const oneDay = 24 * oneHour;
+
+  const now = new Date().getTime();
+  const then = date.getTime();
+  const timeAgo = now - then;
+
+  let desc = '';
+
+  if (timeAgo < oneMin) {
+    desc = 'Just now.';
+  } else if (timeAgo < oneHour) {
+    desc = Math.round(timeAgo / oneMin) + ' minutes ago';
+  } else if (timeAgo < oneDay) {
+    desc = getLocalTimeString(date);
+  } else {
+    desc = getLocalDateString(date);
+  }
+  return desc;
+}
 
 export function getLocalDateString(date: Date) {
   return dateFormat.format(date);
