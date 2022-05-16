@@ -117,7 +117,7 @@ export default function TemporaryDrawer() {
   return (
     <div css={styles.root}>
       <CssBaseline />
-      <AppBar position="sticky" css={styles.appBar(open)} role="banner">
+      <AppBar position="static" css={styles.appBar(open)} role="banner">
         <Toolbar disableGutters variant="dense">
           <Typography variant="h6" noWrap css={styles.title}>
             <Link to="/">

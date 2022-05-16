@@ -63,9 +63,12 @@ export interface IMessage {
 
   sender: string;
   receiver: string;
-  dateCreated: Date;
-  dateSent?: Date;
-  dateReceived?: Date;
-  dateRead?: Date;
   payload: string;
+
+  dateTimeCreated: number;
+
+  dateTimeSent: number;
+  dateTimeReceived: number;
+  dateTimeRead: number;
+
 }

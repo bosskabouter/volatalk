@@ -62,15 +62,15 @@ const StatusDisplay = () => {
         className="peerInfo"
         sx={{
           display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'flex-start',
-          justifyContent: 'left',
+         // flexDirection: 'stretch',
+         // alignItems: 'flex-start',
+          //justifyContent: 'left',
         }}
       >
         <Badge
           color={online ? 'success' : 'error'}
           overlap="circular"
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          //anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
           variant="dot"
         >
           <Avatar

@@ -2,7 +2,7 @@ import { PeerContext } from 'providers/PeerProvider';
 import { DatabaseContext } from 'providers/DatabaseProvider';
 import { IContact, IMessage } from 'types';
 
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import {
   Avatar,
   Badge,
@@ -14,6 +14,7 @@ import {
   ListSubheader,
   TextField,
   Tooltip,
+  Typography,
 } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -47,6 +48,8 @@ const MessageList = () => {
     signature: new ArrayBuffer(0),
   });
   const [messageList, setMessageList] = useState<IMessage[]>([]);
+  
+  const textfieldRef = useRef<HTMLInputElement|null>(null);
 
   useEffect(() => {
     db?.contacts.get(contactId).then((ctc) => {
@@ -85,16 +88,27 @@ const MessageList = () => {
     };
   }, [contact, contactId, peerManager]);
 
+
+
+  useEffect(() => {
+    if (textfieldRef && textfieldRef.current) {
+      //textfieldRef.current.focus();
+    }
+  })
+  
   const ComposeMessageField = () => {
     const [sndMessageText, setSndMessageText] = useState<string>('');
 
+
     const sendText = async () => {
       if (peerManager && sndMessageText.trim().length > 0) {
+
         console.log('Sending text: ' + sndMessageText);
-        const msg = await peerManager.sendMessage(sndMessageText, contactId);
+        const msg = await peerManager.sendText(sndMessageText, contactId);
         setSndMessageText('');
         setMessageList((prevMessageList) => [...prevMessageList, msg]);
-      }
+        
+      } 
     };
 
     const [openEmoji, setOpenEmoji] = useState(false);
@@ -120,6 +134,8 @@ const MessageList = () => {
     return (
       <>
         <TextField
+        autoFocus
+        //  ref={textfieldRef}
           spellCheck
           label={'Send ' + contact.nickname + ' a message'}
           placeholder={'Hi ' + contact.nickname + '!'}
@@ -151,11 +167,11 @@ const MessageList = () => {
   const MessageListItem = (props: { message: IMessage }) => {
     const isMine = props.message.sender === userCtx.user.peerid;
 
-    const [delivered] = useState(props.message.dateSent instanceof Date);
+    const [delivered] = useState(props.message.dateTimeSent >0);
 
     const senderText = isMine ? 'You' : contact?.nickname;
     const secondaryText =
-      (isMine ? 'Sent ' : 'Received ') + descriptiveTimeAgo(props.message.dateCreated);
+      (isMine ? 'Sent ' : 'Received ') + descriptiveTimeAgo(new Date(props.message.dateTimeCreated));
 
     const DeliveredIcon = () => {
       return delivered ? <CheckIcon /> : <HourglassBottomIcon />;
@@ -202,13 +218,13 @@ const MessageList = () => {
           bgcolor: 'background.paper',
           // padding: 5,
           // position: static | relative | absolute | sticky | fixed
-          //  position: 'relative',
+          //  position: 'sticky',
           // overflow: visible | hidden | clip | scroll | auto
-          //overflow: 'auto',
+          overflow: 'visible',
           // height: auto | <length> | <percentage> | min-content | max-content | fit-content | fit-content(<length-percentage>)
-          //height: '90%',
+          height: 'fit-content',
           // maxHeight: none | <length-percentage> | min-content | max-content | fit-content | fit-content(<length-percentage>)
-          // maxHeight: '60%',
+          //  maxHeight: '20%'
           // '& ul': { padding: 15 },
         }}
         // dense={true}
@@ -223,10 +239,8 @@ const MessageList = () => {
                 // justifyContent: 'left',
               }}
             >
-              <IconButton onClick={() => navigate('/contacts')}>
-                <ChevronLeftIcon />
-              </IconButton>
-              {contact.nickname}
+                <ChevronLeftIcon onClick={() => navigate('/contacts')}/>
+              <Typography> {contact.nickname}</Typography>
               <Tooltip title="Personal Identification Icon">
                 <Avatar
                   sizes="small"
@@ -237,13 +251,13 @@ const MessageList = () => {
               <Badge
                 variant="dot"
                 color={contactOnline ? 'success' : 'error'}
-                //overlap="circular"
-               // anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                overlap="rectangular"
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
               >
                 <Avatar src={contact.avatar}></Avatar>
               </Badge>
 
-              <IconButton onClick={() => navigate('/call/' + contactId)}>
+              <IconButton onClick={() => navigate('/call/' + contactId)} size="medium">
                 <CallIcon />
               </IconButton>
             </Box>

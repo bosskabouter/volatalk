@@ -173,12 +173,12 @@ export const ContactListItem = (props: ContactListItemProps) => {
 
         <ListItemAvatar>
         <Badge
-          variant="dot"
+          variant="standard"
           color={badgeOnline()}
           // overlap="circular"
           // anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
               badgeContent={cntUnread}
-              showZero
+              //showZero
         >
          
             <Avatar src={contact.avatar}></Avatar>

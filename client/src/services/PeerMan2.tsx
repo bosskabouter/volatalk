@@ -15,7 +15,15 @@ interface PeerManState {
   friendId: string;
 }
 
-const cleanMessage: IMessage = { payload: '', sender: '', receiver: '', dateCreated: new Date() };
+const cleanMessage: IMessage = {
+  payload: '',
+  sender: '',
+  receiver: '',
+  dateTimeCreated: new Date().getTime(),
+  dateTimeSent: 0,
+  dateTimeReceived: 0,
+  dateTimeRead: 0,
+};
 class PeerMan2 extends Component<PeerManProps, PeerManState> {
   // static contextType = UserContext;
 
@@ -62,7 +70,7 @@ class PeerMan2 extends Component<PeerManProps, PeerManState> {
   }
 
   send = () => {
-    this.props.peer?.sendMessage(this.state.message.payload, this.state.message.receiver);
+    this.props.peer?.sendText(this.state.message.payload, this.state.message.receiver);
     this.setState({
       messages: [...this.state.messages, this.state.message],
       message: cleanMessage,
@@ -116,8 +124,11 @@ class PeerMan2 extends Component<PeerManProps, PeerManState> {
                 message: {
                   sender: this.props.user.peerid,
                   receiver: this.state.friendId,
-                  dateCreated: new Date(),
+                  dateTimeCreated: new Date().getTime(),
                   payload: e.target.value,
+                  dateTimeRead: 0,
+                  dateTimeReceived: 0,
+                  dateTimeSent: 0,
                 },
               });
             }}
@@ -130,7 +141,7 @@ class PeerMan2 extends Component<PeerManProps, PeerManState> {
               <div key={i}>
                 <h3>{message.sender}:</h3>
                 <p>{message.payload}</p>
-                <p>{getLocalDateString(message.dateCreated)}</p>
+                <p>{getLocalDateString(new Date(message.dateTimeCreated))}</p>
               </div>
             );
           })}

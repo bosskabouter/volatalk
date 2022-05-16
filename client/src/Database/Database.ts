@@ -6,6 +6,7 @@ const tableContacts = 'contacts';
 const tableMessages = 'messages';
 
 export class AppDatabase extends Dexie {
+
   userProfile: Dexie.Table<IUserProfile, number>;
 
   contacts: Dexie.Table<IContact, string>;
@@ -18,7 +19,7 @@ export class AppDatabase extends Dexie {
     this.version(2).stores({
       userProfile: '++id',
       contacts: 'peerid , dateAccepted, dateDelined',
-      messages: '++id, sender, receiver, dateCreated, dateSent, dateRead, [sender+dateRead]',
+      messages: '++id, sender, receiver, dateCreated, dateSent, dateRead, [sender+dateRead],[receiver+dateSent]',
     });
 
     this.userProfile = this.table(tableUser);
@@ -36,5 +37,9 @@ export class AppDatabase extends Dexie {
       .or('sender')
       .equals(contact.peerid)
       .sortBy('dateCreated');
+  }
+
+  selectUnsentMessages(c: IContact): IMessage[] | PromiseLike<IMessage[]> {
+    return this.messages.where({receiver:c.peerid, dateSent:0}).sortBy('dateCreated');
   }
 }

@@ -162,13 +162,14 @@ export class PeerManager
     console.debug('Persist message', msg);
     const justNow = new Date();
     const m: IMessage = {
-      dateCreated: justNow,
-      dateSent: justNow,
-      dateReceived: justNow,
+      dateTimeCreated: justNow.getTime(),
+      dateTimeSent: justNow.getTime(),
+      dateTimeReceived: justNow.getTime(),
       receiver: this.user.peerid,
       sender: contact.peerid,
 
       payload: msg,
+      dateTimeRead: 0
     };
     m.id = await this._db.messages.put(m);
     console.debug('Emitting onMessage', msg);
@@ -216,11 +217,12 @@ export class PeerManager
       this.emit('onContactOnline', contact);
       this.handleOnConnectionData(connection, contact);
     });
-
     return connection;
   }
 
+
   handleOnConnectionData(connection: DataConnection, c: IContact) {
+
     connection.on('data', (data) => {
       console.info(`received DATA:` + data);
       const dataDecoded = JSON.parse(data);
@@ -228,6 +230,17 @@ export class PeerManager
       const decryptedString = decryptString(dataDecoded, key);
       this._receiveMessageData(decryptedString, c);
     });
+
+    this.syncUnsentMessages(c);
+  }
+
+  async syncUnsentMessages(c: IContact) {
+    console.info("Sending unsent messages...");
+    const unsentMsgs:IMessage[]=await this._db.selectUnsentMessages(c);
+    for (const msg of unsentMsgs) {
+      this.transmitMessage(msg);
+    }
+    return unsentMsgs;
   }
 
   checkConnection(contact: IContact) {
@@ -235,35 +248,44 @@ export class PeerManager
     return (conn && conn.open) || false;
   }
 
-  async sendMessage(text: string, contactId: string) {
+
+
+  async sendText(text: string, contactId: string) {
     const msg: IMessage = {
-      dateCreated: new Date(),
+      dateTimeCreated: new Date().getTime(),
       receiver: contactId,
       payload: text,
       sender: this.user.peerid,
+      dateTimeSent: 0,
+      dateTimeReceived: 0,
+      dateTimeRead: 0
     };
     msg.id = await this._db.messages.put(msg);
     console.debug('New message saved', msg);
 
-    const conn = this.connectedContacts.get(contactId);
-
-    if (conn && conn.open) {
-      console.info('Sending message: ' + text + ' to: ' + contactId);
-
-      //TODO exchange key
-      const key = generateKeyFromString('1234');
-      const stringToEncrypt = encryptString(text, key);
-
-      conn.send(JSON.stringify(stringToEncrypt));
-      msg.dateSent = new Date();
-      this._db.messages.put(msg);
-      console.info('Message delivered: ' + text + ' to: ' + contactId);
-    } else {
-      console.info('Receiver is not connected...');
-    }
+    this.transmitMessage(msg);
     return msg;
   }
 
+  async transmitMessage(msg:IMessage){
+
+    const conn = this.connectedContacts.get(msg.receiver);
+
+    if (conn && conn.open) {
+      console.info('Sending message',  MessageEvent);
+
+      //TODO exchange key
+      const key = generateKeyFromString('1234');
+      const stringToEncrypt = encryptString( msg.payload , key);
+
+      conn.send(JSON.stringify(stringToEncrypt));
+      msg.dateTimeSent = new Date().getTime();
+      this._db.messages.put(msg);
+      console.info('Message delivered.', msg);
+    } else {
+      console.info('Receiver is not connected...');
+    }
+  }
   isConnectedWith(contact: IContact) {
     const conn = this.connectedContacts.get(contact.peerid);
     return conn && conn.open;
