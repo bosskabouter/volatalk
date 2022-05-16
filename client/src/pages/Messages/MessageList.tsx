@@ -12,11 +12,9 @@ import {
   ListItem,
   ListItemText,
   ListSubheader,
-  Snackbar,
   TextField,
   Tooltip,
 } from '@mui/material';
-import { PeerManager, PeerManagerEvents } from 'services/PeerManager';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import IconButton from '@mui/material/IconButton';
@@ -29,11 +27,9 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import SendIcon from '@mui/icons-material/Send';
 import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
 import EmoPicker from 'emoji-picker-react';
-import { Alerter } from 'components/StatusDisplay/Alerter';
 import { identicon } from 'minidenticons';
 import { UserContext } from 'providers/UserProvider';
 import { descriptiveTimeAgo } from 'services/Generic';
-import StrictEventEmitter from 'strict-event-emitter-types/types/src';
 
 const MessageList = () => {
   const db = useContext(DatabaseContext);
@@ -53,43 +49,41 @@ const MessageList = () => {
   const [messageList, setMessageList] = useState<IMessage[]>([]);
 
   useEffect(() => {
-    db?.messages
-      .where('receiver')
-      .equals(contactId)
-      .or('sender')
-      .equals(contactId)
-      .sortBy('dateCreated')
-      .then((msgs) => {
-        setMessageList(msgs);
-      });
-
     db?.contacts.get(contactId).then((ctc) => {
-      if (ctc) setContact(ctc);
+      if (ctc) {
+        setContact(ctc);
+        db.selectContactMessages(ctc).then((msgs) => {
+          setMessageList(msgs);
+        });
+      }
     });
   }, [contactId, db]);
 
   useEffect(() => {
-    const updateMessageList = (msg: IMessage) => {
+    const insertNewMessageHandler = (msg: IMessage) => {
       if (msg.sender === contactId) {
         setMessageList((prevMessageList) => [...prevMessageList, msg]);
       }
     };
-    const updateContactStatus = (ctc:IContact) => {
-      console.info("Someone online", ctc);      
+    const updateContactStatusHandler = (ctc: IContact) => {
+      console.info('Someone online', ctc);
       if (ctc.peerid === contactId) {
-        console.info("Contact online!", contactId);
+        console.info('Contact online!', contactId);
         setContactOnline(true);
+        //update info
+        setContact(ctc);
       }
     };
     if (peerManager) {
-      peerManager.addListener('onMessage', updateMessageList);
-      peerManager.addListener('onContactOnline', updateContactStatus);
+      if (contact) setContactOnline(peerManager.checkConnection(contact));
+      peerManager.addListener('onMessage', insertNewMessageHandler);
+      peerManager.addListener('onContactOnline', updateContactStatusHandler);
     }
     return () => {
-      peerManager?.removeListener('onMessage', updateMessageList);
-      peerManager?.removeListener('onContactOnline', updateContactStatus);
+      peerManager?.removeListener('onMessage', insertNewMessageHandler);
+      peerManager?.removeListener('onContactOnline', updateContactStatusHandler);
     };
-  }, [contactId, messageList, peerManager]);
+  }, [contact, contactId, peerManager]);
 
   const ComposeMessageField = () => {
     const [sndMessageText, setSndMessageText] = useState<string>('');
@@ -103,20 +97,20 @@ const MessageList = () => {
       }
     };
 
-    const [open, setOpen] = useState(false);
-    const EmojiButton = () => {
-      return open ? (
+    const [openEmoji, setOpenEmoji] = useState(false);
+    const ChooseEmojiButton = () => {
+      return openEmoji ? (
         <EmoPicker
           native
           onEmojiClick={(_e, picked) => {
             setSndMessageText(sndMessageText + picked.emoji);
-            setOpen(false);
+            setOpenEmoji(false);
           }}
         />
       ) : (
         <IconButton
           onClick={() => {
-            setOpen(true);
+            setOpenEmoji(true);
           }}
         >
           <EmojiEmotionsIcon></EmojiEmotionsIcon>
@@ -125,30 +119,31 @@ const MessageList = () => {
     };
     return (
       <>
-        <Box>
-          <TextField
-            spellCheck
-            label={'Send ' + contact.nickname + ' a message'}
-            placeholder={'Hi ' + contact.nickname + '!'}
-            sx={{ width: '90%' }}
-            variant="filled"
-            onChange={(e) => {
-              setSndMessageText(e.target.value);
-            }}
-            value={sndMessageText}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <EmojiButton></EmojiButton>
-                </InputAdornment>
-              ),
-            }}
-          ></TextField>
+        <TextField
+          spellCheck
+          label={'Send ' + contact.nickname + ' a message'}
+          placeholder={'Hi ' + contact.nickname + '!'}
+          sx={{ width: '90%' }}
+          //  variant="filled"
+          onKeyPress={(e) => {
+            if (e.key === 'Enter') sendText();
+          }}
+          onChange={(e) => {
+            setSndMessageText(e.target.value);
+          }}
+          value={sndMessageText}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <ChooseEmojiButton></ChooseEmojiButton>
+              </InputAdornment>
+            ),
+          }}
+        ></TextField>
 
-          <IconButton onClick={sendText} size="medium" color="secondary">
-            <SendIcon />
-          </IconButton>
-        </Box>
+        <IconButton onClick={sendText} size="medium" color="secondary">
+          <SendIcon />
+        </IconButton>
       </>
     );
   };
@@ -158,29 +153,35 @@ const MessageList = () => {
 
     const [delivered] = useState(props.message.dateSent instanceof Date);
 
-    function secondaryText() {
-      return (isMine ? 'Sent ' : 'Received ') + descriptiveTimeAgo(props.message.dateCreated);
-    }
+    const senderText = isMine ? 'You' : contact?.nickname;
+    const secondaryText =
+      (isMine ? 'Sent ' : 'Received ') + descriptiveTimeAgo(props.message.dateCreated);
+
+    const DeliveredIcon = () => {
+      return delivered ? <CheckIcon /> : <HourglassBottomIcon />;
+    };
     return (
       <>
         <ListItem
           key={props.message.id}
           //    disablePadding
-          alignItems={'center'}
+          //  alignItems={'center'}
           divider
-          sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'flex-start',
-            justifyContent: 'right',
-          }}
+          sx={
+            {
+              //  display: 'flex',
+              //  flexDirection: 'row',
+              //   alignItems: 'flex-start',
+              // justifyContent: 'right',
+            }
+          }
         >
-          {delivered ? <CheckIcon /> : <HourglassBottomIcon />}
+          <DeliveredIcon />
 
           <ListItemText
             id={'id-' + props.message.id}
-            primary={(isMine ? 'You' : contact.nickname) + ': ' + props.message.payload}
-            secondary={secondaryText()}
+            primary={senderText + ': ' + props.message.payload}
+            secondary={secondaryText}
           />
         </ListItem>
       </>
@@ -192,23 +193,23 @@ const MessageList = () => {
       boxShadow={15}
       //height={"100%"}
       //minHeight={600}
-      maxHeight={.8}
+      // maxHeight={0.8}
     >
       <List
         //disablePadding
         sx={{
           //  width: '100%',
           bgcolor: 'background.paper',
-          padding: 10,
+          // padding: 5,
           // position: static | relative | absolute | sticky | fixed
           //  position: 'relative',
           // overflow: visible | hidden | clip | scroll | auto
-          overflow: 'auto',
+          //overflow: 'auto',
           // height: auto | <length> | <percentage> | min-content | max-content | fit-content | fit-content(<length-percentage>)
           //height: '90%',
           // maxHeight: none | <length-percentage> | min-content | max-content | fit-content | fit-content(<length-percentage>)
-          maxHeight: '60%',
-          '& ul': { padding: 10 },
+          // maxHeight: '60%',
+          // '& ul': { padding: 15 },
         }}
         // dense={true}
         subheader={
@@ -216,10 +217,10 @@ const MessageList = () => {
             <Box
               sx={{
                 display: 'flex',
-                flexDirection: 'row',
+                //flexDirection: 'row',
                 //flexDirection: 'column-reverse',
-                alignItems: 'flex-start',
-                justifyContent: 'left',
+                // alignItems: 'flex-start',
+                // justifyContent: 'left',
               }}
             >
               <IconButton onClick={() => navigate('/contacts')}>
@@ -234,13 +235,17 @@ const MessageList = () => {
                 ></Avatar>
               </Tooltip>
               <Badge
-                variant="standard"
+                variant="dot"
                 color={contactOnline ? 'success' : 'error'}
-                overlap="circular"
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                //overlap="circular"
+               // anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
               >
                 <Avatar src={contact.avatar}></Avatar>
               </Badge>
+
+              <IconButton onClick={() => navigate('/call/' + contactId)}>
+                <CallIcon />
+              </IconButton>
             </Box>
           </ListSubheader>
         }

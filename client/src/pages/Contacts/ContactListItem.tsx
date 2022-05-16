@@ -1,6 +1,6 @@
 import { IContact, IMessage } from 'types';
 import { PeerContext } from 'providers/PeerProvider';
-import React, { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import CallIcon from '@mui/icons-material/Call';
 import AddTaskIcon from '@mui/icons-material/AddTask';
 
@@ -8,7 +8,6 @@ import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 
 import Badge from '@mui/material/Badge';
 import Avatar from '@mui/material/Avatar';
-import { identicon } from 'minidenticons';
 
 import {
   Divider,
@@ -19,7 +18,7 @@ import {
   Tooltip,
 } from '@mui/material';
 import { VideoCameraFront } from '@mui/icons-material';
-import { getLocalDateString } from 'services/Generic';
+import { descriptiveTimeAgo, getLocalDateString } from 'services/Generic';
 import { DatabaseContext } from 'providers/DatabaseProvider';
 import { useNavigate } from 'react-router-dom';
 
@@ -41,16 +40,13 @@ export const ContactListItem = (props: ContactListItemProps) => {
     navigate('/messages/' + props.contact.peerid);
   };
   useEffect(() => {
+    //unread messages
     if (db) {
-      db.messages
-        .where('sender')
-        .equals(contact.peerid)
-        .count()
-        .then((cnt) => {
-          setCntUnread(cnt);
-        });
+      db.cntUnreadMessages(contact).then((cnt) => {
+        setCntUnread(cnt);
+      });
     }
-  }, [db, contact.peerid]);
+  }, [db, contact]);
 
   useEffect(() => {
     function messageHandler(message: IMessage) {
@@ -58,6 +54,7 @@ export const ContactListItem = (props: ContactListItemProps) => {
       setCntUnread(cntUnread + 1);
     }
     async function contactStatusHandle(c: IContact) {
+      console.log('contactStatusHandler', c);
       if (c.peerid === contact.peerid) {
         setContact(c);
         setOnline(true);
@@ -75,7 +72,7 @@ export const ContactListItem = (props: ContactListItemProps) => {
   const AcceptContactButton = () => {
     const acceptContact = () => {
       if (db) {
-        contact.accepted = true;
+        contact.dateAccepted = new Date();
         db.contacts.put(contact);
         setContact(contact);
         if (peer) {
@@ -84,7 +81,7 @@ export const ContactListItem = (props: ContactListItemProps) => {
         }
       }
     };
-    return !contact.accepted ? (
+    return !contact.dateAccepted ? (
       <IconButton
         onClick={acceptContact}
         edge="start"
@@ -101,21 +98,23 @@ export const ContactListItem = (props: ContactListItemProps) => {
 
   const BlockContactButton = () => {
     const blockContact = async () => {
-      contact.declined = !contact.declined;
-      db?.contacts.put(contact);
+      if (!peer||!db)return;
+      if (contact.dateDeclined) contact.dateDeclined = undefined;
+      else contact.dateDeclined = new Date();
+      db.contacts.put(contact);
 
-      if (contact.declined) {
-        const conn = peer?.connectedContacts.get(contact.peerid);
+      if (contact.dateDeclined) {
+        const conn = peer.connectedContacts.get(contact.peerid);
         conn?.send('bye');
         conn?.close();
       } else {
-        peer?.checkConnection(contact);
-        setOnline(peer?.connectedContacts.get(contact.peerid)?.open);
+        peer._initiateConnection(contact);
+        setOnline(peer.checkConnection(contact));
       }
       setContact(contact);
     };
     function getIconColor() {
-      return contact.declined ? 'error' : 'success';
+      return contact.dateDeclined ? 'error' : 'success';
     }
     return (
       <Tooltip title="Block this user">
@@ -158,43 +157,38 @@ export const ContactListItem = (props: ContactListItemProps) => {
       </>
     );
   };
-
+  function badgeOnline ()  {
+    return online ? 'success' : 'error';
+  }
   return (
     <>
       <Divider variant="inset" component="li" />
       <ListItem
-        alignItems="flex-start"
+       // alignItems="flex-start"
         key={contact.peerid}
         onClick={handleClickContact('messages')}
         secondaryAction={secondaryOptions()}
-        disablePadding
       >
+
+
         <ListItemAvatar>
-          <Tooltip title="Personal Identification Icon">
-            <Avatar
-              sizes="small"
-              src={`data:image/svg+xml;utf8,${identicon(contact.peerid)}`}
-              alt={`${contact.nickname} 's personsal identification icon`}
-            ></Avatar>
-          </Tooltip>
-        </ListItemAvatar>
-
         <Badge
-          variant="standard"
-          color={online ? 'success' : 'primary'}
-          overlap="circular"
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-          badgeContent={cntUnread}
+          variant="dot"
+          color={badgeOnline()}
+          // overlap="circular"
+          // anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+              badgeContent={cntUnread}
+              showZero
         >
-          <ListItemAvatar>
+         
             <Avatar src={contact.avatar}></Avatar>
-          </ListItemAvatar>
+       
         </Badge>
-
+        </ListItemAvatar>
         <ListItemText
           id={contact.peerid}
           primary={contact.nickname}
-          secondary={`connected since ${getLocalDateString(contact.dateCreated)}`}
+          secondary={`connected since ${descriptiveTimeAgo(contact.dateCreated)}`}
         />
       </ListItem>
       <Divider variant="inset" component="li" />

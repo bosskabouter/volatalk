@@ -20,7 +20,7 @@ const ServiceWorkerWrapper: FC = () => {
 
   const reloadPage = () => {
     if ('serviceWorker' in navigator && wb.current !== null) {
-      wb.current.addEventListener('controlling', (event) => {
+      wb.current.addEventListener('controlling', (_event) => {
         setShowReload(false);
         window.location.reload();
       });

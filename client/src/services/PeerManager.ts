@@ -5,6 +5,7 @@ import { genSignature, importPublicKey, peerIdToPublicKey, verifyMessage } from 
 import EventEmitter from 'events';
 import StrictEventEmitter from 'strict-event-emitter-types/types/src';
 import { default as Peer, DataConnection } from 'peerjs';
+import { decryptString, encryptString, generateKeyFromString } from 'dha-encryption';
 
 export interface PeerManagerEvents {
   statusChange: (status: boolean) => void;
@@ -53,9 +54,7 @@ export class PeerManager
       }
       this.emit('statusChange', true);
       this._db.contacts.each((contact: IContact) => {
-        !contact.declined
-          ? this.checkConnection(contact)
-          : console.info('Not checking declined contact', contact);
+        this._initiateConnection(contact);
       });
     });
     this._peer.on('connection', async (conn: DataConnection) => {
@@ -63,7 +62,7 @@ export class PeerManager
         console.debug('Connection open', conn);
         if (await this._hasValidSignatureMetadata(conn)) {
           this._acceptTrustedConnection(conn).then((ctc) => {
-            this.handleConnectionData(conn, ctc);
+            this.handleOnConnectionData(conn, ctc);
           });
         } else {
           console.warn('Invalid signature, closing connection.', conn);
@@ -82,18 +81,11 @@ export class PeerManager
     });
 
     this._peer.on('error', (err) => {
-      if (err.type === 'peer-unavailable') {
-        console.warn('Peer unavailable. Will try again later...');
-
-        //TODO find peer id to reconnect
-        //"Error: Could not connect to peer 7b0a2022637276223a2022502d333834222c0a2022657874223a20747275652c0a20226b65795f6f7073223a205b0a202022766572696679220a205d2c0a20226b7479223a20224543222c0a202278223a2022586f434b5278484e6230764c58437634695f5a42422d776c4d415277444d61714a6f74306d4d416b503268353430734859666a6d6239504269564438484d5843222c0a202279223a202235356552323878514a5179425235756a514c457049656a6978515550365244335749436c776c5f4764486149694c4f5443746d4730697856555f6d6172695230220a7d"
-        const errMsg = err.toString();
-        //errMsg.
-        //"Error: Could not connect to peer "
-        //   setTimeout(() => this._peer.reconnect(), RECONNECT_TIMEOUT);
+      if (err.toString().includes('Could not connect to peer')) {
+        console.warn('Peer unavailable. Should try again later...');
       } else {
         this.emit('statusChange', false);
-        console.warn(err);
+        console.warn('error name: ' + err.name, err);
       }
     });
   }
@@ -121,7 +113,6 @@ export class PeerManager
       /* New user trying to connect.
        * Save for now, notify, user will decide to accept
        */
-
       const sig = await genSignature(conn.peer, this.user.privateKey);
 
       const newContact: IContact = {
@@ -130,8 +121,6 @@ export class PeerManager
         nickname: conn.metadata.nickname,
         avatar: conn.metadata.avatar,
         dateCreated: new Date(),
-        accepted: false,
-        declined: false,
       };
       await this._db.contacts.add(newContact);
       console.info('Emitting onNewContact request!', newContact);
@@ -155,10 +144,10 @@ export class PeerManager
     contact.avatar = md.avatar;
     this._db.contacts.put(contact);
     console.debug('Updated metadata', contact);
-    if (!contact.accepted) {
+    if (!contact.dateAccepted) {
       console.info('Unaccepted contact trying to connect. Closing connection', contact, conn);
       conn.close();
-    } else if (contact.declined) {
+    } else if (contact.dateDeclined) {
       console.warn('Declined contact trying to connect. Closing connection.', contact, conn);
       conn.close();
     } else {
@@ -193,14 +182,14 @@ export class PeerManager
    */
 
   _initiateConnection(contact: IContact) {
-    if (contact.declined) {
+    if (contact.dateDeclined) {
       console.debug(
         'Not initiating connection with declined contact: ' + contact.nickname,
         contact
       );
       return;
     }
-    if (!contact.accepted) {
+    if (!contact.dateAccepted) {
       console.debug(
         'Not initiating connection with not yet accepted contact: ' + contact.nickname,
         contact
@@ -225,37 +214,25 @@ export class PeerManager
       console.info('Connected with: ' + contact.nickname, connection);
       this.connectedContacts.set(contact.peerid, connection);
       this.emit('onContactOnline', contact);
-      this.handleConnectionData(connection, contact);
+      this.handleOnConnectionData(connection, contact);
     });
 
     return connection;
   }
 
-  handleConnectionData(connection: DataConnection, c: IContact) {
+  handleOnConnectionData(connection: DataConnection, c: IContact) {
     connection.on('data', (data) => {
       console.info(`received DATA:` + data);
       const dataDecoded = JSON.parse(data);
-      this._receiveMessageData(dataDecoded, c);
+      const key = generateKeyFromString('1234');
+      const decryptedString = decryptString(dataDecoded, key);
+      this._receiveMessageData(decryptedString, c);
     });
   }
 
   checkConnection(contact: IContact) {
-    let conn = this.connectedContacts.get(contact.peerid);
-    if (conn) {
-      if (conn.open) {
-        console.debug('Connection open with: ' + contact.nickname, contact);
-
-        //TODO check unsent messages
-
-        return true;
-      } else {
-        console.debug('Reopening connection with contact: ' + contact.nickname, contact);
-        conn.close();
-      }
-    }
-    console.info('Opening connection with contact: ' + contact.nickname, contact);
-    conn = this._initiateConnection(contact);
-    return conn && conn.open;
+    const conn = this.connectedContacts.get(contact.peerid);
+    return (conn && conn.open) || false;
   }
 
   async sendMessage(text: string, contactId: string) {
@@ -273,7 +250,11 @@ export class PeerManager
     if (conn && conn.open) {
       console.info('Sending message: ' + text + ' to: ' + contactId);
 
-      conn.send(JSON.stringify(text));
+      //TODO exchange key
+      const key = generateKeyFromString('1234');
+      const stringToEncrypt = encryptString(text, key);
+
+      conn.send(JSON.stringify(stringToEncrypt));
       msg.dateSent = new Date();
       this._db.messages.put(msg);
       console.info('Message delivered: ' + text + ' to: ' + contactId);
@@ -289,7 +270,7 @@ export class PeerManager
   }
 
   disconnectFrom(contact: IContact) {
-    const conn = this._peer.connections[contact.peerid];
+    const conn = this.connectedContacts.get(contact.peerid);
     if (conn && conn.open) conn.close();
   }
 }

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import axios from 'axios';
 import { Box, Typography } from '@mui/material';
-import { getLocalDateString, getLocalTimeString } from 'services/Generic';
+import { getLocalDateString, getLocalTimeString, round } from 'services/Generic';
 
 interface WeatherInfoProps {
   location: GeolocationPosition | null;
@@ -15,7 +15,7 @@ export const WeatherInfo = ({ location }: WeatherInfoProps) => {
   const [locationData, setLocationData] = useState<string>('Lutjebroek');
   const [weatherToday, setWeatherToday] = useState<string>('Cloudy, little rain');
   const [weatherIcon, setWeatherIcon] = useState<string>(makeIconURL('03n'));
-  const [weatherFeelslike, setWeatherForecast] = useState<string>('5');
+  const [weatherTemp, setWeatherForecast] = useState<string>('5');
 
   useEffect(() => {
     if (!location) return;
@@ -39,14 +39,15 @@ export const WeatherInfo = ({ location }: WeatherInfoProps) => {
     fetchOpenWeatherData('https://api.openweathermap.org/data/2.5/weather').then((res) => {
       const weatherInfo = res.data.weather[0].main + ', ' + res.data.weather[0].description;
       const iconURL = makeIconURL(res.data.weather[0].icon);
+      const fahrenheitNow = res.data.main.feels_like;
+
+      const celciusNow = toCelsius(fahrenheitNow)/10;
+      const celciusDesc = round(celciusNow, 1)   + ' \u2103';
+      setWeatherForecast(celciusDesc);
       setWeatherToday(weatherInfo);
       setWeatherIcon(iconURL);
     });
-    fetchOpenWeatherData('https://api.openweathermap.org/data/2.5/forecast').then((res) => {
-      const fahrenheitNextWeek = res.data.list[0].main.feels_like;
-      const celciusNextWeek = Math.round(toCelsius(fahrenheitNextWeek) / 10) + ' Celcius';
-      setWeatherForecast(celciusNextWeek);
-    });
+    
   }, [location]);
 
   useEffect(() => {
@@ -68,8 +69,11 @@ export const WeatherInfo = ({ location }: WeatherInfoProps) => {
     >
       <img src={weatherIcon} alt="Current Weather" />
       <div>
-        <Typography variant="subtitle1" noWrap>
-          {weatherToday},{weatherFeelslike}, near {locationData}
+        <Typography variant="subtitle1" noWrap align='right'>
+        {weatherTemp}, {weatherToday}
+        </Typography>
+        <Typography variant="subtitle2" noWrap>
+          {locationData}
         </Typography>
         <Typography variant="subtitle2">
           {getLocalDateString(time)} - {getLocalTimeString(new Date())}

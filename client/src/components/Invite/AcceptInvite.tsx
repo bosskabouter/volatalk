@@ -63,14 +63,14 @@ export default function AcceptInvite() {
         nickname: receivedInvite.text,
         avatar: '',
         dateCreated: new Date(),
-        accepted: true,
-        declined: false,
+        dateAccepted: new Date(),
+
       };
       db.contacts.put(contact);
       console.info('Contact created', contact);
       setResult('Contact added!');
     }
-    peerCtx?.checkConnection(contact);
+    peerCtx?._initiateConnection(contact);
   };
 
   function isOnlineDesc() {

@@ -20,7 +20,9 @@ const StatusDisplay = () => {
 
   const [online, setOnline] = useState(false);
   const [contactRequests, setContactRequests] = useState(
-    db?.contacts.where({ accepted: false, declined: false }).count()
+    db?.contacts.count()
+     // .where({ dateAccepted: null })
+     
   );
 
   useEffect(() => {
@@ -48,7 +50,11 @@ const StatusDisplay = () => {
   }
 
   const ContactRequestInfo = () => {
-    return <><PersonAddIcon/></>;
+    return (
+      <>
+        <PersonAddIcon />
+      </>
+    );
   };
   const PeerInfo = () => {
     return (
@@ -83,9 +89,9 @@ const StatusDisplay = () => {
 
   return (
     <div>
-      <ContactRequestInfo/>{userDiv()} 
-      <PeerInfo/>
-
+      <ContactRequestInfo />
+      {userDiv()}
+      <PeerInfo />
     </div>
   );
 };

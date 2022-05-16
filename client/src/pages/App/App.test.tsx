@@ -10,5 +10,5 @@ test('renders redux counter', () => {
     </Provider>
   );
 
-  expect(getByText(/Hi/i)).toBeInTheDocument();
+  expect(getByText(/Contact List/i)).toBeInTheDocument();
 });

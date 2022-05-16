@@ -13,6 +13,7 @@ import { RequireAuth } from './RequireAuth';
 import Contacts from 'pages/Contacts/ContactsPage';
 import AcceptInvite from 'components/Invite/AcceptInvite';
 import MessageList from 'pages/Messages/MessageList';
+import Home from 'pages/Home/Home';
 
 // We load each route, when lazy loading, only as they're
 // called by the user. The Home page is not lazily loaded
@@ -22,7 +23,6 @@ import MessageList from 'pages/Messages/MessageList';
 // React.lazy only supports default imports.
 
 const About = lazy(() => import('components/About/About'));
-const Home = lazy(() => import('../../pages/Home/Home'));
 
 const AppRoutes = () => (
   //CHECK FOR INVITE PARAMS TO PASS ALONG EULA AND AccountSetup
@@ -57,7 +57,7 @@ const AppRoutes = () => (
         <Route element={<About />} path="/about" />
         <Route element={<Invite />} path="/invite" />
         <Route element={<Contacts />} path="/contacts" />
-        <Route path="/messages/:contactid" element={<MessageList />} />
+        <Route element={<MessageList />} path="/messages/:contactid" />
       </Route>
       <Route element={<NewPin />} path="/newPin" />
       <Route element={<PinReset />} path="/pinReset" />

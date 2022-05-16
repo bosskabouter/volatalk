@@ -11,14 +11,19 @@ interface IPeerProviderProps {
   children: ReactNode;
 }
 
-export const PeerContext = createContext<StrictEventEmitter<PeerManager, PeerManagerEvents> | null>(null);
+export const PeerContext = createContext<StrictEventEmitter<PeerManager, PeerManagerEvents> | null>(
+  null
+);
 export const usePeer = () => useContext(PeerContext);
 
 export default function PeerProvider({ children }: IPeerProviderProps) {
   const userContext = useContext(UserContext);
   const db = useContext(DatabaseContext);
 
-  const [peerManager, setPeerManager] = useState<StrictEventEmitter<PeerManager, PeerManagerEvents> | null>(null);
+  const [peerManager, setPeerManager] = useState<StrictEventEmitter<
+    PeerManager,
+    PeerManagerEvents
+  > | null>(null);
 
   useEffect(() => {
     console.log('Only first render');

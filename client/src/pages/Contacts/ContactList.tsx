@@ -6,7 +6,6 @@ import { ContactListItem } from './ContactListItem';
 
 import { useContext, useEffect, useState } from 'react';
 import { List, ListSubheader } from '@mui/material';
-import { PeerManagerEvents } from 'services/PeerManager';
 
 const ContactList = () => {
   const db = useContext(DatabaseContext);
@@ -21,11 +20,13 @@ const ContactList = () => {
 
   useEffect(() => {
     if (!peerManager) return;
+
     const updateContactList = (newContact: IContact) => {
-      contactList.push(newContact);
-      setContactList(contactList);
+      setContactList((prevCtcList) => [...prevCtcList, newContact]);
     };
+
     peerManager.addListener('onNewContact', updateContactList);
+
     return () => {
       peerManager.removeListener('onNewContact', updateContactList);
     };
@@ -37,12 +38,12 @@ const ContactList = () => {
         sx={{
           width: '100%',
           bgcolor: 'background.paper',
-          position: 'relative',
-          overflow: 'auto',
-          maxHeight: 300,
-          '& ul': { padding: 0 },
+          //  position: 'relative',
+          //  overflow: 'auto',
+          //  maxHeight: 300,
+          // '& ul': { padding: 0 },
         }}
-        dense={true}
+        // dense={true}
         subheader={
           <ListSubheader component="div" id="nested-list-subheader">
             Contact List

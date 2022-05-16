@@ -46,16 +46,17 @@ export interface IUserProfile {
 
 export interface IContact {
   peerid: string;
+  signature: ArrayBuffer;
+
   nickname: string;
   dateCreated: Date;
 
-  signature: ArrayBuffer;
-  avatar?: string;
-
+  dateAccepted?: Date;
+  dateDeclined?: Date;
+  //?
   dateResponded?: Date;
 
-  accepted?: boolean;
-  declined?: boolean;
+  avatar?: string;
 }
 export interface IMessage {
   id?: number;
