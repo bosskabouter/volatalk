@@ -54,22 +54,26 @@ const MessageList = () => {
   const [messageList, setMessageList] = useState<IMessage[]>([]);
 
   useEffect(() => {
-    db?.contacts.get(contactId).then((ctc) => {
-      if (ctc) {
-        setContact(ctc);
-        db.selectUnreadMessages(ctc)
-          .toArray()
-          .then((msgs) => {
-            msgs.forEach((msg) => {
-              msg.dateTimeRead = new Date().getTime();
-              db.messages.put(msg);
-            });
-          });
-        db.selectContactMessages(ctc).then((msgs) => {
-          setMessageList(msgs);
-        });
-      }
-    });
+    async function loadMessages() {
+      if (!db) return;
+      const ctc = await db.contacts.get(contactId);
+      if (!ctc) return;
+      setContact(ctc);
+      const timeRead = new Date().getTime();
+      const msgs: IMessage[] = await db.selectUnreadMessages(ctc).toArray();
+
+      msgs.forEach((msg) => {
+       // msg.dateTimeRead = timeRead;
+        //db.messages.put(msg);
+         db.messages.update(msg, {dateTimeRead:timeRead});
+      });
+
+      db.selectContactMessages(ctc).then((allmsgs) => {
+        setMessageList(allmsgs);
+      });
+    }
+
+    loadMessages();
   }, [contactId, db]);
 
   useEffect(() => {
@@ -180,7 +184,6 @@ const MessageList = () => {
     useEffect(() => {
       const onMessageDeliverHandler = (msg: IMessage) => {
         if (msg.id === props.message.id) {
-
           setDelivered(true);
         }
       };
@@ -199,17 +202,15 @@ const MessageList = () => {
           //    disablePadding
           //  alignItems={'center'}
           divider
-          sx={
-            {
-                display: 'flex',
-                flexDirection: 'row-reverse',
-                 alignItems: 'flex-start',
-               justifyContent: 'right',
-            }
-          }
+          sx={{
+            display: 'flex',
+            flexDirection: 'row-reverse',
+            alignItems: 'flex-start',
+            justifyContent: 'right',
+          }}
         >
-          <ListItemIcon color='success'>
-          <DeliveredIcon />
+          <ListItemIcon color="success">
+            <DeliveredIcon />
           </ListItemIcon>
           <ListItemText
             id={'id-' + props.message.id}
@@ -235,14 +236,14 @@ const MessageList = () => {
           bgcolor: 'background.paper',
           // padding: 5,
           // position: static | relative | absolute | sticky | fixed
-            position: 'sticky',
+          position: 'sticky',
           // overflow: visible | hidden | clip | scroll | auto
           //overflow: 'auto',
           // height: auto | <length> | <percentage> | min-content | max-content | fit-content | fit-content(<length-percentage>)
-         // height: 'max-content',
+          // height: 'max-content',
           // maxHeight: none | <length-percentage> | min-content | max-content | fit-content | fit-content(<length-percentage>)
-            maxHeight: '20%',
-           //'& ul': { padding: 15 },
+          maxHeight: '20%',
+          //'& ul': { padding: 15 },
         }}
         // dense={true}
         subheader={

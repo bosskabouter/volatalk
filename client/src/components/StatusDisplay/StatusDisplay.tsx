@@ -11,6 +11,7 @@ import Avatar from '@mui/material/Avatar';
 import Badge from '@mui/material/Badge';
 import { Box } from '@mui/material';
 import { DatabaseContext } from 'providers/DatabaseProvider';
+import { MediaConnection } from 'peerjs';
 
 const StatusDisplay = () => {
   const userCtx = useContext(UserContext);
@@ -20,8 +21,7 @@ const StatusDisplay = () => {
 
   const [online, setOnline] = useState(false);
   const [contactRequests, setContactRequests] = useState(
-    db?.contacts.count()
-    // .where({ dateAccepted: null })
+    db?.contacts.where({ dateTimeAccepted: 0 }).count()
   );
 
   useEffect(() => {
@@ -29,10 +29,17 @@ const StatusDisplay = () => {
       //alert('Status change;' + status);
       setOnline(status);
     }
+
+    function handleIncomingCall(call: MediaConnection) {
+      //alert('Status change;' + status);
+      alert('Someone calling' + call.peer);
+    }
     peerCtx?.on('statusChange', handleStatusChange);
+    peerCtx?.on('oneIncomingCall', handleIncomingCall);
 
     return () => {
       peerCtx?.removeListener('statusChange', handleStatusChange);
+      peerCtx?.removeListener('oneIncomingCall', handleIncomingCall);
     };
   }, [peerCtx]);
 
@@ -40,13 +47,9 @@ const StatusDisplay = () => {
     return peerCtx?._peer.id ? peerCtx._peer.id : '123';
   }
 
-  function userDiv() {
-    return !userCtx.user ? (
-      <div>Not logged in</div>
-    ) : (
-      <div className="userInfo">{userCtx.user?.nickname}</div>
-    );
-  }
+  const UserInfo = () => {
+    return !userCtx.user ? <>Not logged in</> : <>{userCtx.user?.nickname}</>;
+  };
 
   const ContactRequestInfo = () => {
     return (
@@ -57,19 +60,11 @@ const StatusDisplay = () => {
   };
   const PeerInfo = () => {
     return (
-      <Box
-        className="peerInfo"
-        sx={{
-          display: 'flex',
-          // flexDirection: 'stretch',
-          // alignItems: 'flex-start',
-          //justifyContent: 'left',
-        }}
-      >
+      <>
         <Avatar
           src={`data:image/svg+xml;utf8,${identicon(myPeerid())}`}
           alt={`${userCtx?.user?.nickname} 's personsal identification icon`}
-        ></Avatar>
+        />
         <Badge
           color={online ? 'success' : 'error'}
           //overlap="circular"
@@ -79,18 +74,27 @@ const StatusDisplay = () => {
           <Avatar
             src={userCtx?.user?.avatar}
             alt={`${userCtx?.user?.nickname} 's personsal identification icon`}
-          ></Avatar>
+          />
         </Badge>
-      </Box>
+      </>
     );
   };
 
   return (
-    <div>
-      <ContactRequestInfo />
-      {userDiv()}
-      <PeerInfo />
-    </div>
+    <>
+      <Box
+        sx={{
+          display: 'flex',
+          // flexDirection: 'stretch',
+          // alignItems: 'flex-start',
+          //justifyContent: 'left',
+        }}
+      >
+        <ContactRequestInfo />
+        <UserInfo />
+        <PeerInfo />
+      </Box>
+    </>
   );
 };
 

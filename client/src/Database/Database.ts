@@ -33,7 +33,6 @@ export class AppDatabase extends Dexie {
     return ctc;
   }
   selectUnreadMessages(contact: IContact) {
-    //TODO include dataRead===0
     return this.messages.where({ sender: contact.peerid, dateTimeRead: 0 });
   }
   selectContactMessages(contact: IContact) {

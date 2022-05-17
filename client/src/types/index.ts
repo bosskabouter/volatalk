@@ -59,7 +59,7 @@ export interface IContact {
   avatar?: string;
 }
 export interface IMessage {
-  id: number;
+  id?: number;
 
   sender: string;
   receiver: string;

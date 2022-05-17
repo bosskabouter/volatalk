@@ -40,20 +40,21 @@ export const ContactListItem = (props: ContactListItemProps) => {
     navigate('/messages/' + props.contact.peerid);
   };
   useEffect(() => {
-    //unread messages
-    if (db) {
-      db.selectUnreadMessages(contact)
-        .count()
-        .then((cnt) => {
-          setCntUnread(cnt);
-        });
+    async function selectUnreadMsg() {
+      if (db) {
+        setCntUnread(await db.selectUnreadMessages(contact).count());
+      }
     }
+    selectUnreadMsg();
+    //unread messages
   }, [db, contact]);
 
   useEffect(() => {
     function messageHandler(message: IMessage) {
-      console.log('Message received in messageHandler', message);
-      setCntUnread(cntUnread + 1);
+      if (message.sender === contact.peerid) {
+        console.log('Message received in messageHandler', message);
+        setCntUnread(cntUnread + 1);
+      }
     }
     async function contactStatusHandle(c: IContact) {
       console.log('contactStatusHandler', c);
@@ -62,12 +63,14 @@ export const ContactListItem = (props: ContactListItemProps) => {
         setOnline(true);
       }
     }
-    peer?.on('onMessage', messageHandler);
-    peer?.on('onContactOnline', contactStatusHandle);
+
+    if (!peer) return;
+    peer.on('onMessage', messageHandler);
+    peer.on('onContactOnline', contactStatusHandle);
 
     return () => {
-      peer?.removeListener('onMessage', messageHandler);
-      peer?.removeListener('onContactOnline', contactStatusHandle);
+      peer.removeListener('onMessage', messageHandler);
+      peer.removeListener('onContactOnline', contactStatusHandle);
     };
   }, [peer, contact, cntUnread]);
 
@@ -172,12 +175,12 @@ export const ContactListItem = (props: ContactListItemProps) => {
       >
         <ListItemAvatar>
           <Badge
-            variant="standard"
-            color={badgeOnline()}
+            variant={cntUnread > 0 ? 'standard' : 'dot'}
+            color={online ? 'success' : 'error'}
             // overlap="circular"
             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             badgeContent={cntUnread}
-            //showZero
+            showZero
           >
             <Avatar src={contact.avatar}></Avatar>
           </Badge>
