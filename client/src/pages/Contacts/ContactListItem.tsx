@@ -18,7 +18,7 @@ import {
   Tooltip,
 } from '@mui/material';
 import { VideoCameraFront } from '@mui/icons-material';
-import { descriptiveTimeAgo, getLocalDateString } from 'services/Generic';
+import { descriptiveTimeAgo } from 'services/Generic';
 import { DatabaseContext } from 'providers/DatabaseProvider';
 import { useNavigate } from 'react-router-dom';
 
@@ -42,9 +42,11 @@ export const ContactListItem = (props: ContactListItemProps) => {
   useEffect(() => {
     //unread messages
     if (db) {
-      db.cntUnreadMessages(contact).then((cnt) => {
-        setCntUnread(cnt);
-      });
+      db.selectUnreadMessages(contact)
+        .count()
+        .then((cnt) => {
+          setCntUnread(cnt);
+        });
     }
   }, [db, contact]);
 
@@ -72,16 +74,16 @@ export const ContactListItem = (props: ContactListItemProps) => {
   const AcceptContactButton = () => {
     const acceptContact = () => {
       if (db) {
-        contact.dateAccepted = new Date();
+        contact.dateTimeAccepted = new Date().getTime();
         db.contacts.put(contact);
         setContact(contact);
         if (peer) {
-          peer.checkConnection(contact);
+          peer._initiateConnection(contact);
           setOnline(peer.connectedContacts.get(contact.peerid)?.open);
         }
       }
     };
-    return !contact.dateAccepted ? (
+    return contact.dateTimeAccepted === 0 ? (
       <IconButton
         onClick={acceptContact}
         edge="start"
@@ -98,12 +100,12 @@ export const ContactListItem = (props: ContactListItemProps) => {
 
   const BlockContactButton = () => {
     const blockContact = async () => {
-      if (!peer||!db)return;
-      if (contact.dateDeclined) contact.dateDeclined = undefined;
-      else contact.dateDeclined = new Date();
+      if (!peer || !db) return;
+      if (contact.dateTimeDeclined !== 0) contact.dateTimeDeclined = 0;
+      else contact.dateTimeDeclined = new Date().getTime();
       db.contacts.put(contact);
 
-      if (contact.dateDeclined) {
+      if (contact.dateTimeDeclined !== 0) {
         const conn = peer.connectedContacts.get(contact.peerid);
         conn?.send('bye');
         conn?.close();
@@ -114,7 +116,7 @@ export const ContactListItem = (props: ContactListItemProps) => {
       setContact(contact);
     };
     function getIconColor() {
-      return contact.dateDeclined ? 'error' : 'success';
+      return contact.dateTimeDeclined === 0 ? 'success' : 'error';
     }
     return (
       <Tooltip title="Block this user">
@@ -157,38 +159,33 @@ export const ContactListItem = (props: ContactListItemProps) => {
       </>
     );
   };
-  function badgeOnline ()  {
-    return online ? 'success' : 'error';
-  }
+  const badgeOnline = () => (online ? 'success' : 'error');
+
   return (
     <>
       <Divider variant="inset" component="li" />
       <ListItem
-       // alignItems="flex-start"
+        // alignItems="flex-start"
         key={contact.peerid}
         onClick={handleClickContact('messages')}
         secondaryAction={secondaryOptions()}
       >
-
-
         <ListItemAvatar>
-        <Badge
-          variant="standard"
-          color={badgeOnline()}
-          // overlap="circular"
-          // anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-              badgeContent={cntUnread}
-              //showZero
-        >
-         
+          <Badge
+            variant="standard"
+            color={badgeOnline()}
+            // overlap="circular"
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            badgeContent={cntUnread}
+            //showZero
+          >
             <Avatar src={contact.avatar}></Avatar>
-       
-        </Badge>
+          </Badge>
         </ListItemAvatar>
         <ListItemText
           id={contact.peerid}
           primary={contact.nickname}
-          secondary={`connected since ${descriptiveTimeAgo(contact.dateCreated)}`}
+          secondary={`connected since ${descriptiveTimeAgo(new Date(contact.dateTimeCreated))}`}
         />
       </ListItem>
       <Divider variant="inset" component="li" />

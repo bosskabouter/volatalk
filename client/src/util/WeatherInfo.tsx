@@ -41,13 +41,12 @@ export const WeatherInfo = ({ location }: WeatherInfoProps) => {
       const iconURL = makeIconURL(res.data.weather[0].icon);
       const fahrenheitNow = res.data.main.feels_like;
 
-      const celciusNow = toCelsius(fahrenheitNow)/10;
-      const celciusDesc = round(celciusNow, 1)   + ' \u2103';
+      const celciusNow = toCelsius(fahrenheitNow) / 10;
+      const celciusDesc = round(celciusNow, 1) + ' \u2103';
       setWeatherForecast(celciusDesc);
       setWeatherToday(weatherInfo);
       setWeatherIcon(iconURL);
     });
-    
   }, [location]);
 
   useEffect(() => {
@@ -69,8 +68,8 @@ export const WeatherInfo = ({ location }: WeatherInfoProps) => {
     >
       <img src={weatherIcon} alt="Current Weather" />
       <div>
-        <Typography variant="subtitle1" noWrap align='right'>
-        {weatherTemp}, {weatherToday}
+        <Typography variant="subtitle1" noWrap align="right">
+          {weatherTemp}, {weatherToday}
         </Typography>
         <Typography variant="subtitle2" noWrap>
           {locationData}

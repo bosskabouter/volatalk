@@ -19,7 +19,7 @@ export function genSignature(peerid: string, userJsonPrivateKey: string) {
  */
 function peerIdFromPublicKey(publicKey: JsonWebKey) {
   const hexPeerid = convertStringToHex(JSON.stringify(publicKey, null, ' '));
-  console.debug('PeerID <= public key: ' + publicKey, hexPeerid);
+  console.debug('Converted PublicKey->PeerID', publicKey, hexPeerid);
   return hexPeerid;
 }
 
@@ -30,7 +30,7 @@ function peerIdFromPublicKey(publicKey: JsonWebKey) {
  */
 function peerIdToPublicKey(peerid: string) {
   const cryptoKey = JSON.parse(convertHexToString(peerid));
-  console.debug('PeerID => public key: ' + cryptoKey, peerid);
+  console.debug('Converted PeerID->PublicKey', cryptoKey, peerid);
   return cryptoKey;
 }
 

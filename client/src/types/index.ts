@@ -49,17 +49,17 @@ export interface IContact {
   signature: ArrayBuffer;
 
   nickname: string;
-  dateCreated: Date;
+  dateTimeCreated: number;
 
-  dateAccepted?: Date;
-  dateDeclined?: Date;
+  dateTimeAccepted: number;
+  dateTimeDeclined: number;
   //?
-  dateResponded?: Date;
+  dateTimeResponded: number;
 
   avatar?: string;
 }
 export interface IMessage {
-  id?: number;
+  id: number;
 
   sender: string;
   receiver: string;
@@ -70,5 +70,4 @@ export interface IMessage {
   dateTimeSent: number;
   dateTimeReceived: number;
   dateTimeRead: number;
-
 }

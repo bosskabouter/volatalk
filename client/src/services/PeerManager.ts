@@ -12,6 +12,7 @@ export interface PeerManagerEvents {
   onContactOnline: (contact: IContact) => void;
   onMessage: (message: IMessage) => void;
   onNewContact: (contact: IContact) => void;
+  onMessageDelivered: (message:IMessage) => void;
 }
 
 const RECONNECT_TIMEOUT = 60 * 1000;
@@ -25,11 +26,12 @@ export class PeerManager
   user: IUserProfile;
   _db: AppDatabase;
   _peer: Peer;
+
   /*
- * https://peerjs.com/docs/#peerconnections
- We recommend keeping track of connections yourself rather than relying on this hash.
- */
-  connectedContacts = new Map<string, DataConnection>();
+   * https://peerjs.com/docs/#peerconnections
+   * We recommend keeping track of connections yourself rather than relying on this hash.
+   */
+  connectedContacts = new Map<string/*peerid*/ , DataConnection>();
 
   constructor(user: IUserProfile, db: AppDatabase) {
     super();
@@ -120,13 +122,18 @@ export class PeerManager
         signature: sig,
         nickname: conn.metadata.nickname,
         avatar: conn.metadata.avatar,
-        dateCreated: new Date(),
+        dateTimeCreated: new Date().getTime(),
+        dateTimeAccepted: 0,
+        dateTimeDeclined: 0,
+        dateTimeResponded: 0
       };
       await this._db.contacts.add(newContact);
       console.info('Emitting onNewContact request!', newContact);
       this.emit('onNewContact', newContact);
-      //TODO keep connection open?
+      //close this connection
       conn.close();
+      //and reestablish sending our metadata
+      this._initiateConnection(newContact);
       return newContact;
     } else {
       console.info('Emitting onContactOnline', contact, conn);
@@ -144,10 +151,10 @@ export class PeerManager
     contact.avatar = md.avatar;
     this._db.contacts.put(contact);
     console.debug('Updated metadata', contact);
-    if (!contact.dateAccepted) {
+    if (contact.dateTimeAccepted===0) {
       console.info('Unaccepted contact trying to connect. Closing connection', contact, conn);
       conn.close();
-    } else if (contact.dateDeclined) {
+    } else if (contact.dateTimeDeclined!==0) {
       console.warn('Declined contact trying to connect. Closing connection.', contact, conn);
       conn.close();
     } else {
@@ -169,10 +176,11 @@ export class PeerManager
       sender: contact.peerid,
 
       payload: msg,
-      dateTimeRead: 0
+      dateTimeRead: 0,
+      id: 0
     };
     m.id = await this._db.messages.put(m);
-    console.debug('Emitting onMessage', msg);
+    console.debug('Emitting onMessage', m);
     this.emit('onMessage', m);
   }
 
@@ -183,14 +191,14 @@ export class PeerManager
    */
 
   _initiateConnection(contact: IContact) {
-    if (contact.dateDeclined) {
+    if (contact.dateTimeDeclined!==0) {
       console.debug(
         'Not initiating connection with declined contact: ' + contact.nickname,
         contact
       );
       return;
     }
-    if (!contact.dateAccepted) {
+    if (contact.dateTimeAccepted===0) {
       console.debug(
         'Not initiating connection with not yet accepted contact: ' + contact.nickname,
         contact
@@ -220,9 +228,7 @@ export class PeerManager
     return connection;
   }
 
-
   handleOnConnectionData(connection: DataConnection, c: IContact) {
-
     connection.on('data', (data) => {
       console.info(`received DATA:` + data);
       const dataDecoded = JSON.parse(data);
@@ -235,8 +241,8 @@ export class PeerManager
   }
 
   async syncUnsentMessages(c: IContact) {
-    console.info("Sending unsent messages...");
-    const unsentMsgs:IMessage[]=await this._db.selectUnsentMessages(c);
+    console.info('Sending unsent messages...');
+    const unsentMsgs: IMessage[] = await this._db.selectUnsentMessages(c);
     for (const msg of unsentMsgs) {
       this.transmitMessage(msg);
     }
@@ -248,17 +254,16 @@ export class PeerManager
     return (conn && conn.open) || false;
   }
 
-
-
   async sendText(text: string, contactId: string) {
     const msg: IMessage = {
+      id:0,
       dateTimeCreated: new Date().getTime(),
       receiver: contactId,
       payload: text,
       sender: this.user.peerid,
       dateTimeSent: 0,
       dateTimeReceived: 0,
-      dateTimeRead: 0
+      dateTimeRead: 0,
     };
     msg.id = await this._db.messages.put(msg);
     console.debug('New message saved', msg);
@@ -267,20 +272,20 @@ export class PeerManager
     return msg;
   }
 
-  async transmitMessage(msg:IMessage){
-
+  async transmitMessage(msg: IMessage) {
     const conn = this.connectedContacts.get(msg.receiver);
 
     if (conn && conn.open) {
-      console.info('Sending message',  MessageEvent);
+      console.info('Sending message', MessageEvent);
 
       //TODO exchange key
       const key = generateKeyFromString('1234');
-      const stringToEncrypt = encryptString( msg.payload , key);
+      const stringToEncrypt = encryptString(msg.payload, key);
 
       conn.send(JSON.stringify(stringToEncrypt));
       msg.dateTimeSent = new Date().getTime();
       this._db.messages.put(msg);
+      this.emit("onMessageDelivered",msg);
       console.info('Message delivered.', msg);
     } else {
       console.info('Receiver is not connected...');

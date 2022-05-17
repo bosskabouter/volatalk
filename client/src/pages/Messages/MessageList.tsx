@@ -2,7 +2,7 @@ import { PeerContext } from 'providers/PeerProvider';
 import { DatabaseContext } from 'providers/DatabaseProvider';
 import { IContact, IMessage } from 'types';
 
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import {
   Avatar,
   Badge,
@@ -10,6 +10,7 @@ import {
   InputAdornment,
   List,
   ListItem,
+  ListItemIcon,
   ListItemText,
   ListSubheader,
   TextField,
@@ -18,19 +19,19 @@ import {
 } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import IconButton from '@mui/material/IconButton';
-import CallIcon from '@mui/icons-material/Call';
-
-import CheckIcon from '@mui/icons-material/Check';
-import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
-
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import SendIcon from '@mui/icons-material/Send';
-import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
-import EmoPicker from 'emoji-picker-react';
+import EmojiPicker from 'emoji-picker-react';
 import { identicon } from 'minidenticons';
 import { UserContext } from 'providers/UserProvider';
 import { descriptiveTimeAgo } from 'services/Generic';
+
+import IconButton from '@mui/material/IconButton';
+
+import SendTextIcon from '@mui/icons-material/Send';
+import CallIcon from '@mui/icons-material/Call';
+import MsgHourglassIcon from '@mui/icons-material/HourglassBottom';
+import MsgDeliveredIcon from '@mui/icons-material/Check';
+import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
+import BackIcon from '@mui/icons-material/ChevronLeft';
 
 const MessageList = () => {
   const db = useContext(DatabaseContext);
@@ -44,17 +45,26 @@ const MessageList = () => {
   const [contact, setContact] = useState<IContact>({
     peerid: '0',
     nickname: 'unknown contact',
-    dateCreated: new Date(),
+    dateTimeCreated: new Date().getTime(),
     signature: new ArrayBuffer(0),
+    dateTimeAccepted: 0,
+    dateTimeDeclined: 0,
+    dateTimeResponded: 0,
   });
   const [messageList, setMessageList] = useState<IMessage[]>([]);
-  
-  const textfieldRef = useRef<HTMLInputElement|null>(null);
 
   useEffect(() => {
     db?.contacts.get(contactId).then((ctc) => {
       if (ctc) {
         setContact(ctc);
+        db.selectUnreadMessages(ctc)
+          .toArray()
+          .then((msgs) => {
+            msgs.forEach((msg) => {
+              msg.dateTimeRead = new Date().getTime();
+              db.messages.put(msg);
+            });
+          });
         db.selectContactMessages(ctc).then((msgs) => {
           setMessageList(msgs);
         });
@@ -88,33 +98,22 @@ const MessageList = () => {
     };
   }, [contact, contactId, peerManager]);
 
-
-
-  useEffect(() => {
-    if (textfieldRef && textfieldRef.current) {
-      //textfieldRef.current.focus();
-    }
-  })
-  
   const ComposeMessageField = () => {
     const [sndMessageText, setSndMessageText] = useState<string>('');
 
-
     const sendText = async () => {
       if (peerManager && sndMessageText.trim().length > 0) {
-
         console.log('Sending text: ' + sndMessageText);
         const msg = await peerManager.sendText(sndMessageText, contactId);
         setSndMessageText('');
         setMessageList((prevMessageList) => [...prevMessageList, msg]);
-        
-      } 
+      }
     };
 
     const [openEmoji, setOpenEmoji] = useState(false);
     const ChooseEmojiButton = () => {
       return openEmoji ? (
-        <EmoPicker
+        <EmojiPicker
           native
           onEmojiClick={(_e, picked) => {
             setSndMessageText(sndMessageText + picked.emoji);
@@ -134,8 +133,8 @@ const MessageList = () => {
     return (
       <>
         <TextField
-        autoFocus
-        //  ref={textfieldRef}
+          autoFocus
+          //  ref={textfieldRef}
           spellCheck
           label={'Send ' + contact.nickname + ' a message'}
           placeholder={'Hi ' + contact.nickname + '!'}
@@ -158,7 +157,7 @@ const MessageList = () => {
         ></TextField>
 
         <IconButton onClick={sendText} size="medium" color="secondary">
-          <SendIcon />
+          <SendTextIcon />
         </IconButton>
       </>
     );
@@ -167,15 +166,32 @@ const MessageList = () => {
   const MessageListItem = (props: { message: IMessage }) => {
     const isMine = props.message.sender === userCtx.user.peerid;
 
-    const [delivered] = useState(props.message.dateTimeSent >0);
+    const [delivered, setDelivered] = useState(props.message.dateTimeSent > 0);
 
     const senderText = isMine ? 'You' : contact?.nickname;
     const secondaryText =
-      (isMine ? 'Sent ' : 'Received ') + descriptiveTimeAgo(new Date(props.message.dateTimeCreated));
+      (isMine ? 'Sent ' : 'Received ') +
+      descriptiveTimeAgo(new Date(props.message.dateTimeCreated));
 
     const DeliveredIcon = () => {
-      return delivered ? <CheckIcon /> : <HourglassBottomIcon />;
+      return delivered ? <MsgDeliveredIcon /> : <MsgHourglassIcon />;
     };
+
+    useEffect(() => {
+      const onMessageDeliverHandler = (msg: IMessage) => {
+        if (msg.id === props.message.id) {
+
+          setDelivered(true);
+        }
+      };
+      if (peerManager && props.message.dateTimeSent === 0) {
+        peerManager.addListener('onMessageDelivered', onMessageDeliverHandler);
+      }
+      return () => {
+        peerManager?.removeListener('onMessageDelivered', onMessageDeliverHandler);
+      };
+    }, [props.message.dateTimeSent, props.message.id]);
+
     return (
       <>
         <ListItem
@@ -185,15 +201,16 @@ const MessageList = () => {
           divider
           sx={
             {
-              //  display: 'flex',
-              //  flexDirection: 'row',
-              //   alignItems: 'flex-start',
-              // justifyContent: 'right',
+                display: 'flex',
+                flexDirection: 'row-reverse',
+                 alignItems: 'flex-start',
+               justifyContent: 'right',
             }
           }
         >
+          <ListItemIcon color='success'>
           <DeliveredIcon />
-
+          </ListItemIcon>
           <ListItemText
             id={'id-' + props.message.id}
             primary={senderText + ': ' + props.message.payload}
@@ -218,14 +235,14 @@ const MessageList = () => {
           bgcolor: 'background.paper',
           // padding: 5,
           // position: static | relative | absolute | sticky | fixed
-          //  position: 'sticky',
+            position: 'sticky',
           // overflow: visible | hidden | clip | scroll | auto
-          overflow: 'visible',
+          //overflow: 'auto',
           // height: auto | <length> | <percentage> | min-content | max-content | fit-content | fit-content(<length-percentage>)
-          height: 'fit-content',
+         // height: 'max-content',
           // maxHeight: none | <length-percentage> | min-content | max-content | fit-content | fit-content(<length-percentage>)
-          //  maxHeight: '20%'
-          // '& ul': { padding: 15 },
+            maxHeight: '20%',
+           //'& ul': { padding: 15 },
         }}
         // dense={true}
         subheader={
@@ -239,7 +256,7 @@ const MessageList = () => {
                 // justifyContent: 'left',
               }}
             >
-                <ChevronLeftIcon onClick={() => navigate('/contacts')}/>
+              <BackIcon onClick={() => navigate('/contacts')} />
               <Typography> {contact.nickname}</Typography>
               <Tooltip title="Personal Identification Icon">
                 <Avatar

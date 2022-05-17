@@ -21,8 +21,7 @@ const StatusDisplay = () => {
   const [online, setOnline] = useState(false);
   const [contactRequests, setContactRequests] = useState(
     db?.contacts.count()
-     // .where({ dateAccepted: null })
-     
+    // .where({ dateAccepted: null })
   );
 
   useEffect(() => {
@@ -62,27 +61,26 @@ const StatusDisplay = () => {
         className="peerInfo"
         sx={{
           display: 'flex',
-         // flexDirection: 'stretch',
-         // alignItems: 'flex-start',
+          // flexDirection: 'stretch',
+          // alignItems: 'flex-start',
           //justifyContent: 'left',
         }}
       >
+        <Avatar
+          src={`data:image/svg+xml;utf8,${identicon(myPeerid())}`}
+          alt={`${userCtx?.user?.nickname} 's personsal identification icon`}
+        ></Avatar>
         <Badge
           color={online ? 'success' : 'error'}
-          overlap="circular"
-          //anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          //overlap="circular"
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
           variant="dot"
         >
           <Avatar
-            src={`data:image/svg+xml;utf8,${identicon(myPeerid())}`}
+            src={userCtx?.user?.avatar}
             alt={`${userCtx?.user?.nickname} 's personsal identification icon`}
           ></Avatar>
         </Badge>
-
-        <Avatar
-          src={userCtx?.user?.avatar}
-          alt={`${userCtx?.user?.nickname} 's personsal identification icon`}
-        ></Avatar>
       </Box>
     );
   };

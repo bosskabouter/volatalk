@@ -14,6 +14,8 @@ import Contacts from 'pages/Contacts/ContactsPage';
 import AcceptInvite from 'components/Invite/AcceptInvite';
 import MessageList from 'pages/Messages/MessageList';
 import Home from 'pages/Home/Home';
+import CallComponent from 'pages/Messages/CallComponent';
+import CallPage from 'pages/Messages/CallPage';
 
 // We load each route, when lazy loading, only as they're
 // called by the user. The Home page is not lazily loaded
@@ -58,6 +60,8 @@ const AppRoutes = () => (
         <Route element={<Invite />} path="/invite" />
         <Route element={<Contacts />} path="/contacts" />
         <Route element={<MessageList />} path="/messages/:contactid" />
+        <Route element={<CallPage videoOn={false} />} path="/call/:contactid" />
+        <Route element={<CallPage videoOn={true} />} path="/video/:contactid" />
       </Route>
       <Route element={<NewPin />} path="/newPin" />
       <Route element={<PinReset />} path="/pinReset" />

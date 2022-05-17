@@ -6,7 +6,6 @@ const tableContacts = 'contacts';
 const tableMessages = 'messages';
 
 export class AppDatabase extends Dexie {
-
   userProfile: Dexie.Table<IUserProfile, number>;
 
   contacts: Dexie.Table<IContact, string>;
@@ -18,8 +17,9 @@ export class AppDatabase extends Dexie {
     //TODO REVIEW DB ENCRYPTION all indexed fields are visible. avoid including identifying info in indexes.. (contact.nickname, msg.payload etc.)
     this.version(2).stores({
       userProfile: '++id',
-      contacts: 'peerid , dateAccepted, dateDelined',
-      messages: '++id, sender, receiver, dateCreated, dateSent, dateRead, [sender+dateRead],[receiver+dateSent]',
+      contacts: 'peerid , dateTimeAccepted, dateTimeDelined',
+      messages:
+        '++id, sender, receiver, dateTimeCreated, dateTimeSent, dateTimeRead, [sender+dateTimeRead],[receiver+dateTimeSent]',
     });
 
     this.userProfile = this.table(tableUser);
@@ -27,8 +27,14 @@ export class AppDatabase extends Dexie {
     this.messages = this.table(tableMessages);
   }
 
-  cntUnreadMessages(contact: IContact) {
-    return this.messages.where({ sender: contact.peerid }).count();
+  async getContact(contactid: string) {
+    const ctc = await this.contacts.get(contactid);
+    if (ctc === undefined) throw Error('Unknown contact...' + contactid);
+    return ctc;
+  }
+  selectUnreadMessages(contact: IContact) {
+    //TODO include dataRead===0
+    return this.messages.where({ sender: contact.peerid, dateTimeRead: 0 });
   }
   selectContactMessages(contact: IContact) {
     return this.messages
@@ -36,10 +42,10 @@ export class AppDatabase extends Dexie {
       .equals(contact.peerid)
       .or('sender')
       .equals(contact.peerid)
-      .sortBy('dateCreated');
+      .sortBy('dateTimeCreated');
   }
 
   selectUnsentMessages(c: IContact): IMessage[] | PromiseLike<IMessage[]> {
-    return this.messages.where({receiver:c.peerid, dateSent:0}).sortBy('dateCreated');
+    return this.messages.where({ receiver: c.peerid, dateTimeSent: 0 }).sortBy('dateTimeCreated');
   }
 }

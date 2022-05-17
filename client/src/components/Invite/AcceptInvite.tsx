@@ -62,9 +62,10 @@ export default function AcceptInvite() {
         signature: sig,
         nickname: receivedInvite.text,
         avatar: '',
-        dateCreated: new Date(),
-        dateAccepted: new Date(),
-
+        dateTimeCreated: new Date().getTime(),
+        dateTimeAccepted: new Date().getTime(),
+        dateTimeResponded: 0,
+        dateTimeDeclined: 0,
       };
       db.contacts.put(contact);
       console.info('Contact created', contact);

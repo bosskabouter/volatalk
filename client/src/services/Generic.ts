@@ -4,18 +4,16 @@
 
 const domain = document.location.host;
 
-
 /**
- * 
+ *
  * @param value https://stackoverflow.com/questions/7342957/how-do-you-round-to-1-decimal-place-in-javascript
- * @param precision 
- * @returns 
+ * @param precision
+ * @returns
  */
-export function round(value:number, precision:number) {
+export function round(value: number, precision: number) {
   const multiplier = Math.pow(10, precision || 0);
   return Math.round(value * multiplier) / multiplier;
 }
-
 
 /**
  */

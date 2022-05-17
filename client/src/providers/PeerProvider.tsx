@@ -26,7 +26,7 @@ export default function PeerProvider({ children }: IPeerProviderProps) {
   > | null>(null);
 
   useEffect(() => {
-    console.log('Only first render');
+    //console.log('Only first render');
   }, []);
 
   useEffect(() => {
