@@ -4,6 +4,7 @@
   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
+
     {
       "name": "Launch Chrome 3000",
       "type": "chrome",
@@ -42,7 +43,7 @@
       "env": {
         "DEBUG": "true",
         "PORT_HTTPS": "8443",
-        "DIR_PUB_STATIC": "../client/public",
+        "DIR_PUB_STATIC": "../client/build",
         "DIR_RENDER_EJS": "/views"
       }
     },

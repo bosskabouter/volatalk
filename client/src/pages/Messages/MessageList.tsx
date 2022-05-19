@@ -28,6 +28,7 @@ import IconButton from '@mui/material/IconButton';
 
 import SendTextIcon from '@mui/icons-material/Send';
 import CallIcon from '@mui/icons-material/Call';
+import VideoCallIcon from '@mui/icons-material/VideoCall';
 import MsgHourglassIcon from '@mui/icons-material/HourglassBottom';
 import MsgDeliveredIcon from '@mui/icons-material/Check';
 import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
@@ -63,9 +64,9 @@ const MessageList = () => {
       const msgs: IMessage[] = await db.selectUnreadMessages(ctc).toArray();
 
       msgs.forEach((msg) => {
-       // msg.dateTimeRead = timeRead;
+        // msg.dateTimeRead = timeRead;
         //db.messages.put(msg);
-         db.messages.update(msg, {dateTimeRead:timeRead});
+        db.messages.update(msg, { dateTimeRead: timeRead });
       });
 
       db.selectContactMessages(ctc).then((allmsgs) => {
@@ -261,19 +262,22 @@ const MessageList = () => {
               <Typography> {contact.nickname}</Typography>
               <Tooltip title="Personal Identification Icon">
                 <Avatar
-                  sizes="small"
+                  // sizes="small"
                   src={`data:image/svg+xml;utf8,${identicon(contact.peerid)}`}
                   alt={`${contact.nickname} 's personsal identification icon`}
-                ></Avatar>
+                />
               </Tooltip>
               <Badge
                 variant="dot"
                 color={contactOnline ? 'success' : 'error'}
-                overlap="rectangular"
+                overlap="circular"
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
               >
                 <Avatar src={contact.avatar}></Avatar>
               </Badge>
+              <IconButton onClick={() => navigate('/video/' + contactId)} size="medium">
+                <VideoCallIcon />
+              </IconButton>
 
               <IconButton onClick={() => navigate('/call/' + contactId)} size="medium">
                 <CallIcon />

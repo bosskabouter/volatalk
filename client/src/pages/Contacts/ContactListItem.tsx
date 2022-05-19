@@ -3,7 +3,7 @@ import { PeerContext } from 'providers/PeerProvider';
 import { useContext, useEffect, useState } from 'react';
 import CallIcon from '@mui/icons-material/Call';
 import AddTaskIcon from '@mui/icons-material/AddTask';
-
+import ChatIcon from '@mui/icons-material/Chat';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 
 import Badge from '@mui/material/Badge';
@@ -20,7 +20,7 @@ import {
 import { VideoCameraFront } from '@mui/icons-material';
 import { descriptiveTimeAgo } from 'services/Generic';
 import { DatabaseContext } from 'providers/DatabaseProvider';
-import { useNavigate } from 'react-router-dom';
+import { NavigateOptions, useNavigate } from 'react-router-dom';
 
 interface ContactListItemProps {
   contact: IContact;
@@ -35,9 +35,18 @@ export const ContactListItem = (props: ContactListItemProps) => {
   const [cntUnread, setCntUnread] = useState(0);
   const [online, setOnline] = useState(peer?.connectedContacts.get(props.contact.peerid)?.open);
 
-  const handleClickContact = (_action: string) => () => {
-    //    console.log(action + ' contact ' + props.contact.nickname);
+  const handleClickMessageContact = () => {
+    console.log('Opening messages for contact ' + props.contact.nickname);
     navigate('/messages/' + props.contact.peerid);
+  };
+  const handleClickCallContact = () => {
+    //    console.log(action + ' contact ' + props.contact.nickname);
+    navigate('/call/' + props.contact.peerid);
+  };
+  const handleClickVideoContact = () => {
+    //    console.log(action + ' contact ' + props.contact.nickname);
+    const opt: NavigateOptions = { replace: true };
+    navigate('/video/' + props.contact.peerid, opt);
   };
   useEffect(() => {
     async function selectUnreadMsg() {
@@ -136,13 +145,13 @@ export const ContactListItem = (props: ContactListItemProps) => {
     );
   };
 
-  const secondaryOptions = () => {
+  const SecondaryOptions = () => {
     return (
       <>
         <AcceptContactButton />
         <BlockContactButton />
         <IconButton
-          onClick={handleClickContact('videocall')}
+          onClick={handleClickVideoContact}
           edge="end"
           aria-label="Video Call"
           color="success"
@@ -151,7 +160,7 @@ export const ContactListItem = (props: ContactListItemProps) => {
           <VideoCameraFront />
         </IconButton>
         <IconButton
-          onClick={handleClickContact('audiocall')}
+          onClick={handleClickCallContact}
           edge="end"
           aria-label="Audio Call"
           color="success"
@@ -159,25 +168,33 @@ export const ContactListItem = (props: ContactListItemProps) => {
         >
           <CallIcon />
         </IconButton>
+
+        <IconButton
+          onClick={handleClickMessageContact}
+          edge="end"
+          aria-label="Messages Call"
+          color="success"
+          size="small"
+        >
+          <ChatIcon />
+        </IconButton>
       </>
     );
   };
-  const badgeOnline = () => (online ? 'success' : 'error');
 
   return (
     <>
-      <Divider variant="inset" component="li" />
       <ListItem
         // alignItems="flex-start"
+        divider
         key={contact.peerid}
-        onClick={handleClickContact('messages')}
-        secondaryAction={secondaryOptions()}
+        secondaryAction={SecondaryOptions()}
       >
         <ListItemAvatar>
           <Badge
             variant={cntUnread > 0 ? 'standard' : 'dot'}
             color={online ? 'success' : 'error'}
-            // overlap="circular"
+            overlap="circular"
             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             badgeContent={cntUnread}
             showZero
@@ -191,7 +208,6 @@ export const ContactListItem = (props: ContactListItemProps) => {
           secondary={`connected since ${descriptiveTimeAgo(new Date(contact.dateTimeCreated))}`}
         />
       </ListItem>
-      <Divider variant="inset" component="li" />
     </>
   );
 };

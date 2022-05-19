@@ -11,7 +11,7 @@ import Avatar from '@mui/material/Avatar';
 import Badge from '@mui/material/Badge';
 import { Box } from '@mui/material';
 import { DatabaseContext } from 'providers/DatabaseProvider';
-import { MediaConnection } from 'peerjs';
+import CalleeComponent from 'pages/Messages/CalleeComponent';
 
 const StatusDisplay = () => {
   const userCtx = useContext(UserContext);
@@ -20,26 +20,22 @@ const StatusDisplay = () => {
   const peerCtx = useContext(PeerContext);
 
   const [online, setOnline] = useState(false);
+
   const [contactRequests, setContactRequests] = useState(
     db?.contacts.where({ dateTimeAccepted: 0 }).count()
   );
 
   useEffect(() => {
+    if (!peerCtx) return;
     function handleStatusChange(status: boolean) {
       //alert('Status change;' + status);
       setOnline(status);
     }
 
-    function handleIncomingCall(call: MediaConnection) {
-      //alert('Status change;' + status);
-      alert('Someone calling' + call.peer);
-    }
-    peerCtx?.on('statusChange', handleStatusChange);
-    peerCtx?.on('oneIncomingCall', handleIncomingCall);
+    peerCtx.on('statusChange', handleStatusChange);
 
     return () => {
-      peerCtx?.removeListener('statusChange', handleStatusChange);
-      peerCtx?.removeListener('oneIncomingCall', handleIncomingCall);
+      peerCtx.removeListener('statusChange', handleStatusChange);
     };
   }, [peerCtx]);
 
@@ -58,6 +54,7 @@ const StatusDisplay = () => {
       </>
     );
   };
+
   const PeerInfo = () => {
     return (
       <>
@@ -67,7 +64,7 @@ const StatusDisplay = () => {
         />
         <Badge
           color={online ? 'success' : 'error'}
-          //overlap="circular"
+          overlap="circular"
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
           variant="dot"
         >
@@ -90,6 +87,7 @@ const StatusDisplay = () => {
           //justifyContent: 'left',
         }}
       >
+        <CalleeComponent />
         <ContactRequestInfo />
         <UserInfo />
         <PeerInfo />
