@@ -35,7 +35,8 @@ export const ContactListItem = (props: ContactListItemProps) => {
   const [cntUnread, setCntUnread] = useState(0);
   const [online, setOnline] = useState(peer?.connectedContacts.get(props.contact.peerid)?.open);
 
-  const handleClickMessageContact = () => {
+  const handleClickMessageContact = (e: Event) => {
+    e.preventDefault();
     console.log('Opening messages for contact ' + props.contact.nickname);
     navigate('/messages/' + props.contact.peerid);
   };
@@ -65,23 +66,24 @@ export const ContactListItem = (props: ContactListItemProps) => {
         setCntUnread(cntUnread + 1);
       }
     }
-    async function contactStatusHandle(c: IContact) {
-      console.log('contactStatusHandler', c);
-      if (c.peerid === contact.peerid) {
-        setContact(c);
-        setOnline(true);
+
+    async function onContactStatusChangeHandle(statchange: { contact: IContact; status: boolean }) {
+      if (statchange.contact.peerid === contact.peerid) {
+        console.log('contactStatusHandler', statchange);
+        setContact(statchange.contact);
+        setOnline(statchange.status);
       }
     }
 
     if (!peer) return;
     peer.on('onMessage', messageHandler);
-    peer.on('onContactOnline', contactStatusHandle);
+    peer.on('onContactStatusChange', onContactStatusChangeHandle);
 
     return () => {
       peer.removeListener('onMessage', messageHandler);
-      peer.removeListener('onContactOnline', contactStatusHandle);
+      peer.removeListener('onContactStatusChange', onContactStatusChangeHandle);
     };
-  }, [peer, contact, cntUnread]);
+  }, [peer, contact, cntUnread,online]);
 
   const AcceptContactButton = () => {
     const acceptContact = () => {
@@ -170,7 +172,7 @@ export const ContactListItem = (props: ContactListItemProps) => {
         </IconButton>
 
         <IconButton
-          onClick={handleClickMessageContact}
+          onClick={(e) => handleClickMessageContact}
           edge="end"
           aria-label="Messages Call"
           color="success"
@@ -188,6 +190,7 @@ export const ContactListItem = (props: ContactListItemProps) => {
         // alignItems="flex-start"
         divider
         key={contact.peerid}
+        onClick={(e) => handleClickMessageContact}
         secondaryAction={SecondaryOptions()}
       >
         <ListItemAvatar>

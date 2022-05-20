@@ -16,7 +16,7 @@ interface PeerManState {
 }
 
 const cleanMessage: IMessage = {
-  id:0,
+  id: 0,
   payload: '',
   sender: '',
   receiver: '',
@@ -123,7 +123,7 @@ class PeerMan2 extends Component<PeerManProps, PeerManState> {
             onChange={(e) => {
               this.setState({
                 message: {
-                  id:0,
+                  id: 0,
                   sender: this.props.user.peerid,
                   receiver: this.state.friendId,
                   dateTimeCreated: new Date().getTime(),

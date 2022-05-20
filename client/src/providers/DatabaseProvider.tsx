@@ -1,6 +1,6 @@
 import { applyEncryptionMiddleware, clearAllTables, NON_INDEXED_FIELDS } from 'dha-dexie-encrypted';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import { AppDatabase } from '../Database/Database';
+import { AppDatabase, DB_CURRENT_VERSION } from '../Database/Database';
 
 interface IDatabaseProviderProps {
   children: ReactNode;
@@ -36,7 +36,7 @@ export const DatabaseProvider = ({ children }: IDatabaseProviderProps) => {
       },
       (db2) => clearAllTables(db2)
     );
-    db.version(5);
+    db.version(DB_CURRENT_VERSION + 1);
     setDatabase(db);
   };
 

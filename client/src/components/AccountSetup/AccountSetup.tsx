@@ -155,7 +155,6 @@ const AccountSetup = () => {
   function updateUser(values: IUserProfile) {
     // Save to database
     if (db !== null) {
-
       //only update input fields (private key /peerid isnt one)
       db.userProfile.put(values, 1);
       setUser(values);

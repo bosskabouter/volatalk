@@ -61,11 +61,9 @@ const MessageList = () => {
       if (!ctc) return;
       setContact(ctc);
       const timeRead = new Date().getTime();
-      const msgs: IMessage[] = await db.selectUnreadMessages(ctc).toArray();
+      const msgs = await db.selectUnreadMessages(ctc).toArray();
 
       msgs.forEach((msg) => {
-        // msg.dateTimeRead = timeRead;
-        //db.messages.put(msg);
         db.messages.update(msg, { dateTimeRead: timeRead });
       });
 
@@ -83,23 +81,23 @@ const MessageList = () => {
         setMessageList((prevMessageList) => [...prevMessageList, msg]);
       }
     };
-    const updateContactStatusHandler = (ctc: IContact) => {
-      console.info('Someone online', ctc);
-      if (ctc.peerid === contactId) {
-        console.info('Contact online!', contactId);
-        setContactOnline(true);
+    function updateContactStatusHandler  (statchange: { contact: IContact; status: boolean }) {
+      console.info('Contact status change: ' + (statchange.status ? ' online' : 'offline'));
+      if (statchange.contact.peerid === contactId) {
+        console.info('This Contact ', contactId);
+        setContactOnline(statchange.status);
         //update info
-        setContact(ctc);
+        setContact(statchange.contact);
       }
-    };
+    }
     if (peerManager) {
       if (contact) setContactOnline(peerManager.checkConnection(contact));
       peerManager.addListener('onMessage', insertNewMessageHandler);
-      peerManager.addListener('onContactOnline', updateContactStatusHandler);
+      peerManager.addListener('onContactStatusChange', updateContactStatusHandler);
     }
     return () => {
       peerManager?.removeListener('onMessage', insertNewMessageHandler);
-      peerManager?.removeListener('onContactOnline', updateContactStatusHandler);
+      peerManager?.removeListener('onContactStatusChange', updateContactStatusHandler);
     };
   }, [contact, contactId, peerManager]);
 

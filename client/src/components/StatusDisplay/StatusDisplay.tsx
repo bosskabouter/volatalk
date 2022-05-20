@@ -21,9 +21,7 @@ const StatusDisplay = () => {
 
   const [online, setOnline] = useState(false);
 
-  const [contactRequests, setContactRequests] = useState(
-    db?.contacts.where({ dateTimeAccepted: 0 }).count()
-  );
+  const [contactRequests, setContactRequests] = useState(db?.selectUnacceptedContacts().count());
 
   useEffect(() => {
     if (!peerCtx) return;

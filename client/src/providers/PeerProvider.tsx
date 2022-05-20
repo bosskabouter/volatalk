@@ -39,9 +39,11 @@ export default function PeerProvider({ children }: IPeerProviderProps) {
       console.log('NewContactHandler PeerProvider', contact);
       peerManager?.checkConnection(contact);
     }
-    function contactOnlineHandle(contact: IContact) {
-      console.log('ContactOnlineHandler PeerProvider', contact);
-      peerManager?.checkConnection(contact);
+    function contactOnlineHandle(statchange: { contact: IContact;status:boolean }) {
+      console.log('ContactOnlineHandler PeerProvider', statchange);
+
+      //TODO if online show online message, in status display?
+      peerManager?.checkConnection(statchange.contact);
     }
     function handleStatusChange(status: boolean) {
       if (!db) return;
@@ -62,21 +64,28 @@ export default function PeerProvider({ children }: IPeerProviderProps) {
       pm.on('statusChange', handleStatusChange);
       pm.on('onMessage', messageHandler);
       pm.on('onNewContact', newContactHandle);
-      pm.on('onContactOnline', contactOnlineHandle);
+      pm.on('onContactStatusChange', contactOnlineHandle);
       setPeerManager(pm);
     }
-    return function cleanup() {
-      //alert('Cleaning up!');
-      peerManager?.removeListener('statusChange', handleStatusChange);
-      peerManager?.removeListener('onMessage', messageHandler);
-      peerManager?.removeListener('onNewContact', newContactHandle);
-      peerManager?.removeListener('onContactOnline', contactOnlineHandle);
-      //pm._peer.disconnect();
+
+    const beforeunloadHandler = () => {
+     
+      peerManager?.disconnectGracefully();
+    };
+    window.addEventListener('beforeunload', beforeunloadHandler);
+    return () => {
+      window.removeEventListener('beforeunload', beforeunloadHandler);
+      if (peerManager) {
+        console.warn('Cleaning up PeerProvider!');
+        peerManager.removeListener('statusChange', handleStatusChange);
+        peerManager.removeListener('onMessage', messageHandler);
+        peerManager.removeListener('onNewContact', newContactHandle);
+        peerManager.removeListener('onContactStatusChange', contactOnlineHandle);
+       // peerManager._peer.disconnect();
+        //setPeerManager(null);
+      }
     };
   }, [userContext, db, peerManager]);
-  /*
-  useBeforeunload(() => {
-    peerManager?._peer.disconnect();
-  });*/
+
   return <PeerContext.Provider value={peerManager}>{children}</PeerContext.Provider>;
 }

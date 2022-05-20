@@ -5,6 +5,8 @@ const tableUser = 'userProfile';
 const tableContacts = 'contacts';
 const tableMessages = 'messages';
 
+export const DB_CURRENT_VERSION = 7;
+
 export class AppDatabase extends Dexie {
   userProfile: Dexie.Table<IUserProfile, number>;
 
@@ -15,12 +17,56 @@ export class AppDatabase extends Dexie {
   constructor() {
     super('appDatabase');
     //TODO REVIEW DB ENCRYPTION all indexed fields are visible. avoid including identifying info in indexes.. (contact.nickname, msg.payload etc.)
-    this.version(2).stores({
+    this.version(1).stores({
       userProfile: '++id',
-      contacts: 'peerid , dateTimeAccepted, dateTimeDelined',
+      contacts: 'peerid , dateAccepted, dateDelined',
       messages:
-        '++id, sender, receiver, dateTimeCreated, dateTimeSent, dateTimeRead, [sender+dateTimeRead],[receiver+dateTimeSent]',
+        '++id, sender, receiver, dateCreated, dateSent, dateRead, [sender+dateRead],[receiver+dateSent]',
     });
+
+    this.version(DB_CURRENT_VERSION)
+      .stores({
+        userProfile: '++id',
+        contacts: 'peerid , dateTimeAccepted, dateTimeDelined',
+        messages:
+          '++id, sender, receiver, dateTimeCreated, dateTimeSent, dateTimeRead, [sender+dateTimeRead],[receiver+dateTimeSent]',
+      })
+      .upgrade((trans) => {
+        console.warn('Upgrading contacts table');
+        return trans
+          .table('contacts')
+          .toCollection()
+          .modify((contact) => {
+            console.warn('Modifying contact', contact);
+
+            contact.dateTimeAccepted = contact.dateAccepted ? contact.dateAccepted.getTime() : 0;
+            delete contact.dateAccepted;
+
+            contact.dateTimeDelined = contact.dateDelined ? contact.dateDelined.getTime() : 0;
+            
+            delete contact.dateDelined;
+            console.warn('Finished modify contact', contact);
+          });
+      })
+      .upgrade((trans) => {
+        console.warn('Upgrading messages table');
+
+        return trans
+          .table('messages')
+          .toCollection()
+          .modify((message) => {
+            console.warn('Modifying message', message);
+            message.dateTimeCreated = message.dateCreated ? message.dateCreated.getTime() : 0;
+            delete message.dateCreated;
+
+            message.dateTimeSent = message.dateSent ? message.dateSent.getTime() : 0;
+            delete message.dateSent;
+
+            message.dateTimeRead = message.dateRead ? message.dateRead.getTime() : 0;
+            delete message.dateRead;
+            console.warn('Finished Modifying message', message);
+          });
+      });
 
     this.userProfile = this.table(tableUser);
     this.contacts = this.table(tableContacts);
@@ -46,5 +92,9 @@ export class AppDatabase extends Dexie {
 
   selectUnsentMessages(c: IContact): IMessage[] | PromiseLike<IMessage[]> {
     return this.messages.where({ receiver: c.peerid, dateTimeSent: 0 }).sortBy('dateTimeCreated');
+  }
+
+  selectUnacceptedContacts() {
+    return this.contacts.where({ dateTimeAccepted: 0 });
   }
 }
