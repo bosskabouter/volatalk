@@ -16,7 +16,6 @@ import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
 import { useTheme } from '@mui/material/styles';
-import logo from 'assets/images/volatalk-logo-336x280.webp';
 import { Rating } from 'dha-rating';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -54,8 +53,8 @@ export default function TemporaryDrawer() {
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.leavingScreen,
       })};
-      padding-right: 10px;
-      padding-left: 10px;
+      padding-right: 36px;
+      padding-left: 18px;
       ${isOpen === true &&
       `
         width: calc(100% - ${drawerWidth}px);
@@ -108,91 +107,84 @@ export default function TemporaryDrawer() {
       margin-right: 0;
     `,
     toolbarLogo: css`
-      height: ${theme.spacing(6)};
-      padding: ${theme.spacing(1)} 0;
+      height: ${theme.spacing(5)};
+      padding: ${theme.spacing(1)} 10;
       width: auto;
     `,
   };
 
   return (
-    <div css={styles.root}>
-      <CssBaseline />
-      <AppBar position="static" css={styles.appBar(open)} role="banner">
-        <Toolbar disableGutters variant="dense">
-          <Typography variant="h6" noWrap css={styles.title}>
-            <Link to="/">
-              <img alt="VolaTALK logo" css={styles.toolbarLogo} src={logo} />
-            </Link>
-          </Typography>
-          <Button onClick={handleDrawerOpen} css={styles.hide(open)}>
-            <StatusDisplay />
-          </Button>
-        </Toolbar>
-      </AppBar>
-      <Drawer
-        css={[styles.drawer, styles.drawerPaper]}
-        variant="persistent"
-        anchor="right"
-        onClose={handleDrawerClose}
-        open={open}
-      >
-        <div css={styles.drawerHeader}>
-          <IconButton onClick={handleDrawerClose} size="large">
-            {theme.direction === 'rtl' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-          </IconButton>
+      <div css={styles.root}>
+        <CssBaseline />
+        <AppBar position={'static'} css={styles.appBar(open)} role="banner">
+          <Toolbar disableGutters variant="dense">
+            <Typography variant="h6" noWrap css={styles.title}>
+              <Link to="/">
+                <img alt="VolaTALK logo" css={styles.toolbarLogo} src="/safari-pinned-tab.svg" />
+              </Link>
+            </Typography>
+            <Button onClick={handleDrawerOpen} css={styles.hide(open)}>
+              <StatusDisplay />
+            </Button>
+          </Toolbar>
+        </AppBar>
+        <Drawer
+          css={[styles.drawer, styles.drawerPaper]}
+          variant="persistent"
+          anchor="right"
+          onClose={handleDrawerClose}
+          open={open}
+        >
+          <div css={styles.drawerHeader}>
+            <IconButton onClick={handleDrawerClose} size="large">
+              {theme.direction === 'rtl' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+            </IconButton>
 
-          <StatusDisplay />
-        </div>
-        <Divider />
-        <List>
-          <Link to="/" css={styles.link}>
-            <ListItem button onClick={handleDrawerClose}>
-              <ListItemIcon>
-                <HomeIcon />
-              </ListItemIcon>
-              <ListItemText primary="Home" />
-            </ListItem>
-          </Link>
-          <Link to="/AccountSetup" css={styles.link}>
-            <ListItem button onClick={handleDrawerClose}>
-              <ListItemIcon>
-                <AccountIcon />
-              </ListItemIcon>
-              <ListItemText primary="Account" />
-            </ListItem>
-          </Link>
-          <Link to="/Contacts" css={styles.link}>
-            <ListItem button onClick={handleDrawerClose}>
-              <ListItemIcon>
-                <PeopleIcon />
-              </ListItemIcon>
-              <ListItemText primary="Contacts" />
-            </ListItem>
-          </Link>
-          <Link to="/Invite" css={styles.link}>
-            <ListItem button onClick={handleDrawerClose}>
-              <ListItemIcon>
-                <QrCode2Icon />
-              </ListItemIcon>
-              <ListItemText primary="Invite" />
-            </ListItem>
-          </Link>
-          <Link to="/About" css={styles.link}>
-            <ListItem onClick={handleDrawerClose}>
-              <ListItemIcon>
-                <HelpOutline />
-              </ListItemIcon>
-              <ListItemText primary="About" />
-            </ListItem>
-          </Link>
+            <StatusDisplay />
+          </div>
+          <Divider />
           <List>
-            <ListItem>
-              <Rating appId="volatalk" />
-            </ListItem>
+          
+            <Link to="/AccountSetup" css={styles.link}>
+              <ListItem button onClick={handleDrawerClose}>
+                <ListItemIcon>
+                  <AccountIcon />
+                </ListItemIcon>
+                <ListItemText primary="Account" />
+              </ListItem>
+            </Link>
+            <Link to="/Contacts" css={styles.link}>
+              <ListItem button onClick={handleDrawerClose}>
+                <ListItemIcon>
+                  <PeopleIcon />
+                </ListItemIcon>
+                <ListItemText primary="Contacts" />
+              </ListItem>
+            </Link>
+            <Link to="/Invite" css={styles.link}>
+              <ListItem button onClick={handleDrawerClose}>
+                <ListItemIcon>
+                  <QrCode2Icon />
+                </ListItemIcon>
+                <ListItemText primary="Invite" />
+              </ListItem>
+            </Link>
+            <Link to="/About" css={styles.link}>
+              <ListItem onClick={handleDrawerClose}>
+                <ListItemIcon>
+                  <HelpOutline />
+                </ListItemIcon>
+                <ListItemText primary="About" />
+              </ListItem>
+            </Link>
+            <List>
+              <ListItem>
+                <Rating appId="volatalk" />
+              </ListItem>
+            </List>
           </List>
-        </List>
-        <Divider />
-      </Drawer>
-    </div>
+          <Divider />
+        </Drawer>
+      </div>
   );
 }

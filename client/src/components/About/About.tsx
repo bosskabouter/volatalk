@@ -5,7 +5,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { Box, Link, List, ListItem, ListItemText } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import Logo from '../../assets/images/volatalk-logo-336x280.webp';
+import Logo from '../../assets/svg/logo-yellow.svg';
 import packageJson from '../../../package.json';
 
 const About = () => {
@@ -31,11 +31,12 @@ const About = () => {
     <Container component="main" maxWidth="xl">
       <CssBaseline />
       <Box css={styles.box}>
-        <img alt="logo" src={Logo} css={styles.logo} />
-
         <List>
           <ListItem key="1">
-            <ListItemText primary="If you lose your device or access to your account, your identity cannot be recovered." />
+            <ListItemText
+              primary="Direct communication with your contacts, but wihout a central server to capture your private data. 
+            This means that if you lose access to your account, your identity cannot be recovered, because it is stored nowhere else."
+            />
           </ListItem>
           <ListItem key="2">
             <ListItemText
@@ -57,12 +58,14 @@ const About = () => {
             />
           </ListItem>
           <ListItem key="5">
-            <ListItemText primary="All source code of this software is publicly available on " />
-            <Link href="https://github.com/bosskabouter/volatalk">GitHub</Link>
+            <Link href="https://github.com/bosskabouter/volatalk">
+              <ListItemText primary="All source code of this software is publicly available on GitHub" />
+            </Link>
           </ListItem>
         </List>
         <Typography css={styles.version}> v{packageJson.version}</Typography>
       </Box>
+      <img alt="logo" src={Logo} css={styles.logo} />
     </Container>
   );
 };

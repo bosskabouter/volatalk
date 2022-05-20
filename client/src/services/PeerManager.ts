@@ -9,11 +9,11 @@ import { decryptString, encryptString, generateKeyFromString } from 'dha-encrypt
 
 export interface PeerManagerEvents {
   statusChange: (status: boolean) => void;
-  onContactStatusChange: (statchange:{contact: IContact, status:boolean}) => void;
+  onContactStatusChange: (statchange: { contact: IContact; status: boolean }) => void;
   onMessage: (message: IMessage) => void;
   onNewContact: (contact: IContact) => void;
   onMessageDelivered: (message: IMessage) => void;
-  oneIncomingCall: (call: MediaConnection) => void;
+  onIncomingMediaConnection: (mediaConnection: MediaConnection) => void;
 }
 
 const RECONNECT_TIMEOUT = 60 * 1000;
@@ -73,10 +73,10 @@ export class PeerManager
         }
       });
     });
-    this._peer.on('call', async (call: MediaConnection) => {
+    this._peer.on('call', async (mediaConnection: MediaConnection) => {
       //verify id someone legit is
 
-      this.emit('oneIncomingCall', call);
+      this.emit('onIncomingMediaConnection', mediaConnection);
     });
     this._peer.on('disconnected', () => {
       console.warn('Peer disconnected.');
@@ -143,8 +143,8 @@ export class PeerManager
       return newContact;
     } else {
       const updatedContact = this._receiveRegisteredContact(contact, conn);
-      console.info('Emitting onContactStatusChange'); 
-      this.emit('onContactStatusChange', {contact:updatedContact,status:true});
+      console.info('Emitting onContactStatusChange');
+      this.emit('onContactStatusChange', { contact: updatedContact, status: true });
       return updatedContact;
     }
   }
@@ -228,15 +228,15 @@ export class PeerManager
     connection.on('open', () => {
       console.info('Connected with: ' + contact.nickname, connection);
       this.connectedContacts.set(contact.peerid, connection);
-      
-      this.emit('onContactStatusChange', {contact:contact,status:true});
+
+      this.emit('onContactStatusChange', { contact: contact, status: true });
 
       this.handleOnConnectionData(connection, contact);
     });
     connection.on('close', () => {
       console.info('Disconnected from: ' + contact.nickname, connection);
       this.connectedContacts.delete(contact.peerid);
-      this.emit('onContactStatusChange', {contact:contact,status:false});
+      this.emit('onContactStatusChange', { contact: contact, status: false });
     });
     return connection;
   }
@@ -314,11 +314,11 @@ export class PeerManager
     if (conn && conn.open) conn.close();
   }
 
-  disconnectGracefully(){
+  disconnectGracefully() {
     console.warn('Disconnecting Peer!');
 
     //TODO say bye
-    this.connectedContacts.forEach(conn=>conn.close());
+    this.connectedContacts.forEach((conn) => conn.close());
     this._peer.destroy();
   }
 }

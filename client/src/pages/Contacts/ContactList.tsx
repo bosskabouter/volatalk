@@ -13,7 +13,7 @@ const ContactList = () => {
   const [contactList, setContactList] = useState<IContact[]>([]);
 
   useEffect(() => {
-    db?.contacts.toArray().then((cts) => {
+    db?.selectContacts().then((cts) => {
       setContactList(cts);
     });
   }, [db]);

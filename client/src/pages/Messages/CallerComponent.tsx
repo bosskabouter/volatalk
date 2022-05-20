@@ -18,7 +18,7 @@ const CallerComponent = (props: CallerComponentProps) => {
 
   const remoteVideoElement = useRef<HTMLVideoElement>(null);
 
-  const [mediaConnection, setMediaConnection] = useState<MediaConnection|null>();
+  const [mediaConnection, setMediaConnection] = useState<MediaConnection | null>();
   const [remoteMediaStream, setRemoteMediaStream] = useState<MediaStream>();
 
   const peerManager = useContext(PeerContext);
@@ -27,13 +27,12 @@ const CallerComponent = (props: CallerComponentProps) => {
   const [videoOn] = useState<boolean>(props.videoOn || false);
 
   useEffect(() => {
-    if (!remoteMediaStream) callContact();
+    if (!mediaConnection) callContact();
 
     async function callContact() {
       let lms;
       try {
         lms = await navigator.mediaDevices.getUserMedia({ video: videoOn, audio: true });
-        
       } catch (err) {
         console.error('Problem getUserMedia', err);
       }
@@ -44,7 +43,7 @@ const CallerComponent = (props: CallerComponentProps) => {
       );
 
       const mc = peerManager._peer.call(contactId, lms);
-    
+
       mc.on('stream', (rms) => {
         console.debug('Got remote media stream', rms);
         setRemoteMediaStream(rms);
@@ -59,17 +58,16 @@ const CallerComponent = (props: CallerComponentProps) => {
       console.info('Set remoteVideoElement');
     }
 
-    return () =>{
+    return () => {
       console.warn('leaving call');
-      if (mediaConnection){
+      if (mediaConnection) {
         console.info('Closing connection');
-        mediaConnection.close();
+        //mediaConnection.close();
         mediaConnection.removeAllListeners();
-        setMediaConnection(null);
+        //setMediaConnection(null);
       }
       //pm._peer.disconnect();
     };
-
   }, [contactId, peerManager, videoOn, remoteMediaStream, mediaConnection]);
 
   return (

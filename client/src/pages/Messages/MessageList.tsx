@@ -81,7 +81,7 @@ const MessageList = () => {
         setMessageList((prevMessageList) => [...prevMessageList, msg]);
       }
     };
-    function updateContactStatusHandler  (statchange: { contact: IContact; status: boolean }) {
+    function updateContactStatusHandler(statchange: { contact: IContact; status: boolean }) {
       console.info('Contact status change: ' + (statchange.status ? ' online' : 'offline'));
       if (statchange.contact.peerid === contactId) {
         console.info('This Contact ', contactId);

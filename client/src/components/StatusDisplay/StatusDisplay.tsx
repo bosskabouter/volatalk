@@ -80,7 +80,7 @@ const StatusDisplay = () => {
       <Box
         sx={{
           display: 'flex',
-          // flexDirection: 'stretch',
+          flexDirection: 'stretch',
           // alignItems: 'flex-start',
           //justifyContent: 'left',
         }}

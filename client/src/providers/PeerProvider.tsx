@@ -39,7 +39,7 @@ export default function PeerProvider({ children }: IPeerProviderProps) {
       console.log('NewContactHandler PeerProvider', contact);
       peerManager?.checkConnection(contact);
     }
-    function contactOnlineHandle(statchange: { contact: IContact;status:boolean }) {
+    function contactOnlineHandle(statchange: { contact: IContact; status: boolean }) {
       console.log('ContactOnlineHandler PeerProvider', statchange);
 
       //TODO if online show online message, in status display?
@@ -69,7 +69,6 @@ export default function PeerProvider({ children }: IPeerProviderProps) {
     }
 
     const beforeunloadHandler = () => {
-     
       peerManager?.disconnectGracefully();
     };
     window.addEventListener('beforeunload', beforeunloadHandler);
@@ -81,7 +80,7 @@ export default function PeerProvider({ children }: IPeerProviderProps) {
         peerManager.removeListener('onMessage', messageHandler);
         peerManager.removeListener('onNewContact', newContactHandle);
         peerManager.removeListener('onContactStatusChange', contactOnlineHandle);
-       // peerManager._peer.disconnect();
+        // peerManager._peer.disconnect();
         //setPeerManager(null);
       }
     };

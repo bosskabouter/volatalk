@@ -119,8 +119,8 @@ export default function Invite() {
   };
 
   return (
-    <Dialog open fullWidth>
-      <Link to="/">
+    <Dialog open fullWidth >
+      <Link to="/" >
         <Close />
       </Link>
       <>
@@ -141,7 +141,6 @@ export default function Invite() {
 }
 
 const ViewFinder = () => (
-  <>
     <svg
       width="50px"
       viewBox="0 0 100 100"
@@ -166,5 +165,4 @@ const ViewFinder = () => (
       />
       <path fill="none" d="M100,13 L100,0 87,0" stroke="rgba(255, 0, 0, 0.5)" strokeWidth="5" />
     </svg>
-  </>
 );

@@ -5,7 +5,7 @@ const tableUser = 'userProfile';
 const tableContacts = 'contacts';
 const tableMessages = 'messages';
 
-export const DB_CURRENT_VERSION = 7;
+export const DB_CURRENT_VERSION = 9;
 
 export class AppDatabase extends Dexie {
   userProfile: Dexie.Table<IUserProfile, number>;
@@ -27,9 +27,10 @@ export class AppDatabase extends Dexie {
     this.version(DB_CURRENT_VERSION)
       .stores({
         userProfile: '++id',
-        contacts: 'peerid , dateTimeAccepted, dateTimeDelined',
+        contacts: 'peerid , dateTimeAccepted, dateTimeDeclined',
         messages:
-          '++id, sender, receiver, dateTimeCreated, dateTimeSent, dateTimeRead, [sender+dateTimeRead],[receiver+dateTimeSent]',
+          '++id, sender, receiver, dateTimeCreated, dateTimeSent, dateTimeRead, '
+          +'[sender+dateTimeRead],[receiver+dateTimeSent]',
       })
       .upgrade((trans) => {
         console.warn('Upgrading contacts table');
@@ -42,8 +43,8 @@ export class AppDatabase extends Dexie {
             contact.dateTimeAccepted = contact.dateAccepted ? contact.dateAccepted.getTime() : 0;
             delete contact.dateAccepted;
 
-            contact.dateTimeDelined = contact.dateDelined ? contact.dateDelined.getTime() : 0;
-            
+            contact.dateTimeDeclined = contact.dateDelined ? contact.dateDelined.getTime() : 0;
+
             delete contact.dateDelined;
             console.warn('Finished modify contact', contact);
           });
@@ -88,6 +89,10 @@ export class AppDatabase extends Dexie {
       .or('sender')
       .equals(contact.peerid)
       .sortBy('dateTimeCreated');
+  }
+
+  selectContacts(){
+    return this.contacts.orderBy('dateTimeDeclined').toArray();
   }
 
   selectUnsentMessages(c: IContact): IMessage[] | PromiseLike<IMessage[]> {

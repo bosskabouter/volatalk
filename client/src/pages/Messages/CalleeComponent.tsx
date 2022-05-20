@@ -52,7 +52,7 @@ const CalleeComponent = () => {
           }
         })
         .catch((error) => {
-          console.warn('Probleming LMS', error);
+          console.warn('Problem LMS', error);
         });
     }
 
@@ -70,9 +70,9 @@ const CalleeComponent = () => {
     }
 
     //wait for incoming call
-    peerManager.on('oneIncomingCall', handleIncomingMediaConnection);
+    peerManager.on('onIncomingMediaConnection', handleIncomingMediaConnection);
     return () => {
-      peerManager.removeListener('oneIncomingCall', handleIncomingMediaConnection);
+      peerManager.removeListener('onIncomingMediaConnection', handleIncomingMediaConnection);
       //setCalling(null);
       //calling?.close();
       //setCalling(null);
