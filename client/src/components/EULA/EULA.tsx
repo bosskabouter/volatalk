@@ -10,6 +10,7 @@ import {
   List,
   ListItem,
   ListItemText,
+  Typography,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { MobileView } from 'react-device-detect';
@@ -75,6 +76,7 @@ const EULA = () => {
       @media (max-width: ${theme.breakpoints.values.sm}) {
         margin-top: 1rem;
         width: 100%;
+        padding-top: 2rem;
         padding-left: 2rem;
         padding-right: 2rem;
       } ;
@@ -105,8 +107,11 @@ const EULA = () => {
           <Button css={styles.eulaBackButton}>Back</Button>
         </MobileView>
       </div>
+
+      <img src={'safari-pinned-tab.svg'} alt="logo" height={50}></img>
+
       <DialogTitle id="dialog-title" css={styles.eulaTitleBackground}>
-        Welcome to VolaTALK.
+        Welcome to VolaTALK
       </DialogTitle>
       <DialogContent id="dialog-agreement" css={styles.eulaDialogContentRoot}>
         <List>
@@ -114,11 +119,16 @@ const EULA = () => {
             <ListItemText primary="Private, Direct Video, Calling and Messenging. The new way to communicate directly with your contacts, without the need for any central authority to capture or censure your private data." />
           </ListItem>
           <ListItem key="2">
-            <ListItemText primary="All information is encrypted on your local device and no personal data is send to any server." />
+            <ListItemText primary="All information is encrypted on your local device and messaging and calling data is not sent to any server other than the receiving contact." />
           </ListItem>
         </List>
         <DialogActions css={styles.eulaDialogAction}>
-          Welcome!
+          <Typography color={'secondary'}>
+            When you continue, you register your IP to a signalling server, used to find each other.
+          </Typography>
+          <Typography variant='h6' color={'secondary'}>
+            VolaTALK signalling server does not store this data.
+          </Typography>
           <Button
             css={styles.eulaAgreeButton}
             color="primary"

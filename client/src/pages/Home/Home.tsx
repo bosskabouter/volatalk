@@ -1,16 +1,11 @@
-import Typography from '@mui/material/Typography';
 import ContactList from 'pages/Contacts/ContactList';
-import { PeerContext } from 'providers/PeerProvider';
 
-import * as React from 'react';
-import logo2 from 'assets/svg/logo.svg';
-import logo3 from '/safari-pinned-tab.svg';
+import AcceptInvite from 'components/Invite/AcceptInvite';
+import { useLocation } from 'react-router-dom';
+
 const Home = () => {
-  return (
-    <>
-      <ContactList />
-    </>
-  );
+  const invite = useLocation().search || localStorage.getItem('invite');
+  return invite && invite?.length > 0 ? <AcceptInvite invite={invite} /> : <ContactList />;
 };
 
 export default Home;

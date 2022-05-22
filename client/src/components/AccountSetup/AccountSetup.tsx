@@ -1,8 +1,9 @@
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react';
-import { useContext } from 'react';
+import { BaseSyntheticEvent, SyntheticEvent, useContext } from 'react';
 import {
   Avatar,
+  Box,
   Button,
   Checkbox,
   Dialog,
@@ -17,6 +18,9 @@ import {
   Typography,
   useTheme,
 } from '@mui/material';
+import LockIcon from '@mui/icons-material/Lock';
+import LockOpenIcon from '@mui/icons-material/LockOpen';
+
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { isMobile } from 'react-device-detect';
@@ -88,13 +92,14 @@ const AccountSetup = () => {
   const navigate = useNavigate();
   const db = useContext(DatabaseContext);
 
-  const validationSchema = yup.object({
+  const userCtx = useContext(UserContext);
+
+  const validationSchemaSecure = yup.object({
     nickname: yup
       .string()
       .defined('Enter a nice nickname people will recognize')
       .min(3, 'Nickname must be at least 6 characters')
       .trim(),
-
     isSecured: yup.boolean(),
     pin: yup.string().when('isSecured', {
       is: true,
@@ -123,32 +128,33 @@ const AccountSetup = () => {
     }),
   });
 
-  const userCtx = useContext(UserContext);
-
   const formik = useFormik({
-    initialValues: userCtx.user
-      ? userCtx.user
-      : {
-          nickname: 'Anonymous',
-          avatar: 'https://thispersondoesnotexist.com/image?reload=' + Math.random(),
+    //   validateOnChange: true,
+    //  validateOnBlur: true,
+    initialValues: userCtx.user || {
+      nickname: 'Anonymous',
+      avatar: 'https://thispersondoesnotexist.com/image?reload=' + Math.random(),
 
-          isSecured: false,
-          isSearchable: true,
-          pin: '',
-          question1: '',
-          answer1: '',
-          question2: '',
-          answer2: '',
+      isSecured: false,
+      isSearchable: true,
+      pin: '',
+      question1: '',
+      answer1: '',
+      question2: '',
+      answer2: '',
 
-          peerid: '',
-          privateKey: '',
+      peerid: '',
+      privateKey: '',
 
-          dateRegistered: new Date(),
-        },
-    validationSchema: validationSchema,
+      dateRegistered: new Date(),
+    },
+
+    validationSchema: validationSchemaSecure,
+
     onSubmit: (values) => {
       if (authenticated) updateUser(values);
       else registerUser(values);
+      //formik.setSubmitting(false);
     },
   });
 
@@ -156,6 +162,14 @@ const AccountSetup = () => {
     // Save to database
     if (db !== null) {
       //only update input fields (private key /peerid isnt one)
+      if (!values.isSecured) {
+        //clear recovery questions
+        values.pin = '';
+        values.question1 = '';
+        values.question2 = '';
+        values.answer1 = '';
+        values.answer2 = '';
+      }
       db.userProfile.put(values, 1);
       setUser(values);
       navigate('/', { replace: false });
@@ -228,6 +242,48 @@ const AccountSetup = () => {
         width: 38rem;
       }
     `,
+    avatarUploadDiv: css`
+      position: relative;
+      overflow: hidden;
+      top: 0;
+      right: 0;
+      margin: 0;
+      padding: 27px;
+      width: 150px;
+      height: 150px;
+      align: 'center';
+    `,
+    avatarUploadImage: css`
+      width: 100%;
+      height: 100%;
+    `,
+    avatarUploadButton: css`
+      position: absolute;
+      top: 0;
+      right: 0;
+      margin: 0;
+      padding: 0;
+      font-size: 20px;
+      cursor: pointer;
+      opacity: 0;
+      filter: alpha(opacity=0);
+      width: 100%;
+      height: 100%;
+    `,
+    accountNickname: css`
+      width: 100%;
+      background-color: ${theme.palette.common.white};
+      border-radius: 0.5em;
+      @media only screen and (min-width: 768px) {
+        height: 3.5rem;
+      }
+    `,
+    accountSecureButton: css`
+      //  width: 100%;
+      min-height: 20px;
+      border-radius: 20;
+      //background: black;
+    `,
     accountPin: css`
       width: 100%;
       background-color: ${theme.palette.common.white};
@@ -272,113 +328,25 @@ const AccountSetup = () => {
       height: 100%;
     `,
   };
-
-  const AuthenticatedAccountSetup = () => {
-    return !formik.values.isSecured ? (
-      <div></div>
-    ) : (
-      <div>
-        <Typography variant="subtitle1">Create a 6 digit security PIN</Typography>
-
-        <TextField
-          required={formik.values.isSecured}
-          css={styles.accountPin}
-          id="pin"
-          variant="outlined"
-          type="password"
-          inputMode="numeric"
-          inputProps={{ maxLength: 6 }}
-          value={formik.values.pin}
-          onChange={formik.handleChange}
-          error={formik.touched.pin && Boolean(formik.errors.pin)}
-          helperText={formik.touched.pin && formik.errors.pin}
-        />
-        <Typography variant="subtitle1">Set up your security authentication</Typography>
-        <FormControl css={styles.accountQuestionRoot} variant="standard">
-          <Select
-            css={styles.accountQuestionSelect}
-            displayEmpty
-            id="question1"
-            name="question1"
-            input={<OutlinedInput />}
-            MenuProps={MenuProps}
-            inputProps={{ 'aria-label': 'Without label' }}
-            variant="standard"
-            value={formik.values.question1}
-            onChange={formik.handleChange}
-            error={formik.touched.question1 && Boolean(formik.errors.question1)}
-          >
-            <MenuItem css={styles.accountQuestionMenu} disabled value="">
-              <em>Select your first authentication question</em>
-            </MenuItem>
-            {questions.map((question) => (
-              <MenuItem css={styles.accountQuestionMenu} key={question} value={question}>
-                {question}
-              </MenuItem>
-            ))}
-          </Select>
-          <TextField
-            css={styles.accountQuestionAnswer}
-            placeholder="First authentication answer"
-            id="answer1"
-            name="answer1"
-            value={formik.values.answer1}
-            variant="outlined"
-            onChange={formik.handleChange}
-            error={formik.touched.answer1 && Boolean(formik.errors.answer1)}
-            helperText={formik.touched.answer1 && formik.errors.answer1}
-          />
-        </FormControl>
-        <FormControl css={styles.accountQuestionRoot} variant="standard">
-          <Select
-            css={styles.accountQuestionSelect}
-            displayEmpty
-            id="question2"
-            name="question2"
-            input={<OutlinedInput />}
-            MenuProps={MenuProps}
-            inputProps={{ 'aria-label': 'Without label' }}
-            variant="standard"
-            value={formik.values.question2}
-            onChange={formik.handleChange}
-            error={formik.touched.question2 && Boolean(formik.errors.question2)}
-          >
-            <MenuItem css={styles.accountQuestionMenu} disabled value="">
-              <em>Select your second authentication question</em>
-            </MenuItem>
-            {questions.map((question) => (
-              <MenuItem css={styles.accountQuestionMenu} key={question} value={question}>
-                {question}
-              </MenuItem>
-            ))}
-          </Select>
-          <TextField
-            css={styles.accountQuestionAnswer}
-            placeholder="Second authentication answer"
-            id="answer2"
-            name="answer2"
-            value={formik.values.answer2}
-            variant="outlined"
-            onChange={formik.handleChange}
-            error={formik.touched.answer2 && Boolean(formik.errors.answer2)}
-            helperText={formik.touched.answer2 && formik.errors.answer2}
-          />
-        </FormControl>
-      </div>
-    );
-  };
-
+  function handleClose(e: SyntheticEvent) {
+    console.log(e, e.currentTarget);
+    if (userCtx.user)navigate("/");
+    
+  }
   return (
     <Dialog
       css={styles.accountSetupDialogRoot}
       open={true}
-      disableEscapeKeyDown
+      //  disableEscapeKeyDown={!userCtx.user}
+      //TransitionComponent={}
+      transitionDuration={{ enter: 1500 }}
       maxWidth="lg"
       fullScreen={fullScreen}
+      onClose={handleClose}
     >
       <DialogContent id="dialog-agreement" css={styles.accountSetupDialogContent}>
         <Typography component="h1" variant="h6">
-          Account Details
+          Profile settings
         </Typography>
 
         <form css={styles.form} onSubmit={formik.handleSubmit}>
@@ -386,9 +354,9 @@ const AccountSetup = () => {
 
           <TextField
             required
-            css={styles.accountQuestionAnswer}
+            css={styles.accountNickname}
             id="nickname"
-            variant="outlined"
+            //  variant="standard"
             type="text"
             inputMode="text"
             inputProps={{ maxLength: 60 }}
@@ -397,49 +365,143 @@ const AccountSetup = () => {
             error={formik.touched.nickname && Boolean(formik.errors.nickname)}
             helperText={formik.touched.nickname && formik.errors.nickname}
           />
-          <Typography variant="subtitle1">Avatar: </Typography>
 
-          <input
-            aria-label="avatar"
-            id="file"
-            name="avatar"
-            type="file"
-            accept="image/*"
-            onChange={(event) => {
-              if (!event.target.files) return;
-              resizeFileUpload(event.target.files[0], 300, 300).then((src) => {
-                formik.setFieldValue('avatar', src);
-              });
-            }}
-            multiple={false}
-          />
-          <Avatar src={formik.values.avatar} sx={{ width: 300 }}></Avatar>
-
-          <FormControlLabel
-            control={<Checkbox id="isSearchable" value={formik.values.isSearchable} />}
-            label={
-              formik.values.isSearchable
-                ? 'Let anyone find me by my nickname'
-                : 'I prefer to invite people manually '
-            }
-          />
-
-          <Typography variant="subtitle1">
-            Would you like to use a pin to secure your local data?
-          </Typography>
+          <div css={styles.avatarUploadDiv}>
+            <Avatar
+              src={formik.values.avatar}
+              css={styles.avatarUploadImage}
+              // sizes="normal"
+              sx={{}}
+            ></Avatar>
+            <input
+              css={styles.avatarUploadButton}
+              aria-label="avatar"
+              id="file"
+              name="avatar"
+              type="file"
+              accept="image/*"
+              onChange={(event) => {
+                if (!event.target.files) return;
+                resizeFileUpload(event.target.files[0], 150, 150).then((src) => {
+                  formik.setFieldValue('avatar', src);
+                });
+              }}
+              multiple={false}
+            />
+          </div>
 
           <FormControlLabel
             control={
-              <Switch
-                defaultChecked={false}
+              <Checkbox
+                css={styles.accountSecureButton}
+                //type="checkbox"
+                name="isSecured"
+                //label="isSecured"
+                //defaultValue={formik.values.isSecured}
                 id="isSecured"
-                value={formik.values.isSecured}
+                checked={formik.values.isSecured}
                 onChange={formik.handleChange}
+                color={formik.values.isSecured ? 'default' : 'error'}
+                icon={<LockOpenIcon />}
+                checkedIcon={<LockIcon></LockIcon>}
               />
             }
-            label={formik.values.isSecured ? 'Yes Please!' : "I don't need a pin..."}
+            label={formik.values.isSecured ? "I don't need security" : 'Secure my account'}
           />
-          <AuthenticatedAccountSetup></AuthenticatedAccountSetup>
+          {formik.values.isSecured && (
+            <Box>
+              <Typography variant="subtitle1">6 digit security PIN</Typography>
+
+              <TextField
+                // required={formik.values.isSecured}
+                css={styles.accountPin}
+                id="pin"
+                variant="outlined"
+                type="password"
+                inputMode="numeric"
+                inputProps={{ maxLength: 6 }}
+                value={formik.values.pin}
+                onChange={formik.handleChange}
+                error={formik.touched.pin && Boolean(formik.errors.pin)}
+                helperText={formik.touched.pin && formik.errors.pin}
+              />
+              <Typography variant="subtitle1">Recovery questions</Typography>
+              <FormControl css={styles.accountQuestionRoot} variant="standard">
+                <Select
+                  //  required={formik.values.isSecured}
+                  css={styles.accountQuestionSelect}
+                  displayEmpty
+                  id="question1"
+                  name="question1"
+                  input={<OutlinedInput />}
+                  MenuProps={MenuProps}
+                  inputProps={{ 'aria-label': 'Without label' }}
+                  //variant="standard"
+                  value={formik.values.question1}
+                  onChange={formik.handleChange}
+                  error={formik.touched.question1 && Boolean(formik.errors.question1)}
+                >
+                  <MenuItem css={styles.accountQuestionMenu} disabled value="">
+                    <em>Select your first authentication question</em>
+                  </MenuItem>
+                  {questions.map((question) => (
+                    <MenuItem css={styles.accountQuestionMenu} key={question} value={question}>
+                      {question}
+                    </MenuItem>
+                  ))}
+                </Select>
+                <TextField
+                  //    required={formik.values.isSecured}
+                  css={styles.accountQuestionAnswer}
+                  placeholder="First authentication answer"
+                  id="answer1"
+                  name="answer1"
+                  value={formik.values.answer1}
+                  variant="outlined"
+                  onChange={formik.handleChange}
+                  error={formik.touched.answer1 && Boolean(formik.errors.answer1)}
+                  helperText={formik.touched.answer1 && formik.errors.answer1}
+                />
+              </FormControl>
+              <FormControl css={styles.accountQuestionRoot} variant="standard">
+                <Select
+                  //    required={formik.values.isSecured}
+                  css={styles.accountQuestionSelect}
+                  displayEmpty
+                  id="question2"
+                  name="question2"
+                  input={<OutlinedInput />}
+                  MenuProps={MenuProps}
+                  inputProps={{ 'aria-label': 'Without label' }}
+                  variant="standard"
+                  value={formik.values.question2}
+                  onChange={formik.handleChange}
+                  error={formik.touched.question2 && Boolean(formik.errors.question2)}
+                >
+                  <MenuItem css={styles.accountQuestionMenu} disabled value="">
+                    <em>Select your second authentication question</em>
+                  </MenuItem>
+                  {questions.map((question) => (
+                    <MenuItem css={styles.accountQuestionMenu} key={question} value={question}>
+                      {question}
+                    </MenuItem>
+                  ))}
+                </Select>
+                <TextField
+                  //     required={formik.values.isSecured}
+                  css={styles.accountQuestionAnswer}
+                  placeholder="Second authentication answer"
+                  id="answer2"
+                  name="answer2"
+                  value={formik.values.answer2}
+                  variant="outlined"
+                  onChange={formik.handleChange}
+                  error={formik.touched.answer2 && Boolean(formik.errors.answer2)}
+                  helperText={formik.touched.answer2 && formik.errors.answer2}
+                />
+              </FormControl>
+            </Box>
+          )}
 
           <Button css={styles.accountSetupButton} type="submit" color="primary" variant="contained">
             Enter VolaTALK

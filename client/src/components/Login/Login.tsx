@@ -7,7 +7,7 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { isMobile } from 'react-device-detect';
 import { DatabaseContext } from 'providers/DatabaseProvider';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from 'providers/AuthProvider';
 import { UserContext } from 'providers/UserProvider';
 import { useDispatch } from 'react-redux';
@@ -16,6 +16,9 @@ const Login = () => {
   const [loggedIn, setLoggedIn] = useState(false);
   const { setAuthenticated } = useContext(AuthContext);
   const { setUser } = useContext(UserContext);
+
+
+  const queryParams = new URLSearchParams(useLocation().search);
 
   const theme = useTheme();
   const fullScreen = isMobile ? true : false;

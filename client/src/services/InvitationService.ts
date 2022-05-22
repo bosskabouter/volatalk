@@ -21,7 +21,8 @@ export function makeInviteURL(user: IUserProfile, inviteText: string) {
       console.debug('signature', signature);
       const sigEncoded = convertAbToBase64(signature);
       console.debug('sigEncoded', sigEncoded);
-      const hostEnvUrl = window.location.origin + '/acceptInvite';
+      //redirect to homepage. router will save invite to localstorage in case new user / not logged in
+      const hostEnvUrl = window.location.origin + '/';
 
       const realURL = new URL(hostEnvUrl);
       realURL.searchParams.append(INVITE_PARAMKEYS.FROM, user.peerid);

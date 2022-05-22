@@ -1,17 +1,19 @@
 import { useContext, useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
 import { extractInvite } from 'services/InvitationService';
 import { identicon } from 'minidenticons';
 import { DatabaseContext } from 'providers/DatabaseProvider';
 import { PeerContext } from 'providers/PeerProvider';
 import { Alerter } from 'components/StatusDisplay/Alerter';
 import { UserContext } from 'providers/UserProvider';
-import { Button, Badge, Avatar } from '@mui/material';
+import { Button, Badge, Avatar, Dialog, Typography, DialogContent } from '@mui/material';
 import { genSignature } from 'services/Crypto';
 import { IInvite } from 'types';
+import { Box } from '@mui/system';
+import { useNavigate } from 'react-router-dom';
 
-export default function AcceptInvite() {
-  const [queryParams] = useState<URLSearchParams>(new URLSearchParams(useLocation().search));
+export default function AcceptInvite(props: { invite: string }) {
+  //recover invite from local storage hack
+  localStorage.removeItem('invite');
 
   const [senderOnline, setSenderOnline] = useState<boolean | undefined>(undefined);
   const [result, setResult] = useState<string>('');
@@ -20,12 +22,14 @@ export default function AcceptInvite() {
 
   const db = useContext(DatabaseContext);
 
+  const navigate = useNavigate();
   const user = useContext(UserContext);
   const peerCtx = useContext(PeerContext);
 
+  // cont
   useEffect(() => {
     if (!receivedInvite && !result) {
-      extractInvite(queryParams).then((invite) => {
+      extractInvite(new URLSearchParams(props.invite)).then((invite) => {
         if (invite) setReceivedInvite(invite);
         else setResult('Invalid invitation');
       });
@@ -33,11 +37,12 @@ export default function AcceptInvite() {
       setSenderOnline(false);
       // we just entered the page from url. wait for our own peer to connect
       //TODO include listener for peer start if closed of null
-      const timeout = 10000;
+      const timeout = 1000;
       setTimeout(() => {
         const conn = peerCtx._peer.connect(receivedInvite.peerId);
         conn?.on('open', () => {
           setSenderOnline(true);
+
           /* Just a quick test (without signature to see if peer is online)
            * once the  invitation is accepted, we'll reconnect with a real signature.
            * Other side will bounce and close since we didn't send signature.
@@ -46,7 +51,7 @@ export default function AcceptInvite() {
         });
       }, timeout);
     }
-  }, [peerCtx, queryParams, result, receivedInvite, senderOnline]);
+  }, [peerCtx, result, receivedInvite, senderOnline, props.invite]);
 
   //handler
   const handleAcceptContact = async () => {
@@ -55,6 +60,9 @@ export default function AcceptInvite() {
     let contact = await db.contacts.get(receivedInvite.peerId);
     if (contact) {
       setResult(`Invite already accepted.. Still waiting to connect... `);
+      setTimeout(() => {
+        navigate('/contacts');
+      }, 5000);
     } else {
       const sig = await genSignature(receivedInvite.peerId, user.user.privateKey);
       contact = {
@@ -70,6 +78,9 @@ export default function AcceptInvite() {
       db.contacts.put(contact);
       console.info('Contact created', contact);
       setResult('Contact added!');
+      setTimeout(() => {
+        navigate('/contacts');
+      }, 5000);
     }
     peerCtx?._initiateConnection(contact);
   };
@@ -89,22 +100,26 @@ export default function AcceptInvite() {
   return !receivedInvite ? (
     <Alerter message="No invite in URL" type="error" />
   ) : (
-    <div>
-      Received invite: {receivedInvite.text}
-      <Badge
-        color={BadgeColor()}
-        overlap="circular"
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        variant="dot"
-      >
-        <Avatar src={`data:image/svg+xml;utf8,${identicon(receivedInvite.peerId)}`}></Avatar>
-      </Badge>
-      <Button variant="contained" onClick={handleAcceptContact}>
-        Accept the Invitation and send a contact request?
+    <Dialog open>
+      <DialogContent>
+        <Typography variant="subtitle2">You received an invite to connect:</Typography>
+        <Typography variant="caption">{receivedInvite.text}</Typography>
+        <Badge
+          color={BadgeColor()}
+          overlap="circular"
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          variant="dot"
+        >
+          <Avatar src={`data:image/svg+xml;utf8,${identicon(receivedInvite.peerId)}`}></Avatar>
+        </Badge>
+        <Button variant="contained" onClick={handleAcceptContact}>
+          Accept the Invitation and send a contact request?
+        </Button>
         <br></br>
-        Sender is {isOnlineDesc()}
-      </Button>
-      {result ?? <Alerter message={result} type="error" />}
-    </div>
+
+        <Typography variant="body2">Sender is {isOnlineDesc()}</Typography>
+        {result ?? <Alerter message={result} type="error" />}
+      </DialogContent>
+    </Dialog>
   );
 }
