@@ -1,15 +1,22 @@
 import { useContext, useEffect, useState } from 'react';
 import { extractInvite } from 'services/InvitationService';
-import { identicon } from 'minidenticons';
 import { DatabaseContext } from 'providers/DatabaseProvider';
 import { PeerContext } from 'providers/PeerProvider';
 import { Alerter } from 'components/StatusDisplay/Alerter';
 import { UserContext } from 'providers/UserProvider';
-import { Button, Badge, Avatar, Dialog, Typography, DialogContent } from '@mui/material';
+import {
+  Button,
+  Badge,
+  Avatar,
+  Dialog,
+  Typography,
+  DialogContent,
+  DialogContentText,
+} from '@mui/material';
 import { genSignature } from 'services/Crypto';
 import { IInvite } from 'types';
-import { Box } from '@mui/system';
 import { useNavigate } from 'react-router-dom';
+import { identicon } from 'minidenticons';
 
 export default function AcceptInvite(props: { invite: string }) {
   //recover invite from local storage hack
@@ -87,9 +94,9 @@ export default function AcceptInvite(props: { invite: string }) {
 
   function isOnlineDesc() {
     if (senderOnline === undefined) return 'Trying to connect with invitor... ';
-    else if (senderOnline) return 'Invitator is online right now!';
+    else if (senderOnline) return 'The person Invitator is online right now!';
     else
-      return 'Invitor seems to be offline right now. Go ahead and accept and save the new contact for now. We`ll try to connect later again. Once the other accepts your connection, you will get notified!';
+      return 'The person who sent the invitation appears to be right now. Go ahead and save the new contact for now. Once the other person accepts your connection, you will get notified!';
   }
 
   function BadgeColor() {
@@ -97,29 +104,45 @@ export default function AcceptInvite(props: { invite: string }) {
     else if (senderOnline) return 'success';
     else return 'error';
   }
-  return !receivedInvite ? (
-    <Alerter message="No invite in URL" type="error" />
-  ) : (
-    <Dialog open>
-      <DialogContent>
-        <Typography variant="subtitle2">You received an invite to connect:</Typography>
-        <Typography variant="caption">{receivedInvite.text}</Typography>
-        <Badge
-          color={BadgeColor()}
-          overlap="circular"
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-          variant="dot"
-        >
-          <Avatar src={`data:image/svg+xml;utf8,${identicon(receivedInvite.peerId)}`}></Avatar>
-        </Badge>
-        <Button variant="contained" onClick={handleAcceptContact}>
-          Accept the Invitation and send a contact request?
-        </Button>
-        <br></br>
+  if (!receivedInvite) {
+    setTimeout(() => {
+      navigate('/contacts');
+    }, 5000);
+    return <Alerter message="No invite in URL" type="error" />;
+  }
 
-        <Typography variant="body2">Sender is {isOnlineDesc()}</Typography>
-        {result ?? <Alerter message={result} type="error" />}
-      </DialogContent>
-    </Dialog>
+  return (
+    <>
+      {result ?? <Alerter message={result} type="error" />}
+      <Dialog open>
+        <DialogContent>
+          <Typography variant="subtitle2" align="center">
+            You received an invite to connect
+          </Typography>
+          <Typography variant="subtitle1" align="center">
+            {receivedInvite.text}
+          </Typography>
+
+          <DialogContentText align="center">
+            <Badge
+              color={BadgeColor()}
+              overlap="circular"
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+              variant="dot"
+            >
+              <Avatar
+                sizes="large"
+                src={`data:image/svg+xml;utf8,${identicon(receivedInvite.peerId)}`}
+              ></Avatar>
+            </Badge>
+            <Button variant="contained" onClick={handleAcceptContact}>
+              Accept the Invitation and send a contact request?
+            </Button>
+          </DialogContentText>
+
+          <DialogContentText align="center">{isOnlineDesc()}</DialogContentText>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

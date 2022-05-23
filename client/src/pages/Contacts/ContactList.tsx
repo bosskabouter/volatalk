@@ -5,22 +5,18 @@ import { IContact } from 'types';
 import { ContactListItem } from './ContactListItem';
 
 import { useContext, useEffect, useState } from 'react';
-import { Link, List, ListSubheader, Typography } from '@mui/material';
+import { Button, List, ListSubheader, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import Invite from 'components/Invite/Invite';
 
+import { Navigate, useNavigate } from 'react-router-dom';
 import AddLinkIcon from '@mui/icons-material/AddLink';
-
-import {
-  //Link,
-  Link as RouterLink,
-} from 'react-router-dom';
 
 const ContactList = () => {
   const db = useContext(DatabaseContext);
   const peerManager = useContext(PeerContext);
   const [contactList, setContactList] = useState<IContact[]>([]);
 
+  const navigate = useNavigate();
   useEffect(() => {
     db?.selectContacts().then((cts) => {
       setContactList(cts);
@@ -67,15 +63,15 @@ const ContactList = () => {
         </List>
       </div>
 
-      <div hidden={(contactList.length > 0)}>
+      <div hidden={contactList.length > 0}>
         <Box>
           <Typography variant="h5">No contacts yet</Typography>
-          <Typography variant="button">
-            <Link component={RouterLink} to="/Invite">
-              <AddLinkIcon />
-              Invite someone!
-            </Link>
-          </Typography>
+          <Typography variant="button"></Typography>
+
+          <Button onClick={() => navigate('/Invite')}>
+            <AddLinkIcon />
+            Invite someone!
+          </Button>
         </Box>
       </div>
     </div>

@@ -29,8 +29,8 @@ export class AppDatabase extends Dexie {
         userProfile: '++id',
         contacts: 'peerid , dateTimeAccepted, dateTimeDeclined',
         messages:
-          '++id, sender, receiver, dateTimeCreated, dateTimeSent, dateTimeRead, '
-          +'[sender+dateTimeRead],[receiver+dateTimeSent]',
+          '++id, sender, receiver, dateTimeCreated, dateTimeSent, dateTimeRead, ' +
+          '[sender+dateTimeRead],[receiver+dateTimeSent]',
       })
       .upgrade((trans) => {
         console.warn('Upgrading contacts table');
@@ -91,7 +91,7 @@ export class AppDatabase extends Dexie {
       .sortBy('dateTimeCreated');
   }
 
-  selectContacts(){
+  selectContacts() {
     return this.contacts.orderBy('dateTimeDeclined').toArray();
   }
 

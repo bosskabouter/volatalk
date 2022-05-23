@@ -3,11 +3,11 @@ import { PeerContext } from 'providers/PeerProvider';
 import { MouseEvent, useContext, useEffect, useState } from 'react';
 import CallIcon from '@mui/icons-material/Call';
 import AddTaskIcon from '@mui/icons-material/AddTask';
-import ChatIcon from '@mui/icons-material/Chat';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 
 import Badge from '@mui/material/Badge';
 import Avatar from '@mui/material/Avatar';
+import { Link } from 'react-router-dom';
 
 import {
   Divider,
@@ -40,12 +40,12 @@ export const ContactListItem = (props: ContactListItemProps) => {
   const handleClickMessageContact = (_e: MouseEvent) => {
     navigate('/messages/' + props.contact.peerid);
   };
-  const handleClickCallContact = (e: MouseEvent) => {
+  const handleClickAudioCallContact = (e: MouseEvent) => {
     navigate('/call/' + props.contact.peerid);
     //avoid onclick listitem handleClickMessageContact
     e.stopPropagation();
   };
-  const handleClickVideoContact = (e: MouseEvent) => {
+  const handleClickVideoCallContact = (e: MouseEvent) => {
     navigate('/video/' + props.contact.peerid);
     //avoid onclick listitem handleClickMessageContact
     e.stopPropagation();
@@ -109,10 +109,9 @@ export const ContactListItem = (props: ContactListItemProps) => {
         <AddTaskIcon />
       </IconButton>
     ) : (
-      <>
-        {' '}
+      <div>
         <IconButton
-          onClick={handleClickVideoContact}
+          onClick={handleClickVideoCallContact}
           edge="end"
           aria-label="Video Call"
           color="success"
@@ -121,7 +120,7 @@ export const ContactListItem = (props: ContactListItemProps) => {
           <VideoCameraFront />
         </IconButton>
         <IconButton
-          onClick={handleClickCallContact}
+          onClick={handleClickAudioCallContact}
           edge="end"
           aria-label="Audio Call"
           color="success"
@@ -129,13 +128,13 @@ export const ContactListItem = (props: ContactListItemProps) => {
         >
           <CallIcon />
         </IconButton>
-      </>
+      </div>
     );
   };
 
   const BlockContactButton = () => {
-    const isBlocked =contact.dateTimeDeclined !== 0;
-    
+    const isBlocked = contact.dateTimeDeclined !== 0;
+
     const blockContact = async () => {
       if (!peer || !db) return;
       if (isBlocked) contact.dateTimeDeclined = 0;
@@ -153,7 +152,7 @@ export const ContactListItem = (props: ContactListItemProps) => {
       setContact(contact);
     };
     const label = (isBlocked ? 'un' : '') + 'block this user';
-    const color = (!isBlocked ? 'success' : 'error');
+    const color = !isBlocked ? 'success' : 'error';
     return (
       <Tooltip title={label}>
         <IconButton
@@ -179,32 +178,30 @@ export const ContactListItem = (props: ContactListItemProps) => {
   };
 
   return (
-    <>
-      <ListItem
-        alignItems="flex-start"
-        divider
-        key={contact.peerid}
-        onClick={handleClickMessageContact}
-        secondaryAction={SecondaryOptions()}
-      >
-        <ListItemAvatar>
-          <Badge
-            variant={cntUnread > 0 ? 'standard' : 'dot'}
-            color={online ? 'success' : 'error'}
-            overlap="circular"
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-            badgeContent={cntUnread}
-            showZero
-          >
-            <Avatar src={contact.avatar}></Avatar>
-          </Badge>
-        </ListItemAvatar>
-        <ListItemText
-          id={contact.peerid}
-          primary={contact.nickname}
-          secondary={`connected since ${descriptiveTimeAgo(new Date(contact.dateTimeCreated))}`}
-        />
-      </ListItem>
-    </>
+    <ListItem
+      alignItems="flex-start"
+      divider
+      key={contact.peerid}
+      onClick={handleClickMessageContact}
+      secondaryAction={SecondaryOptions()}
+    >
+      <ListItemAvatar>
+        <Badge
+          variant={cntUnread > 0 ? 'standard' : 'dot'}
+          color={online ? 'success' : 'error'}
+          overlap="circular"
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          badgeContent={cntUnread}
+          showZero
+        >
+          <Avatar src={contact.avatar}></Avatar>
+        </Badge>
+      </ListItemAvatar>
+      <ListItemText
+        id={contact.peerid}
+        primary={contact.nickname}
+        secondary={`connected since ${descriptiveTimeAgo(new Date(contact.dateTimeCreated))}`}
+      />
+    </ListItem>
   );
 };

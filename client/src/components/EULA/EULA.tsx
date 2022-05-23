@@ -6,11 +6,11 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
+  DialogContentText,
   DialogTitle,
   List,
   ListItem,
   ListItemText,
-  Typography,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { MobileView } from 'react-device-detect';
@@ -119,20 +119,21 @@ const EULA = () => {
             <ListItemText primary="Private, Direct Video, Calling and Messenging. The new way to communicate directly with your contacts, without the need for any central authority to capture or censure your private data." />
           </ListItem>
           <ListItem key="2">
-            <ListItemText primary="All information is encrypted on your local device and messaging and calling data is not sent to any server other than the receiving contact." />
+            <ListItemText primary="All information <<will be>> encrypted on your local device and messaging and calling data is not sent to any server other than the receiving contact." />
+          </ListItem>
+
+          <ListItem key="3">
+            <ListItemText primary="Currently we are in testing phase. Unexpected things might happen." />
+          </ListItem>
+          <ListItem key="4">
+            <ListItemText primary="When you continue, you register your IP to a signalling server, used to find each other." />
           </ListItem>
         </List>
         <DialogActions css={styles.eulaDialogAction}>
-          <Typography color={'secondary'}>
-            When you continue, you register your IP to a signalling server, used to find each other.
-          </Typography>
-          <Typography variant='h6' color={'secondary'}>
-            VolaTALK signalling server does not store this data.
-          </Typography>
+          <DialogContentText color={'primary'}>VolaTALK does not store any data.</DialogContentText>
           <Button
             css={styles.eulaAgreeButton}
             color="primary"
-            // onClick={handleAgreeButtonClick}
             onClick={onClose}
             variant="contained"
           >

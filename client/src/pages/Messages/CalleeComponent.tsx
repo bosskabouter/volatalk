@@ -6,6 +6,7 @@ import { MediaConnection } from 'peerjs';
 import { Button, Dialog, DialogContent, Popper } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import { DatabaseContext } from 'providers/DatabaseProvider';
+import { isMobile } from 'react-device-detect';
 
 const CalleeComponent = () => {
   // navigator.vibrate(200);
@@ -40,8 +41,10 @@ const CalleeComponent = () => {
         .getUserMedia({ video: videoOn, audio: true })
         .then((lms) => {
           //TODO ask if we want the call
+
           if (lms) {
             console.debug('Got LMS', lms);
+
             mediaConnection.answer(lms); // Answer the call with an A/V stream.
             console.debug('Answered call');
 
@@ -66,6 +69,7 @@ const CalleeComponent = () => {
       //alert('Status change;' + status);
       //alert('Someone calling' + call.peer);
       console.info('Incoming call', mc);
+      if (isMobile) navigator.vibrate(2000);
       setMediaConnection(mc);
     }
 
@@ -81,8 +85,8 @@ const CalleeComponent = () => {
 
   return (
     <>
-      <Dialog open={mediaConnection != null}>
-        <DialogContent>
+      <Dialog open={mediaConnection != null} >
+        <DialogContent >
           <video ref={remoteVideoElement} controls autoPlay />
         </DialogContent>
       </Dialog>

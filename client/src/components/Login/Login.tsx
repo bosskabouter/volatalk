@@ -17,7 +17,6 @@ const Login = () => {
   const { setAuthenticated } = useContext(AuthContext);
   const { setUser } = useContext(UserContext);
 
-
   const queryParams = new URLSearchParams(useLocation().search);
 
   const theme = useTheme();

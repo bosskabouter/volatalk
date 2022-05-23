@@ -11,7 +11,6 @@ import { Route, Routes, useLocation } from 'react-router-dom';
 import { RequireAuth } from './RequireAuth';
 
 import Home from 'pages/Home/Home';
-import { useSessionStorage } from 'util/useSessionStorage';
 
 // We load each route, when lazy loading, only as they're
 // called by the user. The Home page is not lazily loaded
@@ -22,23 +21,13 @@ import { useSessionStorage } from 'util/useSessionStorage';
 
 const About = lazy(() => import('components/About/About'));
 const Invite = lazy(() => import('components/Invite/Invite'));
-const AcceptInvite = lazy(() => import('components/Invite/AcceptInvite'));
+//const AcceptInvite = lazy(() => import('components/Invite/AcceptInvite'));
 const MessageList = lazy(() => import('pages/Messages/MessageList'));
 const Contacts = lazy(() => import('pages/Contacts/ContactsPage'));
 const CallerComponent = lazy(() => import('pages/Messages/CallerComponent'));
 
 export const AppRoutes = () => {
-  const inviteParams = useLocation().search;
-
-  useEffect(() => {
-    if (inviteParams.length > 0) {
-      localStorage.setItem('invite', inviteParams);
-    }
-  }, [inviteParams]);
-
   return (
-    //TODO CHECK FOR INVITE PARAMS TO PASS ALONG EULA AND AccountSetup
-
     // Suspense tells React that the data a component is reading
     // needs some time to wait. It does not tie your network logic
     // to React components.

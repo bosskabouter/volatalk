@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react';
-import { BaseSyntheticEvent, SyntheticEvent, useContext } from 'react';
+import { SyntheticEvent, useContext } from 'react';
 import {
   Avatar,
   Box,
@@ -13,7 +13,6 @@ import {
   MenuItem,
   OutlinedInput,
   Select,
-  Switch,
   TextField,
   Typography,
   useTheme,
@@ -330,8 +329,7 @@ const AccountSetup = () => {
   };
   function handleClose(e: SyntheticEvent) {
     console.log(e, e.currentTarget);
-    if (userCtx.user)navigate("/");
-    
+    if (userCtx.user) navigate('/');
   }
   return (
     <Dialog

@@ -3,13 +3,11 @@ import { css } from '@emotion/react';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import HelpOutline from '@mui/icons-material/HelpOutline';
-import HomeIcon from '@mui/icons-material/Home';
 import AccountIcon from '@mui/icons-material/ManageAccounts';
 import QrCode2Icon from '@mui/icons-material/QrCode2';
 
 import PeopleIcon from '@mui/icons-material/People';
 
-import MenuIcon from '@mui/icons-material/Menu';
 import AppBar from '@mui/material/AppBar';
 import CssBaseline from '@mui/material/CssBaseline';
 import Divider from '@mui/material/Divider';
@@ -114,77 +112,76 @@ export default function TemporaryDrawer() {
   };
 
   return (
-      <div css={styles.root}>
-        <CssBaseline />
-        <AppBar position={'static'} css={styles.appBar(open)} role="banner">
-          <Toolbar disableGutters variant="dense">
-            <Typography variant="h6" noWrap css={styles.title}>
-              <Link to="/">
-                <img alt="VolaTALK logo" css={styles.toolbarLogo} src="/safari-pinned-tab.svg" />
-              </Link>
-            </Typography>
-            <Button onClick={handleDrawerOpen} css={styles.hide(open)}>
-              <StatusDisplay />
-            </Button>
-          </Toolbar>
-        </AppBar>
-        <Drawer
-          css={[styles.drawer, styles.drawerPaper]}
-          variant="persistent"
-          anchor="right"
-          onClose={handleDrawerClose}
-          open={open}
-        >
-          <div css={styles.drawerHeader}>
-            <IconButton onClick={handleDrawerClose} size="large">
-              {theme.direction === 'rtl' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-            </IconButton>
-
+    <div css={styles.root}>
+      <CssBaseline />
+      <AppBar position={'static'} css={styles.appBar(open)} role="banner">
+        <Toolbar disableGutters variant="dense">
+          <Typography variant="h6" noWrap css={styles.title}>
+            <Link to="/">
+              <img alt="VolaTALK logo" css={styles.toolbarLogo} src="/safari-pinned-tab.svg" />
+            </Link>
+          </Typography>
+          <Button onClick={handleDrawerOpen} css={styles.hide(open)}>
             <StatusDisplay />
-          </div>
-          <Divider />
+          </Button>
+        </Toolbar>
+      </AppBar>
+      <Drawer
+        css={[styles.drawer, styles.drawerPaper]}
+        variant="persistent"
+        anchor="right"
+        onClose={handleDrawerClose}
+        open={open}
+      >
+        <div css={styles.drawerHeader}>
+          <IconButton onClick={handleDrawerClose} size="large">
+            {theme.direction === 'rtl' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+          </IconButton>
+
+          <StatusDisplay />
+        </div>
+        <Divider />
+        <List>
+          <Link to="/AccountSetup" css={styles.link}>
+            <ListItem button onClick={handleDrawerClose}>
+              <ListItemIcon>
+                <AccountIcon />
+              </ListItemIcon>
+              <ListItemText primary="Account" />
+            </ListItem>
+          </Link>
+          <Link to="/Contacts" css={styles.link}>
+            <ListItem button onClick={handleDrawerClose}>
+              <ListItemIcon>
+                <PeopleIcon />
+              </ListItemIcon>
+              <ListItemText primary="Contacts" />
+            </ListItem>
+          </Link>
+          <Link to="/Invite" css={styles.link}>
+            <ListItem button onClick={handleDrawerClose}>
+              <ListItemIcon>
+                <QrCode2Icon />
+              </ListItemIcon>
+              <ListItemText primary="Invite" />
+            </ListItem>
+          </Link>
+          <Link to="/About" css={styles.link}>
+            <ListItem onClick={handleDrawerClose}>
+              <ListItemIcon>
+                <HelpOutline />
+              </ListItemIcon>
+              <ListItemText primary="About" />
+            </ListItem>
+          </Link>
           <List>
-          
-            <Link to="/AccountSetup" css={styles.link}>
-              <ListItem button onClick={handleDrawerClose}>
-                <ListItemIcon>
-                  <AccountIcon />
-                </ListItemIcon>
-                <ListItemText primary="Account" />
-              </ListItem>
-            </Link>
-            <Link to="/Contacts" css={styles.link}>
-              <ListItem button onClick={handleDrawerClose}>
-                <ListItemIcon>
-                  <PeopleIcon />
-                </ListItemIcon>
-                <ListItemText primary="Contacts" />
-              </ListItem>
-            </Link>
-            <Link to="/Invite" css={styles.link}>
-              <ListItem button onClick={handleDrawerClose}>
-                <ListItemIcon>
-                  <QrCode2Icon />
-                </ListItemIcon>
-                <ListItemText primary="Invite" />
-              </ListItem>
-            </Link>
-            <Link to="/About" css={styles.link}>
-              <ListItem onClick={handleDrawerClose}>
-                <ListItemIcon>
-                  <HelpOutline />
-                </ListItemIcon>
-                <ListItemText primary="About" />
-              </ListItem>
-            </Link>
-            <List>
-              <ListItem>
-                <Rating appId="volatalk" />
-              </ListItem>
-            </List>
+            <ListItem>
+              <Rating appId="volatalk" />
+            </ListItem>
           </List>
-          <Divider />
-        </Drawer>
-      </div>
+        </List>
+        <Divider />
+      </Drawer>
+    </div>
   );
 }

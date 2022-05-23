@@ -1,10 +1,12 @@
 import { DatabaseContext } from 'providers/DatabaseProvider';
 import { UserContext } from 'providers/UserProvider';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Navigate, Outlet } from 'react-router';
 import { State } from 'store/rootReducer';
 import { AuthContext } from '../../providers/AuthProvider';
+import { useLocation } from 'react-router-dom';
+import AcceptInvite from 'components/Invite/AcceptInvite';
 
 export const RequireAuth = () => {
   const { authenticated } = React.useContext(AuthContext);
@@ -15,6 +17,18 @@ export const RequireAuth = () => {
   const userCtx = useContext(UserContext);
 
   const eulaAccepted = useSelector((state: State) => state.eulaState.accepted);
+
+  //CHECK FOR INVITE PARAMS TO PASS ALONG EULA AND AccountSetup
+  const inviteParams = useLocation().search;
+
+  if (inviteParams.length > 0) {
+    localStorage.setItem('invite', inviteParams);
+  }
+
+  const receivedInvite = inviteParams || localStorage.getItem('invite');
+  if (receivedInvite && receivedInvite?.length > 0 && eulaAccepted && existingAccount) {
+    return <AcceptInvite invite={receivedInvite} />;
+  }
 
   if (!eulaAccepted) {
     return <Navigate to="/eula" replace />;
@@ -37,5 +51,6 @@ export const RequireAuth = () => {
         });
     }
   }
+
   return <Outlet />;
 };

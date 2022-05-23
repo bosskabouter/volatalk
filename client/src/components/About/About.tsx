@@ -34,32 +34,16 @@ const About = () => {
         <List>
           <ListItem key="1">
             <ListItemText
-              primary="Direct communication with your contacts, but wihout a central server to capture your private data. 
+              primary="Direct communication with your contacts, no central server to capture your private data needed. 
             This means that if you lose access to your account, your identity cannot be recovered, because it is stored nowhere else."
             />
           </ListItem>
           <ListItem key="2">
-            <ListItemText
-              primary="The application can be installed offline. 
-            All further communication is done directly with your contacts."
-            />
+            <ListItemText primary="The application can be installed offline." />
           </ListItem>
           <ListItem key="3">
-            <ListItemText
-              primary="The application uses a 'Peerserver' to connect to others. 
-            You can use VolaTalk's service, or some other generic public PeerJS available on the internet, 
-            or even setup your own private server. You will only find people connected on the same network."
-            />
-          </ListItem>
-          <ListItem key="4">
-            <ListItemText
-              primary="Push notifications need to be send through a push-server. 
-            VolaTALK's push messenger doesn't collect any data about the messages being sent."
-            />
-          </ListItem>
-          <ListItem key="5">
             <Link href="https://github.com/bosskabouter/volatalk">
-              <ListItemText primary="All source code of this software is publicly available on GitHub" />
+              <ListItemText primary="All source code is publicly available on GitHub" />
             </Link>
           </ListItem>
         </List>

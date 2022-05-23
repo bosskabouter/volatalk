@@ -1,21 +1,14 @@
-import { IContact } from '../../types';
-
 import { useContext, useEffect, useRef, useState } from 'react';
 import { PeerContext } from 'providers/PeerProvider';
 import { MediaConnection } from 'peerjs';
-import { Button, Dialog, DialogContent, Popper } from '@mui/material';
+import { Dialog, DialogContent, DialogTitle } from '@mui/material';
 import { useParams } from 'react-router-dom';
-import { DatabaseContext } from 'providers/DatabaseProvider';
-import { RequestQuoteRounded } from '@mui/icons-material';
 
 interface CallerComponentProps {
   videoOn: boolean;
 }
 
 const CallerComponent = (props: CallerComponentProps) => {
-  // navigator.vibrate(200);
-  //getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-
   const remoteVideoElement = useRef<HTMLVideoElement>(null);
 
   const [mediaConnection, setMediaConnection] = useState<MediaConnection | null>();
@@ -66,15 +59,24 @@ const CallerComponent = (props: CallerComponentProps) => {
         mediaConnection.removeAllListeners();
         //setMediaConnection(null);
       }
-      //pm._peer.disconnect();
     };
   }, [contactId, peerManager, videoOn, remoteMediaStream, mediaConnection]);
 
+  const MediaElement = () => {
+    return videoOn ? (
+      <video ref={remoteVideoElement} controls autoPlay />
+    ) : (
+      <audio ref={remoteVideoElement} controls autoPlay />
+    );
+  };
   return (
     <>
       <Dialog open>
+        <DialogTitle>
+          {videoOn ? 'Video' : 'Audio'} calling {contactId}
+        </DialogTitle>
         <DialogContent>
-          <video ref={remoteVideoElement} controls autoPlay />
+          <MediaElement />
         </DialogContent>
       </Dialog>
     </>
