@@ -4,8 +4,6 @@
   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
-    
-
     {
       "name": "Launch Chrome 3000 - no-cert check",
       "type": "chrome",
@@ -15,19 +13,15 @@
       "runtimeArgs": [
         "--disable-web-security",
         "--ignore-certificate-errors",
-        
-      ],
+        "--auto-ssl-client-auth"
+      ]
     },
     {
       "name": "Launch Chrome https://xpsdeb:8443",
       "type": "chrome",
       "request": "launch",
       "url": "https://xpsdeb:8443",
-      "runtimeArgs": [
-        "--disable-web-security",
-        "--ignore-certificate-errors",
-        
-      ],
+      "runtimeArgs": ["--disable-web-security", "--ignore-certificate-errors"],
       "webRoot": "${workspaceFolder}"
     },
     {

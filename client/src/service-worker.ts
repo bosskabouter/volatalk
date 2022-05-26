@@ -8,6 +8,8 @@
 // You can also remove this file if you'd prefer not to use a
 // service worker, and the Workbox build step will be skipped.
 
+import { decryptString, generateKeyFromString } from 'dha-encryption';
+import { isMobile } from 'react-device-detect';
 import { clientsClaim } from 'workbox-core';
 import { ExpirationPlugin } from 'workbox-expiration';
 import { createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching';
@@ -78,3 +80,25 @@ self.addEventListener('message', (event) => {
 });
 
 // Any other custom service worker logic can go here.
+self.addEventListener('push', (pushEvent) => {
+  console.info('Push Event received!', pushEvent);
+  console.info('pushEvent.composed', pushEvent.composed);
+  console.info('pushEvent.data', pushEvent.data);
+  console.info('pushEvent.target', pushEvent.target);
+  console.info('pushEvent.currentTarget', pushEvent.currentTarget);
+  console.info('pushEvent.timeStamp', pushEvent.timeStamp);
+  console.info('pushEvent.type', pushEvent.type);
+
+  const data = pushEvent.data?.text();
+
+  if (!data) return;
+  const decrypted = decryptString(data, generateKeyFromString('1234'));
+  //TODO no import in service worker.. if const dataDecrypted = data && decryptString(data, generateKeyFromString('1234'));
+
+  isMobile && navigator.vibrate([2000, 2000, 2000]);
+
+  self.registration.showNotification('Data: ' + decrypted, {
+    body: 'VolaTALK Pushed',
+    icon: 'https://www.volatalk.org/mstile-150x150.png',
+  });
+});

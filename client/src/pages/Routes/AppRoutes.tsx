@@ -5,9 +5,9 @@ import Login from 'components/Login/Login';
 import NewPin from 'components/NewPin/NewPin';
 import PinReset from 'components/PinReset/PinReset';
 
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense } from 'react';
 import FadeIn from 'react-fade-in';
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import { RequireAuth } from './RequireAuth';
 
 import Home from 'pages/Home/Home';

@@ -2,12 +2,13 @@
 
 import { StyledEngineProvider, ThemeProvider as MuiThemeProvider } from '@mui/material';
 import { Layout } from 'components';
+import ServiceWorkerWrapper from 'components/ServiceWorkerWrapper';
 import { AppRoutes } from 'pages';
 import { AuthProvider } from 'providers/AuthProvider';
 import { DatabaseProvider } from 'providers/DatabaseProvider';
 import DialogProvider from 'providers/DialogProvider';
 import PeerProvider from 'providers/PeerProvider';
-import { UserProvider as UsrProvider } from 'providers/UserProvider';
+import { UserProvider } from 'providers/UserProvider';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import store, { persistor } from 'store/store';
@@ -23,13 +24,14 @@ const App = () => {
             <DatabaseProvider>
               <DialogProvider>
                 <AuthProvider>
-                  <UsrProvider>
+                  <UserProvider>
+                    <ServiceWorkerWrapper />
                     <PeerProvider>
                       <Layout>
                         <AppRoutes />
                       </Layout>
                     </PeerProvider>
-                  </UsrProvider>
+                  </UserProvider>
                 </AuthProvider>
               </DialogProvider>
             </DatabaseProvider>

@@ -22,8 +22,6 @@ const CalleeComponent = () => {
 
   const db = useContext(DatabaseContext);
 
-  const contactId = useParams().contactid;
-
   const [videoOn, setVideoOn] = useState<boolean>(true);
 
   const [fullScreen, setFullScreen] = useState<boolean>(false);
@@ -51,6 +49,8 @@ const CalleeComponent = () => {
             mediaConnection.on('stream', (rms) => {
               console.debug('Got remote media stream', rms);
               setRemoteMediaStream(rms);
+              const remoteVideoIsOn = rms.getVideoTracks().length > 0;
+              setVideoOn(remoteVideoIsOn);
             });
           }
         })
@@ -68,8 +68,9 @@ const CalleeComponent = () => {
     async function handleIncomingMediaConnection(mc: MediaConnection) {
       //alert('Status change;' + status);
       //alert('Someone calling' + call.peer);
+
       console.info('Incoming call', mc);
-      if (isMobile) navigator.vibrate(2000);
+      if (isMobile) navigator.vibrate([2000, 2000, 2000]);
       setMediaConnection(mc);
     }
 
@@ -85,9 +86,13 @@ const CalleeComponent = () => {
 
   return (
     <>
-      <Dialog open={mediaConnection != null} >
-        <DialogContent >
-          <video ref={remoteVideoElement} controls autoPlay />
+      <Dialog open={mediaConnection != null}>
+        <DialogContent>
+          {videoOn ? (
+            <video ref={remoteVideoElement} autoPlay />
+          ) : (
+            <audio ref={remoteVideoElement} autoPlay hidden />
+          )}
         </DialogContent>
       </Dialog>
     </>

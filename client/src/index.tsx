@@ -1,4 +1,3 @@
-import ServiceWorkerWrapper from 'components/ServiceWorkerWrapper';
 import { App } from 'pages';
 import * as React from 'react';
 import { isIE } from 'react-device-detect';
@@ -21,10 +20,12 @@ if (isIE)
 const baseName =
   process.env.REACT_APP_BASE_NAME !== undefined ? `/${process.env.REACT_APP_BASE_NAME}` : '/';
 
+// Moved <ServiceWorkerWrapper /> to lower level
+// for push subscription in user
+
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter basename={baseName}>
-      <ServiceWorkerWrapper />
       <App />
     </BrowserRouter>
   </React.StrictMode>,

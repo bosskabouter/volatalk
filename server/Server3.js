@@ -113,6 +113,7 @@ if (DO_WEBPUSH) {
     webpush
       .sendNotification(subscription, payload)
       .then(() => {
+        console.log("Web push success!");
         res.status(201);
       })
       .catch((err) => {

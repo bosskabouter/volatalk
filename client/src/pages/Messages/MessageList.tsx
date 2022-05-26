@@ -107,7 +107,7 @@ const MessageList = () => {
     const sendText = async () => {
       if (peerManager && sndMessageText.trim().length > 0) {
         console.log('Sending text: ' + sndMessageText);
-        const msg = await peerManager.sendText(sndMessageText, contactId);
+        const msg = await peerManager.sendText(sndMessageText, contact);
         setSndMessageText('');
         setMessageList((prevMessageList) => [...prevMessageList, msg]);
       }

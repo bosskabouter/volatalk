@@ -14,18 +14,14 @@ import { descriptiveTimeAgo } from 'services/Generic';
 import { DatabaseContext } from 'providers/DatabaseProvider';
 import { useNavigate } from 'react-router-dom';
 
-interface ContactListItemProps {
-  contact: IContact;
-}
-
-export const ContactListItem = (props: ContactListItemProps) => {
-  const peerMngr = useContext(PeerContext);
+export const ContactItem = (props: { contact: IContact }) => {
+  const peer = useContext(PeerContext);
   const db = useContext(DatabaseContext);
   const navigate = useNavigate();
   const [contact, setContact] = useState<IContact>(props.contact);
 
   const [cntUnread, setCntUnread] = useState(0);
-  const [online, setOnline] = useState(peerMngr?.checkConnection(props.contact));
+  const [online, setOnline] = useState(peer?._connectedContacts.get(props.contact.peerid)?.open);
 
   const handleClickMessageContact = (_e: MouseEvent) => {
     navigate('/messages/' + props.contact.peerid);
@@ -66,15 +62,15 @@ export const ContactListItem = (props: ContactListItemProps) => {
       }
     }
 
-    if (!peerMngr) return;
-    peerMngr.on('onMessage', messageHandler);
-    peerMngr.on('onContactStatusChange', onContactStatusChangeHandle);
+    if (!peer) return;
+    peer.on('onMessage', messageHandler);
+    peer.on('onContactStatusChange', onContactStatusChangeHandle);
 
     return () => {
-      peerMngr.removeListener('onMessage', messageHandler);
-      peerMngr.removeListener('onContactStatusChange', onContactStatusChangeHandle);
+      peer.removeListener('onMessage', messageHandler);
+      peer.removeListener('onContactStatusChange', onContactStatusChangeHandle);
     };
-  }, [peerMngr, contact, cntUnread, online]);
+  }, [peer, contact, cntUnread, online]);
 
   const AcceptContactButton = () => {
     const acceptContact = () => {
@@ -82,43 +78,48 @@ export const ContactListItem = (props: ContactListItemProps) => {
         contact.dateTimeAccepted = new Date().getTime();
         db.contacts.put(contact);
         setContact(contact);
-        if (peerMngr) {
-          peerMngr.initiateConnection(contact);
-
-          setOnline(peerMngr.checkConnection(contact));
+        if (peer) {
+          peer.initiateConnection(contact);
+          setOnline(peer._connectedContacts.get(contact.peerid)?.open);
         }
       }
     };
     return contact.dateTimeAccepted === 0 ? (
-      <IconButton
-        onClick={acceptContact}
-        edge="start"
-        aria-label="Accept Contact?"
-        color="success"
-        size="small"
-      >
-        <AddTaskIcon />
-      </IconButton>
+      <Tooltip title={`Accept contact request from ${contact.nickname}?`}>
+        <IconButton
+          onClick={acceptContact}
+          edge="start"
+          aria-label="Accept Contact?"
+          color="success"
+          size="small"
+        >
+          <AddTaskIcon />
+        </IconButton>
+      </Tooltip>
     ) : (
       <div>
-        <IconButton
-          onClick={handleClickVideoCallContact}
-          edge="end"
-          aria-label="Video Call"
-          color="success"
-          size="small"
-        >
-          <VideoCameraFront />
-        </IconButton>
-        <IconButton
-          onClick={handleClickAudioCallContact}
-          edge="end"
-          aria-label="Audio Call"
-          color="success"
-          size="small"
-        >
-          <CallIcon />
-        </IconButton>
+        <Tooltip title={`Video call with ${contact.nickname}`}>
+          <IconButton
+            onClick={handleClickVideoCallContact}
+            edge="end"
+            aria-label="Video Call"
+            color="success"
+            size="small"
+          >
+            <VideoCameraFront />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title={`Audio call with ${contact.nickname}`}>
+          <IconButton
+            onClick={handleClickAudioCallContact}
+            edge="end"
+            aria-label="Audio Call"
+            color="success"
+            size="small"
+          >
+            <CallIcon />
+          </IconButton>
+        </Tooltip>
       </div>
     );
   };
@@ -127,22 +128,22 @@ export const ContactListItem = (props: ContactListItemProps) => {
     const isBlocked = contact.dateTimeDeclined !== 0;
 
     const blockContact = async () => {
-      if (!peerMngr || !db) return;
+      if (!peer || !db) return;
       if (isBlocked) contact.dateTimeDeclined = 0;
       else contact.dateTimeDeclined = new Date().getTime();
       db.contacts.put(contact);
 
       if (isBlocked) {
-        const conn = peerMngr._connectedContacts.get(contact.peerid);
+        const conn = peer._connectedContacts.get(contact.peerid);
         conn?.send('bye');
         conn?.close();
       } else {
-        peerMngr.initiateConnection(contact);
-        setOnline(peerMngr.checkConnection(contact));
+        peer.initiateConnection(contact);
+        setOnline(peer.checkConnection(contact));
       }
       setContact(contact);
     };
-    const label = (isBlocked ? 'un' : '') + 'block this user';
+    const label = (isBlocked ? 'un' : '') + 'block user ' + contact.nickname;
     const color = !isBlocked ? 'success' : 'error';
     return (
       <Tooltip title={label}>
