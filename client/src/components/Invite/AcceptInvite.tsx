@@ -33,7 +33,6 @@ export default function AcceptInvite(props: { invite: string }) {
   const user = useContext(UserContext);
   const peerCtx = useContext(PeerContext);
 
-  // cont
   useEffect(() => {
     if (!receivedInvite && !result) {
       extractInvite(new URLSearchParams(props.invite)).then((invite) => {
@@ -43,19 +42,10 @@ export default function AcceptInvite(props: { invite: string }) {
     } else if (receivedInvite && peerCtx && senderOnline === undefined) {
       setSenderOnline(false);
       // we just entered the page from url. wait for our own peer to connect
-      //TODO include listener for peer start if closed of null
       const timeout = 1000;
-      setTimeout(() => {
-        const conn = peerCtx._peer.connect(receivedInvite.peerId);
-        conn?.on('open', () => {
-          setSenderOnline(true);
-
-          /* Just a quick test (without signature to see if peer is online)
-           * once the  invitation is accepted, we'll reconnect with a real signature.
-           * Other side will bounce and close since we didn't send signature.
-           */
-          conn.close();
-        });
+      setTimeout(async () => {
+        const isOnline = await peerCtx.testPeerOnline(receivedInvite.peerId);
+        setSenderOnline(isOnline);
       }, timeout);
     }
   }, [peerCtx, result, receivedInvite, senderOnline, props.invite]);
@@ -67,9 +57,6 @@ export default function AcceptInvite(props: { invite: string }) {
     let contact = await db.contacts.get(receivedInvite.peerId);
     if (contact) {
       setResult(`Invite already accepted.. Still waiting to connect... `);
-      setTimeout(() => {
-        navigate('/contacts');
-      }, 5000);
     } else {
       const sig = await genSignature(receivedInvite.peerId, user.user.privateKey);
       contact = {
@@ -85,11 +72,8 @@ export default function AcceptInvite(props: { invite: string }) {
       db.contacts.put(contact);
       console.info('Contact created', contact);
       setResult('Contact added!');
-      setTimeout(() => {
-        navigate('/contacts');
-      }, 5000);
     }
-    peerCtx?._initiateConnection(contact);
+    peerCtx?.initiateConnection(contact);
   };
 
   function isOnlineDesc() {
@@ -105,9 +89,9 @@ export default function AcceptInvite(props: { invite: string }) {
     else return 'error';
   }
   if (!receivedInvite) {
-    setTimeout(() => {
-      navigate('/contacts');
-    }, 5000);
+    // setTimeout(() => {
+    //   navigate('/contacts');
+    // }, 5000);
     return <Alerter message="No invite in URL" type="error" />;
   }
 

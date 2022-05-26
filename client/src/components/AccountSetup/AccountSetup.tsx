@@ -191,7 +191,10 @@ const AccountSetup = () => {
         console.log('Peerid: ' + values.peerid);
 
         exportCryptoKey(keyPair.privateKey).then((jsonPrivateKey) => {
-          console.log('jsonPrivateKey: ' + jsonPrivateKey);
+          console.log(
+            'exportCryptoKey(keyPair.privateKey).then((jsonPrivateKey) => ',
+            jsonPrivateKey
+          );
 
           values.privateKey = JSON.stringify(jsonPrivateKey);
 

@@ -129,56 +129,6 @@ function verifyMessage(message: string, signature: BufferSource, publicKey: Cryp
   );
 }
 
-/**
- *
- * @param {*} text
- */
-function digestSHA256(text: string) {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(text);
-  return crypto.subtle.digest('SHA-256', data).then((sha) => {
-    return convertAb2str(sha);
-  });
-}
-
-/*
-Get the encoded message, encrypt it and display a representation
-of the ciphertext in the "Ciphertext" element.
-*/
-function encrypt(text: string, key: CryptoKey) {
-  const encoded = new TextEncoder().encode(text);
-  window.crypto.subtle
-    .encrypt(
-      {
-        name: 'RSA-OAEP',
-      },
-      key,
-      encoded
-    )
-    .then((ciphertext) => {
-      return new Uint8Array(ciphertext, 0, 5);
-    });
-}
-
-/*
-Fetch the ciphertext and decrypt it.
-Write the decrypted message into the "Decrypted" box.
-*/
-function decrypt(ciphertext: BufferSource, key: CryptoKey) {
-  window.crypto.subtle
-    .decrypt(
-      {
-        name: 'RSA-OAEP',
-      },
-      key,
-      ciphertext
-    )
-    .then((decrypted) => {
-      const dec = new TextDecoder();
-      return dec.decode(decrypted);
-    });
-}
-
 export {
   peerIdFromPublicKey,
   peerIdToPublicKey,
@@ -188,7 +138,4 @@ export {
   exportCryptoKey,
   signMessage,
   verifyMessage,
-  encrypt,
-  decrypt,
-  digestSHA256,
 };

@@ -5,7 +5,7 @@ const tableUser = 'userProfile';
 const tableContacts = 'contacts';
 const tableMessages = 'messages';
 
-export const DB_CURRENT_VERSION = 9;
+export const DB_CURRENT_VERSION = 11;
 
 export class AppDatabase extends Dexie {
   userProfile: Dexie.Table<IUserProfile, number>;
@@ -40,12 +40,18 @@ export class AppDatabase extends Dexie {
           .modify((contact) => {
             console.warn('Modifying contact', contact);
 
+            contact.dateTimeCreated = contact.dateCreated ? contact.dateCreated.getTime() : 0;
+            delete contact.dateCreated;
+
             contact.dateTimeAccepted = contact.dateAccepted ? contact.dateAccepted.getTime() : 0;
             delete contact.dateAccepted;
 
             contact.dateTimeDeclined = contact.dateDelined ? contact.dateDelined.getTime() : 0;
-
             delete contact.dateDelined;
+
+            delete contact.accepted;
+            delete contact.declined;
+
             console.warn('Finished modify contact', contact);
           });
       })

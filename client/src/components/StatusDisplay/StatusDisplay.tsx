@@ -38,7 +38,7 @@ const StatusDisplay = () => {
   }, [peerCtx]);
 
   function myPeerid() {
-    return peerCtx?._peer.id ? peerCtx._peer.id : '123';
+    return peerCtx?.peerid ? peerCtx.peerid : '0';
   }
 
   const UserInfo = () => {

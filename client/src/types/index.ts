@@ -8,14 +8,13 @@ export interface IInvite {
   text: string;
   signature: ArrayBuffer;
 }
-export interface IConnectionMetadata {
-  peerid: string;
-  signature: string;
-  nickname: string;
-  avatar: string;
-  dateRegistered: Date;
-}
 
+export interface ConnectionMetadata {
+  //me as a contact for the other side
+  contact: IContact;
+  //my personal signature for this contact
+  signature: string;
+}
 // defines the interface for the db
 export interface IUserProfile {
   id?: string;
@@ -42,6 +41,8 @@ export interface IUserProfile {
   avatar: string;
 
   dateRegistered: Date;
+
+  pushSubscription?: PushSubscription;
 }
 
 export interface IContact {
@@ -57,6 +58,8 @@ export interface IContact {
   dateTimeResponded: number;
 
   avatar?: string;
+
+  pushSubscription?: PushSubscription;
 }
 export interface IMessage {
   id?: number;

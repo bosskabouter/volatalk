@@ -7,10 +7,27 @@
     
 
     {
-      "name": "Launch Chrome 3000",
+      "name": "Launch Chrome 3000 - no-cert check",
       "type": "chrome",
       "request": "launch",
       "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}",
+      "runtimeArgs": [
+        "--disable-web-security",
+        "--ignore-certificate-errors",
+        
+      ],
+    },
+    {
+      "name": "Launch Chrome https://xpsdeb:8443",
+      "type": "chrome",
+      "request": "launch",
+      "url": "https://xpsdeb:8443",
+      "runtimeArgs": [
+        "--disable-web-security",
+        "--ignore-certificate-errors",
+        
+      ],
       "webRoot": "${workspaceFolder}"
     },
     {

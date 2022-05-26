@@ -7,7 +7,6 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { QRCodeSVG } from 'qrcode.react';
-import { QrReader } from 'react-qr-reader';
 
 import shareSomething from 'util/Share';
 import { Box, Button, Dialog } from '@mui/material';
@@ -20,6 +19,8 @@ import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import Close from '@mui/icons-material/Close';
 import { isMobile } from 'react-device-detect';
 
+import { QrReader } from 'react-qr-reader';
+
 export default function Invite() {
   const inputRef = useRef();
   const { user } = useContext(UserContext);
@@ -27,17 +28,28 @@ export default function Invite() {
   const [toggle, setToggle] = React.useState<boolean>(true);
   const [inviteText, setInviteText] = React.useState<string>('Invitation from ' + user.nickname);
   const [inviteUrl, setInviteUrl] = React.useState('');
+  const [isGeneratingInvite, setIsGeneratingInvite] = React.useState<boolean>(false);
+  const [isDirty, setIsDirty] = React.useState<boolean>(true);
 
-  const handleToggle = (_event: React.MouseEvent<HTMLElement>, _newScanOrShow: boolean) => {
-    if (_newScanOrShow === !toggle) setToggle(_newScanOrShow);
+  const handleToggle = (_event: React.MouseEvent<HTMLElement>, newScanOrShow: boolean) => {
+    if (newScanOrShow === !toggle) setToggle(newScanOrShow);
   };
 
   useEffect(() => {
-    makeInviteURL(user, inviteText).then((iUrl) => {
-      console.log('Generated new inviteURL: ' + iUrl);
-      setInviteUrl(iUrl.toString());
-    });
-  }, [inviteText, user]);
+    const interval = setInterval(() => {
+      if (isDirty && !isGeneratingInvite && inviteText?.length > 0) {
+        setIsGeneratingInvite(true);
+        //wait to complete writing the text to generate the heavy inv
+        makeInviteURL(user, inviteText).then((inviteURL) => {
+          console.log('Generated new inviteURL', inviteURL);
+          setInviteUrl(inviteURL.toString());
+          setIsGeneratingInvite(false);
+          setIsDirty(false);
+        });
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [inviteText, isDirty, isGeneratingInvite, user]);
 
   function DisplayQRCode() {
     const handleShareInvite = (txt: string) => {
@@ -48,18 +60,8 @@ export default function Invite() {
     const handleInviteTextChange = (
       event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
     ) => {
-      if (!event || !event.target || !event.target.value) {
-        return;
-      }
-      const iText = event.target.value;
-      setInviteText(iText);
-      //event.target.focus();
-
-      console.debug('Invitation text: ' + iText);
-      makeInviteURL(user, iText).then((iUrl) => {
-        console.log('Generated new inviteURL: ' + iUrl);
-        setInviteUrl(iUrl.toString());
-      });
+      setIsDirty(true);
+      setInviteText(event?.target?.value);
     };
 
     return (
@@ -98,6 +100,7 @@ export default function Invite() {
 
   const DisplayQRScanner = () => {
     const navigate = useNavigate();
+
     return (
       <QrReader
         ViewFinder={ViewFinder}
@@ -128,10 +131,10 @@ export default function Invite() {
 
         <ToggleButtonGroup value={toggle} fullWidth exclusive onChange={handleToggle}>
           <ToggleButton value={true}>
-            <QrCode2Icon /> SHOW MY QR
+            <QrCode2Icon /> SHOW QR
           </ToggleButton>
           <ToggleButton value={false}>
-            SCAN OTHER QR
+            SCAN QR
             <QrCodeScannerIcon />
           </ToggleButton>
         </ToggleButtonGroup>

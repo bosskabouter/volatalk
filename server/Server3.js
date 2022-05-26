@@ -13,12 +13,12 @@ const app = express();
 
 const spdy = require("spdy");
 
-const DO_CORS = true;
+const DO_CORS = false;
 const DO_EJS = false;
 const DO_PEERJS = true;
 
-const DO_WEBPUSH = false;
-const DO_SOCKETIO = true;
+const DO_WEBPUSH = true;
+const DO_SOCKETIO = false;
 
 //CONFIG ENVIRONMENT VARIABLE PARAMS
 const DEBUG = ENV_VAR("DEBUG", true);
@@ -102,18 +102,22 @@ if (DO_WEBPUSH) {
   webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBKEY, VAPID_PRIVKEY);
 
   app.post(WEBPUSH_CONTEXT, (req, res) => {
-    const subscription = req.body;
+    //not logging any user data
+    const body = req.body;
 
-    //pass on complete request to receiver?? :)
-    const payload = JSON.stringify(req);
+    const subscription = body.subscription;
+    const payload = body.payload;
+
+    //TODO remove logging user data after testing
+    console.log("Pushing payload to subscription", payload, subscription);
     webpush
       .sendNotification(subscription, payload)
       .then(() => {
-        res.status(201).json({});
+        res.status(201);
       })
       .catch((err) => {
         console.warn("Invalid subscription request: " + err, req, err);
-        res.status(418).json({});
+        res.status(418);
       });
   });
 }

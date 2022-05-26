@@ -83,9 +83,8 @@ export const WeatherInfo = ({ location }: WeatherInfoProps) => {
 };
 function toCelsius(fahrenheit: number) {
   const celcius = (fahrenheit - 32) / 1.8;
-  console.log(`fahrenheit: ${fahrenheit} -> celcius ${celcius}`);
   const fahren = toFahrenheit(celcius);
-  console.log(`celcius:  ${celcius} -> fahrenheit ${fahren}`);
+  console.debug(`celcius:  ${celcius} -> fahrenheit ${fahren}`);
   return celcius;
 }
 
