@@ -1,31 +1,27 @@
-import { IContact, IMessage } from 'types';
-import { PeerContext } from 'providers/PeerProvider';
 import { MouseEvent, useContext, useEffect, useState } from 'react';
+
 import CallIcon from '@mui/icons-material/Call';
 import AddTaskIcon from '@mui/icons-material/AddTask';
-import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 
-import Badge from '@mui/material/Badge';
-import Avatar from '@mui/material/Avatar';
-
-import { IconButton, ListItem, ListItemAvatar, ListItemText, Tooltip } from '@mui/material';
-import { VideoCameraFront } from '@mui/icons-material';
-import { descriptiveTimeAgo } from 'services/Generic';
-import { DatabaseContext } from 'providers/DatabaseProvider';
+import { IconButton, ListItem, ListItemText } from '@mui/material';
+import { VideoCameraFront as CallContactIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
-interface ContactListItemProps {
-  contact: IContact;
-}
+import { ContactItem } from './ContactItem';
 
-export const ContactListItem = (props: ContactListItemProps) => {
+import { IContact, IMessage } from '../../types';
+import { PeerContext } from '../../providers/PeerProvider';
+import { DatabaseContext } from '../../providers/DatabaseProvider';
+import { descriptiveTimeAgo } from '../../services/Generic';
+
+export const ContactListItem = (props: { contact: IContact }) => {
   const peerMngr = useContext(PeerContext);
   const db = useContext(DatabaseContext);
   const navigate = useNavigate();
-  const [contact, setContact] = useState<IContact>(props.contact);
 
-  const [cntUnread, setCntUnread] = useState(0);
-  const [online, setOnline] = useState(peerMngr?.checkConnection(props.contact));
+  const [online, setOnline] = useState(peerMngr?.isConnected(props.contact));
+
+  const [lastMessage, setLastMessage] = useState<IMessage>();
 
   const handleClickMessageContact = (_e: MouseEvent) => {
     navigate('/messages/' + props.contact.peerid);
@@ -41,55 +37,38 @@ export const ContactListItem = (props: ContactListItemProps) => {
     e.stopPropagation();
   };
   useEffect(() => {
-    async function selectUnreadMsg() {
-      if (db) {
-        setCntUnread(await db.selectUnreadMessages(contact).count());
-      }
-    }
-    selectUnreadMsg();
-    //unread messages
-  }, [db, contact]);
+    db?.selectLastMessage(props.contact).then(setLastMessage);
+  }, [db, props.contact]);
 
   useEffect(() => {
     function messageHandler(message: IMessage) {
-      if (message.sender === contact.peerid) {
+      if (message.sender === props.contact?.peerid) {
         console.log('Message received in messageHandler', message);
-        setCntUnread(cntUnread + 1);
-      }
-    }
-
-    async function onContactStatusChangeHandle(statchange: { contact: IContact; status: boolean }) {
-      if (statchange.contact.peerid === contact.peerid) {
-        console.log('contactStatusHandler', statchange);
-        setContact(statchange.contact);
-        setOnline(statchange.status);
+        setLastMessage(message);
       }
     }
 
     if (!peerMngr) return;
     peerMngr.on('onMessage', messageHandler);
-    peerMngr.on('onContactStatusChange', onContactStatusChangeHandle);
 
     return () => {
       peerMngr.removeListener('onMessage', messageHandler);
-      peerMngr.removeListener('onContactStatusChange', onContactStatusChangeHandle);
     };
-  }, [peerMngr, contact, cntUnread, online]);
+  }, [peerMngr, props.contact, online]);
 
   const AcceptContactButton = () => {
     const acceptContact = () => {
       if (db) {
-        contact.dateTimeAccepted = new Date().getTime();
-        db.contacts.put(contact);
-        setContact(contact);
+        props.contact.dateTimeAccepted = new Date().getTime();
+        db.contacts.put(props.contact);
         if (peerMngr) {
-          peerMngr.initiateConnection(contact);
+          peerMngr.connectContact(props.contact);
 
-          setOnline(peerMngr.checkConnection(contact));
+          setOnline(peerMngr.isConnected(props.contact));
         }
       }
     };
-    return contact.dateTimeAccepted === 0 ? (
+    return props.contact.dateTimeAccepted === 0 ? (
       <IconButton
         onClick={acceptContact}
         edge="start"
@@ -108,7 +87,7 @@ export const ContactListItem = (props: ContactListItemProps) => {
           color="success"
           size="small"
         >
-          <VideoCameraFront />
+          <CallContactIcon />
         </IconButton>
         <IconButton
           onClick={handleClickAudioCallContact}
@@ -123,47 +102,10 @@ export const ContactListItem = (props: ContactListItemProps) => {
     );
   };
 
-  const BlockContactButton = () => {
-    const isBlocked = contact.dateTimeDeclined !== 0;
-
-    const blockContact = async () => {
-      if (!peerMngr || !db) return;
-      if (isBlocked) contact.dateTimeDeclined = 0;
-      else contact.dateTimeDeclined = new Date().getTime();
-      db.contacts.put(contact);
-
-      if (isBlocked) {
-        const conn = peerMngr._connectedContacts.get(contact.peerid);
-        conn?.send('bye');
-        conn?.close();
-      } else {
-        peerMngr.initiateConnection(contact);
-        setOnline(peerMngr.checkConnection(contact));
-      }
-      setContact(contact);
-    };
-    const label = (isBlocked ? 'un' : '') + 'block this user';
-    const color = !isBlocked ? 'success' : 'error';
-    return (
-      <Tooltip title={label}>
-        <IconButton
-          onClick={blockContact}
-          edge="start"
-          aria-label={label}
-          color={color}
-          size="small"
-        >
-          <RemoveCircleOutlineIcon />
-        </IconButton>
-      </Tooltip>
-    );
-  };
-
   const SecondaryOptions = () => {
     return (
       <>
         <AcceptContactButton />
-        <BlockContactButton />
       </>
     );
   };
@@ -172,27 +114,30 @@ export const ContactListItem = (props: ContactListItemProps) => {
     <ListItem
       alignItems="flex-start"
       divider
-      key={contact.peerid}
+      key={props.contact.peerid}
       onClick={handleClickMessageContact}
       secondaryAction={SecondaryOptions()}
+      sx={{
+        borderRadius: '12px',
+        boxShadow: 1,
+        '&:hover': {
+          backgroundColor: 'primary.main',
+          opacity: [0.9, 0.8, 0.7],
+          boxShadow: 6,
+        },
+      }}
     >
-      <ListItemAvatar>
-        <Badge
-          variant={cntUnread > 0 ? 'standard' : 'dot'}
-          color={online ? 'success' : 'error'}
-          overlap="circular"
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-          badgeContent={cntUnread}
-          showZero
-        >
-          <Avatar src={contact.avatar}></Avatar>
-        </Badge>
-      </ListItemAvatar>
-      <ListItemText
-        id={contact.peerid}
-        primary={contact.nickname}
-        secondary={`connected since ${descriptiveTimeAgo(new Date(contact.dateTimeCreated))}`}
-      />
+      <ContactItem contact={props.contact}></ContactItem>
+
+      {lastMessage ? (
+        <ListItemText
+          id={lastMessage.sender + lastMessage.receiver}
+          primary={lastMessage?.payload}
+          secondary={`sent ${descriptiveTimeAgo(new Date(lastMessage.dateTimeSent))}`}
+        />
+      ) : (
+        <ListItemText primary="No message sent yet" />
+      )}
     </ListItem>
   );
 };

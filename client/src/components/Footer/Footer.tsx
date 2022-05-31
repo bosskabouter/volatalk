@@ -3,8 +3,7 @@
 import { css } from '@emotion/react';
 import { AppBar } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-
-import Geolocation from 'util/GeoLocation';
+import Geolocation from '../../util/GeoLocation';
 
 const Footer = () => {
   const theme = useTheme();

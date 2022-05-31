@@ -13,8 +13,8 @@ import {
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { isMobile } from 'react-device-detect';
-import { DatabaseContext } from 'providers/DatabaseProvider';
 import { useNavigate } from 'react-router-dom';
+import { DatabaseContext } from '../../providers/DatabaseProvider';
 
 const PinReset = () => {
   const [

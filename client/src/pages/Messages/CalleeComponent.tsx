@@ -1,56 +1,75 @@
 import { IContact } from '../../types';
 
 import { useContext, useEffect, useRef, useState } from 'react';
-import { PeerContext } from 'providers/PeerProvider';
+import { Button, Dialog, DialogContent } from '@mui/material';
+import { PeerContext } from '../../providers/PeerProvider';
+import { ContactListItem } from '../Contacts/ContactListItem';
 import { MediaConnection } from 'peerjs';
-import { Button, Dialog, DialogContent, Popper } from '@mui/material';
-import { useParams } from 'react-router-dom';
-import { DatabaseContext } from 'providers/DatabaseProvider';
-import { isMobile } from 'react-device-detect';
 
 const CalleeComponent = () => {
-  // navigator.vibrate(200);
-  //getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-
-  const localVideoElement = useRef<HTMLVideoElement>(null);
-  const [localMediaStream, setLocalMediaStream] = useState<MediaStream>();
-
   const remoteVideoElement = useRef<HTMLVideoElement>(null);
+  const peerMngr = useContext(PeerContext);
+
+  const [localMediaStream, setLocalMediaStream] = useState<MediaStream>();
+  const [mediaConnection, setMediaConnection] = useState<MediaConnection>();
   const [remoteMediaStream, setRemoteMediaStream] = useState<MediaStream>();
-
-  const peerManager = useContext(PeerContext);
-
-  const db = useContext(DatabaseContext);
 
   const [videoOn, setVideoOn] = useState<boolean>(true);
 
-  const [fullScreen, setFullScreen] = useState<boolean>(false);
+  const [answered, setAnswered] = useState<boolean>(false);
+  const [accepted, setAccepted] = useState<boolean>(false);
 
-  const [mediaConnection, setMediaConnection] = useState<MediaConnection | null>(null);
-
-  const [Answered, setAnswered] = useState<boolean>(false);
   const [contact, setContact] = useState<IContact | null>(null);
 
   useEffect(() => {
-    if (!peerManager || !db) return;
+    if (!peerMngr) return;
 
-    if (mediaConnection && !remoteMediaStream) {
+    async function handleIncomingCall(ctc: IContact, mc: MediaConnection) {
+      setContact(ctc);
+      setMediaConnection(mc);
+      console.info('Incoming call', ctc, mc);
+      navigator.vibrate && navigator.vibrate([2000, 2000, 2000]);
+    }
+
+    //wait for incoming call
+    peerMngr.on('onIncomingCall', handleIncomingCall);
+    return () => {
+      peerMngr.removeListener('onIncomingCall', handleIncomingCall);
+    };
+  }, [peerMngr]);
+
+  useEffect(() => {
+    if (!remoteMediaStream && mediaConnection) {
+      //someone calling
+      if (answered) {
+        mediaConnection.answer(localMediaStream);
+      } else {
+        mediaConnection.close();
+      }
+    }
+  }, [answered, localMediaStream, mediaConnection, remoteMediaStream]);
+
+  useEffect(() => {
+    if (remoteMediaStream && answered && contact) {
       navigator.mediaDevices
         .getUserMedia({ video: videoOn, audio: true })
         .then((lms) => {
-          //TODO ask if we want the call
-
           if (lms) {
-            console.debug('Got LMS', lms);
-
-            mediaConnection.answer(lms); // Answer the call with an A/V stream.
-            console.debug('Answered call');
-
-            mediaConnection.on('stream', (rms) => {
-              console.debug('Got remote media stream', rms);
+            console.debug(
+              'navigator.mediaDevices.getUserMedia({ video: videoOn, audio: true }).then((lms) =>',
+              lms
+            );
+            setLocalMediaStream(lms);
+            peerMngr?.acceptCall(contact, lms).then((rms) => {
+              console.debug('peerMngr?.acceptCall(contact, lms).then((rms) => ', rms);
               setRemoteMediaStream(rms);
               const remoteVideoIsOn = rms.getVideoTracks().length > 0;
               setVideoOn(remoteVideoIsOn);
+
+              if (remoteVideoElement.current) {
+                remoteVideoElement.current.srcObject = remoteMediaStream;
+                remoteVideoElement?.current?.play();
+              }
             });
           }
         })
@@ -58,36 +77,30 @@ const CalleeComponent = () => {
           console.warn('Problem LMS', error);
         });
     }
+  }, [answered, contact, peerMngr, remoteMediaStream, videoOn]);
 
-    if (remoteVideoElement.current && remoteMediaStream) {
-      console.debug('Set RMS in remoteVideoElement ', remoteVideoElement.current);
-      remoteVideoElement.current.srcObject = remoteMediaStream;
-      remoteVideoElement.current.play();
-    }
-
-    async function handleIncomingMediaConnection(mc: MediaConnection) {
-      //alert('Status change;' + status);
-      //alert('Someone calling' + call.peer);
-
-      console.info('Incoming call', mc);
-      if (isMobile) navigator.vibrate([2000, 2000, 2000]);
-      setMediaConnection(mc);
-    }
-
-    //wait for incoming call
-    peerManager.on('onIncomingMediaConnection', handleIncomingMediaConnection);
-    return () => {
-      peerManager.removeListener('onIncomingMediaConnection', handleIncomingMediaConnection);
-      //setCalling(null);
-      //calling?.close();
-      //setCalling(null);
+  const AskAcceptCall = () => {
+    if (!contact || !localMediaStream || accepted) return <></>;
+    const handleAcceptCall = () => {
+      peerMngr?.acceptCall(contact, localMediaStream).then((rms) => {
+        setRemoteMediaStream(rms);
+        setAccepted(true);
+        setAnswered(true);
+      });
     };
-  }, [db, mediaConnection, peerManager, remoteMediaStream, videoOn]);
+    return (
+      <>
+        Incoming call:<ContactListItem contact={contact}></ContactListItem>
+        <Button onClick={handleAcceptCall}></Button>
+      </>
+    );
+  };
 
   return (
     <>
-      <Dialog open={mediaConnection != null}>
+      <Dialog open={remoteMediaStream != null}>
         <DialogContent>
+          <AskAcceptCall></AskAcceptCall>
           {videoOn ? (
             <video ref={remoteVideoElement} autoPlay />
           ) : (

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, ChangeEvent } from 'react';
-import { convertAbToBase64 } from 'services/Generic';
+import { convertAbToBase64 } from '../services/Generic';
 
 export default function ImageUpload2(props: { value: string }) {
   const [image, setImage] = useState<File | null>();
@@ -24,9 +24,13 @@ export default function ImageUpload2(props: { value: string }) {
 
   return (
     <div>
-      <input type="file" accept="image/*" onChange={onImageChange} />
-
-      <img width="200px" src={imageURL}></img>
+      <input
+        aria-label="Select File for upload"
+        type="file"
+        accept="image/*"
+        onChange={onImageChange}
+      />
+      <img alt="uploadeded" width="200px" src={imageURL}></img>
     </div>
   );
 }

@@ -1,6 +1,5 @@
 import Dexie from 'dexie';
-import { IContact, IMessage, IUserProfile } from 'types';
-
+import { IContact, IMessage, IUserProfile } from '../types';
 const tableUser = 'userProfile';
 const tableContacts = 'contacts';
 const tableMessages = 'messages';
@@ -101,11 +100,19 @@ export class AppDatabase extends Dexie {
     return this.contacts.orderBy('dateTimeDeclined').toArray();
   }
 
+  selectUnacceptedContacts() {
+    return this.contacts.where({ dateTimeAccepted: 0 });
+  }
+
   selectUnsentMessages(c: IContact): IMessage[] | PromiseLike<IMessage[]> {
     return this.messages.where({ receiver: c.peerid, dateTimeSent: 0 }).sortBy('dateTimeCreated');
   }
-
-  selectUnacceptedContacts() {
-    return this.contacts.where({ dateTimeAccepted: 0 });
+  async selectLastMessage(contact: IContact): Promise<IMessage | undefined> {
+    return this.messages
+      .where('sender')
+      .equals(contact.peerid)
+      .or('receiver')
+      .equals(contact.peerid)
+      .last();
   }
 }

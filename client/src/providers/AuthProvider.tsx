@@ -1,16 +1,14 @@
 /* eslint-disable */
 // @ts-nocheck
 import React from 'react';
-import { useSessionStorage } from 'util/useSessionStorage';
+import { useSessionStorage } from '../util/useSessionStorage';
 
 export type IAuthContext = {
   authenticated: boolean;
   setAuthenticated: (isAuthenticated: boolean) => void;
 };
 
-const noop = () => {
-  /* TODO document why this arrow function is empty */
-};
+const noop = () => {};
 export const AuthContext = React.createContext<IAuthContext>({
   authenticated: false,
   setAuthenticated: noop,
@@ -30,9 +28,10 @@ export type AuthProviderProps = {
   defaultAuthenticated?: boolean;
   onLogin?: () => void;
   onLogout?: () => void;
+  children: ReactElement | Element;
 };
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({
+const AuthProvider: React.FC<AuthProviderProps> = ({
   defaultAuthenticated = false,
   onLogin,
   onLogout,
@@ -68,3 +67,5 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
 
   return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
 };
+
+export default AuthProvider;

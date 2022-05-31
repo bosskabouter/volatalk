@@ -21,7 +21,11 @@
       "type": "chrome",
       "request": "launch",
       "url": "https://xpsdeb:8443",
-      "runtimeArgs": ["--disable-web-security", "--ignore-certificate-errors"],
+      "runtimeArgs": [
+        "--disable-web-security",
+        "--ignore-certificate-errors",
+        "--auto-ssl-client-auth"
+      ],
       "webRoot": "${workspaceFolder}"
     },
     {

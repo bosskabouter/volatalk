@@ -1,9 +1,9 @@
 import { FC, useContext, useEffect, useRef, useState } from 'react';
 import { Button, Snackbar } from '@mui/material';
 import { Workbox, WorkboxLifecycleWaitingEvent, WorkboxMessageEvent } from 'workbox-window';
-import { convertBase64ToAb } from 'services/Generic';
-import { UserContext } from 'providers/UserProvider';
-import { DatabaseContext } from 'providers/DatabaseProvider';
+import { UserContext } from '../providers/UserProvider';
+import { DatabaseContext } from '../providers/DatabaseProvider';
+import { convertBase64ToAb } from '../services/Generic';
 
 const ServiceWorkerWrapper: FC = () => {
   const WEBPUSH_SERVER_PUBKEY =
@@ -36,21 +36,18 @@ const ServiceWorkerWrapper: FC = () => {
   };
 
   useEffect(() => {
-    if (!('serviceWorker' in navigator)) return;
+    if (!('serviceWorker' in navigator) || process.env.NODE_ENV !== 'production') return;
 
-    const serviceWorkerFile =
-      process.env.NODE_ENV === 'production' ? '/service-worker.js' : '/service-worker-testpush.js';
-
-    wb.current = new Workbox(process.env.PUBLIC_URL + serviceWorkerFile);
+    wb.current = new Workbox(process.env.PUBLIC_URL + '/service-worker.js');
     wb.current.addEventListener('waiting', onSWUpdate);
 
-    //volatalk push message listener. Do we need to listen to push messages when we are online?
     wb.current.addEventListener('message', onMessage);
 
     wb.current.register().then(async (registration) => {
       //user gave permission to register
       console.info('wb.current.register().then((registration) => ', registration);
       if (registration) {
+        alert('registered service worker' + registration);
         const subscription = await registration.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey: convertBase64ToAb(WEBPUSH_SERVER_PUBKEY),

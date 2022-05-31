@@ -12,6 +12,7 @@ const express = require("express");
 const app = express();
 
 const spdy = require("spdy");
+const { Blob } = require("buffer");
 
 const DO_CORS = false;
 const DO_EJS = false;
@@ -81,6 +82,9 @@ if (DO_PEERJS) {
 }
 
 if (DO_WEBPUSH) {
+  const HTTP_ERROR_Insufficient_Storage_Push_tooBig = 507;
+  const PUSH_MAX_BYTES = 4096;
+
   //SUBSCRIPTION SERVICE
   const WEBPUSH_CONTEXT = ENV_VAR("WEBPUSH_CONTEXT", "/subscribe");
   //WEB-PUSH VAPID KEYS; generate USING ./node_modules/.bin/web-push generate-vapid-keys
@@ -101,24 +105,35 @@ if (DO_WEBPUSH) {
 
   webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBKEY, VAPID_PRIVKEY);
 
-  app.post(WEBPUSH_CONTEXT, (req, res) => {
-    //not logging any user data
-    const body = req.body;
+  app.post(WEBPUSH_CONTEXT, (request, response) => {
+    //console.log("Push request", request);
 
+    const body = request.body;
     const subscription = body.subscription;
     const payload = body.payload;
 
+    const byteSizeHeader = request.header("content-length");
+    const byteSizePayload = new Blob([payload]).size;
+    console.log("Push request size - header", byteSizeHeader);
+    console.log("Push request size - payload", byteSizePayload);
+    if (byteSizeHeader >= PUSH_MAX_BYTES) {
+      console.warn("Message too big. Have to recuse.");
+      response.sendStatus(HTTP_ERROR_Insufficient_Storage_Push_tooBig);
+      return;
+    }
+
     //TODO remove logging user data after testing
-    console.log("Pushing payload to subscription", payload, subscription);
+    //console.debug("Pushing payload to subscription", payload, subscription);
     webpush
       .sendNotification(subscription, payload)
-      .then(() => {
-        console.log("Web push success!");
-        res.status(201);
+      .then((sendResult) => {
+        console.log("Pushed message", sendResult);
+        response.sendStatus(sendResult.statusCode);
       })
       .catch((err) => {
-        console.warn("Invalid subscription request: " + err, req, err);
-        res.status(418);
+        console.error("Problem pushing", err);
+        response.write(JSON.stringify(err));
+        //response.sendStatus(500);
       });
   });
 }
@@ -132,9 +147,9 @@ if (DO_EJS) {
   app.set("views", path.join(__dirname, DIR_RENDER_EJS));
   app.set("view engine", "ejs"); // Tell Express we are using EJS
 
-  app.get("/room/:room", (req, res) => {
-    console.log("Request from: " + req);
-    res.render("room", { roomId: req.params.room });
+  app.get("/room/:room", (request, response) => {
+    console.log("Request from: " + request);
+    response.render("room", { roomId: req.params.room });
   });
 }
 

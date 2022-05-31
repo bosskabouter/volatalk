@@ -1,12 +1,12 @@
-import { DatabaseContext } from 'providers/DatabaseProvider';
-import { UserContext } from 'providers/UserProvider';
-import React, { useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import { useSelector } from 'react-redux';
 import { Navigate, Outlet } from 'react-router';
-import { State } from 'store/rootReducer';
+import { State } from './../../store/rootReducer';
 import { AuthContext } from '../../providers/AuthProvider';
 import { useLocation } from 'react-router-dom';
-import AcceptInvite from 'components/Invite/AcceptInvite';
+import AcceptInvite from './../../components/Invite/AcceptInvite';
+import { DatabaseContext } from '../../providers/DatabaseProvider';
+import { UserContext } from '../../providers/UserProvider';
 
 export const RequireAuth = () => {
   const { authenticated } = React.useContext(AuthContext);

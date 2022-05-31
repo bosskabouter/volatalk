@@ -1,11 +1,5 @@
-import { PeerContext } from 'providers/PeerProvider';
-import { DatabaseContext } from 'providers/DatabaseProvider';
-import { IContact, IMessage } from 'types';
-
 import { useContext, useEffect, useState } from 'react';
 import {
-  Avatar,
-  Badge,
   Box,
   InputAdornment,
   List,
@@ -14,15 +8,10 @@ import {
   ListItemText,
   ListSubheader,
   TextField,
-  Tooltip,
-  Typography,
 } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import EmojiPicker from 'emoji-picker-react';
-import { identicon } from 'minidenticons';
-import { UserContext } from 'providers/UserProvider';
-import { descriptiveTimeAgo } from 'services/Generic';
 
 import IconButton from '@mui/material/IconButton';
 
@@ -33,6 +22,12 @@ import MsgHourglassIcon from '@mui/icons-material/HourglassBottom';
 import MsgDeliveredIcon from '@mui/icons-material/Check';
 import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
 import BackIcon from '@mui/icons-material/ChevronLeft';
+import { DatabaseContext } from '../../providers/DatabaseProvider';
+import { UserContext } from '../../providers/UserProvider';
+import { PeerContext } from '../../providers/PeerProvider';
+import { IContact, IMessage } from '../../types';
+import { descriptiveTimeAgo } from '../../services/Generic';
+import { ContactItem } from '../Contacts/ContactItem';
 
 const MessageList = () => {
   const db = useContext(DatabaseContext);
@@ -43,15 +38,7 @@ const MessageList = () => {
   const contactId = useParams().contactid ?? '';
 
   const [contactOnline, setContactOnline] = useState(false);
-  const [contact, setContact] = useState<IContact>({
-    peerid: '0',
-    nickname: 'unknown contact',
-    dateTimeCreated: new Date().getTime(),
-    signature: new ArrayBuffer(0),
-    dateTimeAccepted: 0,
-    dateTimeDeclined: 0,
-    dateTimeResponded: 0,
-  });
+  const [contact, setContact] = useState<IContact>();
   const [messageList, setMessageList] = useState<IMessage[]>([]);
 
   useEffect(() => {
@@ -91,7 +78,7 @@ const MessageList = () => {
       }
     }
     if (peerManager) {
-      if (contact) setContactOnline(peerManager.checkConnection(contact));
+      if (contact) setContactOnline(peerManager.isConnected(contact));
       peerManager.addListener('onMessage', insertNewMessageHandler);
       peerManager.addListener('onContactStatusChange', updateContactStatusHandler);
     }
@@ -103,9 +90,10 @@ const MessageList = () => {
 
   const ComposeMessageField = () => {
     const [sndMessageText, setSndMessageText] = useState<string>('');
+    const [openEmoji, setOpenEmoji] = useState(false);
 
     const sendText = async () => {
-      if (peerManager && sndMessageText.trim().length > 0) {
+      if (peerManager && contact && sndMessageText.trim().length > 0) {
         console.log('Sending text: ' + sndMessageText);
         const msg = await peerManager.sendText(sndMessageText, contact);
         setSndMessageText('');
@@ -113,7 +101,6 @@ const MessageList = () => {
       }
     };
 
-    const [openEmoji, setOpenEmoji] = useState(false);
     const ChooseEmojiButton = () => {
       return openEmoji ? (
         <EmojiPicker
@@ -133,8 +120,15 @@ const MessageList = () => {
         </IconButton>
       );
     };
-    return (
-      <>
+    return !contact ? (
+      <>No contact selected</>
+    ) : (
+      <Box
+        sx={{
+          minWidth: { md: 270 },
+          overflow: 'hidden',
+        }}
+      >
         <TextField
           autoFocus
           //  ref={textfieldRef}
@@ -157,12 +151,12 @@ const MessageList = () => {
               </InputAdornment>
             ),
           }}
-        ></TextField>
+        />
 
         <IconButton onClick={sendText} size="medium" color="secondary">
           <SendTextIcon />
         </IconButton>
-      </>
+      </Box>
     );
   };
 
@@ -221,7 +215,9 @@ const MessageList = () => {
     );
   };
 
-  return (
+  return !contact ? (
+    <>No contact selected</>
+  ) : (
     <Box
       boxShadow={15}
       //height={"100%"}
@@ -257,27 +253,13 @@ const MessageList = () => {
               }}
             >
               <BackIcon onClick={() => navigate('/contacts')} />
-              <Typography> {contact.nickname}</Typography>
-              <Tooltip title="Personal Identification Icon">
-                <Avatar
-                  // sizes="small"
-                  src={`data:image/svg+xml;utf8,${identicon(contact.peerid)}`}
-                  alt={`${contact.nickname} 's personsal identification icon`}
-                />
-              </Tooltip>
-              <Badge
-                variant="dot"
-                color={contactOnline ? 'success' : 'error'}
-                overlap="circular"
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-              >
-                <Avatar src={contact.avatar}></Avatar>
-              </Badge>
+
+              <ContactItem contact={contact}></ContactItem>
               <IconButton onClick={() => navigate('/video/' + contactId)} size="medium">
                 <VideoCallIcon />
               </IconButton>
 
-              <IconButton onClick={() => navigate('/call/' + contactId)} size="medium">
+              <IconButton onClick={() => navigate('/call/' + contact && contactId)} size="medium">
                 <CallIcon />
               </IconButton>
             </Box>

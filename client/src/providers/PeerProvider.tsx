@@ -1,9 +1,7 @@
 import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
 
-import StrictEventEmitter from 'strict-event-emitter-types/types/src';
-import { IContact, IMessage } from 'types';
-
-import { PeerManager, PeerManagerEvents } from '../services/PeerManager';
+import { PeerManager } from '../services/PeerManager';
+import { IMessage, IContact } from '../types';
 import { DatabaseContext } from './DatabaseProvider';
 import { UserContext } from './UserProvider';
 
@@ -11,23 +9,14 @@ interface IPeerProviderProps {
   children: ReactNode;
 }
 
-export const PeerContext = createContext<StrictEventEmitter<PeerManager, PeerManagerEvents> | null>(
-  null
-);
+export const PeerContext = createContext<PeerManager | null>(null);
 export const usePeer = () => useContext(PeerContext);
 
 export default function PeerProvider({ children }: IPeerProviderProps) {
   const userContext = useContext(UserContext);
   const db = useContext(DatabaseContext);
 
-  const [peerManager, setPeerManager] = useState<StrictEventEmitter<
-    PeerManager,
-    PeerManagerEvents
-  > | null>(null);
-
-  useEffect(() => {
-    //console.log('Only first render');
-  }, []);
+  const [peerManager, setPeerManager] = useState<PeerManager | null>(null);
 
   useEffect(() => {
     if (!userContext.user || !db) return;
@@ -37,13 +26,13 @@ export default function PeerProvider({ children }: IPeerProviderProps) {
     }
     function newContactHandle(contact: IContact) {
       console.log('NewContactHandler PeerProvider', contact);
-      peerManager?.checkConnection(contact);
+      peerManager?.isConnected(contact);
     }
     function contactOnlineHandle(statchange: { contact: IContact; status: boolean }) {
       console.log('ContactOnlineHandler PeerProvider', statchange);
 
       //TODO if online show online message, in status display?
-      peerManager?.checkConnection(statchange.contact);
+      peerManager?.isConnected(statchange.contact);
     }
     function handleStatusChange(status: boolean) {
       if (!db) return;
@@ -51,15 +40,12 @@ export default function PeerProvider({ children }: IPeerProviderProps) {
       if (status)
         //getting online
         db.contacts.each((contact) => {
-          peerManager?.checkConnection(contact);
+          peerManager?.isConnected(contact);
         });
     }
 
     if (!peerManager) {
-      const pm: StrictEventEmitter<PeerManager, PeerManagerEvents> = new PeerManager(
-        userContext.user,
-        db
-      );
+      const pm = new PeerManager(userContext.user, db);
 
       pm.on('statusChange', handleStatusChange);
       pm.on('onMessage', messageHandler);

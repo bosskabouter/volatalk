@@ -15,9 +15,9 @@ import {
 import { useTheme } from '@mui/material/styles';
 import { MobileView } from 'react-device-detect';
 import { useDispatch, useSelector } from 'react-redux';
-import { State } from 'store/rootReducer';
-import { acceptEula } from 'store/slices/eulaSlice';
 import { useNavigate } from 'react-router-dom';
+import { State } from '../../store/rootReducer';
+import { acceptEula } from '../../store/slices/eulaSlice';
 
 const EULA = () => {
   const accepted = useSelector((state: State) => state.eulaState.accepted);

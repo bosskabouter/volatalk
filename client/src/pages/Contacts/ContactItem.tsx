@@ -1,41 +1,34 @@
-import { IContact, IMessage } from 'types';
-import { PeerContext } from 'providers/PeerProvider';
-import { MouseEvent, useContext, useEffect, useState } from 'react';
-import CallIcon from '@mui/icons-material/Call';
-import AddTaskIcon from '@mui/icons-material/AddTask';
-import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
+import { useContext, useEffect, useState } from 'react';
+import MoreOptionsIcon from '@mui/icons-material/MoreVert';
 
-import Badge from '@mui/material/Badge';
-import Avatar from '@mui/material/Avatar';
-
-import { IconButton, ListItem, ListItemAvatar, ListItemText, Tooltip } from '@mui/material';
-import { VideoCameraFront } from '@mui/icons-material';
-import { descriptiveTimeAgo } from 'services/Generic';
-import { DatabaseContext } from 'providers/DatabaseProvider';
-import { useNavigate } from 'react-router-dom';
+import {
+  Box,
+  Dialog,
+  DialogContent,
+  DialogContentText,
+  IconButton,
+  Tooltip,
+  Typography,
+} from '@mui/material';
+import { DatabaseContext } from '../../providers/DatabaseProvider';
+import { PeerContext } from '../../providers/PeerProvider';
+import { descriptiveTimeAgo } from '../../services/Generic';
+import { IContact, IMessage } from '../../types';
+import Identification from 'components/Identification/Identification';
 
 export const ContactItem = (props: { contact: IContact }) => {
-  const peer = useContext(PeerContext);
+  const peerMngr = useContext(PeerContext);
   const db = useContext(DatabaseContext);
-  const navigate = useNavigate();
   const [contact, setContact] = useState<IContact>(props.contact);
 
   const [cntUnread, setCntUnread] = useState(0);
-  const [online, setOnline] = useState(peer?._connectedContacts.get(props.contact.peerid)?.open);
 
-  const handleClickMessageContact = (_e: MouseEvent) => {
-    navigate('/messages/' + props.contact.peerid);
-  };
-  const handleClickAudioCallContact = (e: MouseEvent) => {
-    navigate('/call/' + props.contact.peerid);
-    //avoid onclick listitem handleClickMessageContact
-    e.stopPropagation();
-  };
-  const handleClickVideoCallContact = (e: MouseEvent) => {
-    navigate('/video/' + props.contact.peerid);
-    //avoid onclick listitem handleClickMessageContact
-    e.stopPropagation();
-  };
+  const [online, setOnline] = useState(peerMngr?.isConnected(props.contact) || false);
+
+  const lastTimeSeen = 'last time seen: ' + descriptiveTimeAgo(new Date(contact.dateTimeResponded));
+
+  //const theme = useTheme();
+
   useEffect(() => {
     async function selectUnreadMsg() {
       if (db) {
@@ -62,138 +55,98 @@ export const ContactItem = (props: { contact: IContact }) => {
       }
     }
 
-    if (!peer) return;
-    peer.on('onMessage', messageHandler);
-    peer.on('onContactStatusChange', onContactStatusChangeHandle);
+    if (!peerMngr) return;
+    peerMngr.on('onMessage', messageHandler);
+    peerMngr.on('onContactStatusChange', onContactStatusChangeHandle);
 
     return () => {
-      peer.removeListener('onMessage', messageHandler);
-      peer.removeListener('onContactStatusChange', onContactStatusChangeHandle);
+      peerMngr.removeListener('onMessage', messageHandler);
+      peerMngr.removeListener('onContactStatusChange', onContactStatusChangeHandle);
     };
-  }, [peer, contact, cntUnread, online]);
+  }, [peerMngr, contact, cntUnread, online]);
 
-  const AcceptContactButton = () => {
-    const acceptContact = () => {
-      if (db) {
-        contact.dateTimeAccepted = new Date().getTime();
-        db.contacts.put(contact);
-        setContact(contact);
-        if (peer) {
-          peer.initiateConnection(contact);
-          setOnline(peer._connectedContacts.get(contact.peerid)?.open);
-        }
-      }
-    };
-    return contact.dateTimeAccepted === 0 ? (
-      <Tooltip title={`Accept contact request from ${contact.nickname}?`}>
-        <IconButton
-          onClick={acceptContact}
-          edge="start"
-          aria-label="Accept Contact?"
-          color="success"
-          size="small"
-        >
-          <AddTaskIcon />
-        </IconButton>
-      </Tooltip>
-    ) : (
-      <div>
-        <Tooltip title={`Video call with ${contact.nickname}`}>
-          <IconButton
-            onClick={handleClickVideoCallContact}
-            edge="end"
-            aria-label="Video Call"
-            color="success"
-            size="small"
-          >
-            <VideoCameraFront />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title={`Audio call with ${contact.nickname}`}>
-          <IconButton
-            onClick={handleClickAudioCallContact}
-            edge="end"
-            aria-label="Audio Call"
-            color="success"
-            size="small"
-          >
-            <CallIcon />
-          </IconButton>
-        </Tooltip>
-      </div>
-    );
-  };
-
-  const BlockContactButton = () => {
-    const isBlocked = contact.dateTimeDeclined !== 0;
-
-    const blockContact = async () => {
-      if (!peer || !db) return;
-      if (isBlocked) contact.dateTimeDeclined = 0;
-      else contact.dateTimeDeclined = new Date().getTime();
-      db.contacts.put(contact);
-
-      if (isBlocked) {
-        const conn = peer._connectedContacts.get(contact.peerid);
-        conn?.send('bye');
-        conn?.close();
-      } else {
-        peer.initiateConnection(contact);
-        setOnline(peer.checkConnection(contact));
-      }
-      setContact(contact);
-    };
-    const label = (isBlocked ? 'un' : '') + 'block user ' + contact.nickname;
-    const color = !isBlocked ? 'success' : 'error';
-    return (
-      <Tooltip title={label}>
-        <IconButton
-          onClick={blockContact}
-          edge="start"
-          aria-label={label}
-          color={color}
-          size="small"
-        >
-          <RemoveCircleOutlineIcon />
-        </IconButton>
-      </Tooltip>
-    );
-  };
-
-  const SecondaryOptions = () => {
+  /**
+   *
+   * @returns
+   */
+  const MoreOptionsButton = () => {
+    const [showOptions, setShowOptions] = useState(false);
     return (
       <>
-        <AcceptContactButton />
-        <BlockContactButton />
+        <Tooltip title="More Options">
+          <IconButton
+            onClick={(e) => {
+              e.preventDefault();
+              setShowOptions(true);
+            }}
+          >
+            <MoreOptionsIcon></MoreOptionsIcon>
+          </IconButton>
+        </Tooltip>{' '}
+        <Dialog open={showOptions} onClose={() => setShowOptions(false)}>
+          <DialogContent>
+            <DialogContentText></DialogContentText>{' '}
+          </DialogContent>
+        </Dialog>
       </>
     );
   };
 
   return (
-    <ListItem
-      alignItems="flex-start"
-      divider
-      key={contact.peerid}
-      onClick={handleClickMessageContact}
-      secondaryAction={SecondaryOptions()}
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: { xs: 'column', md: 'row' },
+        alignItems: 'center',
+        //  overflow: 'hidden',
+
+        overflow: 'hidden',
+        //width: 1,
+        // height: 63,
+        padding: (theme) => theme.spacing(1),
+      }}
     >
-      <ListItemAvatar>
-        <Badge
-          variant={cntUnread > 0 ? 'standard' : 'dot'}
-          color={online ? 'success' : 'error'}
-          overlap="circular"
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-          badgeContent={cntUnread}
-          showZero
+      <Box
+        component="span"
+        sx={{
+          display: 'flex',
+          flexDirection: 'row',
+        }}
+      >
+        <Tooltip
+          title={`${
+            contact.nickname + online
+              ? ' is online right now!'
+              : ' appears offline... Leave a message!'
+          } `}
         >
-          <Avatar src={contact.avatar}></Avatar>
-        </Badge>
-      </ListItemAvatar>
-      <ListItemText
-        id={contact.peerid}
-        primary={contact.nickname}
-        secondary={`connected since ${descriptiveTimeAgo(new Date(contact.dateTimeCreated))}`}
-      />
-    </ListItem>
+          <Identification
+            id={contact.peerid}
+            name={contact.nickname}
+            avatar={contact.avatar}
+            status={online}
+            badgeCnt={cntUnread}
+          ></Identification>
+        </Tooltip>
+
+        <MoreOptionsButton></MoreOptionsButton>
+      </Box>
+
+      {/*username can move to bottom or disappear if to small*/}
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: { xs: 'center', md: 'flex-start' },
+          m: 3,
+          minWidth: { md: 180 },
+        }}
+      >
+        <Typography variant="subtitle1">{contact.nickname}</Typography>
+        <Box component="span" sx={{ visibility: { xs: 'collapse', md: 'visible' } }}>
+          {lastTimeSeen}
+        </Box>
+      </Box>
+    </Box>
   );
 };

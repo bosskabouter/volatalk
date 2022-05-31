@@ -1,9 +1,9 @@
-import { App } from 'pages';
 import * as React from 'react';
 import { isIE } from 'react-device-detect';
 import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
 import './index.scss';
+import { App } from './pages';
 
 if (isIE)
   alert(

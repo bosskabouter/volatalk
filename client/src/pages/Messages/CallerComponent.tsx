@@ -1,13 +1,10 @@
 import { useContext, useEffect, useRef, useState } from 'react';
-import { PeerContext } from 'providers/PeerProvider';
-import { MediaConnection } from 'peerjs';
-import { Avatar, Dialog, DialogContent, DialogTitle } from '@mui/material';
+import { Dialog, DialogContent, DialogTitle, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
-import { identicon } from 'minidenticons';
-import { IContact } from 'types';
-import { ContactListItem } from 'pages/Contacts/ContactListItem';
-import { DatabaseContext } from 'providers/DatabaseProvider';
-import { ContactItem } from 'pages/Contacts/ContactItem';
+import { DatabaseContext } from '../../providers/DatabaseProvider';
+import { ContactItem } from '../Contacts/ContactItem';
+import { PeerContext } from '../../providers/PeerProvider';
+import { IContact } from '../../types';
 
 interface CallerComponentProps {
   videoOn: boolean;
@@ -16,7 +13,7 @@ interface CallerComponentProps {
 const CallerComponent = (props: CallerComponentProps) => {
   const remoteVideoElement = useRef<HTMLVideoElement>(null);
 
-  const [mediaConnection, setMediaConnection] = useState<MediaConnection | null>();
+  const [localMediaStream, setLocalMediaStream] = useState<MediaStream>();
   const [remoteMediaStream, setRemoteMediaStream] = useState<MediaStream>();
 
   const peerManager = useContext(PeerContext);
@@ -27,52 +24,44 @@ const CallerComponent = (props: CallerComponentProps) => {
   const [videoOn] = useState<boolean>(props.videoOn || false);
 
   useEffect(() => {
-    if (contactId && db) {
+    navigator.mediaDevices.getUserMedia({ video: videoOn, audio: true }).then(setLocalMediaStream);
+  }, [videoOn]);
+
+  useEffect(() => {
+    if (!contact && contactId && db) {
       db.getContact(contactId).then((ctc) => {
         setContact(ctc);
       });
     }
-    if (!mediaConnection) callContact();
+  }, [contact, contactId, db]);
+
+  useEffect(() => {
+    if (!remoteMediaStream) callContact();
 
     async function callContact() {
-      let lms;
-      try {
-        lms = await navigator.mediaDevices.getUserMedia({ video: videoOn, audio: true });
-      } catch (err) {
-        console.error('Problem getUserMedia', err);
-      }
-      if (!lms || !peerManager || !contactId) return;
+      if (!contact || !localMediaStream || !peerManager) return;
       console.debug(
         'setting up ' + (videoOn ? 'video' : '') + 'call connection with contact',
         contactId
       );
-      //TODO let peermanager make the call
-      const mc = peerManager._peer.call(contactId, lms);
-
-      mc.on('stream', (rms) => {
-        console.debug('Got remote media stream', rms);
-        setRemoteMediaStream(rms);
-      });
-
-      setMediaConnection(mc);
+      const rms = await peerManager.call(contact, localMediaStream);
+      if (rms) setRemoteMediaStream(rms);
     }
+  }, [contactId, peerManager, videoOn, remoteMediaStream, db, contact, localMediaStream]);
 
+  useEffect(() => {
     if (remoteVideoElement.current && remoteMediaStream) {
       remoteVideoElement.current.srcObject = remoteMediaStream;
       remoteVideoElement.current.play();
       console.info('Set remoteVideoElement');
     }
-
     return () => {
-      console.warn('leaving call');
-      if (mediaConnection) {
-        console.info('Closing connection');
-        //mediaConnection.close();
-        mediaConnection.removeAllListeners();
-        //setMediaConnection(null);
+      console.warn('leaving call?');
+      if (remoteMediaStream) {
+        console.info('Should Close connection now?');
       }
     };
-  }, [contactId, peerManager, videoOn, remoteMediaStream, mediaConnection, db]);
+  }, [remoteMediaStream]);
 
   const MediaElement = () => {
     return videoOn ? (
@@ -85,8 +74,10 @@ const CallerComponent = (props: CallerComponentProps) => {
     <>
       <Dialog open>
         <DialogTitle>
-          {videoOn ? 'Video' : 'Audio'} calling
-          {contact && <ContactItem contact={contact}></ContactItem>}
+          <>
+            {videoOn ? 'Video' : 'Audio'} <Typography>calling with </Typography>
+            {contact && <ContactItem contact={contact}></ContactItem>}
+          </>
         </DialogTitle>
         <DialogContent>
           <MediaElement />

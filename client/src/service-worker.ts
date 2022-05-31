@@ -8,8 +8,11 @@
 // You can also remove this file if you'd prefer not to use a
 // service worker, and the Workbox build step will be skipped.
 
+//TODO USE UNENCRYPTED DB FOR PUSH SECRET KEY EXCHANGE
+//import { AppDatabase } from 'Database/Database';
 import { decryptString, generateKeyFromString } from 'dha-encryption';
-import { isMobile } from 'react-device-detect';
+import { identicon } from 'minidenticons';
+import { IMessage } from './types';
 import { clientsClaim } from 'workbox-core';
 import { ExpirationPlugin } from 'workbox-expiration';
 import { createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching';
@@ -78,27 +81,38 @@ self.addEventListener('message', (event) => {
     self.skipWaiting();
   }
 });
-
 // Any other custom service worker logic can go here.
+const VOLA_SECRET_PUSH = '1a2b3c-but there is more to it - &*@^';
+
 self.addEventListener('push', (pushEvent) => {
   console.info('Push Event received!', pushEvent);
-  console.info('pushEvent.composed', pushEvent.composed);
-  console.info('pushEvent.data', pushEvent.data);
-  console.info('pushEvent.target', pushEvent.target);
-  console.info('pushEvent.currentTarget', pushEvent.currentTarget);
+  console.info('pushEvent.target', pushEvent.target, pushEvent.currentTarget);
   console.info('pushEvent.timeStamp', pushEvent.timeStamp);
-  console.info('pushEvent.type', pushEvent.type);
 
-  const data = pushEvent.data?.text();
+  if (!pushEvent.data) {
+    console.warn('No push data available');
+    return;
+  }
+  let data = JSON.parse(pushEvent.data.text());
 
-  if (!data) return;
-  const decrypted = decryptString(data, generateKeyFromString('1234'));
-  //TODO no import in service worker.. if const dataDecrypted = data && decryptString(data, generateKeyFromString('1234'));
+  console.info('Found Encrypted push text', data);
+  data = decryptString(data, generateKeyFromString(VOLA_SECRET_PUSH));
+  console.info('Decrypted push', data);
 
-  isMobile && navigator.vibrate([2000, 2000, 2000]);
+  const message: IMessage = JSON.parse(data);
 
-  self.registration.showNotification('Data: ' + decrypted, {
-    body: 'VolaTALK Pushed',
-    icon: 'https://www.volatalk.org/mstile-150x150.png',
+  const senderInfo = JSON.parse(message.sender);
+  const action: NotificationAction = {
+    title: 'Accept',
+    action: 'handleThis' + senderInfo.contactid,
+  };
+  self.registration.showNotification(senderInfo.nickname, {
+    body: message.payload,
+    vibrate: [2000, 2500],
+    actions: [action],
+    requireInteraction: true,
+    //icon: 'https://www.volatalk.org/mstile-150x150.png',
+    icon: 'data:image/svg+xml;utf8,' + identicon(senderInfo.contactid),
+    //iconURL: 'https://www.volatalk.org/mstile-150x150.png',
   });
 });

@@ -1,5 +1,5 @@
-import ContactList from 'pages/Contacts/ContactList';
 import * as React from 'react';
+import ContactList from './ContactList';
 
 const ContactsPage = () => {
   return (

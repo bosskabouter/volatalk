@@ -1,19 +1,19 @@
 /** @jsxImportSource @emotion/react */
 
 import { StyledEngineProvider, ThemeProvider as MuiThemeProvider } from '@mui/material';
-import { Layout } from 'components';
-import ServiceWorkerWrapper from 'components/ServiceWorkerWrapper';
-import { AppRoutes } from 'pages';
-import { AuthProvider } from 'providers/AuthProvider';
-import { DatabaseProvider } from 'providers/DatabaseProvider';
-import DialogProvider from 'providers/DialogProvider';
-import PeerProvider from 'providers/PeerProvider';
-import { UserProvider } from 'providers/UserProvider';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
-import store, { persistor } from 'store/store';
 import 'typeface-roboto';
-import { theme } from './theme';
+import { Layout } from '../../components';
+import ServiceWorkerWrapper from '../../components/ServiceWorkerWrapper';
+import AuthProvider from '../../providers/AuthProvider';
+import DatabaseProvider from '../../providers/DatabaseProvider';
+import DialogProvider from '../../providers/DialogProvider';
+import PeerProvider from '../../providers/PeerProvider';
+import UserProvider from '../../providers/UserProvider';
+import store, { persistor } from '../../store/store';
+import AppRoutes from '../Routes/AppRoutes';
+import theme from './theme';
 
 const App = () => {
   return (
@@ -30,6 +30,7 @@ const App = () => {
                       <Layout>
                         <AppRoutes />
                       </Layout>
+                      2
                     </PeerProvider>
                   </UserProvider>
                 </AuthProvider>

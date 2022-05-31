@@ -1,16 +1,21 @@
-import { PeerContext } from 'providers/PeerProvider';
-import { DatabaseContext } from 'providers/DatabaseProvider';
-import { IContact } from 'types';
-
-import { ContactListItem } from './ContactListItem';
-
 import { useContext, useEffect, useState } from 'react';
-import { Button, List, ListSubheader, Typography } from '@mui/material';
+import { Button, IconButton, List, ListSubheader, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import AddLinkIcon from '@mui/icons-material/AddLink';
+import NewContactRequestsIcon from '@mui/icons-material/AccessibilityNew';
+import FavoritesOnlyContactIcon from '@mui/icons-material/StarBorderPurple500';
+import FavoritesNotOnlyContactIcon from '@mui/icons-material/Star';
+import { DatabaseContext } from '../../providers/DatabaseProvider';
+import { PeerContext } from '../../providers/PeerProvider';
+import { IContact } from '../../types';
+import { ContactListItem } from './ContactListItem';
+/**
 
+ *
+ * @returns List will all contacts. Enables the user to accept or decline, make a call and enter the messages page from a clicked contact.
+ */
 const ContactList = () => {
   const db = useContext(DatabaseContext);
   const peerManager = useContext(PeerContext);
@@ -39,7 +44,7 @@ const ContactList = () => {
 
   return (
     <div>
-      <div hidden={!(contactList.length > 0)}>
+      <div hidden={contactList.length === 0}>
         <List
           sx={{
             width: '100%',
@@ -50,11 +55,7 @@ const ContactList = () => {
             // '& ul': { padding: 0 },
           }}
           // dense={true}
-          subheader={
-            <ListSubheader component="div" id="nested-list-subheader">
-              Contact List
-            </ListSubheader>
-          }
+          subheader={<ContactListHeader></ContactListHeader>}
         >
           {contactList.length > 0 &&
             contactList.map((contact) => {
@@ -75,6 +76,30 @@ const ContactList = () => {
         </Box>
       </div>
     </div>
+  );
+};
+
+const ContactListHeader = () => {
+  //TODO create options for filtering
+
+  const NewContactRequestsFilter = () => {
+    return (
+      <>
+        <IconButton>
+          <NewContactRequestsIcon></NewContactRequestsIcon>
+        </IconButton>
+        <IconButton>
+          <FavoritesOnlyContactIcon></FavoritesOnlyContactIcon>
+          <FavoritesNotOnlyContactIcon></FavoritesNotOnlyContactIcon>
+        </IconButton>
+      </>
+    );
+  };
+
+  return (
+    <ListSubheader component="div" id="nested-list-subheader">
+      <NewContactRequestsFilter></NewContactRequestsFilter>
+    </ListSubheader>
   );
 };
 export default ContactList;

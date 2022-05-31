@@ -1,16 +1,15 @@
 import { CircularProgress } from '@mui/material';
-import { EULA, PageNotFound } from 'components';
-import AccountSetup from 'components/AccountSetup/AccountSetup';
-import Login from 'components/Login/Login';
-import NewPin from 'components/NewPin/NewPin';
-import PinReset from 'components/PinReset/PinReset';
 
 import { lazy, Suspense } from 'react';
 import FadeIn from 'react-fade-in';
 import { Route, Routes } from 'react-router-dom';
+import { EULA, PageNotFound } from '../../components';
+import AccountSetup from '../../components/AccountSetup/AccountSetup';
+import Login from '../../components/Login/Login';
+import NewPin from '../../components/NewPin/NewPin';
+import PinReset from '../../components/PinReset/PinReset';
+import Home from '../Home/Home';
 import { RequireAuth } from './RequireAuth';
-
-import Home from 'pages/Home/Home';
 
 // We load each route, when lazy loading, only as they're
 // called by the user. The Home page is not lazily loaded
@@ -19,12 +18,11 @@ import Home from 'pages/Home/Home';
 // homescreen loaded in memory as it is a page often visited.
 // React.lazy only supports default imports.
 
-const About = lazy(() => import('components/About/About'));
-const Invite = lazy(() => import('components/Invite/Invite'));
-//const AcceptInvite = lazy(() => import('components/Invite/AcceptInvite'));
-const MessageList = lazy(() => import('pages/Messages/MessageList'));
-const Contacts = lazy(() => import('pages/Contacts/ContactsPage'));
-const CallerComponent = lazy(() => import('pages/Messages/CallerComponent'));
+const About = lazy(() => import('../../components/About/About'));
+const Invite = lazy(() => import('../../components/Invite/Invite'));
+const MessageList = lazy(() => import('../../pages/Messages/MessageList'));
+const Contacts = lazy(() => import('../../pages/Contacts/ContactsPage'));
+const CallerComponent = lazy(() => import('../../pages/Messages/CallerComponent'));
 
 export const AppRoutes = () => {
   return (

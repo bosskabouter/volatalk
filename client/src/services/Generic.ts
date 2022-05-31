@@ -46,18 +46,6 @@ function getUrlParam(name: string, u: string | null) {
 }
 
 /**
- * requires input file upload event
- */
-function readFileAsBase64(evt: any) {
-  const files = evt?.target?.files;
-  const file = files[0];
-
-  return file.arrayBuffer().then((ab: ArrayBuffer) => {
-    console.debug('File uploaded: ' + ab);
-    return convertAbToBase64(ab);
-  });
-}
-/**
  *
  * @param
  * @returns the string in hex
@@ -218,5 +206,4 @@ export {
   convertStringToHex,
   convertAb2str,
   convertStr2ab,
-  readFileAsBase64,
 };

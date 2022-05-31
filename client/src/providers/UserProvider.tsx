@@ -2,7 +2,7 @@
 // @ts-nocheck
 import { IUserProfile } from 'Database/Database';
 import React from 'react';
-import { useSessionStorage } from 'util/useSessionStorage';
+import { useSessionStorage } from '../util/useSessionStorage';
 
 export type IUserContext = {
   user: IUserProfile;
@@ -31,9 +31,10 @@ export type UserProviderProps = {
   defaultUser?: { null };
   onLogin?: () => void;
   onLogout?: () => void;
+  children: unknown;
 };
 
-export const UserProvider: React.FC<UserProviderProps> = ({
+const UserProvider: React.FC<UserProviderProps> = ({
   defaultUser = null,
   onLogin,
   onLogout,
@@ -65,3 +66,5 @@ export const UserProvider: React.FC<UserProviderProps> = ({
 
   return <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>;
 };
+
+export default UserProvider;

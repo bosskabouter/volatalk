@@ -10,11 +10,6 @@ import { Button } from '@mui/material';
 export const Alerter = (props: { message: string; type: string }) => {
   const [open, setOpen] = React.useState(true);
 
-  const handleClick = (txt: string) => {
-    console.log(txt);
-    setOpen(true);
-  };
-
   const handleClose = (_event: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
       return;

@@ -3,8 +3,8 @@
 import { css } from '@emotion/react';
 import { Container } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import TemporaryDrawer from 'components/AppBar/TemporaryDrawer';
 import * as React from 'react';
+import TemporaryDrawer from '../AppBar/TemporaryDrawer';
 import Footer from '../Footer/Footer';
 
 interface IProps {

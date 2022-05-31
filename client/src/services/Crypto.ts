@@ -1,5 +1,5 @@
 import { BufferSource } from 'stream/web';
-import { convertAb2str, convertHexToString, convertStringToHex } from './Generic';
+import { convertHexToString, convertStringToHex } from './Generic';
 
 const ENC_FORMAT_JWK = 'jwk';
 const ENC_ALGORITHM_ECDSA = 'ECDSA';

@@ -43,6 +43,8 @@ export interface IUserProfile {
   dateRegistered: Date;
 
   pushSubscription?: PushSubscription;
+
+  geolocationPosition?: GeolocationPosition;
 }
 
 export interface IContact {
@@ -57,7 +59,7 @@ export interface IContact {
   //?
   dateTimeResponded: number;
 
-  avatar?: string;
+  avatar: string;
 
   pushSubscription?: PushSubscription;
 }

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import axios from 'axios';
 import { Box, Typography } from '@mui/material';
-import { getLocalDateString, getLocalTimeString, round } from 'services/Generic';
+import { getLocalDateString, getLocalTimeString, round } from '../services/Generic';
 
 interface WeatherInfoProps {
   location: GeolocationPosition | null;
@@ -75,7 +75,7 @@ export const WeatherInfo = ({ location }: WeatherInfoProps) => {
           {locationData}
         </Typography>
         <Typography variant="subtitle2">
-          {getLocalDateString(time)} - {getLocalTimeString(new Date())}
+          {getLocalDateString(time) + ' - ' + getLocalTimeString(time)}
         </Typography>
       </div>
     </Box>

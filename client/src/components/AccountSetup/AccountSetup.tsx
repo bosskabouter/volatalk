@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react';
-import { SyntheticEvent, useContext } from 'react';
+import { ChangeEvent, SyntheticEvent, useContext } from 'react';
 import {
   Avatar,
   Box,
@@ -13,6 +13,7 @@ import {
   MenuItem,
   OutlinedInput,
   Select,
+  Switch,
   TextField,
   Typography,
   useTheme,
@@ -23,17 +24,17 @@ import LockOpenIcon from '@mui/icons-material/LockOpen';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { isMobile } from 'react-device-detect';
-import { DatabaseContext } from 'providers/DatabaseProvider';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from 'providers/AuthProvider';
 import { useDispatch } from 'react-redux';
-import { setCreated, setIsSecure } from 'store/slices/accountSlice';
-
-import { exportCryptoKey, generateKeyPair, peerIdFromPublicKey } from 'services/Crypto';
-
-import { UserContext } from 'providers/UserProvider';
-import { resizeFileUpload } from 'services/Generic';
-import { IUserProfile } from 'types';
+import { UserContext } from '../../providers/UserProvider';
+import { DatabaseContext } from '../../providers/DatabaseProvider';
+import { IUserProfile } from '../../types';
+import { AuthContext } from '../../providers/AuthProvider';
+import { exportCryptoKey, generateKeyPair, peerIdFromPublicKey } from '../../services/Crypto';
+import { requestFollowMe } from '../../util/GeoLocation';
+import { notifyMe } from '../../services/PushMessage';
+import { setCreated, setIsSecure } from '../../store/slices/accountSlice';
+import { resizeFileUpload } from '../../services/Generic';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -281,8 +282,10 @@ const AccountSetup = () => {
       }
     `,
     accountSecureButton: css`
-      //  width: 100%;
-      min-height: 20px;
+      padding: ${theme.spacing(3)};
+      width: 63%;
+
+      min-height: 40px;
       border-radius: 20;
       //background: black;
     `,
@@ -327,18 +330,41 @@ const AccountSetup = () => {
       flex-direction: column;
       justify-content: space-between;
       width: 100%;
-      height: 100%;
     `,
   };
+
+  /**
+   * Only permit closing if user already registered
+   * @param e
+   */
   function handleClose(e: SyntheticEvent) {
     console.log(e, e.currentTarget);
     if (userCtx.user) navigate('/');
   }
+
+  /**
+   * Requests geo location and saves it state for user profile, if permitted.
+   */
+  async function handleGPS(_e: ChangeEvent<HTMLInputElement>, checked: boolean) {
+    console.info('GPS turned ' + checked);
+    formik.values.geolocationPosition = checked ? await requestFollowMe() : null;
+  }
+
+  /**
+   * Enables or disables pushsubscription notification service.
+   * @param _e
+   * @param checked
+   */
+  async function handleNotifyMe(_e: ChangeEvent<HTMLInputElement>, checked: boolean) {
+    console.info('Notification turned ' + checked);
+    formik.values.pushSubscription = checked ? notifyMe() : null;
+  }
+
   return (
     <Dialog
       css={styles.accountSetupDialogRoot}
       open={true}
-      //  disableEscapeKeyDown={!userCtx.user}
+      disableEscapeKeyDown={!userCtx.user}
       //TransitionComponent={}
       transitionDuration={{ enter: 1500 }}
       maxWidth="lg"
@@ -364,16 +390,11 @@ const AccountSetup = () => {
             value={formik.values.nickname}
             onChange={formik.handleChange}
             error={formik.touched.nickname && Boolean(formik.errors.nickname)}
-            helperText={formik.touched.nickname && formik.errors.nickname}
+            // helperText={formik.touched.nickname && formik.errors.nickname}
           />
 
           <div css={styles.avatarUploadDiv}>
-            <Avatar
-              src={formik.values.avatar}
-              css={styles.avatarUploadImage}
-              // sizes="normal"
-              sx={{}}
-            ></Avatar>
+            <Avatar src={formik.values.avatar} css={styles.avatarUploadImage}></Avatar>
             <input
               css={styles.avatarUploadButton}
               aria-label="avatar"
@@ -390,7 +411,17 @@ const AccountSetup = () => {
               multiple={false}
             />
           </div>
+          <Box>
+            <FormControlLabel
+              control={<Switch value={formik.values.pushSubscription} onChange={handleNotifyMe} />}
+              label={'Enabled Push Messages'}
+            />
 
+            <FormControlLabel
+              control={<Switch value={formik.values.geolocationPosition} onChange={handleGPS} />}
+              label={formik.values.geolocationPosition?.toString() || 'Enable Location Sharing'}
+            />
+          </Box>
           <FormControlLabel
             control={
               <Checkbox
@@ -424,7 +455,7 @@ const AccountSetup = () => {
                 value={formik.values.pin}
                 onChange={formik.handleChange}
                 error={formik.touched.pin && Boolean(formik.errors.pin)}
-                helperText={formik.touched.pin && formik.errors.pin}
+                //   helperText={formik.touched.pin && formik.errors.pin}
               />
               <Typography variant="subtitle1">Recovery questions</Typography>
               <FormControl css={styles.accountQuestionRoot} variant="standard">
@@ -461,7 +492,7 @@ const AccountSetup = () => {
                   variant="outlined"
                   onChange={formik.handleChange}
                   error={formik.touched.answer1 && Boolean(formik.errors.answer1)}
-                  helperText={formik.touched.answer1 && formik.errors.answer1}
+                  // helperText={formik.touched.answer1 && formik.errors.answer1}
                 />
               </FormControl>
               <FormControl css={styles.accountQuestionRoot} variant="standard">
@@ -498,7 +529,7 @@ const AccountSetup = () => {
                   variant="outlined"
                   onChange={formik.handleChange}
                   error={formik.touched.answer2 && Boolean(formik.errors.answer2)}
-                  helperText={formik.touched.answer2 && formik.errors.answer2}
+                  // helperText={formik.touched.answer2 && formik.errors.answer2}
                 />
               </FormControl>
             </Box>

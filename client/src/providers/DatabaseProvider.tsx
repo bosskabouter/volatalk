@@ -9,7 +9,7 @@ interface IDatabaseProviderProps {
 export const DatabaseContext = createContext<AppDatabase | null>(null);
 export const useDatabase = () => useContext(DatabaseContext);
 
-export const DatabaseProvider = ({ children }: IDatabaseProviderProps) => {
+const DatabaseProvider = ({ children }: IDatabaseProviderProps) => {
   const [database, setDatabase] = useState<AppDatabase | null>(null);
   const setupDatabase = () => {
     // Creates the initial database
@@ -46,3 +46,5 @@ export const DatabaseProvider = ({ children }: IDatabaseProviderProps) => {
 
   return <DatabaseContext.Provider value={database}>{children}</DatabaseContext.Provider>;
 };
+
+export default DatabaseProvider;
