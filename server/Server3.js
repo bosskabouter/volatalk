@@ -14,7 +14,7 @@ const app = express();
 const spdy = require("spdy");
 const { Blob } = require("buffer");
 
-const DO_CORS = false;
+const DO_CORS = true;
 const DO_EJS = false;
 const DO_PEERJS = true;
 
@@ -54,6 +54,7 @@ app.use(express.static(path.join(__dirname, DIR_PUB_STATIC)));
 
 if (DO_CORS) {
   var cors = require("cors");
+  console.log("Using cors", cors);
   app.use(cors());
 }
 
@@ -83,7 +84,9 @@ if (DO_PEERJS) {
 
 if (DO_WEBPUSH) {
   const HTTP_ERROR_Insufficient_Storage_Push_tooBig = 507;
-  const PUSH_MAX_BYTES = 4096;
+  const HTTP_ERROR_PUSH_SERVICE_ERROR_Bad_Gateway = 502;
+
+  const PUSH_MAX_BYTES = 4 * 1024;
 
   //SUBSCRIPTION SERVICE
   const WEBPUSH_CONTEXT = ENV_VAR("WEBPUSH_CONTEXT", "/subscribe");
@@ -114,8 +117,9 @@ if (DO_WEBPUSH) {
 
     const byteSizeHeader = request.header("content-length");
     const byteSizePayload = new Blob([payload]).size;
-    console.log("Push request size - header", byteSizeHeader);
-    console.log("Push request size - payload", byteSizePayload);
+    console.log(
+      `Push request size - header[payload]: ${byteSizeHeader}[${byteSizePayload}]`
+    );
     if (byteSizeHeader >= PUSH_MAX_BYTES) {
       console.warn("Message too big. Have to recuse.");
       response.sendStatus(HTTP_ERROR_Insufficient_Storage_Push_tooBig);
@@ -123,17 +127,18 @@ if (DO_WEBPUSH) {
     }
 
     //TODO remove logging user data after testing
-    //console.debug("Pushing payload to subscription", payload, subscription);
+    console.debug("Pushing payload to subscription", payload, subscription);
     webpush
       .sendNotification(subscription, payload)
       .then((sendResult) => {
-        console.log("Pushed message", sendResult);
+        console.log("Pushed message: result=>", sendResult);
         response.sendStatus(sendResult.statusCode);
+        response.write(JSON.stringify(sendResult));
       })
       .catch((err) => {
         console.error("Problem pushing", err);
+        response.sendStatus(HTTP_ERROR_PUSH_SERVICE_ERROR_Bad_Gateway);
         response.write(JSON.stringify(err));
-        //response.sendStatus(500);
       });
   });
 }

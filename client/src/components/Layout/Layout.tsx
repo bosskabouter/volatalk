@@ -16,8 +16,8 @@ const Layout = ({ children }: IProps) => {
 
   const styles = {
     containerRoot: css`
-      margin-bottom: 56px;
-      margin-top: 64px;
+      margin-bottom: 0;
+      margin-top: 0;
 
       //Equivalent to [theme.breakpoints.only('xs')]: {}
       @media (width: ${theme.breakpoints.values.xs}) {

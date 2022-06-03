@@ -11,13 +11,13 @@
 //TODO USE UNENCRYPTED DB FOR PUSH SECRET KEY EXCHANGE
 //import { AppDatabase } from 'Database/Database';
 import { decryptString, generateKeyFromString } from 'dha-encryption';
-import { identicon } from 'minidenticons';
 import { IMessage } from './types';
 import { clientsClaim } from 'workbox-core';
 import { ExpirationPlugin } from 'workbox-expiration';
 import { createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
 import { StaleWhileRevalidate } from 'workbox-strategies';
+import Identicon, { IdenticonOptions } from 'identicon.js';
 
 declare const self: ServiceWorkerGlobalScope;
 
@@ -82,6 +82,7 @@ self.addEventListener('message', (event) => {
   }
 });
 // Any other custom service worker logic can go here.
+//TODO get users secret shared with contacts from localstorage
 const VOLA_SECRET_PUSH = '1a2b3c-but there is more to it - &*@^';
 
 self.addEventListener('push', (pushEvent) => {
@@ -89,7 +90,7 @@ self.addEventListener('push', (pushEvent) => {
   console.info('pushEvent.target', pushEvent.target, pushEvent.currentTarget);
   console.info('pushEvent.timeStamp', pushEvent.timeStamp);
 
-  if (!pushEvent.data) {
+  if (!pushEvent.data || !pushEvent.data.text()) {
     console.warn('No push data available');
     return;
   }
@@ -102,17 +103,32 @@ self.addEventListener('push', (pushEvent) => {
   const message: IMessage = JSON.parse(data);
 
   const senderInfo = JSON.parse(message.sender);
+
   const action: NotificationAction = {
-    title: 'Accept',
-    action: 'handleThis' + senderInfo.contactid,
+    title: 'dismiss',
+    action: 'someAction',
   };
-  self.registration.showNotification(senderInfo.nickname, {
+
+  const identiconOptions: IdenticonOptions = {
+    //foreground: [0, 0, 0, 255], // rgba black
+    //background: [255, 255, 255, 255], // rgba white
+    margin: 0.1, // 20% margin
+    size: 256, // 256px square
+    format: 'svg', // use SVG instead of PNG
+  };
+  const idString = senderInfo.contactid.substring(225, 252);
+
+  const identicon =
+    'data:image/svg+xml;base64,' + new Identicon(idString, identiconOptions).toString();
+
+  //  const identicon = 'https://volatalk.org/mstile-150x150.png';
+
+  const notificationOptions: NotificationOptions = {
     body: message.payload,
-    vibrate: [2000, 2500],
-    actions: [action],
-    requireInteraction: true,
-    //icon: 'https://www.volatalk.org/mstile-150x150.png',
-    icon: 'data:image/svg+xml;utf8,' + identicon(senderInfo.contactid),
-    //iconURL: 'https://www.volatalk.org/mstile-150x150.png',
-  });
+    // vibrate: [2000, 2500],
+    //   actions: [action],
+    //  requireInteraction: true,
+    image: identicon,
+  };
+  self.registration.showNotification(senderInfo.nickname, notificationOptions);
 });

@@ -31,10 +31,11 @@ import { DatabaseContext } from '../../providers/DatabaseProvider';
 import { IUserProfile } from '../../types';
 import { AuthContext } from '../../providers/AuthProvider';
 import { exportCryptoKey, generateKeyPair, peerIdFromPublicKey } from '../../services/Crypto';
-import { requestFollowMe } from '../../util/GeoLocation';
+import { requestFollowMe } from '../../util/geo/GeoLocation';
 import { notifyMe } from '../../services/PushMessage';
 import { setCreated, setIsSecure } from '../../store/slices/accountSlice';
 import { resizeFileUpload } from '../../services/Generic';
+import { DistanceFromMiddleEarth } from 'util/geo/Distance';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -135,7 +136,7 @@ const AccountSetup = () => {
       nickname: 'Anonymous',
       avatar: 'https://thispersondoesnotexist.com/image?reload=' + Math.random(),
 
-      isSecured: false,
+      isSecured: false, //unused. .where to publish profile ?
       isSearchable: true,
       pin: '',
       question1: '',
@@ -147,6 +148,9 @@ const AccountSetup = () => {
       privateKey: '',
 
       dateRegistered: new Date(),
+      position: null,
+      usePush: false,
+      pushSubscription: null,
     },
 
     validationSchema: validationSchemaSecure,
@@ -172,7 +176,7 @@ const AccountSetup = () => {
       }
       db.userProfile.put(values, 1);
       setUser(values);
-      navigate('/', { replace: false });
+      //navigate('/', { replace: false });
     }
   }
 
@@ -188,6 +192,7 @@ const AccountSetup = () => {
       const publicCryptoKey: CryptoKey = keyPair.publicKey;
       if (publicCryptoKey === undefined) return;
       exportCryptoKey(publicCryptoKey).then((pubKey) => {
+        //convert pubKey to peerid (base64 encoded json.tostring)
         values.peerid = peerIdFromPublicKey(pubKey);
         console.log('Peerid: ' + values.peerid);
 
@@ -212,7 +217,12 @@ const AccountSetup = () => {
                 setUser(values);
 
                 setAuthenticated(true);
-                navigate('/');
+
+                if (values.usePush) {
+                  //reload the app to activate service worker
+                  document.location = document.location.origin;
+                }
+                //else navigate('/');
               })
               .catch((err) => {
                 console.error(err);
@@ -337,17 +347,25 @@ const AccountSetup = () => {
    * Only permit closing if user already registered
    * @param e
    */
-  function handleClose(e: SyntheticEvent) {
-    console.log(e, e.currentTarget);
+  function handleClose(_e: SyntheticEvent) {
+    console.log('User trying to close AccountSetup', userCtx.user);
     if (userCtx.user) navigate('/');
   }
 
   /**
    * Requests geo location and saves it state for user profile, if permitted.
    */
-  async function handleGPS(_e: ChangeEvent<HTMLInputElement>, checked: boolean) {
-    console.info('GPS turned ' + checked);
-    formik.values.geolocationPosition = checked ? await requestFollowMe() : null;
+  async function handleGPS(e: ChangeEvent<HTMLInputElement>, checked: boolean) {
+    console.info('GPS checked ' + checked);
+    formik.handleChange(e);
+    if (checked) {
+      const pos = await requestFollowMe();
+      console.log('User position', pos);
+      formik.values.position = pos;
+    } //reset
+    else formik.values.position = null;
+
+    formik.setTouched(formik.values.position);
   }
 
   /**
@@ -355,21 +373,29 @@ const AccountSetup = () => {
    * @param _e
    * @param checked
    */
-  async function handleNotifyMe(_e: ChangeEvent<HTMLInputElement>, checked: boolean) {
-    console.info('Notification turned ' + checked);
-    formik.values.pushSubscription = checked ? notifyMe() : null;
+  async function handleUsePush(e: ChangeEvent<HTMLInputElement>, checked: boolean) {
+    console.info('Notification checked ' + checked);
+    formik.handleChange(e);
+    if (checked)
+      notifyMe(); //test notification. The actual registration of push subscription depends on the saved boolean usePush in UserProfile
+    else {
+      console.info('Clearing subscription data');
+      formik.values.pushSubscription = null;
+    }
+    formik.setTouched(formik.values.usePush);
   }
 
   return (
     <Dialog
       css={styles.accountSetupDialogRoot}
       open={true}
+      onClose={handleClose}
+      //only allow escape when already registered before
       disableEscapeKeyDown={!userCtx.user}
       //TransitionComponent={}
       transitionDuration={{ enter: 1500 }}
       maxWidth="lg"
       fullScreen={fullScreen}
-      onClose={handleClose}
     >
       <DialogContent id="dialog-agreement" css={styles.accountSetupDialogContent}>
         <Typography component="h1" variant="h6">
@@ -413,20 +439,43 @@ const AccountSetup = () => {
           </div>
           <Box>
             <FormControlLabel
-              control={<Switch value={formik.values.pushSubscription} onChange={handleNotifyMe} />}
-              label={'Enabled Push Messages'}
+              label={
+                formik.values.usePush
+                  ? `Subscribed to offline messages!`
+                  : `Notify when I'm offline!`
+              }
+              control={
+                <Switch
+                  checked={formik.values.usePush}
+                  id="usePush"
+                  value={formik.values.usePush}
+                  onChange={handleUsePush}
+                />
+              }
             />
 
             <FormControlLabel
-              control={<Switch value={formik.values.geolocationPosition} onChange={handleGPS} />}
-              label={formik.values.geolocationPosition?.toString() || 'Enable Location Sharing'}
+              label={
+                formik.values.position
+                  ? `Your are ${DistanceFromMiddleEarth(
+                      formik.values.position
+                    )} km. away from Middle Earth`
+                  : 'Enable Location Sharing'
+              }
+              control={
+                <Switch
+                  defaultChecked={formik.values.position !== null}
+                  name="position"
+                  //value={formik.values.position}
+                  onChange={handleGPS}
+                />
+              }
             />
           </Box>
           <FormControlLabel
             control={
               <Checkbox
                 css={styles.accountSecureButton}
-                //type="checkbox"
                 name="isSecured"
                 //label="isSecured"
                 //defaultValue={formik.values.isSecured}
@@ -445,7 +494,6 @@ const AccountSetup = () => {
               <Typography variant="subtitle1">6 digit security PIN</Typography>
 
               <TextField
-                // required={formik.values.isSecured}
                 css={styles.accountPin}
                 id="pin"
                 variant="outlined"
@@ -455,12 +503,10 @@ const AccountSetup = () => {
                 value={formik.values.pin}
                 onChange={formik.handleChange}
                 error={formik.touched.pin && Boolean(formik.errors.pin)}
-                //   helperText={formik.touched.pin && formik.errors.pin}
               />
               <Typography variant="subtitle1">Recovery questions</Typography>
               <FormControl css={styles.accountQuestionRoot} variant="standard">
                 <Select
-                  //  required={formik.values.isSecured}
                   css={styles.accountQuestionSelect}
                   displayEmpty
                   id="question1"
@@ -483,7 +529,6 @@ const AccountSetup = () => {
                   ))}
                 </Select>
                 <TextField
-                  //    required={formik.values.isSecured}
                   css={styles.accountQuestionAnswer}
                   placeholder="First authentication answer"
                   id="answer1"
@@ -492,12 +537,10 @@ const AccountSetup = () => {
                   variant="outlined"
                   onChange={formik.handleChange}
                   error={formik.touched.answer1 && Boolean(formik.errors.answer1)}
-                  // helperText={formik.touched.answer1 && formik.errors.answer1}
                 />
               </FormControl>
               <FormControl css={styles.accountQuestionRoot} variant="standard">
                 <Select
-                  //    required={formik.values.isSecured}
                   css={styles.accountQuestionSelect}
                   displayEmpty
                   id="question2"
@@ -508,7 +551,6 @@ const AccountSetup = () => {
                   variant="standard"
                   value={formik.values.question2}
                   onChange={formik.handleChange}
-                  error={formik.touched.question2 && Boolean(formik.errors.question2)}
                 >
                   <MenuItem css={styles.accountQuestionMenu} disabled value="">
                     <em>Select your second authentication question</em>
@@ -520,7 +562,6 @@ const AccountSetup = () => {
                   ))}
                 </Select>
                 <TextField
-                  //     required={formik.values.isSecured}
                   css={styles.accountQuestionAnswer}
                   placeholder="Second authentication answer"
                   id="answer2"
@@ -529,7 +570,6 @@ const AccountSetup = () => {
                   variant="outlined"
                   onChange={formik.handleChange}
                   error={formik.touched.answer2 && Boolean(formik.errors.answer2)}
-                  // helperText={formik.touched.answer2 && formik.errors.answer2}
                 />
               </FormControl>
             </Box>

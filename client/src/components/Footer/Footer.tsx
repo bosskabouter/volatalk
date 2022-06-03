@@ -3,7 +3,7 @@
 import { css } from '@emotion/react';
 import { AppBar } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import Geolocation from '../../util/GeoLocation';
+import Geolocation from '../../util/geo/GeoLocation';
 
 const Footer = () => {
   const theme = useTheme();
@@ -14,12 +14,13 @@ const Footer = () => {
     `,
     logos: css`
       margin-bottom: ${theme.spacing(2)};
-      max-width: 480px;
+      max-width: 360px;
+      bottom: 0;
     `,
   };
 
   return (
-    <AppBar css={styles.footerRoot} position="static">
+    <AppBar css={styles.footerRoot} position="relative">
       <Geolocation></Geolocation>
     </AppBar>
   );

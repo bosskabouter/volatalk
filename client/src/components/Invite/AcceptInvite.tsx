@@ -1,6 +1,7 @@
-import { useContext, useEffect, useState } from 'react';
-import { identicon } from 'minidenticons';
+/** @jsxImportSource @emotion/react */
 
+import { css } from '@emotion/react';
+import { useContext, useEffect, useState } from 'react';
 import {
   Button,
   Badge,
@@ -18,6 +19,7 @@ import { PeerContext } from '../../providers/PeerProvider';
 import { extractInvite } from '../../services/InvitationService';
 import { Alerter } from '../StatusDisplay/Alerter';
 import { genSignature } from '../../services/Crypto';
+import Identification from 'components/Identification/Identification';
 
 export default function AcceptInvite(props: { invite: string }) {
   //recover invite from local storage hack
@@ -41,8 +43,7 @@ export default function AcceptInvite(props: { invite: string }) {
         if (invite) {
           setReceivedInvite(invite);
 
-          const contact = await db.contacts.get(invite.peerId);
-          if (contact) {
+          if (await db.contacts.get(invite.peerId)) {
             setResult(`Invite already accepted.. Still waiting to connect... `);
           } else if (invite.peerId === userCtx.user.peerid) {
             setResult('Inviting yourself?');
@@ -60,16 +61,7 @@ export default function AcceptInvite(props: { invite: string }) {
         setSenderOnline(isOnline);
       }, timeout);
     }
-  }, [
-    peerCtx,
-    result,
-    receivedInvite,
-    senderOnline,
-    props.invite,
-    db,
-    userCtx.user.peerid,
-    userCtx,
-  ]);
+  }, [db, peerCtx, props.invite, receivedInvite, result, senderOnline, userCtx]);
 
   //handler
   const handleAcceptContact = async () => {
@@ -106,50 +98,43 @@ export default function AcceptInvite(props: { invite: string }) {
       return 'The person who sent the invitation appears to be right now. Go ahead and save the new contact for now. Once the other person accepts your connection, you will get notified!';
   }
 
-  function BadgeColor() {
-    if (senderOnline === undefined) return 'default';
-    else if (senderOnline) return 'success';
-    else return 'error';
-  }
   if (!receivedInvite) {
-    // setTimeout(() => {
-    //   navigate('/contacts');
-    // }, 5000);
     return <Alerter message="No invite in URL" type="error" />;
   }
+  const styles = {
+    AcceptInviteStyle: css`
+      padding-top: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      height: 100%;
+    `,
+  };
 
   return (
     <>
       {result ? (
         <Alerter message={result} type="error" />
       ) : (
-        <Dialog open>
+        <Dialog open css={styles.AcceptInviteStyle}>
           <DialogContent>
-            <Typography variant="subtitle2" align="center">
-              You received an invite to connect
-            </Typography>
-            <Typography variant="subtitle1" align="center">
-              {receivedInvite.text}
-            </Typography>
-
-            <DialogContentText align="center">
-              <Badge
-                color={BadgeColor()}
-                overlap="circular"
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                variant="dot"
-              >
-                <Avatar
-                  sizes="large"
-                  src={`data:image/svg+xml;utf8,${identicon(receivedInvite.peerId)}`}
-                ></Avatar>
-              </Badge>
-              <Button variant="contained" onClick={handleAcceptContact}>
-                Accept the Invitation and send a contact request?
+            <Typography variant="subtitle2">You received an invite to connect</Typography>
+            <Typography variant="subtitle1">{receivedInvite.text}</Typography>
+            <Identification
+              id={receivedInvite.peerId}
+              avatar=""
+              name={receivedInvite.text}
+              status={senderOnline || false}
+            />
+            <DialogContentText>
+              <Button variant="contained" fullWidth onClick={handleAcceptContact}>
+                CONNECT
               </Button>
             </DialogContentText>
 
-            <DialogContentText align="center">{isOnlineDesc()}</DialogContentText>
+            <DialogContentText>{isOnlineDesc()}</DialogContentText>
           </DialogContent>
         </Dialog>
       )}

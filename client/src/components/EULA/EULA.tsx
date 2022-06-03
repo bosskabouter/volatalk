@@ -126,11 +126,13 @@ const EULA = () => {
             <ListItemText primary="Currently we are in testing phase. Unexpected things might happen." />
           </ListItem>
           <ListItem key="4">
-            <ListItemText primary="When you continue, you register your IP to a signalling server, used to find each other." />
+            <ListItemText primary="When you continue, you register your IP to a signalling server, so you can connect to other users." />
           </ListItem>
         </List>
         <DialogActions css={styles.eulaDialogAction}>
-          <DialogContentText color={'primary'}>VolaTALK does not store any data.</DialogContentText>
+          <DialogContentText color={'primary'}>
+            VolaTALK does not store any data of your data.
+          </DialogContentText>
           <Button
             css={styles.eulaAgreeButton}
             color="primary"

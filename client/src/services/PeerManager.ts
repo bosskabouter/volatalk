@@ -316,6 +316,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
   async _handleMessageData(msg: string, contact: IContact): Promise<boolean> {
     const justNow = new Date();
     const m: IMessage = {
+      dateTimePushed: 0,
       dateTimeCreated: justNow.getTime(),
       dateTimeSent: justNow.getTime(),
       dateTimeReceived: justNow.getTime(),
@@ -387,6 +388,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
       receiver: contact.peerid,
       payload: text,
       sender: this._user.peerid,
+      dateTimePushed: 0,
       dateTimeSent: 0,
       dateTimeReceived: 0,
       dateTimeRead: 0,
@@ -394,11 +396,15 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
     msg.id = await this._db.messages.add(msg);
     console.debug('New message saved', msg);
 
-    this._attemptTransmitMessage(msg).then((sent) => {
-      //TODO remove comment - always push furing test
-
-      //!sent &&
-      pushMessage(msg, contact, this._user);
+    this._attemptTransmitMessage(msg).then(async (sent) => {
+      //if not able to send directly, push and save
+      //always push for test
+      //if (!sent)
+      {
+        const pushed = await pushMessage(msg, contact, this._user);
+        msg.dateTimePushed = pushed;
+        this._db.messages.put(msg);
+      }
     });
     return msg;
   }

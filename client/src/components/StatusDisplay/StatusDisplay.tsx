@@ -52,7 +52,7 @@ const StatusDisplay = () => {
           display: 'flex',
           flexDirection: 'stretch',
           // alignItems: 'flex-start',
-          //justifyContent: 'left',
+          justifyContent: 'space-around',
         }}
       >
         <CalleeComponent />

@@ -42,9 +42,10 @@ export interface IUserProfile {
 
   dateRegistered: Date;
 
+  usePush: boolean; //bridge to signal ServiceWorkerWrapper to save subscription
   pushSubscription?: PushSubscription;
 
-  geolocationPosition?: GeolocationPosition;
+  position?: GeolocationPosition;
 }
 
 export interface IContact {
@@ -60,7 +61,7 @@ export interface IContact {
   dateTimeResponded: number;
 
   avatar: string;
-
+  position?: GeolocationPosition;
   pushSubscription?: PushSubscription;
 }
 export interface IMessage {
@@ -72,6 +73,7 @@ export interface IMessage {
 
   dateTimeCreated: number;
 
+  dateTimePushed: number;
   dateTimeSent: number;
   dateTimeReceived: number;
   dateTimeRead: number;

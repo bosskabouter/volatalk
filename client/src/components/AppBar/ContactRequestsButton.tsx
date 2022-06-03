@@ -39,7 +39,6 @@ function ContactRequestButton() {
   }, [peerCtx]);
 
   const handleClickButton = () => {
-    console.log('Make beatiful inviting dialog');
     navigate('/Invite');
   };
 

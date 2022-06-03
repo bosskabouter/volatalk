@@ -68,7 +68,7 @@ export const WeatherInfo = ({ location }: WeatherInfoProps) => {
     >
       <img src={weatherIcon} alt="Current Weather" />
       <div>
-        <Typography variant="subtitle1" noWrap align="right">
+        <Typography variant="subtitle1">
           {weatherTemp}, {weatherToday}
         </Typography>
         <Typography variant="subtitle2" noWrap>

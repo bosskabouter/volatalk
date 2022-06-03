@@ -7,10 +7,17 @@ import { convertBase64ToAb } from '../services/Generic';
 
 const ServiceWorkerWrapper: FC = () => {
   const WEBPUSH_SERVER_PUBKEY =
-    'BChZg2Ky1uKIDRdYWapWKZXZ19VvFedmK0bjqir9kMsyUK42cguvoAr4Pau4yQr2aY4IWGIsr3W1lWK5okZ6O84';
+    'BOzjBiLaa9psTJ5Nd5T8WEPQjq92HmPgzSr4Lvr53AVGsEhcQiWmjP8crRxS5CIq4KVxCbnBUl5v55axenXLjCg';
+
+  const noServiceWorkerAvailable = !('serviceWorker' in navigator);
+  const serviceWorkerScript =
+    process.env.NODE_ENV === 'production' ? '/service-worker.js' : '/service-worker-testpush.js';
 
   const [showReload, setShowReload] = useState(false);
-  const [pushSubscription, setPushSubscription] = useState<PushSubscription>();
+  const [registration, setRegistration] = useState<ServiceWorkerRegistration>();
+  const [pushSubscription, setPushSubscription] = useState<PushSubscription | null | undefined>(
+    undefined
+  );
 
   const userCtx = useContext(UserContext);
   const db = useContext(DatabaseContext);
@@ -36,39 +43,77 @@ const ServiceWorkerWrapper: FC = () => {
   };
 
   useEffect(() => {
-    if (!('serviceWorker' in navigator) || process.env.NODE_ENV !== 'production') return;
+    if (noServiceWorkerAvailable) {
+      console.warn(
+        'No service worker in navigator available. Push messages and off-line browsing disabled.'
+      );
+      return;
+    }
 
-    wb.current = new Workbox(process.env.PUBLIC_URL + '/service-worker.js');
+    wb.current = new Workbox(process.env.PUBLIC_URL + serviceWorkerScript);
     wb.current.addEventListener('waiting', onSWUpdate);
-
     wb.current.addEventListener('message', onMessage);
+    wb.current
+      .register()
+      .then((reg) => {
+        console.info('Registered Service Worker', reg);
+        if (reg) {
+          console.info('registered service worker', reg);
+          setRegistration(reg);
+        }
+      })
+      .catch((e) => {
+        console.error('Error registering service worker', e);
+      });
+  }, [noServiceWorkerAvailable, serviceWorkerScript]);
 
-    wb.current.register().then(async (registration) => {
-      //user gave permission to register
-      console.info('wb.current.register().then((registration) => ', registration);
-      if (registration) {
-        alert('registered service worker' + registration);
-        const subscription = await registration.pushManager.subscribe({
+  /**
+   * Subscribes to the pushManager in the registration, only if user registered and he opted for push.
+   * If not usePush, clear the subscription from his profile.
+   */
+  useEffect(() => {
+    if (!db || !userCtx.user || !registration) return;
+
+    const subPush = () => {
+      console.log('Subscribe pushManager in registration', registration);
+      registration.pushManager
+        .subscribe({
           userVisibleOnly: true,
           applicationServerKey: convertBase64ToAb(WEBPUSH_SERVER_PUBKEY),
+        })
+        .then((subscription) => {
+          console.log('Push subscribed!', subscription);
+          setPushSubscription(subscription);
+        })
+        .catch((e) => {
+          console.error('Error subscribing push manager', e);
         });
-
-        console.log('Push registered! subscription=>', subscription);
-        setPushSubscription(subscription);
-      }
-    });
-  }, []);
-
-  useEffect(() => {
-    if (db && userCtx.user && pushSubscription) {
-      console.info('Saving users push subscription', pushSubscription);
-      userCtx.user.pushSubscription = pushSubscription;
-      db.userProfile.put(userCtx.user);
+    };
+    if (userCtx.user.usePush) {
+      subPush();
+    } else {
+      //clearing push subscription
+      setPushSubscription(null);
     }
-  }, [db, pushSubscription, userCtx.user]);
+  }, [db, registration, userCtx.user]);
+
+  /**
+   * Saves the push subscription to users profile.
+   */
+  useEffect(() => {
+    if (!db || !userCtx.user || !registration) return;
+    console.info('Saving new push subscription!', pushSubscription);
+    console.info('Overwriting old subscription', userCtx.user.pushSubscription);
+    userCtx.user.pushSubscription = pushSubscription;
+    db.userProfile.put(userCtx.user);
+  }, [db, pushSubscription, registration, userCtx.user]);
 
   const reloadPage = () => {
     if ('serviceWorker' in navigator && wb.current !== null) {
+      wb.current.getSW().then((sw) => {
+        console.info('Posting a message to service worker...');
+        sw.postMessage('Hi SW?!');
+      });
       wb.current.addEventListener('controlling', (event) => {
         console.info("wb.current.addEventListener('controlling', (event)=>", event);
         setShowReload(false);

@@ -12,11 +12,15 @@ import {
 } from '@mui/material';
 import { DatabaseContext } from '../../providers/DatabaseProvider';
 import { PeerContext } from '../../providers/PeerProvider';
+
 import { descriptiveTimeAgo } from '../../services/Generic';
 import { IContact, IMessage } from '../../types';
 import Identification from 'components/Identification/Identification';
+import { UserContext } from 'providers/UserProvider';
+import Distance from 'util/geo/Distance';
 
 export const ContactItem = (props: { contact: IContact }) => {
+  const userCtx = useContext(UserContext);
   const peerMngr = useContext(PeerContext);
   const db = useContext(DatabaseContext);
   const [contact, setContact] = useState<IContact>(props.contact);
@@ -24,9 +28,15 @@ export const ContactItem = (props: { contact: IContact }) => {
   const [cntUnread, setCntUnread] = useState(0);
 
   const [online, setOnline] = useState(peerMngr?.isConnected(props.contact) || false);
+  const [distance, setDistance] = useState('');
 
-  const lastTimeSeen = 'last time seen: ' + descriptiveTimeAgo(new Date(contact.dateTimeResponded));
+  const lastTimeSeen =
+    'Connected last time: ' + descriptiveTimeAgo(new Date(contact.dateTimeResponded));
 
+  useEffect(() => {
+    const distanceFromMe = Distance(userCtx.user.position, contact.position);
+    if (distanceFromMe) setDistance(`Distance from me: ${distanceFromMe} km.`);
+  }, [contact, userCtx.user]);
   //const theme = useTheme();
 
   useEffect(() => {
@@ -97,10 +107,10 @@ export const ContactItem = (props: { contact: IContact }) => {
       sx={{
         display: 'flex',
         flexDirection: { xs: 'column', md: 'row' },
-        alignItems: 'center',
+        alignItems: 'baseline',
         //  overflow: 'hidden',
 
-        overflow: 'hidden',
+        //overflow: 'hidden',
         //width: 1,
         // height: 63,
         padding: (theme) => theme.spacing(1),
@@ -113,21 +123,13 @@ export const ContactItem = (props: { contact: IContact }) => {
           flexDirection: 'row',
         }}
       >
-        <Tooltip
-          title={`${
-            contact.nickname + online
-              ? ' is online right now!'
-              : ' appears offline... Leave a message!'
-          } `}
-        >
-          <Identification
-            id={contact.peerid}
-            name={contact.nickname}
-            avatar={contact.avatar}
-            status={online}
-            badgeCnt={cntUnread}
-          ></Identification>
-        </Tooltip>
+        <Identification
+          id={contact.peerid}
+          name={contact.nickname}
+          avatar={contact.avatar}
+          status={online}
+          badgeCnt={cntUnread}
+        ></Identification>
 
         <MoreOptionsButton></MoreOptionsButton>
       </Box>
@@ -137,14 +139,18 @@ export const ContactItem = (props: { contact: IContact }) => {
         sx={{
           display: 'flex',
           flexDirection: 'column',
-          alignItems: { xs: 'center', md: 'flex-start' },
-          m: 3,
+          alignItems: { xs: 'left', md: 'flex-start' },
+          //m: 3,
+          borderwidth: '1',
           minWidth: { md: 180 },
         }}
       >
         <Typography variant="subtitle1">{contact.nickname}</Typography>
-        <Box component="span" sx={{ visibility: { xs: 'collapse', md: 'visible' } }}>
+        <Box component="span" sx={{ visibility: { xs: 'hidden', md: 'visible' } }}>
           {lastTimeSeen}
+        </Box>
+        <Box component="span" sx={{ visibility: { xs: 'hidden', md: 'visible' } }}>
+          {distance}
         </Box>
       </Box>
     </Box>

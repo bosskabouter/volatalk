@@ -55,7 +55,6 @@
     "emoji-picker-react": "^3.5.1",
     "formik": "^2.2.9",
     "identicon.js": "^2.3.3",
-    "minidenticons": "^1.0.3",
     "qrcode.react": "^3.0.2",
     "react": "^18.1.0",
     "react-device-detect": "^2.2.2",

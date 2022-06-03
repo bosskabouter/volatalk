@@ -50,9 +50,9 @@ const ContactList = () => {
             width: '100%',
             bgcolor: 'background.paper',
             //  position: 'relative',
-            //  overflow: 'auto',
-            //  maxHeight: 300,
-            // '& ul': { padding: 0 },
+            //overflow: 'scroll',
+            //maxHeight: 1,
+            '& ul': { padding: 0 },
           }}
           // dense={true}
           subheader={<ContactListHeader></ContactListHeader>}
@@ -82,23 +82,15 @@ const ContactList = () => {
 const ContactListHeader = () => {
   //TODO create options for filtering
 
-  const NewContactRequestsFilter = () => {
-    return (
-      <>
-        <IconButton>
-          <NewContactRequestsIcon></NewContactRequestsIcon>
-        </IconButton>
-        <IconButton>
-          <FavoritesOnlyContactIcon></FavoritesOnlyContactIcon>
-          <FavoritesNotOnlyContactIcon></FavoritesNotOnlyContactIcon>
-        </IconButton>
-      </>
-    );
-  };
-
   return (
     <ListSubheader component="div" id="nested-list-subheader">
-      <NewContactRequestsFilter></NewContactRequestsFilter>
+      <IconButton>
+        <NewContactRequestsIcon></NewContactRequestsIcon>
+      </IconButton>
+      <IconButton>
+        <FavoritesOnlyContactIcon></FavoritesOnlyContactIcon>
+        <FavoritesNotOnlyContactIcon></FavoritesNotOnlyContactIcon>
+      </IconButton>
     </ListSubheader>
   );
 };

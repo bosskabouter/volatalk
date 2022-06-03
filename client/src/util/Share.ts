@@ -1,19 +1,15 @@
 /**
  */
-export default function shareURL(url: string) {
-  navigator.canShare() ? shareMobile() : copyTextToClipboard();
-
-  function shareMobile() {
-    alert('Sharing...');
-
-    navigator.share({
-      url: url,
-    });
-  }
+export default function shareURL(u: string) {
+  const shareData = {
+    url: u,
+  };
+  navigator.canShare && navigator.canShare() ? navigator.share(shareData) : copyTextToClipboard();
 
   /**
    */
   function copyTextToClipboard() {
-    return navigator.clipboard && navigator.clipboard.writeText(url);
+    console.debug('Copying to clipboard');
+    return navigator.clipboard && navigator.clipboard.writeText(u);
   }
 }

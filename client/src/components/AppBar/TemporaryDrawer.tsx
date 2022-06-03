@@ -10,8 +10,6 @@ import logo from '../../assets/svg/logo-black.svg';
 import { Typography, Toolbar } from '@mui/material';
 import StatusDisplay from '../StatusDisplay/StatusDisplay';
 
-const drawerWidth = 180;
-
 export default function TemporaryDrawer() {
   const theme = useTheme();
 
@@ -19,7 +17,7 @@ export default function TemporaryDrawer() {
     root: css`
       display: flex;
     `,
-    appBar: (isOpen: boolean) => css`
+    appBar: css`
       padding-right: 36px;
       padding-left: 18px;
     `,
@@ -38,7 +36,6 @@ export default function TemporaryDrawer() {
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.leavingScreen,
       })};
-      margin-right: -${drawerWidth};
     `,
     contentShift: css`
       transition: ${theme.transitions.create('margin', {
@@ -57,8 +54,8 @@ export default function TemporaryDrawer() {
   return (
     <div css={styles.root}>
       <CssBaseline />
-      <AppBar position={'fixed'} css={styles.appBar(false)} role="banner">
-        <Toolbar disableGutters variant="regular">
+      <AppBar position={'fixed'} css={styles.appBar} role="banner">
+        <Toolbar disableGutters variant="dense">
           <Typography variant="h6" noWrap css={styles.title}>
             <Link to="/">
               <img alt="VolaTALK logo" css={styles.toolbarLogo} src={logo} />

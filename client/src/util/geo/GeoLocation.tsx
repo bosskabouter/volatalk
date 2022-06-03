@@ -1,24 +1,22 @@
 import { useContext, useEffect, useState } from 'react';
-import { UserContext } from '../providers/UserProvider';
-import { WeatherInfo } from './WeatherInfo';
+import { UserContext } from '../../providers/UserProvider';
+import { WeatherInfo } from '../WeatherInfo';
 
 export default function Geolocation() {
-  const [data, setData] = useState<GeolocationPosition | null>(null);
+  const [position, setPosition] = useState<GeolocationPosition | null>(null);
   const { user } = useContext(UserContext);
   useEffect(() => {
     if (user && user.position && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((position: GeolocationPosition) => {
-        setData(position);
-      });
+      navigator.geolocation.getCurrentPosition(setPosition);
     } else {
       console.warn('Location Sharing is not enabled.');
     }
   }, [user]);
 
-  return <>{user && user.position && <WeatherInfo location={data}></WeatherInfo>}</>;
+  return <>{position && <WeatherInfo location={position}></WeatherInfo>}</>;
 }
 
-export async function requestFollowMe() {
+export async function requestFollowMe(): Promise<GeolocationPosition | null> {
   return new Promise((resolve, reject) => {
     const onSuccess = (location: GeolocationPosition) => {
       console.info('Follow me success', location);
@@ -28,6 +26,6 @@ export async function requestFollowMe() {
       reject(error);
     };
     if (navigator.geolocation) navigator.geolocation.getCurrentPosition(onSuccess, onError);
-    else return null;
+    else resolve(null);
   });
 }

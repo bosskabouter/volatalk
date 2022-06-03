@@ -30,7 +30,6 @@ const App = () => {
                       <Layout>
                         <AppRoutes />
                       </Layout>
-                      2
                     </PeerProvider>
                   </UserProvider>
                 </AuthProvider>

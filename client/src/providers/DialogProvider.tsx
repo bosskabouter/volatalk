@@ -60,14 +60,14 @@ export default function DialogProvider({ children }) {
   const [dialogs, setDialogs] = useState<DialogParams[]>([]);
   const createDialog = (option: DialogOption) => {
     const dialog = { ...option, open: true };
-    setDialogs((dialogs) => [...dialogs, dialog]);
+    setDialogs((dlgs) => [...dlgs, dialog]);
   };
   const closeDialog = () => {
-    setDialogs((dialogs) => {
+    setDialogs((dlgs) => {
       const latestDialog = dialogs.pop();
       if (!latestDialog) return dialogs;
       if (latestDialog.onClose) latestDialog.onClose();
-      return [...dialogs].concat({ ...latestDialog, open: false });
+      return [...dlgs].concat({ ...latestDialog, open: false });
     });
   };
   const contextValue = useRef([createDialog, closeDialog] as const);
@@ -79,7 +79,7 @@ export default function DialogProvider({ children }) {
         const { onClose, ...dialogParams } = dialog;
         const handleKill = () => {
           if (dialog.onExited) dialog.onExited();
-          setDialogs((dialogs) => dialogs.slice(0, dialogs.length - 1));
+          setDialogs((dlgs) => dlgs.slice(0, dlgs.length - 1));
         };
 
         return (

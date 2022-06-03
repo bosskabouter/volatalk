@@ -6,19 +6,18 @@ const ENC_ALGORITHM_ECDSA = 'ECDSA';
 const ENC_ALGORITHM_ECDSA_HASH = 'SHA-384';
 const ENC_ALGORITHM_ECDSA_NAMEDCURVE = 'P-384';
 
-export function genSignature(peerid: string, userJsonPrivateKey: string) {
+function generateSignature(peerid: string, userJsonPrivateKey: string) {
   return importPrivateKey(JSON.parse(userJsonPrivateKey)).then((privKey) => {
     return signMessage(peerid, privKey);
   });
 }
 
 /**
- *
- * @param {*} publicKey
- * @returns
+ * hex encoded the public key to be used as peerid
+ * @returns peerid; hex encoded stringified given publicKey
  */
-function peerIdFromPublicKey(publicKey: JsonWebKey) {
-  const hexPeerid = convertStringToHex(JSON.stringify(publicKey, null, ' '));
+function peerIdFromPublicKey(publicKey: JsonWebKey): string {
+  const hexPeerid = convertStringToHex(JSON.stringify(publicKey));
   console.debug('Converted PublicKey->PeerID', publicKey, hexPeerid);
   return hexPeerid;
 }
@@ -130,6 +129,7 @@ function verifyMessage(message: string, signature: BufferSource, publicKey: Cryp
 }
 
 export {
+  generateSignature as genSignature,
   peerIdFromPublicKey,
   peerIdToPublicKey,
   generateKeyPair,
