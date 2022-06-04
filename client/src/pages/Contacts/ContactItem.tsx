@@ -34,6 +34,7 @@ export const ContactItem = (props: { contact: IContact }) => {
     'Connected last time: ' + descriptiveTimeAgo(new Date(contact.dateTimeResponded));
 
   useEffect(() => {
+    if (!userCtx.user.position || !contact.position) return;
     const distanceFromMe = Distance(userCtx.user.position, contact.position);
     if (distanceFromMe) setDistance(`Distance from me: ${distanceFromMe} km.`);
   }, [contact, userCtx.user]);

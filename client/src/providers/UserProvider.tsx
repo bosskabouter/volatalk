@@ -1,7 +1,7 @@
 /* eslint-disable */
 // @ts-nocheck
-import { IUserProfile } from 'Database/Database';
 import React from 'react';
+import { IUserProfile } from 'types';
 import { useSessionStorage } from '../util/useSessionStorage';
 
 export type IUserContext = {

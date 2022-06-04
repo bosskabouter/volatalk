@@ -6,7 +6,7 @@ export default function Geolocation() {
   const [position, setPosition] = useState<GeolocationPosition | null>(null);
   const { user } = useContext(UserContext);
   useEffect(() => {
-    if (user && user.position && navigator.geolocation) {
+    if (user && user.useGps && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(setPosition);
     } else {
       console.warn('Location Sharing is not enabled.');

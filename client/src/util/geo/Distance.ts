@@ -7,12 +7,11 @@
 
 const R = 6371; // Radius of the earth in km
 
-export default function Distance(pos1?: GeolocationPosition, pos2?: GeolocationPosition) {
-  if (!pos1?.coords || !pos2?.coords) {
+export default function Distance(pos1: GeolocationPosition, pos2: GeolocationPosition) {
+  if (!pos1.coords || !pos2.coords) {
     console.info('Distance unknown', pos1, pos2);
     return;
   }
-
   const dLat = deg2rad(pos1.coords.latitude - pos2.coords.latitude);
   const dLon = deg2rad(pos1.coords.longitude - pos2.coords.longitude);
   const a =
@@ -29,12 +28,8 @@ export default function Distance(pos1?: GeolocationPosition, pos2?: GeolocationP
   }
 }
 
-export function DistanceFromMiddleEarth(pos?: GeolocationPosition) {
-  if (!pos) {
-    console.warn('No pos!', pos);
-    return;
-  } else if (!pos?.coords) {
-    console.warn('No pos.coords', pos);
+export function DistanceFromMiddleEarth(pos: GeolocationPosition) {
+  if (!pos.coords) {
     return;
   }
   return (pos.coords.altitude ? pos.coords.altitude : 0) + R;

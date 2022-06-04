@@ -43,9 +43,10 @@ export interface IUserProfile {
   dateRegistered: Date;
 
   usePush: boolean; //bridge to signal ServiceWorkerWrapper to save subscription
-  pushSubscription?: PushSubscription;
+  pushSubscription: PushSubscription | null;
 
-  position?: GeolocationPosition;
+  useGps: boolean; //basically to make formik understand the switch...
+  position: GeolocationPosition | null;
 }
 
 export interface IContact {
@@ -61,8 +62,8 @@ export interface IContact {
   dateTimeResponded: number;
 
   avatar: string;
-  position?: GeolocationPosition;
-  pushSubscription?: PushSubscription;
+  position: GeolocationPosition | null;
+  pushSubscription: PushSubscription | null;
 }
 export interface IMessage {
   id?: number;

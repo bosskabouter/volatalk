@@ -44,10 +44,13 @@ export const RequireAuth = () => {
     } else if (isSecure) {
       return <Navigate to="/login" replace />;
     } else {
-      //load user and set in context. Normally login would do this.
+      //user didnt secure account. load user and set in context. Normally login would do this.
       if (db && !userCtx.user)
         db.userProfile.get(1).then((user) => {
-          if (user) userCtx.setUser(user);
+          if (user) {
+            console.info('Setting user in Context', user);
+            userCtx.setUser(user);
+          }
         });
     }
   }

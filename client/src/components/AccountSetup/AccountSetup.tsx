@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react';
-import { ChangeEvent, SyntheticEvent, useContext } from 'react';
+import { ChangeEvent, useContext, useState } from 'react';
 import {
   Avatar,
   Box,
@@ -36,6 +36,7 @@ import { notifyMe } from '../../services/PushMessage';
 import { setCreated, setIsSecure } from '../../store/slices/accountSlice';
 import { resizeFileUpload } from '../../services/Generic';
 import { DistanceFromMiddleEarth } from 'util/geo/Distance';
+import { questions } from './SecurityQuestions';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -48,42 +49,6 @@ const MenuProps = {
   },
 };
 
-const questions = [
-  'In what city did you meet your first spouse/partner?',
-  'In what city did your parents meet?',
-  'In what city does your nearest sibling live?',
-  'In what city was your father born?',
-  'In what city was your first job?',
-  'In what city was your mother born?',
-  "What city were you in on New Year's 2000?",
-  'What is the last name of your favorite teacher in high school?',
-  "What is the name of a college you applied to but didn't attend?",
-  "What is your father's middle name?",
-  'What is your favorite food?',
-  "What is your maternal grandmother's first and last name?",
-  "What is your mother's middle name?",
-  "What is your oldest sibling's middle name?",
-  "What is your paternal grandfather's first and last name?",
-  "What is your youngest sibling's middle name?",
-  'What school did you attend for sixth grade?',
-  'What was the first and last name of your childhood best friend?',
-  'What was the first and last name of your first significant other?',
-  'What was the last name of your favorite grade school teacher?',
-  'What was the make and model of your first car or motorcycle?',
-  'What was the name of the first school you attended?',
-  'What was the name of the hospital in which you were born?',
-  'What was the name of the street of your first childhood home?',
-  'What was the name of your childhood hero?',
-  'What was the name of your favorite stuffed animal?',
-  'What was the name of your first pet?',
-  'What was your childhood nickname?',
-  'What was your favorite sport in high school?',
-  'What was your first job?',
-  'What were the last four digits of your childhood telephone number?',
-  'When you were young, what did you want to be when you grew up?',
-  'Who is the most famous person you have ever met?',
-];
-
 const AccountSetup = () => {
   const { authenticated, setAuthenticated } = useContext(AuthContext);
   const { setUser } = useContext(UserContext);
@@ -94,6 +59,8 @@ const AccountSetup = () => {
   const db = useContext(DatabaseContext);
 
   const userCtx = useContext(UserContext);
+
+  const [currentPosition, setCurrentPosition] = useState(userCtx.user?.position);
 
   const validationSchemaSecure = yup.object({
     nickname: yup
@@ -129,15 +96,13 @@ const AccountSetup = () => {
     }),
   });
 
-  const formik = useFormik({
-    //   validateOnChange: true,
-    //  validateOnBlur: true,
+  const formik = useFormik<IUserProfile>({
     initialValues: userCtx.user || {
       nickname: 'Anonymous',
       avatar: 'https://thispersondoesnotexist.com/image?reload=' + Math.random(),
 
-      isSecured: false, //unused. .where to publish profile ?
-      isSearchable: true,
+      isSecured: false,
+      isSearchable: true, //unused. .where to publish profile ?
       pin: '',
       question1: '',
       answer1: '',
@@ -148,41 +113,46 @@ const AccountSetup = () => {
       privateKey: '',
 
       dateRegistered: new Date(),
+
+      useGps: false,
       position: null,
+
       usePush: false,
       pushSubscription: null,
     },
 
     validationSchema: validationSchemaSecure,
 
-    onSubmit: (values) => {
+    onSubmit: (values: IUserProfile) => {
+      //gps coords are not controlled by formik
+      values.position = currentPosition;
       if (authenticated) updateUser(values);
       else registerUser(values);
-      //formik.setSubmitting(false);
     },
   });
 
   function updateUser(values: IUserProfile) {
-    // Save to database
-    if (db !== null) {
-      //only update input fields (private key /peerid isnt one)
-      if (!values.isSecured) {
-        //clear recovery questions
-        values.pin = '';
-        values.question1 = '';
-        values.question2 = '';
-        values.answer1 = '';
-        values.answer2 = '';
-      }
-      db.userProfile.put(values, 1);
-      setUser(values);
-      //navigate('/', { replace: false });
+    if (!db) return;
+    //only update input fields (private key /peerid isnt one)
+    if (!values.isSecured) {
+      //clear recovery questions
+      values.pin = '';
+      values.question1 = '';
+      values.question2 = '';
+      values.answer1 = '';
+      values.answer2 = '';
     }
+
+    //only 1 user, for now
+    db.userProfile.put(values, 1);
+    console.log('Updated user', values);
+    setUser(values);
+    navigate('/', { replace: true });
   }
 
   /**
-   *
-   * @param values from form
+   * Register a new user, by generating a keyPairge
+   * @param values from form containing user data
    */
   function registerUser(values: IUserProfile) {
     generateKeyPair().then((keyPair) => {
@@ -220,9 +190,11 @@ const AccountSetup = () => {
 
                 if (values.usePush) {
                   //reload the app to activate service worker
-                  document.location = document.location.origin;
+                  //  document.location = document.location.origin;
                 }
-                //else navigate('/');
+                //dont need reload for service worker activation, go directly
+                //else
+                navigate('/');
               })
               .catch((err) => {
                 console.error(err);
@@ -344,28 +316,27 @@ const AccountSetup = () => {
   };
 
   /**
-   * Only permit closing if user already registered
+   * Only permit closing if user already registered, otherwise do not close
    * @param e
    */
-  function handleClose(_e: SyntheticEvent) {
+  function handleClose() {
     console.log('User trying to close AccountSetup', userCtx.user);
     if (userCtx.user) navigate('/');
   }
 
   /**
    * Requests geo location and saves it state for user profile, if permitted.
+   * Handles uncontrolled property user.position
    */
   async function handleGPS(e: ChangeEvent<HTMLInputElement>, checked: boolean) {
-    console.info('GPS checked ' + checked);
+    console.debug('Current position', currentPosition);
     formik.handleChange(e);
-    if (checked) {
-      const pos = await requestFollowMe();
-      console.log('User position', pos);
-      formik.values.position = pos;
-    } //reset
-    else formik.values.position = null;
+    const pos = checked ? await requestFollowMe() : null;
 
-    formik.setTouched(formik.values.position);
+    console.debug('Setting user position', pos);
+    setCurrentPosition(pos);
+
+    //formik.setTouched(formik.values.useGps);
   }
 
   /**
@@ -373,16 +344,16 @@ const AccountSetup = () => {
    * @param _e
    * @param checked
    */
-  async function handleUsePush(e: ChangeEvent<HTMLInputElement>, checked: boolean) {
+  async function handlePush(e: ChangeEvent<HTMLInputElement>, checked: boolean) {
     console.info('Notification checked ' + checked);
     formik.handleChange(e);
     if (checked)
-      notifyMe(); //test notification. The actual registration of push subscription depends on the saved boolean usePush in UserProfile
+      notifyMe(); //test notification. The actual registration of push subscription is done in ServiceWorkerWrapper
     else {
       console.info('Clearing subscription data');
       formik.values.pushSubscription = null;
     }
-    formik.setTouched(formik.values.usePush);
+    // formik.setTouched(usePush);
   }
 
   return (
@@ -416,7 +387,7 @@ const AccountSetup = () => {
             value={formik.values.nickname}
             onChange={formik.handleChange}
             error={formik.touched.nickname && Boolean(formik.errors.nickname)}
-            // helperText={formik.touched.nickname && formik.errors.nickname}
+            //helperText={formik.touched.nickname && formik.errors.nickname}
           />
 
           <div css={styles.avatarUploadDiv}>
@@ -449,24 +420,25 @@ const AccountSetup = () => {
                   checked={formik.values.usePush}
                   id="usePush"
                   value={formik.values.usePush}
-                  onChange={handleUsePush}
+                  onChange={handlePush}
                 />
               }
             />
 
             <FormControlLabel
               label={
-                formik.values.position
+                currentPosition != null
                   ? `Your are ${DistanceFromMiddleEarth(
-                      formik.values.position
+                      currentPosition
                     )} km. away from Middle Earth`
                   : 'Enable Location Sharing'
               }
               control={
                 <Switch
-                  defaultChecked={formik.values.position !== null}
-                  name="position"
-                  //value={formik.values.position}
+                  //    defaultChecked={formik.values.useGps}
+                  checked={formik.values.useGps}
+                  id="useGps"
+                  value={formik.values.useGps}
                   onChange={handleGPS}
                 />
               }
@@ -503,6 +475,7 @@ const AccountSetup = () => {
                 value={formik.values.pin}
                 onChange={formik.handleChange}
                 error={formik.touched.pin && Boolean(formik.errors.pin)}
+                //helperText={(formik.touched.pin? formik.errors.pin)}
               />
               <Typography variant="subtitle1">Recovery questions</Typography>
               <FormControl css={styles.accountQuestionRoot} variant="standard">

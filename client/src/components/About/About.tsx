@@ -39,7 +39,7 @@ const About = () => {
             />
           </ListItem>
           <ListItem key="2">
-            <ListItemText primary="The application can be installed offline." />
+            <ListItemText primary="The application can be used offline. This means you don't need to be connected to the in" />
           </ListItem>
           <ListItem key="3">
             <Link href="https://github.com/bosskabouter/volatalk">

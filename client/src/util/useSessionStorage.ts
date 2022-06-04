@@ -69,7 +69,7 @@ function getWithExpiry(key: string) {
   }
   const item = JSON.parse(itemStr);
   const now = new Date();
-  // compare the expiry time of the item with the current timevolatalk-logo-v1
+  // compare the expiry time of the item with the current time
   if (now.getTime() > item.expiry) {
     // If the item is expired, delete the item from storage
     // and return null

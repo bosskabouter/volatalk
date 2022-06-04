@@ -122,11 +122,17 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
 
     this._peer.on('error', (err) => {
       if (err.toString().includes('Could not connect to peer')) {
-        console.warn('Peer unavailable. Should try again later...');
+        console.warn('Contact unavailable. Should try again later...');
       } else {
+        //severe error concerning our connection
+        if (err.toString().includes('is taken')) {
+          console.error(
+            'UserID occupied on signalling server. Other browser already logged? Otherwise account might be hostage.'
+          );
+        } else {
+          console.error('peer error: ' + err.name, err);
+        }
         this.emit('statusChange', false);
-        console.warn("this._peer.on('error', (err) => " + err.name, err);
-
         setTimeout(() => this._initSignallingServer(), RECONNECT_TIMEOUT);
       }
     });
@@ -363,6 +369,9 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
 
         //TODO ask if user accepts push messages from contact, oherwise dont share
         pushSubscription: this._user.pushSubscription,
+
+        //TODO ask if user shares location with this contact
+        position: this._user.position,
 
         dateTimeCreated: new Date().getTime(),
 

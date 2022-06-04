@@ -5,7 +5,7 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import 'typeface-roboto';
 import { Layout } from '../../components';
-import ServiceWorkerWrapper from '../../components/ServiceWorkerWrapper';
+import ServiceWorkerWrapper from '../../sw/ServiceWorkerWrapper';
 import AuthProvider from '../../providers/AuthProvider';
 import DatabaseProvider from '../../providers/DatabaseProvider';
 import DialogProvider from '../../providers/DialogProvider';

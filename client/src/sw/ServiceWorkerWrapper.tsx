@@ -11,15 +11,19 @@ const ServiceWorkerWrapper: FC = () => {
 
   const noServiceWorkerAvailable = !('serviceWorker' in navigator);
   const serviceWorkerScript =
-    process.env.NODE_ENV === 'production' ? '/service-worker.js' : '/service-worker-testpush.js';
+    process.env.NODE_ENV === 'production'
+      ? '/service-worker.js'
+      : '/sw/test/service-worker-testpush.js';
 
   const [showReload, setShowReload] = useState(false);
   const [registration, setRegistration] = useState<ServiceWorkerRegistration>();
-  const [pushSubscription, setPushSubscription] = useState<PushSubscription | null | undefined>(
-    undefined
-  );
 
   const userCtx = useContext(UserContext);
+
+  const [pushSubscription, setPushSubscription] = useState<PushSubscription | null>(
+    userCtx.user?.pushSubscription
+  );
+
   const db = useContext(DatabaseContext);
 
   const wb = useRef<Workbox | null>(null);
@@ -48,6 +52,9 @@ const ServiceWorkerWrapper: FC = () => {
         'No service worker in navigator available. Push messages and off-line browsing disabled.'
       );
       return;
+    } else if (registration) {
+      //ran already
+      return;
     }
 
     wb.current = new Workbox(process.env.PUBLIC_URL + serviceWorkerScript);
@@ -56,25 +63,25 @@ const ServiceWorkerWrapper: FC = () => {
     wb.current
       .register()
       .then((reg) => {
-        console.info('Registered Service Worker', reg);
         if (reg) {
-          console.info('registered service worker', reg);
+          console.info('Registered service worker', reg);
           setRegistration(reg);
         }
       })
       .catch((e) => {
         console.error('Error registering service worker', e);
       });
-  }, [noServiceWorkerAvailable, serviceWorkerScript]);
+  }, [noServiceWorkerAvailable, registration, serviceWorkerScript]);
 
   /**
-   * Subscribes to the pushManager in the registration, only if user registered and he opted for push.
-   * If not usePush, clear the subscription from his profile.
+   * Wait for the user to register and activate the registration to activate,
+   * then Subscribe to the pushManager, if the user opted for this.
+   * If not usePush, clear the subscription from his profile, in case he recently was subscribed.
    */
   useEffect(() => {
-    if (!db || !userCtx.user || !registration) return;
+    if (!db || !userCtx.user?.id || !registration?.active) return;
 
-    const subPush = () => {
+    const subscribePush = () => {
       console.log('Subscribe pushManager in registration', registration);
       registration.pushManager
         .subscribe({
@@ -90,29 +97,28 @@ const ServiceWorkerWrapper: FC = () => {
         });
     };
     if (userCtx.user.usePush) {
-      subPush();
+      subscribePush();
     } else {
-      //clearing push subscription
       setPushSubscription(null);
     }
-  }, [db, registration, userCtx.user]);
+  }, [db, registration, userCtx.user, registration?.active]);
 
   /**
    * Saves the push subscription to users profile.
    */
   useEffect(() => {
-    if (!db || !userCtx.user || !registration) return;
-    console.info('Saving new push subscription!', pushSubscription);
-    console.info('Overwriting old subscription', userCtx.user.pushSubscription);
+    if (!db || !userCtx.user || !registration || !userCtx.user.id) return;
+    console.info('Overwriting previous push subscription', userCtx.user.pushSubscription);
+    console.info('New push subscription!', pushSubscription);
     userCtx.user.pushSubscription = pushSubscription;
-    db.userProfile.put(userCtx.user);
-  }, [db, pushSubscription, registration, userCtx.user]);
+    db.userProfile.update(1, { pushSubscription: pushSubscription });
+  }, [db, pushSubscription, registration, userCtx.user, userCtx.user?.id]);
 
   const reloadPage = () => {
     if ('serviceWorker' in navigator && wb.current !== null) {
       wb.current.getSW().then((sw) => {
         console.info('Posting a message to service worker...');
-        sw.postMessage('Hi SW?!');
+        sw.postMessage('Hi SW? It is me... LeClerc!');
       });
       wb.current.addEventListener('controlling', (event) => {
         console.info("wb.current.addEventListener('controlling', (event)=>", event);

@@ -2,15 +2,7 @@
 
 import { css } from '@emotion/react';
 import { useContext, useEffect, useState } from 'react';
-import {
-  Button,
-  Badge,
-  Avatar,
-  Dialog,
-  Typography,
-  DialogContent,
-  DialogContentText,
-} from '@mui/material';
+import { Button, Dialog, Typography, DialogContent, DialogContentText } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { DatabaseContext } from '../../providers/DatabaseProvider';
 import { UserContext } from '../../providers/UserProvider';
@@ -25,7 +17,7 @@ export default function AcceptInvite(props: { invite: string }) {
   //recover invite from local storage hack
   localStorage.removeItem('invite');
 
-  const [senderOnline, setSenderOnline] = useState<boolean | undefined>(undefined);
+  const [senderOnline, setSenderOnline] = useState<boolean | null>(null);
   const [result, setResult] = useState<string>('');
 
   const [receivedInvite, setReceivedInvite] = useState<IInvite | null>(null);
@@ -52,7 +44,7 @@ export default function AcceptInvite(props: { invite: string }) {
           setResult('Invalid invitation');
         }
       });
-    } else if (receivedInvite && senderOnline === undefined) {
+    } else if (receivedInvite && senderOnline === null) {
       setSenderOnline(false);
       // we just entered the page from url. wait for our own peer to connect
       const timeout = 1000;
@@ -81,6 +73,8 @@ export default function AcceptInvite(props: { invite: string }) {
         dateTimeAccepted: new Date().getTime(),
         dateTimeResponded: 0,
         dateTimeDeclined: 0,
+        position: null,
+        pushSubscription: null,
       };
       db.contacts.put(contact);
       console.info('Contact created', contact);
@@ -92,10 +86,10 @@ export default function AcceptInvite(props: { invite: string }) {
   };
 
   function isOnlineDesc() {
-    if (senderOnline === undefined) return 'Trying to connect with invitor... ';
+    if (senderOnline === null) return 'Trying to connect with invitor... ';
     else if (senderOnline) return 'The person Invitator is online right now!';
     else
-      return 'The person who sent the invitation appears to be right now. Go ahead and save the new contact for now. Once the other person accepts your connection, you will get notified!';
+      return 'The person who sent the invitation appears to be offline right now. Go ahead and save the new contact for now. Once the other person accepts your connection, you will get notified!';
   }
 
   if (!receivedInvite) {

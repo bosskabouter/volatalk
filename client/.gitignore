@@ -5,6 +5,9 @@
 /.pnp
 .pnp.js
 
+#anoying compile hero or something js dist files 
+*/dist
+
 # testing
 /coverage
 /remote-debug-profile

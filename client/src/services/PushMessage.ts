@@ -28,15 +28,16 @@ export async function pushMessage(
     const senderInfo = JSON.stringify({
       contactid: user.peerid,
       nickname: user.nickname,
-      //  avatar: user.avatar, doesn't fit
+      //  avatar: user.avatar, doesn't fit in small push
     });
     //temporarily put our shortened info in push message, not just our id
 
     message.sender = senderInfo;
 
-    //for now we use a global volatalk key to encrypt... TOOD write a key for each contact in unencrypted local storage for service worker to be able to find and decrypt.
-    //Do not encrypt in test environment with simplified service-worker.
+    //for now we use a global volatalk key to encrypt... TOOD write a key for each contact in unencrypted local idb for service worker to be able to find and decrypt.
+
     const encodedMessage = JSON.stringify(message);
+    //Do not encrypt in test environment with simplified service-worker.
     const encryptedMessage =
       process.env.NODE_ENV === 'production'
         ? JSON.stringify(encryptString(encodedMessage, generateKeyFromString(VOLA_SECRET_PUSH)))

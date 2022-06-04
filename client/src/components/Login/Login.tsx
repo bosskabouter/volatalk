@@ -41,12 +41,13 @@ const Login = () => {
       if (db !== null) {
         db.userProfile
           .get(1)
-          .then((res) => {
-            if (res !== undefined) {
-              if (res.pin === values.pin) {
+          .then((user) => {
+            if (user !== undefined) {
+              if (user.pin === values.pin) {
                 setLoggedIn(true);
                 setAuthenticated(true);
-                setUser(res);
+                console.log('Logged in user', user);
+                setUser(user);
                 //dispatch(setUser(res));
 
                 navigate('/');
