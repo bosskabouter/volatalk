@@ -9,14 +9,16 @@ self.addEventListener('push', (pushEvent) => {
     console.warn('No push data available');
     return;
   }
-  let data = JSON.parse(pushEvent.data.text());
 
-  console.info('Found Encrypted push text', data);
-  // test push not encrypted
-  //   data = decryptString(data, generateKeyFromString(VOLA_SECRET_PUSH));
-  console.info('Decrypted push', data);
+  // test push not encrypted, see equivalent prod code in
+  // /service-worker.ts
+  let payload /* IMessage JSON */ = pushEvent.data.text();
 
-  const message = JSON.parse(data);
+  console.info('Unencrypted test push data.text', payload);
+  //payload = decryptString(payload, generateKeyFromString(VOLA_SECRET_PUSH));
+  //console.info('Decrypted push', data);
+
+  const message = JSON.parse(payload);
 
   const senderInfo = JSON.parse(message.sender);
   const action = {
@@ -24,17 +26,16 @@ self.addEventListener('push', (pushEvent) => {
     action: 'handleThis' + senderInfo.contactid,
   };
 
-  // const idString = senderInfo.contactid.substring(225, 252);
+  const idString = senderInfo.contactid.substring(225, 252);
   console.log('Identicon ID String: ' + idString);
   //const icon = 'data:image/svg+xml;base64,' + new Identicon(idString, options).toString();
 
   self.registration.showNotification(senderInfo.nickname, {
     body: message.payload,
-    //  vibrate: [2000, 2500],
+    vibrate: [2000, 2500],
     //  actions: [action],
     //requireInteraction: true,
-    icon: 'https://volatalk.org/mstile-150x150.png',
-    //icon: icon,
-    //iconURL: 'https://volatalk.org/mstile-150x150.png',
+    //icon: 'https://volatalk.org/mstile-150x150.png',
+    icon: senderInfo.avatar,
   });
 });

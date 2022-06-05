@@ -17,7 +17,6 @@ import { ExpirationPlugin } from 'workbox-expiration';
 import { createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
 import { StaleWhileRevalidate } from 'workbox-strategies';
-import Identicon, { IdenticonOptions } from 'identicon.js';
 
 declare const self: ServiceWorkerGlobalScope;
 
@@ -94,41 +93,34 @@ self.addEventListener('push', (pushEvent) => {
     console.warn('No push data available');
     return;
   }
-  let data = JSON.parse(pushEvent.data.text());
 
-  console.info('Found Encrypted push text', data);
-  data = decryptString(data, generateKeyFromString(VOLA_SECRET_PUSH));
-  console.info('Decrypted push', data);
+  //production payload is encrypted
+  let payload /* encrypted string */ = pushEvent.data.text();
 
-  const message: IMessage = JSON.parse(data);
+  console.info('Encrypted push data.text', payload);
+  payload = decryptString(payload, generateKeyFromString(VOLA_SECRET_PUSH));
+  console.info('Decrypted push data.text', payload);
 
-  const senderInfo = JSON.parse(message.sender);
+  const message: IMessage = JSON.parse(payload);
+
+  //message.sender contains not only contactid, but also nickname
+  const senderInfo: {
+    contactid: string;
+    nickname: string;
+    avatar: string; // doesn't fit in small push
+  } = JSON.parse(message.sender);
 
   const action: NotificationAction = {
     title: 'dismiss',
     action: 'someAction',
   };
 
-  const identiconOptions: IdenticonOptions = {
-    //foreground: [0, 0, 0, 255], // rgba black
-    //background: [255, 255, 255, 255], // rgba white
-    margin: 0.1, // 20% margin
-    size: 256, // 256px square
-    format: 'svg', // use SVG instead of PNG
-  };
-  const idString = senderInfo.contactid.substring(225, 252);
-
-  const identicon =
-    'data:image/svg+xml;base64,' + new Identicon(idString, identiconOptions).toString();
-
-  //  const identicon = 'https://volatalk.org/mstile-150x150.png';
-
   const notificationOptions: NotificationOptions = {
     body: message.payload,
     // vibrate: [2000, 2500],
     //   actions: [action],
     //  requireInteraction: true,
-    image: identicon,
+    icon: senderInfo.avatar,
   };
   self.registration.showNotification(senderInfo.nickname, notificationOptions);
 });

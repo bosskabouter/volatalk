@@ -7,6 +7,7 @@ import Badge from '@mui/material/Badge';
 import { IContact } from 'types';
 import { DatabaseContext } from 'providers/DatabaseProvider';
 import { PeerContext } from 'providers/PeerProvider';
+import { Avatar } from '@mui/material';
 
 function ContactRequestButton() {
   const db = useContext(DatabaseContext);
@@ -51,8 +52,14 @@ function ContactRequestButton() {
       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       badgeContent={contactRequests.length}
     >
-      <IconButton size="large" onClick={handleClickButton}>
+      <IconButton
+        size="large"
+        onClick={handleClickButton}
+        color={hasUnansweredRequests ? 'success' : 'default'}
+      >
+        {' '}
         <PersonAddIcon></PersonAddIcon>
+        <Avatar variant="rounded"></Avatar>
       </IconButton>
     </Badge>
   );

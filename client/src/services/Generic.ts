@@ -112,9 +112,6 @@ function convertAbToBase64(buffer: ArrayBuffer) {
  */
 export function resizeFileUpload(imageFile: File, MAX_WIDTH: number, MAX_HEIGHT: number) {
   return new Promise((resolve, _reject) => {
-    // DO DIRTY JOB
-    //reject(err);
-
     const reader = new FileReader();
     reader.onload = function (e) {
       const img = document.createElement('img');

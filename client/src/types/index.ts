@@ -39,6 +39,7 @@ export interface IUserProfile {
 
   nickname: string;
   avatar: string;
+  avatarMini: string;
 
   dateRegistered: Date;
 

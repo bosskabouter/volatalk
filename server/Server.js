@@ -1,13 +1,28 @@
+const compression = require("compression");
 const https = require("https");
-const express = require("express");
-const { ExpressPeerServer } = require("peer");
+
 const webpush = require("web-push");
 const path = require("path");
+
 const fs = require("fs");
 const os = require("os");
 
-//CONFIG ENVIRONMENT VARIABLE PARAMS
+const express = require("express");
+
+const app = express();
+
+const spdy = require("spdy");
+
+const DO_STATIC = ENV_VAR("DO_STATIC", false);
+const DO_CORS = ENV_VAR("DO_CORS", false);
+const DO_EJS = ENV_VAR("DO_EJS", false);
+const DO_PEERJS = ENV_VAR("DO_PEERJS", false);
+
+const DO_WEBPUSH = ENV_VAR("DO_WEBPUSH", false);
+const DO_SOCKETIO = ENV_VAR("DO_SOCKETIO", false);
+
 const DEBUG = ENV_VAR("DEBUG", true);
+
 //HTTPS REQUIRED
 const PORT_HTTPS = ENV_VAR("PORT_HTTPS", 8443);
 //SSL KEYS
@@ -15,28 +30,6 @@ const HOSTNAME = os.hostname();
 
 const KEY_FILENAME = ENV_VAR("KEY_FILE", "./crt/" + HOSTNAME + ".key");
 const CERT_FILENAME = ENV_VAR("CERT_FILE", "./crt/" + HOSTNAME + ".crt");
-
-//local directorty with static files to be served
-const DIR_PUB_STATIC = ENV_VAR("DIR_PUB_STATIC", "www");
-
-const PEERJS_CONTEXT = ENV_VAR("PEER_CONTEXT", "/peerjs");
-const PEERJS_KEY = ENV_VAR("PEERJS_KEY", "pmkey");
-
-//SUBSCRIPTION SERVICE
-const WEBPUSH_CONTEXT = ENV_VAR("WEBPUSH_CONTEXT", "/subscribe");
-//WEB-PUSH VAPID KEYS; generate USING ./node_modules/.bin/web-push generate-vapid-keys
-const VAPID_SUBJECT = ENV_VAR(
-  "VAPID_SUBJECT",
-  "mailto:subscription@volatalk.org"
-);
-const VAPID_PUBKEY = ENV_VAR(
-  "VAPID_PUBKEY",
-  "BChZg2Ky1uKIDRdYWapWKZXZ19VvFedmK0bjqir9kMsyUK42cguvoAr4Pau4yQr2aY4IWGIsr3W1lWK5okZ6O84"
-);
-const VAPID_PRIVKEY = ENV_VAR(
-  "VAPID_PRIVKEY",
-  "CvQGYBs-AzSHF55J7mqTR8VE7l-qwiBiSslqeaMfx8o"
-);
 
 const KEY_FILE = fs.readFileSync(path.join(__dirname, KEY_FILENAME));
 const CERT_FILE = fs.readFileSync(path.join(__dirname, CERT_FILENAME));
@@ -46,55 +39,164 @@ const HTTPS_OPTIONS = {
   cert: CERT_FILE,
 };
 
-//express server
-const app = express();
+// https://webhint.io/docs/user-guide/hints/hint-no-disallowed-headers/?source=devtools
+app.disable("x-powered-by");
 
-//serve static
-app.use(express.static(path.join(__dirname, DIR_PUB_STATIC)));
-const server = https.createServer(HTTPS_OPTIONS, app);
+// compress all responses
+// https://webhint.io/docs/user-guide/hints/hint-http-compression/
+app.use(compression());
+
+if (DO_STATIC) {
+  //local directorty with static files to be served
+  const DIR_PUB_STATIC = ENV_VAR("DIR_PUB_STATIC", "public");
+  //serve static
+  app.use(express.static(path.join(__dirname, DIR_PUB_STATIC)));
+}
+
+if (DO_CORS) {
+  var cors = require("cors");
+  console.log("Using cors", cors);
+  app.use(cors());
+}
+
+const server = spdy.createServer(HTTPS_OPTIONS, app);
 server.listen(PORT_HTTPS);
 console.info("HTTPS started on port: " + PORT_HTTPS);
 
-//serve peerjs
-const PEERJS_OPTIONS = {
-  port: PORT_HTTPS,
-  path: "/",
-  key: PEERJS_KEY,
-  debug: DEBUG,
-  ssl: {
-    key: KEY_FILE,
-    cert: CERT_FILE,
-  },
-};
+if (DO_PEERJS) {
+  const { ExpressPeerServer } = require("peer");
+  const PEERJS_CONTEXT = ENV_VAR("PEER_CONTEXT", "/vtpeer");
+  const PEERJS_KEY = ENV_VAR("PEERJS_KEY", "pmkey");
+  //serve peerjs
+  const PEERJS_OPTIONS = {
+    port: PORT_HTTPS,
+    path: PEERJS_CONTEXT,
+    key: PEERJS_KEY,
+    debug: DEBUG,
+    ssl: {
+      key: KEY_FILE,
+      cert: CERT_FILE,
+    },
+  };
 
-const peerServer = ExpressPeerServer(server, PEERJS_OPTIONS);
-app.use(PEERJS_CONTEXT, peerServer);
+  const peerServer = ExpressPeerServer(server, PEERJS_OPTIONS);
+  app.use(PEERJS_CONTEXT, peerServer);
+}
 
-//serve web-push
-app.use(express.json());
+if (DO_WEBPUSH) {
+  const HTTP_ERROR_Insufficient_Storage_Push_tooBig = 507;
+  const HTTP_ERROR_PUSH_SERVICE_ERROR_Bad_Gateway = 502;
 
-webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBKEY, VAPID_PRIVKEY);
+  const PUSH_MAX_BYTES = 4 * 1024;
 
-app.post(WEBPUSH_CONTEXT, (req, res) => {
-  const subscription = req.body;
+  const WEBPUSH_CONTEXT = ENV_VAR("WEBPUSH_CONTEXT", "/web-push");
 
-  //pass on complete request to receiver?? :)
-  const payload = JSON.stringify(req);
-  webpush
-    .sendNotification(subscription, payload)
-    .then(() => {
-      res.status(201).json({});
-    })
-    .catch((err) => {
-      console.warn("Invalid subscription request: " + err, req, err);
-      res.status(418).json({});
+  const VAPID_SUBJECT = ENV_VAR("VAPID_SUBJECT", "mailto:push@volatalk.org");
+  //WEB-PUSH VAPID KEYS; generate USING ./node_modules/.bin/web-push generate-vapid-keys
+  const VAPID_PUBKEY = ENV_VAR(
+    "VAPID_PUBKEY",
+    "BChZg2Ky1uKIDRdYWapWKZXZ19VvFedmK0bjqir9kMsyUK42cguvoAr4Pau4yQr2aY4IWGIsr3W1lWK5okZ6O84"
+  );
+  const VAPID_PRIVKEY = ENV_VAR(
+    "VAPID_PRIVKEY",
+    "CvQGYBs-AzSHF55J7mqTR8VE7l-qwiBiSslqeaMfx8o"
+  );
+
+  app.use(express.json());
+
+  webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBKEY, VAPID_PRIVKEY);
+
+  //Blob needed to measure request size
+  const { Blob } = require("buffer");
+
+  app.post(WEBPUSH_CONTEXT, (request, response) => {
+    if (DEBUG) console.log("Push request", request);
+
+    const body = request.body;
+    const subscription = body.subscription;
+    const payload = body.payload;
+
+    const byteSizeHeader = request.header("content-length");
+    const byteSizePayload = new Blob([payload]).size;
+    console.info(
+      `Push request size - header[payload]: ${byteSizeHeader}[${byteSizePayload}]`
+    );
+    if (byteSizePayload >= PUSH_MAX_BYTES) {
+      console.warn(
+        "Message payload too big. Have to recuse.",
+        byteSizePayload + "kb"
+      );
+      response.sendStatus(HTTP_ERROR_Insufficient_Storage_Push_tooBig);
+      return;
+    }
+
+    if (DEBUG)
+      console.debug("Pushing payload to subscription", payload, subscription);
+
+    webpush
+      .sendNotification(subscription, payload)
+      .then((sendResult) => {
+        console.log("Pushed message: result=>", sendResult);
+        response.sendStatus(sendResult.statusCode);
+        response.write(JSON.stringify(sendResult));
+      })
+      .catch((err) => {
+        console.error("Problem pushing", err);
+        response.sendStatus(HTTP_ERROR_PUSH_SERVICE_ERROR_Bad_Gateway);
+        response.write(JSON.stringify(err));
+      });
+  });
+}
+
+if (DO_EJS) {
+  //local directorty with static files to be served
+  const DIR_RENDER_EJS = ENV_VAR("DIR_RENDER_EJS", "views");
+
+  // If they join a specific room, then render that room
+
+  app.set("views", path.join(__dirname, DIR_RENDER_EJS));
+  app.set("view engine", "ejs"); // Tell Express we are using EJS
+
+  app.get("/room/:room", (request, response) => {
+    console.log("Request from: " + request);
+    response.render("room", { roomId: req.params.room });
+  });
+}
+
+if (DO_SOCKETIO) {
+  const io = require("socket.io")(server, {
+    cors: {
+      origin: "*",
+    },
+  });
+  // When someone connects to the server
+  io.on("connection", (socket) => {
+    // When someone attempts to join the room
+    socket.on("join-room", (roomId, userId) => {
+      // Tell everyone else in the room that we joined
+
+      // Communicate the disconnection
+      socket.on("disconnect", () => {
+        socket.broadcast.emit("user-disconnected", userId);
+      });
+
+      socket.broadcast.emit("user-connected", userId);
+
+      socket.join(roomId); // Join the room
+
+      console.log(`user ${userId} joins room ${roomId}`);
     });
-});
-
+  });
+}
 function ENV_VAR(varName, defaults) {
   let val = process.env[varName];
+  val = val?.trim();
+
   console.log(
     varName + (!val ? " [UNDEFINED]. Using default: " + defaults : ": " + val)
   );
-  return val || defaults;
+
+  if (val === "true") return true;
+  if (val === "false") return false;
+  else return val?.trim() || defaults;
 }

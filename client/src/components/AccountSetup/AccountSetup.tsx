@@ -96,10 +96,13 @@ const AccountSetup = () => {
     }),
   });
 
+  const randImage = 'https://thispersondoesnotexist.com/image?reload=' + Math.random();
+
   const formik = useFormik<IUserProfile>({
     initialValues: userCtx.user || {
       nickname: 'Anonymous',
-      avatar: 'https://thispersondoesnotexist.com/image?reload=' + Math.random(),
+      avatar: randImage,
+      avatarMini: randImage,
 
       isSecured: false,
       isSearchable: true, //unused. .where to publish profile ?
@@ -391,7 +394,11 @@ const AccountSetup = () => {
           />
 
           <div css={styles.avatarUploadDiv}>
-            <Avatar src={formik.values.avatar} css={styles.avatarUploadImage}></Avatar>
+            <Avatar
+              src={formik.values.avatar}
+              css={styles.avatarUploadImage}
+              variant={'rounded'} 
+            ></Avatar>
             <input
               css={styles.avatarUploadButton}
               aria-label="avatar"
@@ -401,8 +408,12 @@ const AccountSetup = () => {
               accept="image/*"
               onChange={(event) => {
                 if (!event.target.files) return;
-                resizeFileUpload(event.target.files[0], 150, 150).then((src) => {
+                resizeFileUpload(event.target.files[0], 180, 180).then((src) => {
                   formik.setFieldValue('avatar', src);
+                });
+
+                resizeFileUpload(event.target.files[0], 36, 36).then((src) => {
+                  formik.setFieldValue('avatarMini', src);
                 });
               }}
               multiple={false}

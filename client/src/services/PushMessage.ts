@@ -1,7 +1,7 @@
 import { encryptString, generateKeyFromString } from 'dha-encryption';
 import { IContact, IMessage, IUserProfile } from '../types';
 
-const WEBPUSH_SERVER_ADDRESS = 'https://volatalk.org/subscribe';
+const WEBPUSH_SERVER_ADDRESS = 'https://peered.me:432/push';
 
 const POST_PUSH_HTTP_STATUS_SUCCESS = 201;
 const VOLA_SECRET_PUSH = '1a2b3c-but there is more to it - &*@^';
@@ -13,12 +13,12 @@ const VOLA_SECRET_PUSH = '1a2b3c-but there is more to it - &*@^';
  * @returns (a) 0 if contact does not have a subscription, (b) error code if post failed. (c) time if success
  */
 export async function pushMessage(
-  message: IMessage,
+  message2: IMessage,
   contact: IContact,
   user: IUserProfile
 ): Promise<number> {
   if (!contact.pushSubscription) {
-    console.log(`Contact without subscription. Not pushing message.`, message, contact);
+    console.log(`Contact without subscription. Not pushing message.`, message2, contact);
     return 0;
   }
 
@@ -28,31 +28,36 @@ export async function pushMessage(
     const senderInfo = JSON.stringify({
       contactid: user.peerid,
       nickname: user.nickname,
-      //  avatar: user.avatar, doesn't fit in small push
+      avatar: user.avatar, // doesn't fit in small push
     });
-    //temporarily put our shortened info in push message, not just our id
 
-    message.sender = senderInfo;
+    //copy the message, we'll shorten it with relevant info. Push max 4k
+    const copiedMessage = JSON.parse(JSON.stringify(message2));
+
+    //temporarily put our shortened info sender not just id. test-push-sw no db to lookup name
+    copiedMessage.sender = senderInfo;
+
+    copiedMessage.receiver = contact.nickname; //he knows who, save some space
+
+    //Do not encrypt in test environment with simplified service-worker.
+    const unEnctyptedPayload = JSON.stringify(copiedMessage);
 
     //for now we use a global volatalk key to encrypt... TOOD write a key for each contact in unencrypted local idb for service worker to be able to find and decrypt.
-
-    const encodedMessage = JSON.stringify(message);
-    //Do not encrypt in test environment with simplified service-worker.
-    const encryptedMessage =
+    const payload =
       process.env.NODE_ENV === 'production'
-        ? JSON.stringify(encryptString(encodedMessage, generateKeyFromString(VOLA_SECRET_PUSH)))
-        : encodedMessage;
+        ? encryptString(unEnctyptedPayload, generateKeyFromString(VOLA_SECRET_PUSH))
+        : unEnctyptedPayload;
     //body matches the expected server input
     //TODO truncate too long message. max 4k
-    const body = JSON.stringify({
+    const b = JSON.stringify({
       subscription: contact.pushSubscription,
-      payload: encryptedMessage,
+      payload: payload,
     });
 
-    console.log('Posting Push message', WEBPUSH_SERVER_ADDRESS, body);
+    console.log('Posting Push message', WEBPUSH_SERVER_ADDRESS, b);
     fetch(WEBPUSH_SERVER_ADDRESS, {
       method: 'POST',
-      body: body,
+      body: b, //corresponds to pushEvent.data.text() on service-worker side
       headers: { 'content-type': 'application/json' },
     })
       .then((resp) => {
@@ -61,7 +66,7 @@ export async function pushMessage(
         resolve(success ? new Date().getTime() : resp.status);
       })
       .catch((err) => {
-        console.error('Error posting push message', err, body);
+        console.error('Error posting push message', err, b);
         rejectj(err);
       });
   });

@@ -52,7 +52,7 @@ const ServiceWorkerWrapper: FC = () => {
         'No service worker in navigator available. Push messages and off-line browsing disabled.'
       );
       return;
-    } else if (registration) {
+    } else if (registration || wb.current) {
       //ran already
       return;
     }
@@ -64,7 +64,7 @@ const ServiceWorkerWrapper: FC = () => {
       .register()
       .then((reg) => {
         if (reg) {
-          console.info('Registered service worker', reg);
+          console.debug('Service worker registration', reg);
           setRegistration(reg);
         }
       })
@@ -79,17 +79,17 @@ const ServiceWorkerWrapper: FC = () => {
    * If not usePush, clear the subscription from his profile, in case he recently was subscribed.
    */
   useEffect(() => {
-    if (!db || !userCtx.user?.id || !registration?.active) return;
+    if (!db || !userCtx.user?.id || !registration?.active || pushSubscription) return;
 
     const subscribePush = () => {
-      console.log('Subscribe pushManager in registration', registration);
+      console.debug('Registration', registration);
       registration.pushManager
         .subscribe({
           userVisibleOnly: true,
           applicationServerKey: convertBase64ToAb(WEBPUSH_SERVER_PUBKEY),
         })
         .then((subscription) => {
-          console.log('Push subscribed!', subscription);
+          console.info('Subscription', subscription);
           setPushSubscription(subscription);
         })
         .catch((e) => {
@@ -107,9 +107,9 @@ const ServiceWorkerWrapper: FC = () => {
    * Saves the push subscription to users profile.
    */
   useEffect(() => {
-    if (!db || !userCtx.user || !registration || !userCtx.user.id) return;
+    if (!db || !userCtx.user || !registration || !userCtx.user.id || !pushSubscription) return;
     console.info('Overwriting previous push subscription', userCtx.user.pushSubscription);
-    console.info('New push subscription!', pushSubscription);
+    console.info('New push subscription', pushSubscription);
     userCtx.user.pushSubscription = pushSubscription;
     db.userProfile.update(1, { pushSubscription: pushSubscription });
   }, [db, pushSubscription, registration, userCtx.user, userCtx.user?.id]);
@@ -121,7 +121,7 @@ const ServiceWorkerWrapper: FC = () => {
         sw.postMessage('Hi SW? It is me... LeClerc!');
       });
       wb.current.addEventListener('controlling', (event) => {
-        console.info("wb.current.addEventListener('controlling', (event)=>", event);
+        console.info('Controlling', event);
         setShowReload(false);
         window.location.reload();
       });
