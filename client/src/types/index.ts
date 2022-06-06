@@ -47,7 +47,7 @@ export interface IUserProfile {
   pushSubscription: PushSubscription | null;
 
   useGps: boolean; //basically to make formik understand the switch...
-  position: GeolocationPosition | null;
+  position: GeolocationCoordinates | null;
 }
 
 export interface IContact {
@@ -63,20 +63,46 @@ export interface IContact {
   dateTimeResponded: number;
 
   avatar: string;
-  position: GeolocationPosition | null;
+  position: GeolocationCoordinates | null;
   pushSubscription: PushSubscription | null;
 }
 export interface IMessage {
+  //auto generated id
   id?: number;
 
+  //peerid of sender
   sender: string;
+
+  //peerid of receiver
   receiver: string;
+
+  //data sent
   payload: string;
 
   dateTimeCreated: number;
 
+  /**
+   * timestamp when pushed, or http error code if failed
+   */
   dateTimePushed: number;
+
+  /**
+   * Timestamp when successfully transmitted p2p
+   */
   dateTimeSent: number;
+
+  /**
+   * Timestamp when successfully received through p2p
+   */
   dateTimeReceived: number;
+
+  /**
+   * Timestamp when user opens the message
+   */
   dateTimeRead: number;
+
+  /**
+   * Boolean to give urgency to the message. Notification will be
+   */
+  urgent?: boolean;
 }

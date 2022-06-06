@@ -60,7 +60,9 @@ const AccountSetup = () => {
 
   const userCtx = useContext(UserContext);
 
-  const [currentPosition, setCurrentPosition] = useState(userCtx.user?.position);
+  const [currentPosition, setCurrentPosition] = useState<GeolocationCoordinates | null>(
+    userCtx.user?.position
+  );
 
   const validationSchemaSecure = yup.object({
     nickname: yup
@@ -397,7 +399,7 @@ const AccountSetup = () => {
             <Avatar
               src={formik.values.avatar}
               css={styles.avatarUploadImage}
-              variant={'rounded'} 
+              variant={'rounded'}
             ></Avatar>
             <input
               css={styles.avatarUploadButton}

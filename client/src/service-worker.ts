@@ -81,6 +81,7 @@ self.addEventListener('message', (event) => {
   }
 });
 // Any other custom service worker logic can go here.
+
 //TODO get users secret shared with contacts from localstorage
 const VOLA_SECRET_PUSH = '1a2b3c-but there is more to it - &*@^';
 
@@ -104,23 +105,62 @@ self.addEventListener('push', (pushEvent) => {
   const message: IMessage = JSON.parse(payload);
 
   //message.sender contains not only contactid, but also nickname
+
   const senderInfo: {
     contactid: string;
     nickname: string;
-    avatar: string; // doesn't fit in small push
+    avatar: string;
   } = JSON.parse(message.sender);
 
-  const action: NotificationAction = {
-    title: 'dismiss',
-    action: 'someAction',
+  const actionOpen = {
+    title: 'Open',
+    action: 'open',
+  };
+  const actionClose = {
+    title: 'Close',
+    action: 'close',
   };
 
   const notificationOptions: NotificationOptions = {
     body: message.payload,
-    // vibrate: [2000, 2500],
-    //   actions: [action],
-    //  requireInteraction: true,
-    icon: senderInfo.avatar,
+    badge: senderInfo.avatar,
+    image: senderInfo.avatar,
+    icon: 'https://volatalk.org/mstile-150x150.png',
+    vibrate: [1000, 2000, 3000, 4000, 5000],
+    actions: [actionOpen, actionClose],
+    requireInteraction: message.urgent,
+    renotify: message.urgent,
+    data: senderInfo.contactid,
   };
   self.registration.showNotification(senderInfo.nickname, notificationOptions);
 });
+
+/**
+ * https://developer.mozilla.org/en-US/docs/Web/API/Clients/openWindow
+ * https://w3c.github.io/ServiceWorker/#clients-openwindow
+ *
+ */
+self.addEventListener(
+  'notificationclick',
+  function (event) {
+    console.info('Clicked pushed notification', event);
+    event.notification.close();
+
+    console.log('self.location.origin', self.location.origin);
+    event.waitUntil(
+      self.clients.matchAll({ type: 'window' }).then((clientsArr) => {
+        console.log('Open windows: ' + clientsArr);
+        // If a Window tab matching the targeted URL already exists, focus that;
+        const hadWindowToFocus = clientsArr.some((windowClient) =>
+          windowClient.url.includes(self.location.origin) ? (windowClient.focus(), true) : false
+        );
+        // Otherwise, open a new tab to the applicable URL and focus it.
+        if (!hadWindowToFocus)
+          self.clients
+            .openWindow(self.location.origin + '/messages/' + event.notification.data)
+            .then((windowClient) => (windowClient ? windowClient.focus() : null));
+      })
+    );
+  },
+  false
+);

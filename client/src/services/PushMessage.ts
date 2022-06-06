@@ -28,7 +28,7 @@ export async function pushMessage(
     const senderInfo = JSON.stringify({
       contactid: user.peerid,
       nickname: user.nickname,
-      avatar: user.avatar, // doesn't fit in small push
+      avatar: user.avatarMini, // doesn't fit in small push
     });
 
     //copy the message, we'll shorten it with relevant info. Push max 4k
@@ -61,7 +61,7 @@ export async function pushMessage(
       headers: { 'content-type': 'application/json' },
     })
       .then((resp) => {
-        const success = resp.status === POST_PUSH_HTTP_STATUS_SUCCESS;
+        const success = resp.ok;
         console.log(`Post Push Message - success(${success})`, resp);
         resolve(success ? new Date().getTime() : resp.status);
       })
@@ -95,7 +95,35 @@ export function notifyMe() {
   Notification.requestPermission().then(function (permission) {
     // If the user accepts, let's create a notification
     if (permission === 'granted') {
-      const notification = new Notification('Notification working!');
+      const action: NotificationAction = {
+        action: 'DoSomething',
+        title: 'Do This!',
+      };
+
+      const options: NotificationOptions = {
+        //actions: [action],
+        badge: 'https://volatalk.org/mstile-150x150.png',
+        renotify: true,
+        image: 'https://volatalk.org/mstile-150x150.png',
+        tag: 'id' + Math.random(), //msg.id
+        requireInteraction: true,
+        vibrate: [1000, 2000, 3000, 4000, 5000],
+        silent: false,
+        icon: 'https://volatalk.org/mstile-150x150.png',
+        data: 'data here',
+        body: 'body here',
+      };
+
+      const notification = new Notification('Notification working!!', options);
+
+      notification.addEventListener('click', (event) => {
+        console.log('Clicked on notification!', event);
+      });
+
+      notification.onclick = (event) => {
+        console.log('Clicked on notification2!', event);
+        //navigate
+      };
       console.info('Notification ok', notification);
     }
   });

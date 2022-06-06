@@ -21,7 +21,7 @@ const DO_PEERJS = ENV_VAR("DO_PEERJS", false);
 const DO_WEBPUSH = ENV_VAR("DO_WEBPUSH", false);
 const DO_SOCKETIO = ENV_VAR("DO_SOCKETIO", false);
 
-const DEBUG = ENV_VAR("DEBUG", true);
+const DEBUG = ENV_VAR("DEBUG", false);
 
 //HTTPS REQUIRED
 const PORT_HTTPS = ENV_VAR("PORT_HTTPS", 8443);
@@ -80,6 +80,7 @@ if (DO_PEERJS) {
   };
 
   const peerServer = ExpressPeerServer(server, PEERJS_OPTIONS);
+  console.info("Starting peerserver with options", PEERJS_OPTIONS);
   app.use(PEERJS_CONTEXT, peerServer);
 }
 
@@ -123,7 +124,7 @@ if (DO_WEBPUSH) {
     );
     if (byteSizePayload >= PUSH_MAX_BYTES) {
       console.warn(
-        "Message payload too big. Have to recuse.",
+        "Message payload too big. Have to refuse sending.",
         byteSizePayload + "kb"
       );
       response.sendStatus(HTTP_ERROR_Insufficient_Storage_Push_tooBig);
@@ -137,12 +138,11 @@ if (DO_WEBPUSH) {
       .sendNotification(subscription, payload)
       .then((sendResult) => {
         console.log("Pushed message: result=>", sendResult);
-        response.sendStatus(sendResult.statusCode);
         response.write(JSON.stringify(sendResult));
       })
       .catch((err) => {
         console.error("Problem pushing", err);
-        response.sendStatus(HTTP_ERROR_PUSH_SERVICE_ERROR_Bad_Gateway);
+        response.statusCode = HTTP_ERROR_PUSH_SERVICE_ERROR_Bad_Gateway;
         response.write(JSON.stringify(err));
       });
   });
@@ -193,7 +193,7 @@ function ENV_VAR(varName, defaults) {
   val = val?.trim();
 
   console.log(
-    varName + (!val ? " [UNDEFINED]. Using default: " + defaults : ": " + val)
+    varName + (!val ? " [UNDEFINED] Using default: " + defaults : ": " + val)
   );
 
   if (val === "true") return true;

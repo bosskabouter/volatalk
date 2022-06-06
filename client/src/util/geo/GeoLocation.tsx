@@ -16,11 +16,11 @@ export default function Geolocation() {
   return <>{position && <WeatherInfo location={position}></WeatherInfo>}</>;
 }
 
-export async function requestFollowMe(): Promise<GeolocationPosition | null> {
+export async function requestFollowMe(): Promise<GeolocationCoordinates | null> {
   return new Promise((resolve, reject) => {
     const onSuccess = (location: GeolocationPosition) => {
       console.info('Follow me success', location);
-      resolve(location);
+      resolve(location.coords);
     };
     const onError = (error: GeolocationPositionError) => {
       reject(error);

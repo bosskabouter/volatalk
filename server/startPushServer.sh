@@ -16,4 +16,5 @@ export VAPID_SUBJECT=mailto:push@peered.me
 export VAPID_PUBKEY=BOzjBiLaa9psTJ5Nd5T8WEPQjq92HmPgzSr4Lvr53AVGsEhcQiWmjP8crRxS5CIq4KVxCbnBUl5v55axenXLjCg
 export VAPID_PRIVKEY=4OJkW95WhL4JzBir_IShOzyjbCLo0gtwZNpcNuvMxAw
 
-node /home/admin/Server.js -pushserver
+node /home/admin/Server.js -pushserver > ./logs/pushserver.log 2>&1 
+

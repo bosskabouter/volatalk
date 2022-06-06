@@ -10,4 +10,4 @@ export DO_PEERJS=false;
 export DO_STATIC=true
 export DIR_PUB_STATIC=/www
 
-node /home/admin/Server.js -webserver
+node /home/admin/Server.js -webserver > ./logs/webserver.log 2>&1 

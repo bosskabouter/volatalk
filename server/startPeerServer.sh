@@ -13,7 +13,6 @@ export DO_PEERJS=true;
 export PEER_CONTEXT=/
 export PEERJS_KEY=volakey
 
-node /home/admin/Server.js -peerserver
-
+node /home/admin/Server.js -peerserver > ./logs/peerserver.log 2>&1 
 
 
