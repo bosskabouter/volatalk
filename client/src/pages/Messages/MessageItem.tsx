@@ -1,5 +1,5 @@
-import { useContext, useEffect, useState } from 'react';
-import { Box, ListItem, ListItemText, ListItemIcon, Tooltip } from '@mui/material';
+import { useContext, useEffect } from 'react';
+import { Box, ListItemText, ListItemIcon, Tooltip } from '@mui/material';
 
 import PendingIcon from '@mui/icons-material/HourglassBottom';
 import DeliveredIcon from '@mui/icons-material/Check';
@@ -9,10 +9,16 @@ import ReadIcon from '@mui/icons-material/MarkChatRead';
 
 import { UserContext } from '../../providers/UserProvider';
 import { PeerContext } from '../../providers/PeerProvider';
-import { IContact, IMessage } from '../../types';
+import { IContactResume, IMessage } from '../../types';
 import { descriptiveTimeAgo } from '../../services/Generic';
 
-export const MessageItem = ({ contact, message }: { contact: IContact; message: IMessage }) => {
+export const MessageItem = ({
+  contact,
+  message,
+}: {
+  contact: IContactResume;
+  message: IMessage;
+}) => {
   const peerManager = useContext(PeerContext);
   const userCtx = useContext(UserContext);
 

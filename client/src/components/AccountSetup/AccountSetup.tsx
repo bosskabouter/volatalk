@@ -31,7 +31,7 @@ import { DatabaseContext } from '../../providers/DatabaseProvider';
 import { IUserProfile } from '../../types';
 import { AuthContext } from '../../providers/AuthProvider';
 import { exportCryptoKey, generateKeyPair, peerIdFromPublicKey } from '../../services/Crypto';
-import { requestFollowMe } from '../../util/geo/GeoLocation';
+import { requestFollowMe } from '../../util/Widgets/LocationInfo';
 import { notifyMe } from '../../services/PushMessage';
 import { setCreated, setIsSecure } from '../../store/slices/accountSlice';
 import { resizeFileUpload } from '../../services/Generic';
@@ -102,22 +102,24 @@ const AccountSetup = () => {
 
   const formik = useFormik<IUserProfile>({
     initialValues: userCtx.user || {
-      nickname: 'Anonymous',
-      avatar: randImage,
-      avatarMini: randImage,
-
-      isSecured: false,
-      isSearchable: true, //unused. .where to publish profile ?
-      pin: '',
-      question1: '',
-      answer1: '',
-      question2: '',
-      answer2: '',
+      dateRegistered: new Date(),
 
       peerid: '',
-      privateKey: '',
 
-      dateRegistered: new Date(),
+      nickname: 'Anonymous',
+
+      avatar: randImage,
+      avatarThumb: randImage,
+
+      security: {
+        privateKey: '',
+        isSecured: false,
+        pin: '',
+        question1: '',
+        answer1: '',
+        question2: '',
+        answer2: '',
+      },
 
       useGps: false,
       position: null,
@@ -139,13 +141,13 @@ const AccountSetup = () => {
   function updateUser(values: IUserProfile) {
     if (!db) return;
     //only update input fields (private key /peerid isnt one)
-    if (!values.isSecured) {
+    if (!values.security.isSecured) {
       //clear recovery questions
-      values.pin = '';
-      values.question1 = '';
-      values.question2 = '';
-      values.answer1 = '';
-      values.answer2 = '';
+      values.security.pin = '';
+      values.security.question1 = '';
+      values.security.question2 = '';
+      values.security.answer1 = '';
+      values.security.answer2 = '';
     }
 
     //only 1 user, for now
@@ -177,7 +179,7 @@ const AccountSetup = () => {
             jsonPrivateKey
           );
 
-          values.privateKey = JSON.stringify(jsonPrivateKey);
+          values.security.privateKey = JSON.stringify(jsonPrivateKey);
 
           // Save to database
           if (db !== null) {
@@ -186,7 +188,7 @@ const AccountSetup = () => {
               .put(values, 1)
               .then(() => {
                 dispatch(setCreated());
-                if (formik.values.isSecured) {
+                if (formik.values.security.isSecured) {
                   dispatch(setIsSecure());
                 }
                 setUser(values);
@@ -465,16 +467,16 @@ const AccountSetup = () => {
                 //label="isSecured"
                 //defaultValue={formik.values.isSecured}
                 id="isSecured"
-                checked={formik.values.isSecured}
+                checked={formik.values.security.isSecured}
                 onChange={formik.handleChange}
-                color={formik.values.isSecured ? 'default' : 'error'}
+                color={formik.values.security.isSecured ? 'default' : 'error'}
                 icon={<LockOpenIcon />}
                 checkedIcon={<LockIcon></LockIcon>}
               />
             }
-            label={formik.values.isSecured ? "I don't need security" : 'Secure my account'}
+            label={formik.values.security.isSecured ? "I don't need security" : 'Secure my account'}
           />
-          {formik.values.isSecured && (
+          {formik.values.security.isSecured && (
             <Box>
               <Typography variant="subtitle1">6 digit security PIN</Typography>
 
@@ -485,9 +487,9 @@ const AccountSetup = () => {
                 type="password"
                 inputMode="numeric"
                 inputProps={{ maxLength: 6 }}
-                value={formik.values.pin}
+                value={formik.values.security.pin}
                 onChange={formik.handleChange}
-                error={formik.touched.pin && Boolean(formik.errors.pin)}
+                error={formik.touched.security?.pin && Boolean(formik.errors.security?.pin)}
                 //helperText={(formik.touched.pin? formik.errors.pin)}
               />
               <Typography variant="subtitle1">Recovery questions</Typography>
@@ -501,9 +503,11 @@ const AccountSetup = () => {
                   MenuProps={MenuProps}
                   inputProps={{ 'aria-label': 'Without label' }}
                   //variant="standard"
-                  value={formik.values.question1}
+                  value={formik.values.security.question1}
                   onChange={formik.handleChange}
-                  error={formik.touched.question1 && Boolean(formik.errors.question1)}
+                  error={
+                    formik.touched.security?.question1 && Boolean(formik.errors.security?.question1)
+                  }
                 >
                   <MenuItem css={styles.accountQuestionMenu} disabled value="">
                     <em>Select your first authentication question</em>
@@ -519,10 +523,12 @@ const AccountSetup = () => {
                   placeholder="First authentication answer"
                   id="answer1"
                   name="answer1"
-                  value={formik.values.answer1}
+                  value={formik.values.security.answer1}
                   variant="outlined"
                   onChange={formik.handleChange}
-                  error={formik.touched.answer1 && Boolean(formik.errors.answer1)}
+                  error={
+                    formik.touched.security?.answer1 && Boolean(formik.errors.security?.answer1)
+                  }
                 />
               </FormControl>
               <FormControl css={styles.accountQuestionRoot} variant="standard">
@@ -535,7 +541,7 @@ const AccountSetup = () => {
                   MenuProps={MenuProps}
                   inputProps={{ 'aria-label': 'Without label' }}
                   variant="standard"
-                  value={formik.values.question2}
+                  value={formik.values.security.question2}
                   onChange={formik.handleChange}
                 >
                   <MenuItem css={styles.accountQuestionMenu} disabled value="">
@@ -552,10 +558,12 @@ const AccountSetup = () => {
                   placeholder="Second authentication answer"
                   id="answer2"
                   name="answer2"
-                  value={formik.values.answer2}
+                  value={formik.values.security.answer2}
                   variant="outlined"
                   onChange={formik.handleChange}
-                  error={formik.touched.answer2 && Boolean(formik.errors.answer2)}
+                  error={
+                    formik.touched.security?.answer2 && Boolean(formik.errors.security?.answer2)
+                  }
                 />
               </FormControl>
             </Box>

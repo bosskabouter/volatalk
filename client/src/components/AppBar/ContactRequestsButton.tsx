@@ -4,7 +4,7 @@ import IconButton from '@mui/material/IconButton';
 
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import Badge from '@mui/material/Badge';
-import { IContact } from 'types';
+import { IContactResume } from 'types';
 import { DatabaseContext } from 'providers/DatabaseProvider';
 import { PeerContext } from 'providers/PeerProvider';
 import { Avatar } from '@mui/material';
@@ -15,7 +15,7 @@ function ContactRequestButton() {
 
   const navigate = useNavigate();
 
-  const [contactRequests, setContactRequests] = useState<IContact[]>([]);
+  const [contactRequests, setContactRequests] = useState<IContactResume[]>([]);
 
   useEffect(() => {
     if (!db) return;
@@ -30,7 +30,7 @@ function ContactRequestButton() {
   useEffect(() => {
     if (!peerCtx) return;
 
-    const handleNewIncomingContactRequest = (newContact: IContact) => {
+    const handleNewIncomingContactRequest = (newContact: IContactResume) => {
       setContactRequests((prevCtcList) => [...prevCtcList, newContact]);
     };
     peerCtx.on('onNewContact', handleNewIncomingContactRequest);

@@ -1,71 +1,92 @@
-export type WebRTCUser = {
-  id: string;
-  email: string;
-  stream: MediaStream;
-};
 export interface IInvite {
-  peerId: string;
+  peerid: string;
   text: string;
   signature: ArrayBuffer;
 }
 
-export interface ConnectionMetadata {
-  //me as a contact for the other side
-  contact: IContact;
-  //my personal signature for this contact
-  signature: string;
-}
 // defines the interface for the db
-export interface IUserProfile {
+export interface IUserProfile extends IContactResume {
   id?: string;
 
   /**
-   * Indicates if user uses a pin secured context
+   * Securtity context, not serialized in connection metadata
+   */
+  security: Security;
+
+  /**
+   * bridge to signal ServiceWorkerWrapper to save subscription
+   */
+  usePush: boolean;
+
+  /**
+   * User wants GPS tracking
+   * Basically to make formik understand the switch...
+   */
+  useGps: boolean;
+}
+
+export interface Security {
+  /**
+   * Private KEY for public peer id key
+   */
+  privateKey: string;
+
+  /**
+   * User option to secure account with pin
    */
   isSecured: boolean;
-  /**
-   * Indicates if user wants to be be searchable by nickname. PeerManager will instantiate a second peer connection using the user's nickname.
-   */
-  isSearchable: boolean;
 
+  /**
+   *  Indicates if user uses a pin secured context
+   */
   pin: string;
+
+  /**
+   * Recovery questions/answers
+   */
   question1: string;
   answer1: string;
   question2: string;
   answer2: string;
-
+}
+/**
+ * Basic UserInfo serialized in connection metadata
+ */
+export interface IContactResume {
   peerid: string;
-  privateKey: string;
-
-  nickname: string;
-  avatar: string;
-  avatarMini: string;
-
   dateRegistered: Date;
 
-  usePush: boolean; //bridge to signal ServiceWorkerWrapper to save subscription
-  pushSubscription: PushSubscription | null;
+  nickname: string;
 
-  useGps: boolean; //basically to make formik understand the switch...
+  avatar: string;
+  avatarThumb: string;
+
   position: GeolocationCoordinates | null;
+  pushSubscription: PushSubscription | null;
 }
 
-export interface IContact {
-  peerid: string;
+/**
+ * Full contact information, for local use. Excluded from serialization in metadata
+ *
+ */
+export interface IContact extends IContactResume {
   signature: ArrayBuffer;
 
-  nickname: string;
   dateTimeCreated: number;
-
   dateTimeAccepted: number;
   dateTimeDeclined: number;
   //?
   dateTimeResponded: number;
-
-  avatar: string;
-  position: GeolocationCoordinates | null;
-  pushSubscription: PushSubscription | null;
 }
+
+/**
+ * Basic Data Message object
+ * TODO : split in different Message types;
+ *
+ * receive-confirm
+ * read-confirm
+ * 
+ */
 export interface IMessage {
   //auto generated id
   id?: number;

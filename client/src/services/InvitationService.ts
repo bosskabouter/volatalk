@@ -14,7 +14,7 @@ export const INVITE_PARAMKEYS = { FROM: 'f', KEY: 'k', SIGNATURE: 's' };
  * TODO: add expiration date
  */
 export function makeInviteURL(user: IUserProfile, inviteText: string) {
-  return importPrivateKey(JSON.parse(user.privateKey)).then((pk) => {
+  return importPrivateKey(JSON.parse(user.security.privateKey)).then((pk) => {
     const signedMessage = user.peerid + inviteText;
     console.debug('Signing message: ' + signedMessage);
     return signMessage(signedMessage, pk).then((signature) => {
@@ -62,7 +62,7 @@ export async function extractInvite(params: URLSearchParams) {
   console.debug('signature', sig);
 
   const invite: IInvite = {
-    peerId: otherPeerId,
+    peerid: otherPeerId,
     signature: sig,
     text: invitationText,
   };

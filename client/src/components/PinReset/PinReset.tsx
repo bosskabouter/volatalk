@@ -45,7 +45,10 @@ const PinReset = () => {
           .get(1)
           .then((res) => {
             if (res !== undefined) {
-              if (res.answer1 === values.answer1 && res.answer2 === values.answer2) {
+              if (
+                res.security.answer1 === values.answer1 &&
+                res.security.answer2 === values.answer2
+              ) {
                 navigate('/newPin');
               }
             }
@@ -63,8 +66,8 @@ const PinReset = () => {
         .get(1)
         .then((res) => {
           if (res !== undefined) {
-            setQuestion1(res.question1);
-            setQuestion2(res.question2);
+            setQuestion1(res.security.question1);
+            setQuestion2(res.security.question2);
           }
         })
         .catch((err) => {

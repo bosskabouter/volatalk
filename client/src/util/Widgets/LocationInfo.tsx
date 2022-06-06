@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import { UserContext } from '../../providers/UserProvider';
-import { WeatherInfo } from '../WeatherInfo';
+import { WeatherInfo } from './WeatherInfo';
 
 export default function Geolocation() {
   const [position, setPosition] = useState<GeolocationPosition | null>(null);
@@ -12,6 +12,10 @@ export default function Geolocation() {
       console.warn('Location Sharing is not enabled.');
     }
   }, [user]);
+
+  useEffect(() => {
+    if (position?.coords && position?.coords !== user.position) user.position = position.coords;
+  });
 
   return <>{position && <WeatherInfo location={position}></WeatherInfo>}</>;
 }

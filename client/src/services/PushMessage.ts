@@ -3,7 +3,6 @@ import { IContact, IMessage, IUserProfile } from '../types';
 
 const WEBPUSH_SERVER_ADDRESS = 'https://peered.me:432/push';
 
-const POST_PUSH_HTTP_STATUS_SUCCESS = 201;
 const VOLA_SECRET_PUSH = '1a2b3c-but there is more to it - &*@^';
 
 /**
@@ -28,7 +27,7 @@ export async function pushMessage(
     const senderInfo = JSON.stringify({
       contactid: user.peerid,
       nickname: user.nickname,
-      avatar: user.avatarMini, // doesn't fit in small push
+      avatar: user.avatarThumb, // doesn't fit in small push
     });
 
     //copy the message, we'll shorten it with relevant info. Push max 4k
@@ -95,18 +94,12 @@ export function notifyMe() {
   Notification.requestPermission().then(function (permission) {
     // If the user accepts, let's create a notification
     if (permission === 'granted') {
-      const action: NotificationAction = {
-        action: 'DoSomething',
-        title: 'Do This!',
-      };
-
       const options: NotificationOptions = {
-        //actions: [action],
         badge: 'https://volatalk.org/mstile-150x150.png',
         renotify: true,
         image: 'https://volatalk.org/mstile-150x150.png',
         tag: 'id' + Math.random(), //msg.id
-        requireInteraction: true,
+        requireInteraction: false,
         vibrate: [1000, 2000, 3000, 4000, 5000],
         silent: false,
         icon: 'https://volatalk.org/mstile-150x150.png',

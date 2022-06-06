@@ -1,6 +1,6 @@
 import { StrictEventEmitter } from 'strict-event-emitter';
 
-import { ConnectionMetadata, IContact, IMessage, IUserProfile } from '../types';
+import { IContact, IContactResume, IMessage, IUserProfile } from '../types';
 import { AppDatabase } from '../Database/Database';
 import { genSignature, importPublicKey, peerIdToPublicKey, verifyMessage } from './Crypto';
 
@@ -20,12 +20,15 @@ export interface PeerManagerEvents {
 //try reconnect with peerserver/other contact every RECONNECT_TIMEOUT seconds
 const RECONNECT_TIMEOUT = 60 * 1000;
 
+interface ConnectionMetadata {
+  contact: IContactResume;
+  signature: string;
+}
 /**
  * Stateful module class to hook into react peerprovider. React components can listen to events fired through PeerManagerEvents
  */
 export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
   online: boolean;
-  peerid: string;
 
   _user: IUserProfile;
   _db: AppDatabase;
@@ -71,14 +74,12 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
     this._user = user;
     this._db = db;
 
-    this.peerid = this._user.peerid;
-
     //TODO connect several peers
     this._peer = this._initSignallingServer();
   }
 
   _initSignallingServer() {
-    this._peer = new Peer(this.peerid, this._usingSignallingServer);
+    this._peer = new Peer(this._user.peerid, this._usingSignallingServer);
     this._peer.on('open', (pid) => {
       console.log('Peer connected: ' + this._peer.id);
       if (pid !== this._user.peerid) {
@@ -92,7 +93,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
     this._peer.on('connection', async (conn: DataConnection) => {
       conn.on('open', async () => {
         console.debug('Connection open', conn);
-        const contact = await this._contactFromConnection(conn);
+        const contact = await this._contactConnected(conn);
         if (contact) {
           this._handleConnection(conn, contact);
         } else {
@@ -103,7 +104,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
     });
     this._peer.on('call', async (mediaConnection: MediaConnection) => {
       //verify id someone legit is
-      const contact = await this._contactFromConnection(mediaConnection);
+      const contact = await this._contactConnected(mediaConnection);
       if (contact) {
         this.emit('onIncomingCall', contact, mediaConnection);
       } else {
@@ -145,9 +146,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
    * and a signed a message containing this user's peerid.
    * @param {*} conn
    */
-  async _contactFromConnection(
-    conn: DataConnection | MediaConnection
-  ): Promise<IContact | undefined> {
+  async _contactConnected(conn: DataConnection | MediaConnection): Promise<IContact | undefined> {
     const md: ConnectionMetadata = conn.metadata;
     if (!md) return;
     const pubKey = peerIdToPublicKey(conn.peer);
@@ -191,18 +190,23 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
     /* New user trying to connect.
      * Save for now, notify, user will decide to accept
      */
-    const sig = await genSignature(conn.peer, this._user.privateKey);
+    const sig = await genSignature(conn.peer, this._user.security.privateKey);
 
     const metaData: ConnectionMetadata = conn.metadata;
 
-    const newContact = metaData.contact;
+    const newContact: IContact = Object.assign(
+      {
+        dateTimeCreated: new Date().getTime(),
+        dateTimeResponded: new Date().getTime(),
+        dateTimeAccepted: 0,
+        dateTimeDeclined: 0,
+        signature: sig,
+      },
+      metaData.contact
+    );
     //let user decide to accept or decline this new contact
     if (newContact.peerid !== conn.peer)
       throw Error('Contact sending different peerid in metadata');
-    newContact.dateTimeCreated = new Date().getTime();
-    newContact.dateTimeAccepted = 0;
-    newContact.dateTimeDeclined = 0;
-    newContact.signature = sig;
 
     this._db.contacts.add(newContact);
     return newContact;
@@ -210,46 +214,33 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
   /**
    * Known contact incoming. Update his metadata, and Validate if we have 1. accepted 2. not declined.
    */
-  _receiveRegisteredContact(
-    oldContact: IContact,
-    conn: DataConnection | MediaConnection
-  ): IContact {
+  _receiveRegisteredContact(contact: IContact, conn: DataConnection | MediaConnection): IContact {
     const md: ConnectionMetadata = conn.metadata;
     //persist updated contact info
-    const updatedContact = md.contact;
+    //merge new profile info into existing contact
+    Object.assign(contact, md.contact);
 
-    //keep our signature
-    updatedContact.signature = oldContact.signature;
-    //keep our flags
-    updatedContact.dateTimeAccepted = oldContact.dateTimeAccepted;
-    updatedContact.dateTimeCreated = oldContact.dateTimeCreated;
-    updatedContact.dateTimeDeclined = oldContact.dateTimeDeclined;
+    contact.dateTimeResponded = new Date().getTime();
 
-    updatedContact.dateTimeResponded = new Date().getTime();
+    this._db.contacts.put(contact);
 
-    this._db.contacts.put(updatedContact);
-
-    console.debug('contact updated', updatedContact);
-    if (updatedContact.dateTimeAccepted === 0) {
+    console.debug('contact updated', contact);
+    if (contact.dateTimeAccepted === 0) {
       console.info(
         'Unaccepted contact trying to connect. Closing connection for now.',
-        updatedContact,
+        contact,
         conn
       );
       conn.close();
-    } else if (updatedContact.dateTimeDeclined !== 0) {
-      console.warn(
-        'Declined contact trying to connect. I said no connection.',
-        updatedContact,
-        conn
-      );
+    } else if (contact.dateTimeDeclined !== 0) {
+      console.warn('Declined contact trying to connect. I said no connection.', contact, conn);
       conn.close();
     } else {
       //conn.send('Hi ' + contact.nickname + ', ' + this.user.nickname + ' is online!');
 
-      console.info('Accepted connection from known peer', updatedContact, conn);
+      console.info('Accepted connection from known peer', contact, conn);
     }
-    return updatedContact;
+    return contact;
   }
 
   /**
@@ -287,9 +278,9 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
       console.info("connection.on('open', () =>", contact, connection);
       this._connectedContacts.set(contact.peerid, connection);
 
-      this.emit('onContactStatusChange', { contact: contact, status: true });
-
       this._handleConnection(connection, contact);
+
+      this.emit('onContactStatusChange', { contact: contact, status: true });
     });
     connection.on('close', () => {
       console.info("connection.on('close', () => ", contact, connection);
@@ -299,15 +290,15 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
     return connection;
   }
 
-  _handleConnection(connection: DataConnection, c: IContact) {
-    this._connectedContacts.set(c.peerid, connection);
+  _handleConnection(connection: DataConnection, contact: IContact) {
+    this._connectedContacts.set(contact.peerid, connection);
     connection.on('data', (data) => {
       console.info(`received DATA:` + data);
       if (typeof data === 'string') {
         const dataDecoded = JSON.parse(data);
         const key = generateKeyFromString('1234');
         const decryptedString = decryptString(dataDecoded, key);
-        this._handleMessageData(decryptedString, c);
+        this._handleMessageData(decryptedString, contact);
 
         //not that simple, or is it
         // connection.send("ok");
@@ -316,7 +307,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
       }
     });
 
-    this._syncUnsentMessages(c);
+    this._syncUnsentMessages(contact);
   }
 
   async _handleMessageData(msg: string, contact: IContact): Promise<boolean> {
@@ -359,28 +350,10 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
    * @returns
    */
   _signConnectionMetadata(contact: IContact): ConnectionMetadata {
+    const { security, ...contactResume } = this._user;
+
     return {
-      contact: {
-        peerid: this._user.peerid,
-
-        nickname: this._user.nickname,
-        avatar: this._user.avatar,
-        signature: new ArrayBuffer(0), //not mine
-
-        //TODO ask if user accepts push messages from contact, oherwise dont share
-        pushSubscription: this._user.pushSubscription,
-
-        //TODO ask if user shares location with this contact
-        position: this._user.position,
-
-        dateTimeCreated: new Date().getTime(),
-
-        /* Requester can try to sent himself 'as accepted', receiver should reset and control himself */
-        dateTimeAccepted: new Date().getTime(),
-        /* same for trying to reset declined */
-        dateTimeDeclined: 0,
-        dateTimeResponded: 0,
-      },
+      contact: contactResume,
       signature: JSON.stringify(Array.from(new Uint8Array(contact.signature))),
     };
   }
@@ -408,12 +381,10 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
     this._attemptTransmitMessage(msg).then(async (sent) => {
       //if not able to send directly, push and save
       //always push for test
-      //if (!sent)
-      {
-        const pushed = await pushMessage(msg, contact, this._user);
-        msg.dateTimePushed = pushed;
-        this._db.messages.put(msg);
-      }
+      if (!sent) console.debug('Pushing anyway');
+      const pushed = await pushMessage(msg, contact, this._user);
+      msg.dateTimePushed = pushed;
+      this._db.messages.put(msg);
     });
     return msg;
   }

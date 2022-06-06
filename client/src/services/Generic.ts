@@ -154,7 +154,7 @@ const dateFormat = new Intl.DateTimeFormat(navigator.languages[0], {
   //  dateStyle: 'full',
 
   weekday: 'long',
-  year: 'numeric',
+  // year: 'numeric',
   month: 'long',
   day: 'numeric',
 });
@@ -193,6 +193,18 @@ export function getLocalDateString(date: Date) {
 export function getLocalTimeString(date: Date) {
   return timeFormat.format(date);
 }
+
+export function toCelsius(fahrenheit: number) {
+  const celcius = (fahrenheit - 32) / 1.8;
+  const fahren = toFahrenheit(celcius);
+  console.debug(`celcius:  ${celcius} -> fahrenheit ${fahren}`);
+  return celcius;
+}
+
+export function toFahrenheit(celsius: number) {
+  return celsius * 1.8 + 32;
+}
+
 export {
   domain,
   localLoad,

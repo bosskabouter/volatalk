@@ -35,9 +35,9 @@ export default function AcceptInvite(props: { invite: string }) {
         if (invite) {
           setReceivedInvite(invite);
 
-          if (await db.contacts.get(invite.peerId)) {
+          if (await db.contacts.get(invite.peerid)) {
             setResult(`Invite already accepted.. Still waiting to connect... `);
-          } else if (invite.peerId === userCtx.user.peerid) {
+          } else if (invite.peerid === userCtx.user.peerid) {
             setResult('Inviting yourself?');
           }
         } else {
@@ -49,7 +49,7 @@ export default function AcceptInvite(props: { invite: string }) {
       // we just entered the page from url. wait for our own peer to connect
       const timeout = 1000;
       setTimeout(async () => {
-        const isOnline = await peerCtx.isPeerOnline(receivedInvite.peerId);
+        const isOnline = await peerCtx.isPeerOnline(receivedInvite.peerid);
         setSenderOnline(isOnline);
       }, timeout);
     }
@@ -59,16 +59,18 @@ export default function AcceptInvite(props: { invite: string }) {
   const handleAcceptContact = async () => {
     if (!(db && receivedInvite && peerCtx)) return;
 
-    let contact = await db.contacts.get(receivedInvite.peerId);
+    let contact = await db.contacts.get(receivedInvite.peerid);
     if (contact) {
       setResult(`Invite already accepted.. Still waiting to connect... `);
     } else {
-      const sig = await genSignature(receivedInvite.peerId, userCtx.user.privateKey);
+      const sig = await genSignature(receivedInvite.peerid, userCtx.user.security.privateKey);
       contact = {
-        peerid: receivedInvite.peerId,
+        peerid: receivedInvite.peerid,
         signature: sig,
         nickname: receivedInvite.text,
         avatar: '',
+        avatarThumb: '',
+        dateRegistered: new Date(),
         dateTimeCreated: new Date().getTime(),
         dateTimeAccepted: new Date().getTime(),
         dateTimeResponded: 0,
@@ -117,7 +119,7 @@ export default function AcceptInvite(props: { invite: string }) {
             <Typography variant="subtitle2">You received an invite to connect</Typography>
             <Typography variant="subtitle1">{receivedInvite.text}</Typography>
             <Identification
-              id={receivedInvite.peerId}
+              id={receivedInvite.peerid}
               avatar=""
               name={receivedInvite.text}
               status={senderOnline || false}

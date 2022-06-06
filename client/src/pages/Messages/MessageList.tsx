@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
-import { Box, List, ListItem, ListItemText, ListSubheader } from '@mui/material';
+import { Box, List, ListItem, ListSubheader } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import IconButton from '@mui/material/IconButton';
@@ -9,16 +9,14 @@ import VideoCallIcon from '@mui/icons-material/VideoCall';
 
 import BackIcon from '@mui/icons-material/ChevronLeft';
 import { DatabaseContext } from '../../providers/DatabaseProvider';
-import { UserContext } from '../../providers/UserProvider';
 import { PeerContext } from '../../providers/PeerProvider';
-import { IContact, IMessage } from '../../types';
 import { ContactItem } from '../Contacts/ContactItem';
 import { ComposeMessage } from './ComposeMessage';
 import { MessageItem } from './MessageItem';
+import { IContact, IMessage } from '../../types';
 
 const MessageList = () => {
   const db = useContext(DatabaseContext);
-  const userCtx = useContext(UserContext);
   const peerManager = useContext(PeerContext);
   const navigate = useNavigate();
 

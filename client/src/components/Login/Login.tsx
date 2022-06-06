@@ -43,7 +43,7 @@ const Login = () => {
           .get(1)
           .then((user) => {
             if (user !== undefined) {
-              if (user.pin === values.pin) {
+              if (user.security.pin === values.pin) {
                 setLoggedIn(true);
                 setAuthenticated(true);
                 console.log('Logged in user', user);

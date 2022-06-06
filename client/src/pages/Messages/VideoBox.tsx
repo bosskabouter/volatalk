@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { IContact } from '../../types';
+import { IContactResume } from '../../types';
 
-function VideoBox(props: { contact: IContact }) {
+function VideoBox(props: { contact: IContactResume }) {
   return (
     <>
       <video></video>
