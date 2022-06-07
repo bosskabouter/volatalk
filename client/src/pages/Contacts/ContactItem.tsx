@@ -93,10 +93,10 @@ export const ContactItem = (props: { contact: IContact }) => {
           >
             <MoreOptionsIcon></MoreOptionsIcon>
           </IconButton>
-        </Tooltip>{' '}
+        </Tooltip>
         <Dialog open={showOptions} onClose={() => setShowOptions(false)}>
           <DialogContent>
-            <DialogContentText></DialogContentText>{' '}
+            <DialogContentText></DialogContentText>
           </DialogContent>
         </Dialog>
       </>
@@ -135,9 +135,9 @@ export const ContactItem = (props: { contact: IContact }) => {
         <MoreOptionsButton></MoreOptionsButton>
       </Box>
 
-      {/*username can move to bottom or disappear if to small*/}
       <Box
         sx={{
+          //username can move to bottom or disappear if to small
           display: 'flex',
           flexDirection: 'column',
           alignItems: { xs: 'left', md: 'flex-start' },

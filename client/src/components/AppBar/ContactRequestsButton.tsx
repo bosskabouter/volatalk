@@ -1,15 +1,14 @@
 import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import IconButton from '@mui/material/IconButton';
 
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import Badge from '@mui/material/Badge';
 import { IContactResume } from 'types';
 import { DatabaseContext } from 'providers/DatabaseProvider';
 import { PeerContext } from 'providers/PeerProvider';
-import { Avatar } from '@mui/material';
+import { Button } from '@mui/material';
 
-function ContactRequestButton() {
+function ContactRequestsButton() {
   const db = useContext(DatabaseContext);
   const peerCtx = useContext(PeerContext);
 
@@ -52,17 +51,16 @@ function ContactRequestButton() {
       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       badgeContent={contactRequests.length}
     >
-      <IconButton
-        size="large"
+      <Button
+        variant="contained"
         onClick={handleClickButton}
-        color={hasUnansweredRequests ? 'success' : 'default'}
+        startIcon={<PersonAddIcon />}
+        color="secondary"
       >
-        {' '}
-        <PersonAddIcon></PersonAddIcon>
-        <Avatar variant="rounded"></Avatar>
-      </IconButton>
+        Invite
+      </Button>
     </Badge>
   );
 }
 
-export default ContactRequestButton;
+export default ContactRequestsButton;

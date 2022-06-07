@@ -3,14 +3,14 @@
 import { css } from '@emotion/react';
 import { AppBar } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import Geolocation from '../../util/Widgets/LocationInfo';
+import { WidgetBar } from 'util/Widgets/WidgetBar';
 
 const Footer = () => {
   const theme = useTheme();
 
   const styles = {
     footerRoot: css`
-      padding: ${theme.spacing(2)} ${theme.spacing(2)};
+      padding: ${theme.spacing(0)} ${theme.spacing(1)};
     `,
     logos: css`
       margin-bottom: ${theme.spacing(2)};
@@ -21,7 +21,7 @@ const Footer = () => {
 
   return (
     <AppBar css={styles.footerRoot} position="relative">
-      <Geolocation></Geolocation>
+      <WidgetBar />
     </AppBar>
   );
 };

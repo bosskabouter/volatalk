@@ -34,13 +34,28 @@ export const ComposeMessage = ({
 
   const ChooseEmojiButton = () => {
     return openEmoji ? (
-      <EmojiPicker
-        native
-        onEmojiClick={(_e, picked) => {
-          setSndMessageText(sndMessageText + picked.emoji);
-          setOpenEmoji(false);
+      <Box
+        sx={{
+          //  overflow: 'hidden',
+          backgroundColor: 'coral',
+
+          //absolute
+          //fixed made disappear
+          position: 'fixed',
+          bottom: 80,
+          right: 20,
+          border: 1,
         }}
-      />
+      >
+        <EmojiPicker
+          preload
+          native
+          onEmojiClick={(_e, picked) => {
+            setSndMessageText(sndMessageText + picked.emoji);
+            setOpenEmoji(false);
+          }}
+        />
+      </Box>
     ) : (
       <IconButton
         onClick={() => {
@@ -56,9 +71,12 @@ export const ComposeMessage = ({
   ) : (
     <Box
       sx={{
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
         flex: '',
         minWidth: { md: 270 },
-        overflow: 'visible',
+        //overflow: 'visible',
       }}
     >
       <TextField
@@ -68,7 +86,7 @@ export const ComposeMessage = ({
         label={'Send ' + contact.nickname + ' a message'}
         placeholder={'Hi ' + contact.nickname + '!'}
         sx={{ width: '90%' }}
-        //  variant="filled"
+        variant="filled"
         onKeyPress={(e) => {
           if (e.key === 'Enter') sendText();
         }}

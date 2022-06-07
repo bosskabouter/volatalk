@@ -31,12 +31,12 @@ import { DatabaseContext } from '../../providers/DatabaseProvider';
 import { IUserProfile } from '../../types';
 import { AuthContext } from '../../providers/AuthProvider';
 import { exportCryptoKey, generateKeyPair, peerIdFromPublicKey } from '../../services/Crypto';
-import { requestFollowMe } from '../../util/Widgets/LocationInfo';
 import { notifyMe } from '../../services/PushMessage';
 import { setCreated, setIsSecure } from '../../store/slices/accountSlice';
 import { resizeFileUpload } from '../../services/Generic';
 import { DistanceFromMiddleEarth } from 'util/geo/Distance';
 import { questions } from './SecurityQuestions';
+import { requestFollowMe } from 'services/LocationService';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;

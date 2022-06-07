@@ -85,7 +85,7 @@ export interface IContact extends IContactResume {
  *
  * receive-confirm
  * read-confirm
- * 
+ *
  */
 export interface IMessage {
   //auto generated id

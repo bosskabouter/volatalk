@@ -103,11 +103,7 @@ export const ContactListItem = (props: { contact: IContact }) => {
   };
 
   const SecondaryOptions = () => {
-    return (
-      <>
-        <AcceptContactButton />
-      </>
-    );
+    return <AcceptContactButton />;
   };
 
   return (

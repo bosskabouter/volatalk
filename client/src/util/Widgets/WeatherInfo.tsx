@@ -1,68 +1,56 @@
 import { useEffect, useState } from 'react';
 
-import { Box, Tooltip, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { round, toCelsius } from 'services/Generic';
-import { fetchLocationDescription, fetchLocationWeather } from 'services/LocationService';
+import { fetchLocationWeather } from 'services/LocationService';
 
 interface WeatherInfoProps {
-  location: GeolocationPosition | null;
+  location: GeolocationCoordinates | null;
 }
 
 export const WeatherInfo = ({ location }: WeatherInfoProps) => {
-  const [fetched, setFetched] = useState<boolean>(false);
-  const [locationData, setLocationData] = useState<string>('Lutjebroek');
-  const [weatherToday, setWeatherToday] = useState<string>('Cloudy, little rain');
-  const [weatherIcon, setWeatherIcon] = useState<string>(makeIconURL('03n'));
-  const [weatherTemp, setWeatherForecast] = useState<string>('5');
+  const [weatherNow, setWeatherNow] = useState<{
+    description: string;
+    fahrenheit: number;
+    icon: string;
+  }>();
 
   useEffect(() => {
-    if (!location || fetched) return;
-    setFetched(true);
-    fetchLocationDescription(location.coords).then((desc) => {
-      setLocationData(`${desc.name} (${desc.country})`);
-    });
-    fetchLocationWeather(location.coords).then((weather) => {
-      const celciusNow = toCelsius(weather.fahrenheit) / 10;
-      const celciusDesc = round(celciusNow, 1) + ' \u2103';
-      setWeatherForecast(celciusDesc);
-      setWeatherToday(weather.description);
-      setWeatherIcon(weather.icon);
-    });
-  }, [fetched, location]);
+    if (!location?.longitude || weatherNow) return;
 
-  return (
+    fetchLocationWeather(location).then((weather) => {
+      setWeatherNow(weather);
+    });
+  }, [location, location?.longitude, weatherNow]);
+
+  return weatherNow ? (
     <Box
       sx={{
-        display: 'flex',
-        flexDirection: 'row',
-        // alignItems: 'flex-start',
-        justifyContent: 'right',
+        // display: { xs: 'hidden', lg: 'collapse' },
+        flexDirection: { md: 'row', lg: 'column' },
+        //  alignItems: { xs: 'left', md: 'flex-start' },
+        //minWidth: { md: 80 },
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden',
+        margin: 0,
+        padding: 0,
       }}
     >
-      {locationData}
-      <Typography variant="subtitle1" noWrap>
-        <Tooltip title={weatherToday}>
-          <div>
-            <img src={weatherIcon} alt="Current Weather" />
-
-            <Typography variant="subtitle2" noWrap>
-              {weatherTemp}
-            </Typography>
-          </div>
-        </Tooltip>
-      </Typography>
       <Box
         sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-end',
-          justifyContent: 'right',
+          visibility: { xs: 'hidden', lg: 'visible' },
         }}
-      ></Box>
+      >
+        <Typography variant="subtitle2" noWrap>
+          {round(toCelsius(weatherNow.fahrenheit) / 10, 1) + ' \u2103'}
+        </Typography>
+      </Box>
+      <Box>
+        <img src={weatherNow.icon} alt="Current Weather" />
+      </Box>
     </Box>
+  ) : (
+    <div>No Weather data without location</div>
   );
 };
-
-function makeIconURL(iconName: string) {
-  return 'https://openweathermap.org/img/wn/' + iconName + '.png';
-}

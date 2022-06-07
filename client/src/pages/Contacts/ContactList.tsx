@@ -50,7 +50,7 @@ const ContactList = () => {
             width: '100%',
             bgcolor: 'background.paper',
             //  position: 'relative',
-            //overflow: 'scroll',
+            overflow: 'scroll',
             //maxHeight: 1,
             '& ul': { padding: 0 },
           }}

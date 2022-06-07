@@ -38,9 +38,8 @@ export default function Invite() {
       padding: ${theme.spacing(2)} ${theme.spacing(2)};
     `,
     viewFinderStyle: css`
-      margin-bottom: ${theme.spacing(2)};
-      max-width: 480px;
-
+   
+    padding:0,
       top: 0,
       left: 0,
       zIndex: 1,
@@ -109,7 +108,7 @@ export default function Invite() {
 
   const DisplayQRScanner = () => {
     const ViewFinder = () => (
-      <svg width="50px" viewBox="0 0 100 100" css={styles.viewFinderStyle}>
+      <svg width="100%" viewBox="0 0 100 100" css={styles.viewFinderStyle}>
         <path fill="none" d="M13,0 L0,0 L0,13" stroke="rgba(255, 0, 0, 0.5)" strokeWidth="5" />
         <path fill="none" d="M0,87 L0,100 L13,100" stroke="rgba(255, 0, 0, 0.5)" strokeWidth="5" />
         <path
