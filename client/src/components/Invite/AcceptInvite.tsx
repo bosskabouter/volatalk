@@ -14,6 +14,8 @@ import { genSignature } from '../../services/Crypto';
 import Identification from 'components/Identification/Identification';
 
 export default function AcceptInvite(props: { invite: string }) {
+  const timeout = 5000;
+
   //recover invite from local storage hack
   localStorage.removeItem('invite');
 
@@ -47,7 +49,7 @@ export default function AcceptInvite(props: { invite: string }) {
     } else if (receivedInvite && senderOnline === null) {
       setSenderOnline(false);
       // we just entered the page from url. wait for our own peer to connect
-      const timeout = 1000;
+
       setTimeout(async () => {
         const isOnline = await peerCtx.isPeerOnline(receivedInvite.peerid);
         setSenderOnline(isOnline);

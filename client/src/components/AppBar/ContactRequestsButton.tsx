@@ -38,10 +38,6 @@ function ContactRequestsButton() {
     };
   }, [peerCtx]);
 
-  const handleClickButton = () => {
-    navigate('/Invite');
-  };
-
   const hasUnansweredRequests = contactRequests.length > 0;
   return (
     <Badge
@@ -53,11 +49,12 @@ function ContactRequestsButton() {
     >
       <Button
         variant="contained"
-        onClick={handleClickButton}
-        startIcon={<PersonAddIcon />}
+        onClick={() => {
+          navigate('/Invite');
+        }}
         color="secondary"
       >
-        Invite
+        <PersonAddIcon sx={{ width: 23, height: 23, border: 0 }} />
       </Button>
     </Badge>
   );

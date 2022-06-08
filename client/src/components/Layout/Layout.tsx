@@ -4,7 +4,7 @@ import { css } from '@emotion/react';
 import { Container } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import * as React from 'react';
-import TemporaryDrawer from '../AppBar/TemporaryDrawer';
+import Header from '../AppBar/TemporaryDrawer';
 import Footer from '../Footer/Footer';
 
 interface IProps {
@@ -37,13 +37,17 @@ const Layout = ({ children }: IProps) => {
         padding-top: ${theme.spacing(4)};
       }
     `,
-    root: css``,
+    root: css`
+      padding-top: 100;
+      padding-bottom: 63px;
+      backgroundcolor: purple;
+    `,
   };
 
   return (
     <>
-      <TemporaryDrawer />
-      <Container css={styles.containerRoot}>
+      <Header />
+      <Container css={styles.containerRoot} sx={{}}>
         <main css={styles.root}>{children}</main>
       </Container>
       <Footer />

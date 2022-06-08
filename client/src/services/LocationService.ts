@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { round, toCelsius } from './Generic';
 
 const OPENWEATHER_APIKEY = '420408196cb33ae10825f1019e75bcb2';
 
@@ -59,6 +60,7 @@ export async function fetchLocationDescription(coords: GeolocationCoordinates): 
 export async function fetchLocationWeather(coords: GeolocationCoordinates): Promise<{
   description: string;
   fahrenheit: number;
+  celcius: number;
   icon: string;
 }> {
   return (
@@ -73,7 +75,8 @@ export async function fetchLocationWeather(coords: GeolocationCoordinates): Prom
 
           const fahrenheit = res.data.main.feels_like;
 
-          resolve({ description, fahrenheit, icon });
+          const celcius = round(toCelsius(fahrenheit) / 10, 1);
+          resolve({ description, fahrenheit, celcius, icon });
         }
       );
     })

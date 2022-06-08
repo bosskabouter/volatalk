@@ -7,10 +7,11 @@ import { useTheme } from '@mui/material/styles';
 import { Link } from 'react-router-dom';
 import logo from '../../assets/svg/logo-black.svg';
 
-import { Typography, Toolbar } from '@mui/material';
-import StatusDisplay from '../StatusDisplay/StatusDisplay';
+import { Typography, Toolbar, Avatar } from '@mui/material';
+import AccountAvatar from '../StatusDisplay/AccountAvatar';
+import { deepOrange } from '@mui/material/colors';
 
-export default function TemporaryDrawer() {
+export default function Header() {
   const theme = useTheme();
 
   const styles = {
@@ -58,10 +59,15 @@ export default function TemporaryDrawer() {
         <Toolbar disableGutters variant="dense">
           <Typography variant="h6" noWrap css={styles.title}>
             <Link to="/">
-              <img alt="VolaTALK logo" css={styles.toolbarLogo} src={logo} />
+              <Avatar
+                src={logo}
+                variant="rounded"
+                color="secondary"
+                sx={{ width: 36, height: 36, border: 2 }}
+              ></Avatar>
             </Link>
           </Typography>
-          <StatusDisplay />
+          <AccountAvatar />
         </Toolbar>
       </AppBar>
     </div>

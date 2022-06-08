@@ -36,10 +36,17 @@ export const ContactListItem = (props: { contact: IContact }) => {
     //avoid onclick listitem handleClickMessageContact
     e.stopPropagation();
   };
+
+  /**
+   * Select last message from
+   */
   useEffect(() => {
     db?.selectLastMessage(props.contact).then(setLastMessage);
   }, [db, props.contact]);
 
+  /**
+   * Listens for new Messages. If it came from this contact, set as last message
+   */
   useEffect(() => {
     function messageHandler(message: IMessage) {
       if (message.sender === props.contact?.peerid) {
@@ -56,16 +63,19 @@ export const ContactListItem = (props: { contact: IContact }) => {
     };
   }, [peerMngr, props.contact, online]);
 
+  /**
+   *
+   * @returns
+   */
   const AcceptContactButton = () => {
     const acceptContact = () => {
-      if (db) {
-        props.contact.dateTimeAccepted = new Date().getTime();
-        db.contacts.put(props.contact);
-        if (peerMngr) {
-          peerMngr.connectContact(props.contact);
+      if (!db) throw Error('No DB');
+      props.contact.dateTimeAccepted = new Date().getTime();
+      db.contacts.put(props.contact);
+      if (peerMngr) {
+        peerMngr.connectContact(props.contact);
 
-          setOnline(peerMngr.isConnected(props.contact));
-        }
+        setOnline(peerMngr.isConnected(props.contact));
       }
     };
     return props.contact.dateTimeAccepted === 0 ? (

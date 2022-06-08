@@ -187,7 +187,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
   async _createNewContactFromTrustedConnection(
     conn: DataConnection | MediaConnection
   ): Promise<IContact> {
-    /* New user trying to connect.
+    /* New certified user trying to connect.
      * Save for now, notify, user will decide to accept
      */
     const sig = await genSignature(conn.peer, this._user.security.privateKey);
@@ -211,8 +211,13 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
     this._db.contacts.add(newContact);
     return newContact;
   }
+
   /**
    * Known contact incoming. Update his metadata, and Validate if we have 1. accepted 2. not declined.
+   *
+   * @param contact
+   * @param conn
+   * @returns
    */
   _receiveRegisteredContact(contact: IContact, conn: DataConnection | MediaConnection): IContact {
     const md: ConnectionMetadata = conn.metadata;
@@ -244,9 +249,10 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
   }
 
   /**
-   * Start a new connection request handshake with contact, sending user's'
+   *  Start a new connection request handshake with contact, sending user's'
    * Public info and our signature for the other peer for validation.
-   * @param {*} contact
+   * @param contact
+   * @returns
    */
   connectContact(contact: IContact): DataConnection | null {
     if (contact.dateTimeDeclined !== 0) {
@@ -331,7 +337,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
   }
 
   /**
-   * Send all unsent messages (independent of push delivered).
+   * Send all unsent messages (independent of push delivery).
    * @param c
    * @returns
    */
@@ -350,10 +356,11 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
    * @returns
    */
   _signConnectionMetadata(contact: IContact): ConnectionMetadata {
-    const { security, ...contactResume } = this._user;
+    //create shallow copy of this user as resume to send over, without the security details
+    const { security, ...myResume } = this._user;
 
     return {
-      contact: contactResume,
+      contact: myResume,
       signature: JSON.stringify(Array.from(new Uint8Array(contact.signature))),
     };
   }

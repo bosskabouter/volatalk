@@ -38,7 +38,7 @@ import { DistanceFromMiddleEarth } from 'util/geo/Distance';
 import { questions } from './SecurityQuestions';
 import { requestFollowMe } from 'services/LocationService';
 
-const ITEM_HEIGHT = 48;
+const ITEM_HEIGHT = 18;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
   PaperProps: {
@@ -84,17 +84,54 @@ const AccountSetup = () => {
       is: true,
       then: yup.string().defined('Please enter a security question').trim(),
     }),
-    answer1: yup.string().when('isSecured', {
+    answer1: yup.string().when('security.isSecured', {
       is: true,
       then: yup.string().defined('Please enter an answer to your security question').trim(),
     }),
-    question2: yup.string().when('isSecured', {
+    question2: yup.string().when('security.isSecured', {
       is: true,
       then: yup.string().defined('Please enter a security question').trim(),
     }),
-    answer2: yup.string().when('isSecured', {
+    answer2: yup.string().when('security.isSecured', {
       is: true,
       then: yup.string().defined('Please enter an answer to your security question').trim(),
+    }),
+  });
+
+  const validationSchema = yup.object({
+    nickname: yup
+      .string()
+      .defined('Enter a nice nickname people will recognize')
+      .min(3, 'Nickname must be at least 6 characters')
+      .trim(),
+
+    security: yup.object({
+      isSecured: yup.boolean(),
+      pin: yup.string().when('isSecured', {
+        is: true,
+        then: yup
+          .string()
+          .defined('Enter a valid pin')
+          .min(6, 'Pin must be at least 6 characters')
+          .matches(/^\d+$/, 'Pin must only contain numbers')
+          .trim(),
+      }),
+      question1: yup.string().when('isSecured', {
+        is: true,
+        then: yup.string().defined('Please enter a security question').trim(),
+      }),
+      answer1: yup.string().when('security.isSecured', {
+        is: true,
+        then: yup.string().defined('Please enter an answer to your security question').trim(),
+      }),
+      question2: yup.string().when('security.isSecured', {
+        is: true,
+        then: yup.string().defined('Please enter a security question').trim(),
+      }),
+      answer2: yup.string().when('security.isSecured', {
+        is: true,
+        then: yup.string().defined('Please enter an answer to your security question').trim(),
+      }),
     }),
   });
 
@@ -128,7 +165,7 @@ const AccountSetup = () => {
       pushSubscription: null,
     },
 
-    validationSchema: validationSchemaSecure,
+    validationSchema: validationSchema,
 
     onSubmit: (values: IUserProfile) => {
       //gps coords are not controlled by formik
@@ -162,6 +199,7 @@ const AccountSetup = () => {
    * @param values from form containing user data
    */
   function registerUser(values: IUserProfile) {
+    if (!db) throw Error('No DB');
     generateKeyPair().then((keyPair) => {
       if (!keyPair) {
         return;
@@ -182,31 +220,30 @@ const AccountSetup = () => {
           values.security.privateKey = JSON.stringify(jsonPrivateKey);
 
           // Save to database
-          if (db !== null) {
-            //only 1 user, for now
-            db.userProfile
-              .put(values, 1)
-              .then(() => {
-                dispatch(setCreated());
-                if (formik.values.security.isSecured) {
-                  dispatch(setIsSecure());
-                }
-                setUser(values);
 
-                setAuthenticated(true);
+          //only 1 user, for now
+          db.userProfile
+            .put(values, 1)
+            .then(() => {
+              dispatch(setCreated());
+              if (formik.values.security.isSecured) {
+                dispatch(setIsSecure());
+              }
+              setUser(values);
 
-                if (values.usePush) {
-                  //reload the app to activate service worker
-                  //  document.location = document.location.origin;
-                }
-                //dont need reload for service worker activation, go directly
-                //else
-                navigate('/');
-              })
-              .catch((err) => {
-                console.error(err);
-              });
-          }
+              setAuthenticated(true);
+
+              if (values.usePush) {
+                //reload the app to activate service worker
+                //  document.location = document.location.origin;
+              }
+              //dont need reload for service worker activation, go directly
+              //else
+              navigate('/');
+            })
+            .catch((err) => {
+              console.error(err);
+            });
         });
       });
     });
@@ -376,9 +413,7 @@ const AccountSetup = () => {
       fullScreen={fullScreen}
     >
       <DialogContent id="dialog-agreement" css={styles.accountSetupDialogContent}>
-        <Typography component="h1" variant="h6">
-          Profile settings
-        </Typography>
+        <Typography variant="h5">Profile settings</Typography>
 
         <form css={styles.form} onSubmit={formik.handleSubmit}>
           <Typography variant="subtitle1">Your nickname: </Typography>
@@ -463,18 +498,20 @@ const AccountSetup = () => {
             control={
               <Checkbox
                 css={styles.accountSecureButton}
-                name="isSecured"
+                name="security.isSecured"
                 //label="isSecured"
                 //defaultValue={formik.values.isSecured}
-                id="isSecured"
-                checked={formik.values.security.isSecured}
+                id="security.isSecured"
+                checked={formik.values.security?.isSecured}
                 onChange={formik.handleChange}
-                color={formik.values.security.isSecured ? 'default' : 'error'}
+                color={formik.values.security?.isSecured ? 'default' : 'error'}
                 icon={<LockOpenIcon />}
                 checkedIcon={<LockIcon></LockIcon>}
               />
             }
-            label={formik.values.security.isSecured ? "I don't need security" : 'Secure my account'}
+            label={
+              formik.values.security?.isSecured ? "I don't need security" : 'Secure my account'
+            }
           />
           {formik.values.security.isSecured && (
             <Box>
@@ -482,12 +519,12 @@ const AccountSetup = () => {
 
               <TextField
                 css={styles.accountPin}
-                id="pin"
+                id="security.pin"
                 variant="outlined"
                 type="password"
                 inputMode="numeric"
                 inputProps={{ maxLength: 6 }}
-                value={formik.values.security.pin}
+                value={formik.values.security?.pin}
                 onChange={formik.handleChange}
                 error={formik.touched.security?.pin && Boolean(formik.errors.security?.pin)}
                 //helperText={(formik.touched.pin? formik.errors.pin)}
@@ -497,13 +534,13 @@ const AccountSetup = () => {
                 <Select
                   css={styles.accountQuestionSelect}
                   displayEmpty
-                  id="question1"
-                  name="question1"
+                  id="security.question1"
+                  name="security.question1"
                   input={<OutlinedInput />}
                   MenuProps={MenuProps}
                   inputProps={{ 'aria-label': 'Without label' }}
                   //variant="standard"
-                  value={formik.values.security.question1}
+                  value={formik.values.security?.question1}
                   onChange={formik.handleChange}
                   error={
                     formik.touched.security?.question1 && Boolean(formik.errors.security?.question1)
@@ -521,9 +558,9 @@ const AccountSetup = () => {
                 <TextField
                   css={styles.accountQuestionAnswer}
                   placeholder="First authentication answer"
-                  id="answer1"
-                  name="answer1"
-                  value={formik.values.security.answer1}
+                  id="security.answer1"
+                  name="security.answer1"
+                  value={formik.values.security?.answer1}
                   variant="outlined"
                   onChange={formik.handleChange}
                   error={
@@ -535,13 +572,13 @@ const AccountSetup = () => {
                 <Select
                   css={styles.accountQuestionSelect}
                   displayEmpty
-                  id="question2"
-                  name="question2"
+                  id="security.question2"
+                  name="security.question2"
                   input={<OutlinedInput />}
                   MenuProps={MenuProps}
                   inputProps={{ 'aria-label': 'Without label' }}
                   variant="standard"
-                  value={formik.values.security.question2}
+                  value={formik.values.security?.question2}
                   onChange={formik.handleChange}
                 >
                   <MenuItem css={styles.accountQuestionMenu} disabled value="">
@@ -556,9 +593,9 @@ const AccountSetup = () => {
                 <TextField
                   css={styles.accountQuestionAnswer}
                   placeholder="Second authentication answer"
-                  id="answer2"
-                  name="answer2"
-                  value={formik.values.security.answer2}
+                  id="security.answer2"
+                  name="security.answer2"
+                  value={formik.values.security?.answer2}
                   variant="outlined"
                   onChange={formik.handleChange}
                   error={
@@ -570,7 +607,7 @@ const AccountSetup = () => {
           )}
 
           <Button css={styles.accountSetupButton} type="submit" color="primary" variant="contained">
-            Enter VolaTALK
+            {!authenticated ? 'Enter VolaTALK' : 'UPDATE PROFILE'}
           </Button>
         </form>
       </DialogContent>

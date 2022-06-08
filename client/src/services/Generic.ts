@@ -150,6 +150,15 @@ export function resizeFileUpload(imageFile: File, MAX_WIDTH: number, MAX_HEIGHT:
   });
 }
 
+const dateFormatShort = new Intl.DateTimeFormat(navigator.languages[0], {
+  //  dateStyle: 'full',
+
+  // weekday: 'short',
+  // year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+
 const dateFormat = new Intl.DateTimeFormat(navigator.languages[0], {
   //  dateStyle: 'full',
 
@@ -186,7 +195,9 @@ export function descriptiveTimeAgo(date: Date) {
   }
   return desc;
 }
-
+export function getLocalDateShortString(date: Date) {
+  return dateFormatShort.format(date);
+}
 export function getLocalDateString(date: Date) {
   return dateFormat.format(date);
 }

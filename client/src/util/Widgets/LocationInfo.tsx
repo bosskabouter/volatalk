@@ -41,21 +41,27 @@ export default function LocationInfo() {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'right',
-        border: 1,
+        border: 0,
+        columnGap: 1,
         margin: 0,
         padding: 0,
       }}
     >
       <WeatherInfo location={position} />
-
-      <Box
-        sx={{
-          display: { xs: 'none', lg: 'block' },
-        }}
+      <Tooltip
+        title={`long:${position.longitude} - lat:${position.latitude} - near ${location.city} (${location.state}-${location.country})`}
       >
-        <Typography>{location.city}</Typography>
-      </Box>
-      {location.flag}
+        <Box sx={{ display: 'flex', flexDirection: 'row', columnGap: 1 }}>
+          <Box
+            sx={{
+              display: { xs: 'none', md: 'block' },
+            }}
+          >
+            <Typography>{location.city}</Typography>
+          </Box>
+          <Typography variant="h5">{location.flag}</Typography>
+        </Box>
+      </Tooltip>
     </Box>
   ) : (
     <Tooltip title="GPS disabled">

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { Box, Typography } from '@mui/material';
-import { round, toCelsius } from 'services/Generic';
+import { Box, Tooltip, Typography } from '@mui/material';
 import { fetchLocationWeather } from 'services/LocationService';
 
 interface WeatherInfoProps {
@@ -12,6 +11,7 @@ export const WeatherInfo = ({ location }: WeatherInfoProps) => {
   const [weatherNow, setWeatherNow] = useState<{
     description: string;
     fahrenheit: number;
+    celcius: number;
     icon: string;
   }>();
 
@@ -24,32 +24,25 @@ export const WeatherInfo = ({ location }: WeatherInfoProps) => {
   }, [location, location?.longitude, weatherNow]);
 
   return weatherNow ? (
-    <Box
-      sx={{
-        // display: { xs: 'hidden', lg: 'collapse' },
-        flexDirection: { md: 'row', lg: 'column' },
-        //  alignItems: { xs: 'left', md: 'flex-start' },
-        //minWidth: { md: 80 },
-        alignItems: 'center',
-        justifyContent: 'center',
-        overflow: 'hidden',
-        margin: 0,
-        padding: 0,
-      }}
-    >
+    <Tooltip title={weatherNow.description + ' - ' + weatherNow.celcius + ' \u2103'}>
       <Box
         sx={{
-          visibility: { xs: 'hidden', lg: 'visible' },
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'right',
+          alignItems: 'center',
+          border: 0,
+          margin: 0,
+          padding: 0,
+          columnGap: 0,
         }}
       >
-        <Typography variant="subtitle2" noWrap>
-          {round(toCelsius(weatherNow.fahrenheit) / 10, 1) + ' \u2103'}
+        <Typography noWrap sx={{ display: { xs: 'none', md: 'block' } }}>
+          {weatherNow.celcius + ' \u2103'}
         </Typography>
-      </Box>
-      <Box>
         <img src={weatherNow.icon} alt="Current Weather" />
       </Box>
-    </Box>
+    </Tooltip>
   ) : (
     <div>No Weather data without location</div>
   );

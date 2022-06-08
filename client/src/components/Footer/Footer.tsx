@@ -10,6 +10,10 @@ const Footer = () => {
 
   const styles = {
     footerRoot: css`
+      position: fixed;
+      bottom: 0;
+      overflow: overlay;
+
       padding: ${theme.spacing(0)} ${theme.spacing(1)};
     `,
     logos: css`

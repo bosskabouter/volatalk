@@ -76,8 +76,9 @@ const MessageList = () => {
           //  width: '100%',
           bgcolor: 'background.paper',
           // padding: 5,
+          // mt: 5,
           // position: static | relative | absolute | sticky | fixed
-          // position: 'clip',
+          //position: 'fixed',
           // overflow: visible | hidden | clip | scroll | auto
           // overflow: 'scroll',
           // height: auto | <length> | <percentage> | min-content | max-content | fit-content | fit-content(<length-percentage>)
@@ -92,6 +93,7 @@ const MessageList = () => {
             <Box
               sx={{
                 display: 'flex',
+                pt: 7,
                 //flexDirection: 'row',
                 //flexDirection: 'column-reverse',
                 // alignItems: 'flex-start',
