@@ -33,6 +33,8 @@ export default function AcceptInvite(props: { invite: string }) {
   useEffect(() => {
     if (!db || !peerCtx || !userCtx) return;
     if (!receivedInvite && !result) {
+      console.debug('useEffect extractInvite');
+
       extractInvite(new URLSearchParams(props.invite)).then(async (invite) => {
         if (invite) {
           setReceivedInvite(invite);

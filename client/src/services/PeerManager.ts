@@ -77,8 +77,12 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
     //TODO connect several peers
     this._peer = this._initSignallingServer();
   }
+  verifyValidPeerId(peerid: string) {
+    if (peerid?.length < 100) throw Error('Invalid peerID:' + peerid);
+  }
 
   _initSignallingServer() {
+    this.verifyValidPeerId(this._user.peerid);
     this._peer = new Peer(this._user.peerid, this._usingSignallingServer);
     this._peer.on('open', (pid) => {
       console.log('Peer connected: ' + this._peer.id);
@@ -282,7 +286,6 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
     });
     connection.on('open', () => {
       console.info("connection.on('open', () =>", contact, connection);
-      this._connectedContacts.set(contact.peerid, connection);
 
       this._handleConnection(connection, contact);
 
@@ -451,7 +454,6 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
       });
     });
   }
-
   async call(contact: IContact, localMediaStream: MediaStream): Promise<MediaStream | null> {
     return new Promise((resolve, _reject) => {
       console.debug('Calling contact', contact, localMediaStream);
@@ -469,6 +471,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
       });
     });
   }
+
   /**
    * Checks if connection exists and open with known contact
    * @param contact

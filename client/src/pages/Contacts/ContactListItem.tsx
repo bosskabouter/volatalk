@@ -21,7 +21,7 @@ export const ContactListItem = (props: { contact: IContact }) => {
 
   const [online, setOnline] = useState(peerMngr?.isConnected(props.contact));
 
-  const [lastMessage, setLastMessage] = useState<IMessage>();
+  const [lastMessage, setLastMessage] = useState<IMessage | null>();
 
   const handleClickMessageContact = (_e: MouseEvent) => {
     navigate('/messages/' + props.contact.peerid);
@@ -38,10 +38,12 @@ export const ContactListItem = (props: { contact: IContact }) => {
   };
 
   /**
-   * Select last message from
+   * Select initial last message from db
    */
   useEffect(() => {
-    db?.selectLastMessage(props.contact).then(setLastMessage);
+    if (!db) return;
+    console.debug('useEffect selectLastMessage');
+    db.selectLastMessage(props.contact).then(setLastMessage);
   }, [db, props.contact]);
 
   /**
@@ -55,7 +57,9 @@ export const ContactListItem = (props: { contact: IContact }) => {
       }
     }
 
-    if (!peerMngr) return;
+    if (!peerMngr || !online || !props.contact) return;
+    console.debug('useEffect onMessage');
+
     peerMngr.on('onMessage', messageHandler);
 
     return () => {
@@ -68,13 +72,12 @@ export const ContactListItem = (props: { contact: IContact }) => {
    * @returns
    */
   const AcceptContactButton = () => {
-    const acceptContact = () => {
-      if (!db) throw Error('No DB');
+    const acceptContact = (e: { preventDefault: () => void }) => {
+      e.preventDefault();
       props.contact.dateTimeAccepted = new Date().getTime();
-      db.contacts.put(props.contact);
+      db?.contacts.put(props.contact);
       if (peerMngr) {
         peerMngr.connectContact(props.contact);
-
         setOnline(peerMngr.isConnected(props.contact));
       }
     };
@@ -85,6 +88,7 @@ export const ContactListItem = (props: { contact: IContact }) => {
         aria-label="Accept Contact?"
         color="success"
         size="small"
+        title="Accept Contact"
       >
         <AddTaskIcon />
       </IconButton>
@@ -112,20 +116,17 @@ export const ContactListItem = (props: { contact: IContact }) => {
     );
   };
 
-  const SecondaryOptions = () => {
-    return <AcceptContactButton />;
-  };
-
   return (
     <ListItem
       alignItems="flex-start"
       divider
       key={props.contact.peerid}
       onClick={handleClickMessageContact}
-      secondaryAction={SecondaryOptions()}
+      secondaryAction={<AcceptContactButton />}
+      dense
       sx={{
-        borderRadius: '12px',
-        boxShadow: 1,
+        borderRadius: '9px',
+        boxShadow: 2,
         '&:hover': {
           backgroundColor: 'primary.main',
           opacity: [0.9, 0.8, 0.7],

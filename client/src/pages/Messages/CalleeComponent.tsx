@@ -7,12 +7,13 @@ import { ContactListItem } from '../Contacts/ContactListItem';
 import { MediaConnection } from 'peerjs';
 
 const CalleeComponent = () => {
-  const remoteVideoElement = useRef<HTMLVideoElement>(null);
   const peerMngr = useContext(PeerContext);
 
-  const [localMediaStream, setLocalMediaStream] = useState<MediaStream>();
-  const [mediaConnection, setMediaConnection] = useState<MediaConnection>();
-  const [remoteMediaStream, setRemoteMediaStream] = useState<MediaStream>();
+  const [localMediaStream, setLocalMediaStream] = useState<MediaStream | null>(null);
+  const [mediaConnection, setMediaConnection] = useState<MediaConnection | null>(null);
+  const [remoteMediaStream, setRemoteMediaStream] = useState<MediaStream | null>(null);
+
+  const remoteVideoElement = useRef<HTMLVideoElement>(null);
 
   const [videoOn, setVideoOn] = useState<boolean>(true);
 
@@ -23,6 +24,7 @@ const CalleeComponent = () => {
 
   useEffect(() => {
     if (!peerMngr) return;
+    console.debug('useEffect handleIncomingCall');
 
     async function handleIncomingCall(ctc: IContact, mc: MediaConnection) {
       setContact(ctc);
@@ -39,7 +41,9 @@ const CalleeComponent = () => {
   }, [peerMngr]);
 
   useEffect(() => {
-    if (!remoteMediaStream && mediaConnection) {
+    console.debug('useEffect answerCall');
+
+    if (!remoteMediaStream && mediaConnection && localMediaStream) {
       //someone calling
       if (answered) {
         mediaConnection.answer(localMediaStream);
@@ -50,6 +54,8 @@ const CalleeComponent = () => {
   }, [answered, localMediaStream, mediaConnection, remoteMediaStream]);
 
   useEffect(() => {
+    console.debug('useEffect acceptCall');
+
     if (remoteMediaStream && answered && contact) {
       navigator.mediaDevices
         .getUserMedia({ video: videoOn, audio: true })
@@ -80,7 +86,7 @@ const CalleeComponent = () => {
   }, [answered, contact, peerMngr, remoteMediaStream, videoOn]);
 
   const AskAcceptCall = () => {
-    if (!contact || !localMediaStream || accepted) return <></>;
+    if (!contact || !localMediaStream) return <>No call to accept</>;
     const handleAcceptCall = () => {
       peerMngr?.acceptCall(contact, localMediaStream).then((rms) => {
         setRemoteMediaStream(rms);
@@ -91,20 +97,27 @@ const CalleeComponent = () => {
     return (
       <>
         Incoming call:<ContactListItem contact={contact}></ContactListItem>
-        <Button onClick={handleAcceptCall}></Button>
+        <Button onClick={() => setAccepted(true)}>Accept</Button>
+        <Button onClick={() => setAccepted(false)}>Decline</Button>
       </>
     );
   };
 
   return (
     <>
-      <Dialog open={remoteMediaStream != null}>
+      {/* first ask to accept the call */}
+      <Dialog open={remoteMediaStream != null && !accepted}>
         <DialogContent>
           <AskAcceptCall></AskAcceptCall>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={accepted}>
+        <DialogContent>
           {videoOn ? (
             <video ref={remoteVideoElement} autoPlay />
           ) : (
-            <audio ref={remoteVideoElement} autoPlay hidden />
+            <audio ref={remoteVideoElement} autoPlay />
           )}
         </DialogContent>
       </Dialog>

@@ -16,11 +16,16 @@ const PeerDisplay = () => {
   const [peerIdenticon, setPeerIdenticon] = useState('');
 
   useEffect(() => {
-    if (userCtx?.user?.id && !peerIdenticon)
+    if (userCtx?.user?.id && !peerIdenticon) {
+      console.debug('setPeerIcon');
+
       setPeerIdenticon(PeerIdenticon({ peerid: userCtx.user.peerid }));
+    }
   }, [peerIdenticon, userCtx]);
 
   useEffect(() => {
+    console.debug('useEffect statusChange');
+
     peerCtx?.on('statusChange', setStatus);
   }, [peerCtx]);
 

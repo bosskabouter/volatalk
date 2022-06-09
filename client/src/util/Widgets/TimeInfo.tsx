@@ -14,6 +14,8 @@ export const TimeInfo = () => {
   const [time, setTime] = useState<Date>();
   //digital clock effect
   useEffect(() => {
+    console.debug('useEffect setTime');
+
     const interval = setInterval(() => setTime(new Date()), 10000);
     return () => {
       clearInterval(interval);
@@ -27,6 +29,7 @@ export const TimeInfo = () => {
 
     //analog clock effect
     useEffect(() => {
+      console.debug('useEffect rotate clock');
       function rotate(
         el: RefObject<SVGRectElement | undefined> | RefObject<SVGLineElement | undefined>,
         deg: number
@@ -43,9 +46,9 @@ export const TimeInfo = () => {
       }, 1000);
 
       return () => {
-        clearInterval(interval);
+        // clearInterval(interval);
       };
-    }, []);
+    });
 
     const styles = {
       clockRoot: css`

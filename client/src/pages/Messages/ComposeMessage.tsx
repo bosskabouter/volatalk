@@ -41,7 +41,7 @@ export const ComposeMessage = ({
 
           //absolute
           //fixed made disappear
-          position: 'fixed',
+          //position: 'fixed',
           bottom: 80,
           right: 20,
           border: 1,

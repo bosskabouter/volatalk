@@ -9,7 +9,6 @@ import logo from '../../assets/svg/logo-black.svg';
 
 import { Typography, Toolbar, Avatar } from '@mui/material';
 import AccountAvatar from '../StatusDisplay/AccountAvatar';
-import { deepOrange } from '@mui/material/colors';
 
 export default function Header() {
   const theme = useTheme();
@@ -19,7 +18,7 @@ export default function Header() {
       display: flex;
     `,
     appBar: css`
-      padding-right: 36px;
+      padding-right: 18px;
       padding-left: 18px;
     `,
     title: css`
@@ -63,7 +62,7 @@ export default function Header() {
                 src={logo}
                 variant="rounded"
                 color="secondary"
-                sx={{ width: 36, height: 36, border: 2 }}
+                sx={{ width: 36, height: 36, border: 0 }}
               ></Avatar>
             </Link>
           </Typography>

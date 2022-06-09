@@ -61,19 +61,19 @@ const PinReset = () => {
   });
 
   useEffect(() => {
-    if (db !== null) {
-      db.userProfile
-        .get(1)
-        .then((res) => {
-          if (res !== undefined) {
-            setQuestion1(res.security.question1);
-            setQuestion2(res.security.question2);
-          }
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-    }
+    if (!db) return;
+    console.debug('useEffect setQuestions');
+    db.userProfile
+      .get(1)
+      .then((res) => {
+        if (res !== undefined) {
+          setQuestion1(res.security.question1);
+          setQuestion2(res.security.question2);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   }, [db]);
 
   const styles = {

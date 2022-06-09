@@ -107,12 +107,15 @@ export class AppDatabase extends Dexie {
   selectUnsentMessages(c: IContact): IMessage[] | PromiseLike<IMessage[]> {
     return this.messages.where({ receiver: c.peerid, dateTimeSent: 0 }).sortBy('dateTimeCreated');
   }
-  async selectLastMessage(contact: IContact): Promise<IMessage | undefined> {
-    return this.messages
+  async selectLastMessage(contact: IContact): Promise<IMessage | null> {
+    let msg: IMessage | undefined | null = await this.messages
       .where('sender')
       .equals(contact.peerid)
       .or('receiver')
       .equals(contact.peerid)
       .last();
+
+    if (msg === undefined) msg = null;
+    return msg;
   }
 }

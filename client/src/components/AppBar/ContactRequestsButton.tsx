@@ -6,7 +6,7 @@ import Badge from '@mui/material/Badge';
 import { IContactResume } from 'types';
 import { DatabaseContext } from 'providers/DatabaseProvider';
 import { PeerContext } from 'providers/PeerProvider';
-import { Button } from '@mui/material';
+import { Button, Tooltip } from '@mui/material';
 
 function ContactRequestsButton() {
   const db = useContext(DatabaseContext);
@@ -17,18 +17,18 @@ function ContactRequestsButton() {
   const [contactRequests, setContactRequests] = useState<IContactResume[]>([]);
 
   useEffect(() => {
-    if (!db) return;
-
+    if (!db || contactRequests) return;
+    console.debug('useEffect selectUnacceptedContacts');
     db.selectUnacceptedContacts()
       .toArray()
       .then((ctc) => {
         setContactRequests(ctc);
       });
-  }, [db]);
+  }, [contactRequests, db]);
 
   useEffect(() => {
     if (!peerCtx) return;
-
+    console.debug('useEffect handleNewIncomingContactRequest');
     const handleNewIncomingContactRequest = (newContact: IContactResume) => {
       setContactRequests((prevCtcList) => [...prevCtcList, newContact]);
     };
@@ -40,23 +40,25 @@ function ContactRequestsButton() {
 
   const hasUnansweredRequests = contactRequests.length > 0;
   return (
-    <Badge
-      variant={hasUnansweredRequests ? 'standard' : 'dot'}
-      color={'info'}
-      overlap="circular"
-      anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-      badgeContent={contactRequests.length}
-    >
-      <Button
-        variant="contained"
-        onClick={() => {
-          navigate('/Invite');
-        }}
-        color="secondary"
+    <Tooltip title="Invite People">
+      <Badge
+        variant={hasUnansweredRequests ? 'standard' : 'dot'}
+        color={'info'}
+        overlap="circular"
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        badgeContent={contactRequests.length}
       >
-        <PersonAddIcon sx={{ width: 23, height: 23, border: 0 }} />
-      </Button>
-    </Badge>
+        <Button
+          variant="contained"
+          onClick={() => {
+            navigate('/Invite');
+          }}
+          color="secondary"
+        >
+          <PersonAddIcon sx={{ width: 27, height: 27, border: 0 }} />
+        </Button>
+      </Badge>
+    </Tooltip>
   );
 }
 

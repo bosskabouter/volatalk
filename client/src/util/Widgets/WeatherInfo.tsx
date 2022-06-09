@@ -16,6 +16,7 @@ export const WeatherInfo = ({ location }: WeatherInfoProps) => {
   }>();
 
   useEffect(() => {
+    console.debug('useEffect weatherNow');
     if (!location?.longitude || weatherNow) return;
 
     fetchLocationWeather(location).then((weather) => {

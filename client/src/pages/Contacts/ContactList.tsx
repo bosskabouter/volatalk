@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
-import { Button, IconButton, List, ListSubheader, Typography } from '@mui/material';
+import { Button, CssBaseline, IconButton, List, ListSubheader, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 
 import { useNavigate } from 'react-router-dom';
@@ -27,16 +27,18 @@ const ContactList = () => {
    * Initial load all contacts effect
    */
   useEffect(() => {
-    db?.selectContacts().then((cts) => {
-      setContactList(cts);
-    });
-  }, [contactList, db]);
+    if (!db) return;
+    console.debug('useEffect selectContacts');
+
+    db.selectContacts().then(setContactList);
+  }, [db]);
 
   /**
    * New incoming Contact Request effect
    */
   useEffect(() => {
     if (!peerManager) return;
+    console.debug('useEffect onMessage/onContactChange');
 
     const updateContactList = (newContact: IContact) => {
       setContactList((prevCtcList) => [...prevCtcList, newContact]);
@@ -45,27 +47,31 @@ const ContactList = () => {
     return () => {
       peerManager.removeListener('onNewContact', updateContactList);
     };
-  }, [contactList, peerManager]);
+  }, [peerManager]);
 
   return contactList.length > 0 ? (
-    <List
-      sx={{
-        width: '100%',
-        height: 1,
-        bgcolor: 'background.paper',
-        //  position: 'relative',
-        // overflow: 'scroll',
-        //maxHeight: 1,
-        '& ul': { padding: 0 },
-      }}
-      // dense={true}
-      subheader={<ContactListHeader></ContactListHeader>}
-    >
-      {contactList.length > 0 &&
-        contactList.map((contact) => {
-          return <ContactListItem contact={contact} key={contact.peerid} />;
-        })}
-    </List>
+    <div>
+      <CssBaseline />
+      <List
+        sx={{
+          mt: 7,
+          width: '90vw',
+          height: 1,
+          bgcolor: 'background.paper',
+          //  position: 'relative',
+          // overflow: 'scroll',
+          //maxHeight: 1,
+          '& ul': { padding: 0 },
+        }}
+        dense={true}
+        subheader={<ContactListHeader />}
+      >
+        {contactList.length > 0 &&
+          contactList.map((contact) => {
+            return <ContactListItem contact={contact} key={contact.peerid} />;
+          })}
+      </List>
+    </div>
   ) : (
     <Box>
       <Typography variant="h5">No contacts yet</Typography>

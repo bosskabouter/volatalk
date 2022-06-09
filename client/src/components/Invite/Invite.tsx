@@ -1,5 +1,7 @@
 /** @jsxImportSource @emotion/react */
-//import { QRCodeSVG } from 'qrcode.react';
+import { css } from '@emotion/react';
+
+import { QRCodeCanvas as QRCode } from 'qrcode.react';
 import { QrReader } from 'react-qr-reader';
 
 import React, { useContext, useEffect, useRef, useState } from 'react';
@@ -14,11 +16,10 @@ import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 
 import { isMobile } from 'react-device-detect';
 
-import { css } from '@emotion/react';
 import { UserContext } from '../../providers/UserProvider';
 import { makeInviteURL } from '../../services/InvitationService';
-import shareURL from '../../util/Share';
-import { QRCodeSVG } from 'qrcode.react';
+import Share from '../../util/Share';
+
 export default function Invite() {
   const inputRef = useRef();
   const { user } = useContext(UserContext);
@@ -31,29 +32,26 @@ export default function Invite() {
 
   const navigate = useNavigate();
 
-  const fullScreen = isMobile ? true : false;
   const theme = useTheme();
   const styles = {
-    footerRoot: css`
-      padding: ${theme.spacing(2)} ${theme.spacing(2)};
+    root: css`
+      padding: ${theme.spacing(1)} ${theme.spacing(1)};
+      justify-content: center;
+      align: center;
     `,
+
     viewFinderStyle: css`
-   
-    padding:0,
-      top: 0,
-      left: 0,
-      zIndex: 1,
-      boxSizing: 'border-box',
-      border: '50px solid rgba(0, 0, 0, 0.3)',
-      position: 'absolute',
-      width: '100%',
-      height: '100%',
-
-
+      z-index: 1;
+      position: absolute;
+      top: 0;
+      left: 0;
+      border: '50px solid rgba(0, 0, 0, 0.3)';
     `,
   };
 
   useEffect(() => {
+    console.debug('useEffect setInterval isGeneratingInvite');
+
     const interval = setInterval(() => {
       if (isDirty && !isGeneratingInvite && inviteText?.length > 0) {
         setIsGeneratingInvite(true);
@@ -71,7 +69,7 @@ export default function Invite() {
 
   function DisplayQRCode() {
     const handleShareInvite = () => {
-      shareURL(inviteUrl);
+      Share(inviteUrl);
     };
 
     const handleInviteTextChange = (
@@ -85,7 +83,7 @@ export default function Invite() {
       <Box>
         <TextField
           spellCheck
-          autoFocus
+          //autoFocus
           inputRef={inputRef}
           fullWidth
           placeholder="Enter invitation text"
@@ -100,7 +98,22 @@ export default function Invite() {
         </Button>
 
         {inviteUrl.length > 0 && (
-          <QRCodeSVG value={inviteUrl} size={300} includeMargin style={{ width: '100%' }} />
+          <QRCode
+            value={inviteUrl}
+            size={320}
+            //width={'100%'}
+            //css={styles.qrCode}
+            includeMargin={true}
+            bgColor="white"
+            style={{
+              minWidth: 200,
+              minHeight: 200,
+              width: '63vw',
+              height: '63vw',
+              maxHeight: '63vh',
+              maxWidth: '63vh',
+            }}
+          />
         )}
       </Box>
     );
@@ -108,7 +121,7 @@ export default function Invite() {
 
   const DisplayQRScanner = () => {
     const ViewFinder = () => (
-      <svg width="100%" viewBox="0 0 100 100" css={styles.viewFinderStyle}>
+      <svg viewBox="-20 -20 140 140" css={styles.viewFinderStyle}>
         <path fill="none" d="M13,0 L0,0 L0,13" stroke="rgba(255, 0, 0, 0.5)" strokeWidth="5" />
         <path fill="none" d="M0,87 L0,100 L13,100" stroke="rgba(255, 0, 0, 0.5)" strokeWidth="5" />
         <path
@@ -125,15 +138,22 @@ export default function Invite() {
       <QrReader
         ViewFinder={ViewFinder}
         videoId="video"
-        videoStyle={{ width: '100%', align: 'center' }}
+        containerStyle={{
+          minWidth: 200,
+          minHeight: 200,
+          width: '63vw',
+          height: '63vw',
+          maxHeight: '63vh',
+          maxWidth: '63vh',
+        }}
+        // css={styles.qrReader}
         onResult={(result, error) => {
           if (!!result) {
-            const url = result?.getText();
-            const u = new URL(url);
-            navigate('/' + u.search);
+            console.info('Scanned QR', result);
+            navigate('/' + new URL(result.getText()).search);
           }
           if (!!error) {
-            console.debug('Scanned nothing... ' + error);
+            console.debug('Scanned nothing... ');
           }
         }}
         constraints={{ facingMode: isMobile ? 'environment' : 'user' }}
@@ -141,15 +161,19 @@ export default function Invite() {
     );
   };
   const handleToggle = (_event: React.MouseEvent<HTMLElement>, newScanOrShow: boolean) => {
-    if (newScanOrShow === !toggleReaderScanner) setToggle(newScanOrShow);
+    if (newScanOrShow === !toggleReaderScanner) {
+      setToggle(newScanOrShow);
+    }
   };
+
   return (
     <Dialog
       open={true}
       onClose={() => navigate('/', { replace: false })}
       transitionDuration={{ enter: 1500 }}
-      maxWidth="lg"
-      fullWidth={fullScreen}
+      //  maxWidth="md"
+      fullWidth={true}
+      style={{ minWidth: 300 }}
     >
       <DialogContent>
         {toggleReaderScanner ? <DisplayQRCode /> : <DisplayQRScanner />}

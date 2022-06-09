@@ -22,16 +22,27 @@ export default function LocationInfo() {
     if (!user) return;
     else if (!navigator.geolocation) {
       console.warn('Location services are not available in this browser.');
-    } else if (user.useGps && !position) requestFollowMe().then(setPosition);
+    } else if (user.useGps && !position) {
+      console.debug('useEffect requestFollowMe');
+
+      requestFollowMe().then(setPosition);
+    }
   }, [position, user]);
 
   useEffect(() => {
-    if (position) fetchLocationDescription(position).then(setLocation);
+    if (position) {
+      console.debug('useEffect fetchLocationDescription');
+      fetchLocationDescription(position).then(setLocation);
+    }
   }, [position]);
 
   //updates location info in user profile
   useEffect(() => {
-    if (position && position !== user.position) user.position = position;
+    if (position && position !== user.position) {
+      console.debug('useEffect user.position');
+
+      user.position = position;
+    }
   }, [position, user, user?.position]);
 
   return position ? (

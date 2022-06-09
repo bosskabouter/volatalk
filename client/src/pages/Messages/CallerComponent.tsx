@@ -24,10 +24,14 @@ const CallerComponent = (props: CallerComponentProps) => {
   const [videoOn] = useState<boolean>(props.videoOn || false);
 
   useEffect(() => {
+    console.debug('useEffect getUserMedia');
+
     navigator.mediaDevices.getUserMedia({ video: videoOn, audio: true }).then(setLocalMediaStream);
   }, [videoOn]);
 
   useEffect(() => {
+    console.debug('useEffect getContact');
+
     if (!contact && contactId && db) {
       db.getContact(contactId).then((ctc) => {
         setContact(ctc);
@@ -36,6 +40,8 @@ const CallerComponent = (props: CallerComponentProps) => {
   }, [contact, contactId, db]);
 
   useEffect(() => {
+    console.debug('useEffect callContact');
+
     if (!remoteMediaStream) callContact();
 
     async function callContact() {
@@ -50,6 +56,8 @@ const CallerComponent = (props: CallerComponentProps) => {
   }, [contactId, peerManager, videoOn, remoteMediaStream, db, contact, localMediaStream]);
 
   useEffect(() => {
+    console.debug('useEffect remoteVideoElement');
+
     if (remoteVideoElement.current && remoteMediaStream) {
       remoteVideoElement.current.srcObject = remoteMediaStream;
       remoteVideoElement.current.play();
@@ -72,7 +80,13 @@ const CallerComponent = (props: CallerComponentProps) => {
   };
   return (
     <>
-      <Dialog open>
+      <Dialog
+        open
+        onClose={() => {
+          console.log('Closing caller Dialog');
+          if (localMediaStream) setLocalMediaStream(undefined);
+        }}
+      >
         <DialogTitle>
           <>
             {videoOn ? 'Video' : 'Audio'} <Typography>calling with </Typography>

@@ -1,15 +1,20 @@
 /**
  */
-export default function shareURL(u: string) {
+export default function Share(u: string) {
   const shareData = {
     url: u,
   };
-  navigator.canShare && navigator.canShare() ? navigator.share(shareData) : copyTextToClipboard();
+  if (!navigator.canShare) copyTextToClipboard();
+  else navigator.share(shareData);
 
   /**
    */
   function copyTextToClipboard() {
-    console.debug('Copying to clipboard');
-    return navigator.clipboard && navigator.clipboard.writeText(u);
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(u);
+      alert('Copied to clipboard: ' + u);
+    } else {
+      alert('Cannot share data without clipboard');
+    }
   }
 }

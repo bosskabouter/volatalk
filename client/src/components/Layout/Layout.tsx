@@ -4,7 +4,7 @@ import { css } from '@emotion/react';
 import { Container } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import * as React from 'react';
-import Header from '../AppBar/TemporaryDrawer';
+import Header from '../AppBar/Header';
 import Footer from '../Footer/Footer';
 
 interface IProps {
@@ -16,7 +16,7 @@ const Layout = ({ children }: IProps) => {
 
   const styles = {
     containerRoot: css`
-      margin-bottom: 0;
+      margin-bottom: 110;
       margin-top: 0;
 
       //Equivalent to [theme.breakpoints.only('xs')]: {}
@@ -38,9 +38,7 @@ const Layout = ({ children }: IProps) => {
       }
     `,
     root: css`
-      padding-top: 100;
-      padding-bottom: 63px;
-      backgroundcolor: purple;
+      position: fixed;
     `,
   };
 

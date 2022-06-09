@@ -1,5 +1,5 @@
-import { useContext, useEffect, useState } from 'react';
-import { Box, List, ListItem, ListSubheader } from '@mui/material';
+import { useContext, useEffect, useState, useRef } from 'react';
+import { Box, CssBaseline, List, ListItem, ListSubheader } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import IconButton from '@mui/material/IconButton';
@@ -25,7 +25,11 @@ const MessageList = () => {
   const [contact, setContact] = useState<IContact>();
   const [messageList, setMessageList] = useState<IMessage[]>([]);
 
+  const listElement = useRef<HTMLUListElement>(null);
+
   useEffect(() => {
+    console.debug('useEffect loadMessages');
+
     async function loadMessages() {
       if (!db) return;
       const ctc = await db.contacts.get(contactId);
@@ -40,6 +44,10 @@ const MessageList = () => {
 
       db.selectContactMessages(ctc).then((allmsgs) => {
         setMessageList(allmsgs);
+        console.info(listElement);
+        if (listElement?.current) {
+          listElement.current.scrollTop = 100 * allmsgs.length;
+        }
       });
     }
 
@@ -47,6 +55,8 @@ const MessageList = () => {
   }, [contactId, db]);
 
   useEffect(() => {
+    console.debug('useEffect onMessageHandler');
+
     const onMessageHandler = (msg: IMessage) => {
       if (msg.sender === contactId) {
         setMessageList((prevMessageList) => [...prevMessageList, msg]);
@@ -70,7 +80,9 @@ const MessageList = () => {
       //minHeight={600}
       // maxHeight={0.8}
     >
+      <CssBaseline />
       <List
+        ref={listElement}
         //disablePadding
         sx={{
           //  width: '100%',
@@ -78,14 +90,17 @@ const MessageList = () => {
           // padding: 5,
           // mt: 5,
           // position: static | relative | absolute | sticky | fixed
-          //position: 'fixed',
+          // position: 'static',
           // overflow: visible | hidden | clip | scroll | auto
-          // overflow: 'scroll',
+          overflow: 'auto',
           // height: auto | <length> | <percentage> | min-content | max-content | fit-content | fit-content(<length-percentage>)
-          // height: 'max-content',
+          height: '81vh',
           // maxHeight: none | <length-percentage> | min-content | max-content | fit-content | fit-content(<length-percentage>)
-          maxHeight: '20%',
-          //'& ul': { padding: 15 },
+          //maxHeight: '20%',
+          paddingLeft: 1,
+          width: '90vw',
+
+          scrollBehavior: 'smooth',
         }}
         // dense={true}
         subheader={
@@ -94,6 +109,7 @@ const MessageList = () => {
               sx={{
                 display: 'flex',
                 pt: 7,
+                pb: 0,
                 //flexDirection: 'row',
                 //flexDirection: 'column-reverse',
                 // alignItems: 'flex-start',

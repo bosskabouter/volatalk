@@ -25,36 +25,44 @@ export const ContactItem = (props: { contact: IContact }) => {
   const db = useContext(DatabaseContext);
   const [contact, setContact] = useState<IContact>(props.contact);
 
-  const [cntUnread, setCntUnread] = useState(0);
+  const [cntUnread, setCntUnread] = useState<number>();
 
   const [online, setOnline] = useState(peerMngr?.isConnected(props.contact) || false);
   const [distance, setDistance] = useState('');
 
-  const lastTimeSeen =
-    'Connected last time: ' + descriptiveTimeAgo(new Date(contact.dateTimeResponded));
+  const lastTimeSeen = 'Seen: ' + descriptiveTimeAgo(new Date(contact.dateTimeResponded));
 
+  /**
+   * Calculates distance from me in km, if coords are known.
+   */
   useEffect(() => {
-    if (!userCtx.user.position || !contact.position) return;
+    if (!userCtx.user.position || !contact.position || distance) return;
+    console.debug('useEffect distanceFromMe');
     const distanceFromMe = Distance(userCtx.user.position, contact.position);
+    console.debug('Contact distance: ' + distanceFromMe);
     if (distanceFromMe) setDistance(`Distance from me: ${distanceFromMe} km.`);
-  }, [contact, userCtx.user]);
-  //const theme = useTheme();
+  }, [contact, distance, userCtx.user]);
 
+  /**
+   * Selects unread messages;
+   */
   useEffect(() => {
-    async function selectUnreadMsg() {
-      if (db) {
-        setCntUnread(await db.selectUnreadMessages(contact).count());
-      }
-    }
-    selectUnreadMsg();
-    //unread messages
-  }, [db, contact]);
+    console.debug('usEffect unreadMessages');
+    !cntUnread && db?.selectUnreadMessages(contact).count().then(setCntUnread);
+  }, [db, contact, cntUnread]);
 
+  /**
+   * Receives handles events from peermanager;
+   * 1. new messages, if from peer, add +1 to count unread
+   * 2. status change; if from this contact, show peer on/offline
+   */
   useEffect(() => {
+    console.debug('useEffect messageHandler');
+
     function messageHandler(message: IMessage) {
       if (message.sender === contact.peerid) {
         console.log('Message received in messageHandler', message);
-        setCntUnread(cntUnread + 1);
+        setCntUnread((cntUnread ? cntUnread : 0) + 1);
       }
     }
 
@@ -67,6 +75,7 @@ export const ContactItem = (props: { contact: IContact }) => {
     }
 
     if (!peerMngr) return;
+    console.debug('useEffect onMessage/onContactChange');
     peerMngr.on('onMessage', messageHandler);
     peerMngr.on('onContactStatusChange', onContactStatusChangeHandle);
 
@@ -84,19 +93,17 @@ export const ContactItem = (props: { contact: IContact }) => {
     const [showOptions, setShowOptions] = useState(false);
     return (
       <>
-        <Tooltip title="More Options">
-          <IconButton
-            onClick={(e) => {
-              e.preventDefault();
-              setShowOptions(true);
-            }}
-          >
-            <MoreOptionsIcon></MoreOptionsIcon>
-          </IconButton>
-        </Tooltip>
+        <IconButton
+          onClick={(_e) => {
+            //  e.preventDefault();
+            setShowOptions(true);
+          }}
+        >
+          <MoreOptionsIcon></MoreOptionsIcon>
+        </IconButton>
         <Dialog open={showOptions} onClose={() => setShowOptions(false)}>
           <DialogContent>
-            <DialogContentText></DialogContentText>
+            <DialogContentText>No options yet</DialogContentText>
           </DialogContent>
         </Dialog>
       </>
@@ -108,13 +115,13 @@ export const ContactItem = (props: { contact: IContact }) => {
       sx={{
         display: 'flex',
         flexDirection: { xs: 'column', md: 'row' },
-        alignItems: 'baseline',
+        ///alignItems: 'baseline',
         //  overflow: 'hidden',
 
         //overflow: 'hidden',
         //width: 1,
         // height: 63,
-        padding: (theme) => theme.spacing(1),
+        //padding: (theme) => theme.spacing(1),
       }}
     >
       <Box
@@ -131,7 +138,6 @@ export const ContactItem = (props: { contact: IContact }) => {
           status={online}
           badgeCnt={cntUnread}
         ></Identification>
-
         <MoreOptionsButton></MoreOptionsButton>
       </Box>
 
@@ -142,16 +148,22 @@ export const ContactItem = (props: { contact: IContact }) => {
           flexDirection: 'column',
           alignItems: { xs: 'left', md: 'flex-start' },
           //m: 3,
-          borderwidth: '1',
-          minWidth: { md: 180 },
+          borderwidth: '0',
+          minWidth: 180,
         }}
       >
-        <Typography variant="subtitle1">{contact.nickname}</Typography>
-        <Box component="span" sx={{ visibility: { xs: 'hidden', md: 'visible' } }}>
-          {lastTimeSeen}
-        </Box>
-        <Box component="span" sx={{ visibility: { xs: 'hidden', md: 'visible' } }}>
-          {distance}
+        <Typography variant="h6" sx={{ minWidth: 200, maxWidth: 200, border: 0 }}>
+          {contact.nickname}
+        </Typography>
+        <Box component="span" sx={{ display: { xs: 'none', md: 'block' } }}>
+          <Typography variant="subtitle2" noWrap>
+            <div>{lastTimeSeen}</div>
+          </Typography>
+          {distance && (
+            <Typography variant="subtitle2" noWrap>
+              <div>{distance}</div>
+            </Typography>
+          )}
         </Box>
       </Box>
     </Box>

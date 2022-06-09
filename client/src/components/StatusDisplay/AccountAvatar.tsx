@@ -27,9 +27,9 @@ const StatusDisplay = () => {
         onClick={() => navigate('AccountSetup')}
         variant="contained"
         color="secondary"
-        title="Account Setup"
+        title={userCtx?.user?.nickname + ' Profile'}
       >
-        <Avatar src={userCtx?.user?.avatar} sx={{ width: 23, height: 23, border: 1 }}></Avatar>
+        <Avatar src={userCtx?.user?.avatar} sx={{ width: 27, height: 27, border: 1 }}></Avatar>
       </Button>
     </Box>
   );

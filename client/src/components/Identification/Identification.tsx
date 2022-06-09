@@ -1,7 +1,8 @@
 import Badge from '@mui/material/Badge';
 import Avatar from '@mui/material/Avatar';
-import { AvatarGroup, Box, Tooltip } from '@mui/material';
-import Identicon, { IdenticonOptions } from 'identicon.js';
+import { AvatarGroup, Box } from '@mui/material';
+import { PeerIdenticon } from 'util/Widgets/PeerIdenticon';
+import { useEffect, useState } from 'react';
 
 //import { identicon } from 'minidenticons';
 const Identification = (props: {
@@ -11,17 +12,14 @@ const Identification = (props: {
   avatar: string;
   badgeCnt?: number;
 }) => {
-  const options: IdenticonOptions = {
-    //foreground: [0, 0, 0, 255], // rgba black
-    //background: [255, 255, 255, 255], // rgba white
-    margin: 0.1, // 20% margin
-    size: 256, // 256px square
-    format: 'svg', // use SVG instead of PNG
-  };
-  if (!props.id) return <></>;
+  const [identicon, setIdenticon] = useState('');
 
-  const idString = props.id.substring(225, 252);
-  const identicon = 'data:image/svg+xml;base64,' + new Identicon(idString, options).toString();
+  useEffect(() => {
+    if (!identicon) {
+      console.debug('useEffect setIdenticon');
+      setIdenticon(PeerIdenticon({ peerid: props.id }));
+    }
+  }, [identicon, props.id]);
 
   return (
     <Box
@@ -41,9 +39,7 @@ const Identification = (props: {
         >
           <Avatar src={props.avatar} sx={{ width: 54, height: 54 }}></Avatar>
         </Badge>
-        <Tooltip title={'Personal Identification Icon'}>
-          <Avatar src={identicon} sx={{ width: 24, height: 24 }} />
-        </Tooltip>
+        <Avatar src={identicon} sx={{ width: 24, height: 24 }} />
       </AvatarGroup>
     </Box>
   );

@@ -10,6 +10,7 @@ export const DateInfo = () => {
   const [time, setTime] = useState<Date>(new Date());
   //digital clock effect
   useEffect(() => {
+    console.debug('useEffect setTime');
     const interval = setInterval(() => setTime(new Date()), 60 * 1000);
     return () => {
       clearInterval(interval);

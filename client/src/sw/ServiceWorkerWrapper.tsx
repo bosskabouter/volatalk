@@ -80,7 +80,7 @@ const ServiceWorkerWrapper: FC = () => {
    */
   useEffect(() => {
     if (!db || !userCtx.user?.id || !registration?.active || pushSubscription) return;
-
+    console.debug('useEffect subscription registration');
     const subscribePush = () => {
       console.debug('Registration', registration);
       registration.pushManager
@@ -101,7 +101,7 @@ const ServiceWorkerWrapper: FC = () => {
     } else {
       setPushSubscription(null);
     }
-  }, [db, registration, userCtx.user, registration?.active]);
+  }, [db, registration, userCtx.user, registration?.active, pushSubscription]);
 
   /**
    * Saves the push subscription to users profile.

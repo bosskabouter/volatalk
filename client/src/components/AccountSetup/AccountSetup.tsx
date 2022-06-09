@@ -64,40 +64,6 @@ const AccountSetup = () => {
     userCtx.user?.position
   );
 
-  const validationSchemaSecure = yup.object({
-    nickname: yup
-      .string()
-      .defined('Enter a nice nickname people will recognize')
-      .min(3, 'Nickname must be at least 6 characters')
-      .trim(),
-    isSecured: yup.boolean(),
-    pin: yup.string().when('isSecured', {
-      is: true,
-      then: yup
-        .string()
-        .defined('Enter a valid pin')
-        .min(6, 'Pin must be at least 6 characters')
-        .matches(/^\d+$/, 'Pin must only contain numbers')
-        .trim(),
-    }),
-    question1: yup.string().when('isSecured', {
-      is: true,
-      then: yup.string().defined('Please enter a security question').trim(),
-    }),
-    answer1: yup.string().when('security.isSecured', {
-      is: true,
-      then: yup.string().defined('Please enter an answer to your security question').trim(),
-    }),
-    question2: yup.string().when('security.isSecured', {
-      is: true,
-      then: yup.string().defined('Please enter a security question').trim(),
-    }),
-    answer2: yup.string().when('security.isSecured', {
-      is: true,
-      then: yup.string().defined('Please enter an answer to your security question').trim(),
-    }),
-  });
-
   const validationSchema = yup.object({
     nickname: yup
       .string()
@@ -452,7 +418,7 @@ const AccountSetup = () => {
                 });
 
                 resizeFileUpload(event.target.files[0], 36, 36).then((src) => {
-                  formik.setFieldValue('avatarMini', src);
+                  formik.setFieldValue('avatarThumb', src);
                 });
               }}
               multiple={false}
