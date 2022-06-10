@@ -20,7 +20,7 @@ export const TimeInfo = () => {
     return () => {
       clearInterval(interval);
     };
-  }, [time]);
+  }, []);
 
   const AnalogClock = () => {
     const sec = useRef<null | SVGRectElement>(null);
@@ -46,9 +46,9 @@ export const TimeInfo = () => {
       }, 1000);
 
       return () => {
-        // clearInterval(interval);
+        clearInterval(interval);
       };
-    });
+    }, []);
 
     const styles = {
       clockRoot: css`

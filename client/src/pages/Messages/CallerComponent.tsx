@@ -1,5 +1,12 @@
 import { useContext, useEffect, useRef, useState } from 'react';
-import { Dialog, DialogContent, DialogTitle, Typography } from '@mui/material';
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from '@mui/material';
 import { useParams } from 'react-router-dom';
 import { DatabaseContext } from '../../providers/DatabaseProvider';
 import { ContactItem } from '../Contacts/ContactItem';
@@ -14,47 +21,61 @@ const CallerComponent = (props: CallerComponentProps) => {
   const remoteVideoElement = useRef<HTMLVideoElement>(null);
 
   const [localMediaStream, setLocalMediaStream] = useState<MediaStream>();
-  const [remoteMediaStream, setRemoteMediaStream] = useState<MediaStream>();
+  const [remoteMediaStream, setRemoteMediaStream] = useState<MediaStream | null>(null);
 
   const peerManager = useContext(PeerContext);
   const db = useContext(DatabaseContext);
-  const contactId = useParams().contactid || '';
+  const contactId = useParams().contactid;
 
   const [contact, setContact] = useState<IContact>();
+  const [contactOnline, setContactOnline] = useState<boolean>(false);
   const [videoOn] = useState<boolean>(props.videoOn || false);
 
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
+  /**
+   * Asks permission to use audio/video and sets the mediaStream in state
+   */
   useEffect(() => {
-    console.debug('useEffect getUserMedia');
+    if (contactOnline) {
+      console.debug('useEffect getUserMedia');
+      navigator.mediaDevices
+        .getUserMedia({ video: videoOn, audio: true })
+        .then(setLocalMediaStream);
+    }
+  }, [contactOnline, videoOn]);
 
-    navigator.mediaDevices.getUserMedia({ video: videoOn, audio: true }).then(setLocalMediaStream);
-  }, [videoOn]);
-
+  /**
+   * Retrieves contactId from URL param, retrieves contact and verifies if contact is online
+   */
   useEffect(() => {
     console.debug('useEffect getContact');
+    if (!db) throw Error('No DB');
+    if (!contactId) throw Error('No contactId param');
+    if (!peerManager) return;
 
-    if (!contact && contactId && db) {
-      db.getContact(contactId).then((ctc) => {
-        setContact(ctc);
-      });
-    }
-  }, [contact, contactId, db]);
+    db.getContact(contactId).then((ctc) => {
+      setContact(ctc);
+      setContactOnline(peerManager.isConnected(ctc));
+    });
+  }, [contactId, db, peerManager]);
 
+  /**
+   * Once contact is loaded and connected and local mediaStream is available, tries to setup call connection,
+   */
   useEffect(() => {
     console.debug('useEffect callContact');
 
-    if (!remoteMediaStream) callContact();
-
-    async function callContact() {
-      if (!contact || !localMediaStream || !peerManager) return;
-      console.debug(
-        'setting up ' + (videoOn ? 'video' : '') + 'call connection with contact',
-        contactId
-      );
-      const rms = await peerManager.call(contact, localMediaStream);
-      if (rms) setRemoteMediaStream(rms);
+    if (!remoteMediaStream && contact && localMediaStream) {
+      console.debug('setting up call with contact', contactId);
+      peerManager?.call(contact, localMediaStream).then(setRemoteMediaStream);
     }
   }, [contactId, peerManager, videoOn, remoteMediaStream, db, contact, localMediaStream]);
 
+  /**
+   *
+   */
   useEffect(() => {
     console.debug('useEffect remoteVideoElement');
 
@@ -80,8 +101,22 @@ const CallerComponent = (props: CallerComponentProps) => {
   };
   return (
     <>
+      <Dialog open={!peerManager?.isOnline()}>
+        <DialogTitle>
+          <Typography>You are currently offline. Leave a message!</Typography>
+          {contact && <ContactItem contact={contact}></ContactItem>}
+        </DialogTitle>
+      </Dialog>
+      <Dialog open={peerManager?.isOnline() === true && !contactOnline}>
+        <DialogTitle>
+          <Typography>Contact is currently offline. Leave a message!</Typography>
+          {contact && <ContactItem contact={contact}></ContactItem>}
+        </DialogTitle>
+      </Dialog>
       <Dialog
-        open
+        fullScreen={fullScreen}
+        open={contactOnline}
+        draggable={true}
         onClose={() => {
           console.log('Closing caller Dialog');
           if (localMediaStream) setLocalMediaStream(undefined);

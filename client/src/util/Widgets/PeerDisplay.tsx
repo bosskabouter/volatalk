@@ -1,17 +1,13 @@
-import { useContext, useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useContext, useEffect, useState } from 'react';
 import { Avatar, Badge, Box, Tooltip } from '@mui/material';
 import { UserContext } from '../../providers/UserProvider';
 import { PeerContext } from '../../providers/PeerProvider';
 import CalleeComponent from '../../pages/Messages/CalleeComponent';
-import Identification from 'components/Identification/Identification';
-import ContactRequestsButton from 'components/AppBar/ContactRequestsButton';
 import { PeerIdenticon } from './PeerIdenticon';
 
 const PeerDisplay = () => {
   const peerCtx = useContext(PeerContext);
   const userCtx = useContext(UserContext);
-  const navigate = useNavigate();
   const [status, setStatus] = useState(false);
   const [peerIdenticon, setPeerIdenticon] = useState('');
 

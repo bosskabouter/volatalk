@@ -1,13 +1,14 @@
 import { IContact } from '../../types';
 
 import { useContext, useEffect, useRef, useState } from 'react';
-import { Button, Dialog, DialogContent } from '@mui/material';
+import { Button, Dialog, DialogContent, Typography } from '@mui/material';
 import { PeerContext } from '../../providers/PeerProvider';
 import { ContactListItem } from '../Contacts/ContactListItem';
 import { MediaConnection } from 'peerjs';
+import { rmSync } from 'fs';
 
 const CalleeComponent = () => {
-  const peerMngr = useContext(PeerContext);
+  const peerManager = useContext(PeerContext);
 
   const [localMediaStream, setLocalMediaStream] = useState<MediaStream | null>(null);
   const [mediaConnection, setMediaConnection] = useState<MediaConnection | null>(null);
@@ -17,13 +18,12 @@ const CalleeComponent = () => {
 
   const [videoOn, setVideoOn] = useState<boolean>(true);
 
-  const [answered, setAnswered] = useState<boolean>(false);
-  const [accepted, setAccepted] = useState<boolean>(false);
+  const [accepted, setAccepted] = useState<boolean | null>(null);
 
   const [contact, setContact] = useState<IContact | null>(null);
 
   useEffect(() => {
-    if (!peerMngr) return;
+    if (!peerManager) return;
     console.debug('useEffect handleIncomingCall');
 
     async function handleIncomingCall(ctc: IContact, mc: MediaConnection) {
@@ -34,91 +34,84 @@ const CalleeComponent = () => {
     }
 
     //wait for incoming call
-    peerMngr.on('onIncomingCall', handleIncomingCall);
+    peerManager.on('onIncomingCall', handleIncomingCall);
     return () => {
-      peerMngr.removeListener('onIncomingCall', handleIncomingCall);
+      peerManager.removeListener('onIncomingCall', handleIncomingCall);
     };
-  }, [peerMngr]);
+  }, [peerManager]);
 
   useEffect(() => {
     console.debug('useEffect answerCall');
 
     if (!remoteMediaStream && mediaConnection && localMediaStream) {
       //someone calling
-      if (answered) {
-        mediaConnection.answer(localMediaStream);
-      } else {
+      if (accepted === false && mediaConnection != null) {
         mediaConnection.close();
       }
     }
-  }, [answered, localMediaStream, mediaConnection, remoteMediaStream]);
+  }, [accepted, localMediaStream, mediaConnection, remoteMediaStream]);
 
+  /**
+   *
+   */
   useEffect(() => {
     console.debug('useEffect acceptCall');
 
-    if (remoteMediaStream && answered && contact) {
-      navigator.mediaDevices
-        .getUserMedia({ video: videoOn, audio: true })
-        .then((lms) => {
-          if (lms) {
-            console.debug(
-              'navigator.mediaDevices.getUserMedia({ video: videoOn, audio: true }).then((lms) =>',
-              lms
-            );
-            setLocalMediaStream(lms);
-            peerMngr?.acceptCall(contact, lms).then((rms) => {
-              console.debug('peerMngr?.acceptCall(contact, lms).then((rms) => ', rms);
-              setRemoteMediaStream(rms);
-              const remoteVideoIsOn = rms.getVideoTracks().length > 0;
-              setVideoOn(remoteVideoIsOn);
+    if (!accepted || localMediaStream || !contact || !peerManager) return;
 
-              if (remoteVideoElement.current) {
-                remoteVideoElement.current.srcObject = remoteMediaStream;
-                remoteVideoElement?.current?.play();
-              }
-            });
-          }
-        })
-        .catch((error) => {
-          console.warn('Problem LMS', error);
-        });
-    }
-  }, [answered, contact, peerMngr, remoteMediaStream, videoOn]);
+    navigator.mediaDevices
+      .getUserMedia({ video: videoOn, audio: true })
+      .then((lms) => {
+        if (lms) {
+          console.debug(
+            'navigator.mediaDevices.getUserMedia({ video: videoOn, audio: true }).then((lms) =>',
+            lms
+          );
+          setLocalMediaStream(lms);
+          peerManager.acceptCall(contact, lms).then((rms) => {
+            console.debug('peerMngr?.acceptCall(contact, lms).then((rms) => ', rms);
+            setRemoteMediaStream(rms);
+            const remoteVideoIsOn = rms.getVideoTracks().length > 0;
+            setVideoOn(remoteVideoIsOn);
 
-  const AskAcceptCall = () => {
-    if (!contact || !localMediaStream) return <>No call to accept</>;
-    const handleAcceptCall = () => {
-      peerMngr?.acceptCall(contact, localMediaStream).then((rms) => {
-        setRemoteMediaStream(rms);
-        setAccepted(true);
-        setAnswered(true);
+            if (remoteVideoElement.current) {
+              remoteVideoElement.current.srcObject = remoteMediaStream;
+              remoteVideoElement?.current?.play();
+            }
+          });
+        }
+      })
+      .catch((error) => {
+        console.warn('Problem LMS', error);
       });
-    };
-    return (
-      <>
-        Incoming call:<ContactListItem contact={contact}></ContactListItem>
-        <Button onClick={() => setAccepted(true)}>Accept</Button>
-        <Button onClick={() => setAccepted(false)}>Decline</Button>
-      </>
+  }, [accepted, contact, localMediaStream, peerManager, remoteMediaStream, videoOn]);
+
+  const MediaElement = () => {
+    return videoOn ? (
+      <video ref={remoteVideoElement} autoPlay />
+    ) : (
+      <audio ref={remoteVideoElement} autoPlay />
     );
   };
-
-  return (
+  return !contact ? (
+    <Typography variant="subtitle1">Currently No calls</Typography>
+  ) : (
     <>
       {/* first ask to accept the call */}
-      <Dialog open={remoteMediaStream != null && !accepted}>
+      <Dialog open={mediaConnection != null}>
+        <ContactListItem contact={contact}></ContactListItem>
         <DialogContent>
-          <AskAcceptCall></AskAcceptCall>
-        </DialogContent>
-      </Dialog>
+          <Button onClick={() => setAccepted(true)} hidden={accepted === undefined}>
+            Accept
+          </Button>
+          <Button onClick={() => setAccepted(false)} hidden={accepted === undefined}>
+            Decline
+          </Button>
+          <Button onClick={() => mediaConnection?.close()} hidden={accepted === true}>
+            Hangup
+          </Button>
 
-      <Dialog open={accepted}>
-        <DialogContent>
-          {videoOn ? (
-            <video ref={remoteVideoElement} autoPlay />
-          ) : (
-            <audio ref={remoteVideoElement} autoPlay />
-          )}
+          <MediaElement />
         </DialogContent>
       </Dialog>
     </>

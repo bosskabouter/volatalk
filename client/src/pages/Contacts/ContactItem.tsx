@@ -148,7 +148,7 @@ export const ContactItem = (props: { contact: IContact }) => {
           flexDirection: 'column',
           alignItems: { xs: 'left', md: 'flex-start' },
           //m: 3,
-          borderwidth: '0',
+          border: 0,
           minWidth: 180,
         }}
       >

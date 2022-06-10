@@ -17,6 +17,7 @@ const DO_STATIC = ENV_VAR("DO_STATIC", false);
 const DO_CORS = ENV_VAR("DO_CORS", false);
 const DO_EJS = ENV_VAR("DO_EJS", false);
 const DO_PEERJS = ENV_VAR("DO_PEERJS", false);
+const DO_PEERJS_SECURE = ENV_VAR("DO_PEERJS_SECURE", false);
 
 const DO_WEBPUSH = ENV_VAR("DO_WEBPUSH", false);
 const DO_SOCKETIO = ENV_VAR("DO_SOCKETIO", false);
@@ -82,6 +83,10 @@ if (DO_PEERJS) {
   const peerServer = ExpressPeerServer(server, PEERJS_OPTIONS);
   console.info("Starting peerserver with options", PEERJS_OPTIONS);
   app.use(PEERJS_CONTEXT, peerServer);
+
+  if (DO_PEERJS_SECURE) {
+    makePeerSecure(peerServer);
+  }
 }
 
 if (DO_WEBPUSH) {
@@ -199,4 +204,19 @@ function ENV_VAR(varName, defaults) {
   if (val === "true") return true;
   if (val === "false") return false;
   else return val?.trim() || defaults;
+}
+
+function makePeerSecure(peerServer) {
+  console.info("Making peerServer secure", peerServer);
+  peerServer.on("connection", (client) => {
+    console.log("Client connecting", client);
+    const peerid = client.getId();
+    const token = client.getToken();
+    console.info("client id/token", peerid, token);
+    //verify
+
+    const fishy = false;
+
+    if (fishy) client.getSocket().close();
+  });
 }

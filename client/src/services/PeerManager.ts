@@ -28,8 +28,6 @@ interface ConnectionMetadata {
  * Stateful module class to hook into react peerprovider. React components can listen to events fired through PeerManagerEvents
  */
 export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
-  online: boolean;
-
   _user: IUserProfile;
   _db: AppDatabase;
   _peer: Peer;
@@ -50,6 +48,9 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
       secure: true,
       key: 'volakey',
       debug: 1,
+
+      //secure signature, does it arrive?
+  
     },
     {
       //second volatalk instance
@@ -70,7 +71,6 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
 
   constructor(user: IUserProfile, db: AppDatabase) {
     super();
-    this.online = false;
     this._user = user;
     this._db = db;
 
@@ -85,12 +85,14 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
     this.verifyValidPeerId(this._user.peerid);
     this._peer = new Peer(this._user.peerid, this._usingSignallingServer);
     this._peer.on('open', (pid) => {
-      console.log('Peer connected: ' + this._peer.id);
+      console.log('Peer connected', this._peer.id);
       if (pid !== this._user.peerid) {
         throw Error('Signaller assigned different id: ' + pid);
       }
+      console.info('Emit statusChange ONLINE');
       this.emit('statusChange', true);
       this._db.contacts.each((contact: IContact) => {
+        console.info('Connecting contact', contact);
         this.connectContact(contact);
       });
     });
@@ -108,6 +110,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
     });
     this._peer.on('call', async (mediaConnection: MediaConnection) => {
       //verify id someone legit is
+      console.info('Someone calling', mediaConnection);
       const contact = await this._contactConnected(mediaConnection);
       if (contact) {
         this.emit('onIncomingCall', contact, mediaConnection);
@@ -117,17 +120,17 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
       }
     });
     this._peer.on('disconnected', () => {
-      console.warn(`this._peer.on('disconnected', () =>`);
+      console.warn(`this peer disconnected. Emit statusChange OFFLINE.`);
       this.emit('statusChange', false);
     });
     this._peer.on('close', () => {
-      console.warn("this._peer.on('close', () =>");
+      console.warn('this peer closed. Emitting statusChange OFFLINE');
       this.emit('statusChange', false);
     });
 
     this._peer.on('error', (err) => {
       if (err.toString().includes('Could not connect to peer')) {
-        console.warn('Contact unavailable. Should try again later...');
+        console.warn('Contact unavailable. Try again later...');
       } else {
         //severe error concerning our connection
         if (err.toString().includes('is taken')) {
@@ -145,20 +148,23 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
     return this._peer;
   }
   /**
-   * Received connection open from someone. Validate his signature first.
-   * Requester must have sent ConnectionMetadata containing his user info
-   * and a signed a message containing this user's peerid.
-   * @param {*} conn
+   * Validates signature on Received connection open request.
+   * Requester must have sent ConnectionMetadata containing user info
+   * and a signed message containing this user's peerid.
+   *
+   * If first time connection, create a contact, otherwise returns from db.
+   * @param conn incoming, unverified connection
+   * @returns connecting contact, if valid metadata present in connection, null if otherwise.
    */
-  async _contactConnected(conn: DataConnection | MediaConnection): Promise<IContact | undefined> {
+  async _contactConnected(conn: DataConnection | MediaConnection): Promise<IContact | null> {
     const md: ConnectionMetadata = conn.metadata;
-    if (!md) return;
+    if (!md) return null;
     const pubKey = peerIdToPublicKey(conn.peer);
     const contactPubKey = await importPublicKey(pubKey);
     const sigDecoded = new Uint8Array(JSON.parse(md.signature)).buffer;
-    if (await verifyMessage(this._user.peerid, sigDecoded, contactPubKey)) {
-      return this._acceptTrustedConnection(conn);
-    }
+    return (await verifyMessage(this._user.peerid, sigDecoded, contactPubKey))
+      ? this._acceptTrustedConnection(conn)
+      : null;
   }
 
   /**
@@ -208,9 +214,6 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
       },
       metaData.contact
     );
-    //let user decide to accept or decline this new contact
-    if (newContact.peerid !== conn.peer)
-      throw Error('Contact sending different peerid in metadata');
 
     this._db.contacts.add(newContact);
     return newContact;
@@ -437,6 +440,14 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
         resolve(false);
       }
     });
+  }
+
+  /**
+   *
+   * @returns Verifies if peer exists and is not disconnected
+   */
+  isOnline(): boolean {
+    return this._peer && !this._peer.disconnected;
   }
   /* Just a quick test (without signature to see if peer is online)
    * once the  invitation is accepted, we'll reconnect with a real signature.
