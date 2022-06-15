@@ -14,10 +14,10 @@ export const INVITE_PARAMKEYS = { FROM: 'f', KEY: 'k', SIGNATURE: 's' };
  * TODO: add expiration date
  */
 export function makeInviteURL(user: IUserProfile, inviteText: string) {
-  return importPrivateKey(JSON.parse(user.security.privateKey)).then((pk) => {
+  return importPrivateKey(JSON.parse(user.security.privateKey)).then((privKey) => {
     const signedMessage = user.peerid + inviteText;
     console.debug('Signing message: ' + signedMessage);
-    return signMessage(signedMessage, pk).then((signature) => {
+    return signMessage(signedMessage, privKey).then((signature) => {
       console.debug('signature', signature);
       const sigEncoded = convertAbToBase64(signature);
       console.debug('sigEncoded', sigEncoded);
