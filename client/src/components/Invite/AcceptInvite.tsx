@@ -10,7 +10,7 @@ import { IInvite } from '../../types';
 import { PeerContext } from '../../providers/PeerProvider';
 import { extractInvite } from '../../services/InvitationService';
 import { Alerter } from '../StatusDisplay/Alerter';
-import { genSignature } from '../../services/Crypto';
+import { generateSignature } from '../../services/CryptoService';
 import Identification from 'components/Identification/Identification';
 
 export default function AcceptInvite(props: { invite: string }) {
@@ -67,7 +67,7 @@ export default function AcceptInvite(props: { invite: string }) {
     if (contact) {
       setResult(`Invite already accepted.. Still waiting to connect... `);
     } else {
-      const sig = await genSignature(receivedInvite.peerid, userCtx.user.security.privateKey);
+      const sig = await generateSignature(receivedInvite.peerid, userCtx.user.security.privateKey);
       contact = {
         peerid: receivedInvite.peerid,
         signature: sig,

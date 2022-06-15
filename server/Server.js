@@ -113,7 +113,7 @@ if (DO_WEBPUSH) {
   webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBKEY, VAPID_PRIVKEY);
 
   //Blob needed to measure request size
-  const { Blob } = require("buffer");
+ // const { Blob } = require("buffer");
 
   app.post(WEBPUSH_CONTEXT, (request, response) => {
     if (DEBUG) console.log("Push request", request);
@@ -122,15 +122,15 @@ if (DO_WEBPUSH) {
     const subscription = body.subscription;
     const payload = body.payload;
 
-    const byteSizeHeader = request.header("content-length");
-    const byteSizePayload = new Blob([payload]).size;
+    const byteSizeHeader = Number(request.header("content-length"));
+   // const byteSizePayload = new Blob([payload]).size;
     console.info(
       `Push request size - header[payload]: ${byteSizeHeader}[${byteSizePayload}]`
     );
-    if (byteSizePayload >= PUSH_MAX_BYTES) {
+    if (byteSizeHeader >= PUSH_MAX_BYTES) {
       console.warn(
-        "Message payload too big. Have to refuse sending.",
-        byteSizePayload + "kb"
+        "Message too big. Have to refuse push.",
+        byteSizeHeader + "kb"
       );
       response.sendStatus(HTTP_ERROR_Insufficient_Storage_Push_tooBig);
       return;
@@ -213,7 +213,7 @@ function makePeerSecure(peerServer) {
     const peerid = client.getId();
     const token = client.getToken();
     console.info("client id/token", peerid, token);
-    //verify
+    //TODO verify if user is fishy
 
     const fishy = false;
 

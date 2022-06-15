@@ -3,6 +3,7 @@ import Avatar from '@mui/material/Avatar';
 import { AvatarGroup, Box } from '@mui/material';
 import { PeerIdenticon } from 'util/Widgets/PeerIdenticon';
 import { useEffect, useState } from 'react';
+import { toSvg } from 'jdenticon';
 
 //import { identicon } from 'minidenticons';
 const Identification = (props: {
@@ -12,15 +13,6 @@ const Identification = (props: {
   avatar: string;
   badgeCnt?: number;
 }) => {
-  const [identicon, setIdenticon] = useState('');
-
-  useEffect(() => {
-    if (!identicon) {
-      console.debug('useEffect setIdenticon');
-      setIdenticon(PeerIdenticon({ peerid: props.id }));
-    }
-  }, [identicon, props.id]);
-
   return (
     <Box
       sx={{
@@ -39,7 +31,7 @@ const Identification = (props: {
         >
           <Avatar src={props.avatar} sx={{ width: 54, height: 54 }}></Avatar>
         </Badge>
-        <Avatar src={identicon} sx={{ width: 24, height: 24 }} />
+        {toSvg(props.id, 100)}
       </AvatarGroup>
     </Box>
   );

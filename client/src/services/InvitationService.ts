@@ -4,7 +4,7 @@ import {
   peerIdToPublicKey,
   signMessage,
   verifyMessage,
-} from './Crypto';
+} from './CryptoService';
 import { convertAbToBase64, convertBase64ToAb } from './Generic';
 import { IInvite, IUserProfile } from '../types';
 
@@ -66,9 +66,9 @@ export async function extractInvite(params: URLSearchParams) {
     signature: sig,
     text: invitationText,
   };
-  const pk = await importPublicKey(peerIdToPublicKey(otherPeerId));
+  const pk: CryptoKey | null = await peerIdToPublicKey(otherPeerId);
 
-  const verified = await verifyMessage(otherPeerId + invitationText, sig, pk);
+  const verified = pk && (await verifyMessage(otherPeerId + invitationText, sig, pk));
 
   if (verified) {
     console.info('Invitation verified.');

@@ -4,7 +4,7 @@ import { Avatar, Box, Button } from '@mui/material';
 import { UserContext } from '../../providers/UserProvider';
 import ContactRequestsButton from 'components/AppBar/ContactRequestsButton';
 
-const StatusDisplay = () => {
+const AccountAvatar = () => {
   const userCtx = useContext(UserContext);
   const navigate = useNavigate();
 
@@ -35,4 +35,4 @@ const StatusDisplay = () => {
   );
 };
 
-export default StatusDisplay;
+export default AccountAvatar;

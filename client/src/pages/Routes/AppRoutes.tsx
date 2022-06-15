@@ -3,11 +3,8 @@ import { CircularProgress } from '@mui/material';
 import { lazy, Suspense } from 'react';
 import FadeIn from 'react-fade-in';
 import { Route, Routes } from 'react-router-dom';
-import { EULA, PageNotFound } from '../../components';
+import { EULA } from '../../components';
 import AccountSetup from '../../components/AccountSetup/AccountSetup';
-import Login from '../../components/Login/Login';
-import NewPin from '../../components/NewPin/NewPin';
-import PinReset from '../../components/PinReset/PinReset';
 import Home from '../Home/Home';
 import { RequireAuth } from './RequireAuth';
 
@@ -19,6 +16,10 @@ import { RequireAuth } from './RequireAuth';
 // React.lazy only supports default imports.
 
 const About = lazy(() => import('../../components/About/About'));
+const Login = lazy(() => import('../../components/Login/Login'));
+const PageNotFound = lazy(() => import('../../components/PageNotFound/PageNotFound'));
+const NewPin = lazy(() => import('../../components/NewPin/NewPin'));
+const PinReset = lazy(() => import('../../components/PinReset/PinReset'));
 const Invite = lazy(() => import('../../components/Invite/Invite'));
 const MessageList = lazy(() => import('../../pages/Messages/MessageList'));
 const Contacts = lazy(() => import('../../pages/Contacts/ContactsPage'));

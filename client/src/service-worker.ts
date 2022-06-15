@@ -17,6 +17,7 @@ import { ExpirationPlugin } from 'workbox-expiration';
 import { createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
 import { StaleWhileRevalidate } from 'workbox-strategies';
+import { AppDatabase } from 'Database/Database';
 
 declare const self: ServiceWorkerGlobalScope;
 
@@ -110,8 +111,9 @@ self.addEventListener('push', (pushEvent) => {
     contactid: string;
     nickname: string;
     avatar: string;
-  } = JSON.parse(message.sender);
+  } = JSON.parse(message.sender); //new AppDatabase();
 
+  //lets try to find contact info from db
   const actionOpen = {
     title: 'Open',
     action: 'open',

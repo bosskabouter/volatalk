@@ -1,50 +1,32 @@
-/**
- * Generic shortcuts common used statements
- */
-
-const domain = document.location.host;
-
+import { encode, decode } from '@web3pack/base58-check';
 /**
  *
  * @param value https://stackoverflow.com/questions/7342957/how-do-you-round-to-1-decimal-place-in-javascript
  * @param precision
  * @returns
  */
-export function round(value: number, precision: number) {
+export function round(value: number, precision: number): number {
   const multiplier = Math.pow(10, precision || 0);
   return Math.round(value * multiplier) / multiplier;
 }
-
-/**
- */
-function localSave(param: string, value: unknown) {
-  const objToJSON = JSON.stringify(value);
-  localStorage.setItem(param, objToJSON);
-  console.debug('Saved to local storage param: ' + param, objToJSON);
+export function convertObjectToBase58(o: object): string {
+  return convertStringToBase58(JSON.stringify(o));
 }
-
-/**
- */
-function localLoad(param: string) {
-  const item: string | null = localStorage.getItem(param);
-  if (!item) throw Error('No local storage. Boohoooo.. for param: ' + param);
-  const obj = JSON.parse(item);
-  console.debug('Loaded from local storage param: ' + param, obj);
-  return obj;
+export function convertBase58ToObject(b58: string): object | null {
+  return JSON.parse(convertBase58ToString(b58));
 }
-
-/**
- */
-function getUrlParam(name: string, u: string | null) {
-  const url = !u ? document.location : u;
-  name = name.replace(/[[]/, '\\[').replace(/[\]]/, '\\]');
-  const regexS = '[\\?&]' + name + '=([^&#]*)';
-  const regex = new RegExp(regexS);
-  const results = regex.exec(url.toString());
-  if (results == null) return null;
-  else return results[1];
+export function convertStringToBase58(s: string): string {
+  return convertBufToBase58(Buffer.from(s));
 }
-
+export function convertBase58ToString(b58: string): string {
+  return convertBase58ToBuf(b58).toString();
+}
+export function convertBufToBase58(buf: Buffer): string {
+  return encode(buf);
+}
+export function convertBase58ToBuf(b58: string): Buffer {
+  return decode(b58);
+}
 /**
  *
  * @param
@@ -52,7 +34,7 @@ function getUrlParam(name: string, u: string | null) {
  * @see https://stackoverflow.com/questions/36637146/encode-string-to-hex
  * @see convertHexToString
  */
-function convertStringToHex(s: string) {
+export function convertStringToHex(s: string) {
   return s
     .split('')
     .map((c) => c.charCodeAt(0).toString(16).padStart(2, '0'))
@@ -66,24 +48,12 @@ function convertStringToHex(s: string) {
  * @see https://stackoverflow.com/questions/36637146/encode-string-to-hex
  * @see convertStringToHex
  */
-function convertHexToString(hex: string) {
+export function convertHexToString(hex: string) {
   return hex
     .split(/(\w\w)/g)
     .filter((p) => !!p)
     .map((c) => String.fromCharCode(parseInt(c, 16)))
     .join('');
-}
-
-/**
- */
-function convertAb2str(buf: ArrayBufferLike) {
-  return new TextDecoder('utf-8').decode(new DataView(buf));
-}
-
-/**
- */
-function convertStr2ab(str: string) {
-  return new TextEncoder().encode(str);
 }
 
 export function convertBase64ToAb(base64: string) {
@@ -96,7 +66,7 @@ export function convertBase64ToAb(base64: string) {
   return bytes.buffer;
 }
 
-function convertAbToBase64(buffer: ArrayBuffer) {
+export function convertAbToBase64(buffer: ArrayBuffer) {
   let binary = '';
   const bytes = new Uint8Array(buffer);
   const len = bytes.byteLength;
@@ -215,15 +185,3 @@ export function toCelsius(fahrenheit: number) {
 export function toFahrenheit(celsius: number) {
   return celsius * 1.8 + 32;
 }
-
-export {
-  domain,
-  localLoad,
-  localSave,
-  getUrlParam,
-  convertAbToBase64,
-  convertHexToString,
-  convertStringToHex,
-  convertAb2str,
-  convertStr2ab,
-};

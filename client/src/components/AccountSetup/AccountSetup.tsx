@@ -30,13 +30,14 @@ import { UserContext } from '../../providers/UserProvider';
 import { DatabaseContext } from '../../providers/DatabaseProvider';
 import { IUserProfile } from '../../types';
 import { AuthContext } from '../../providers/AuthProvider';
-import { exportCryptoKey, generateKeyPair, peerIdFromPublicKey } from '../../services/Crypto';
+
 import { notifyMe } from '../../services/PushMessage';
 import { setCreated, setIsSecure } from '../../store/slices/accountSlice';
 import { resizeFileUpload } from '../../services/Generic';
 import { DistanceFromMiddleEarth } from 'util/geo/Distance';
 import { questions } from './SecurityQuestions';
 import { requestFollowMe } from 'services/LocationService';
+import enrollUser from 'services/UserService';
 
 const ITEM_HEIGHT = 18;
 const ITEM_PADDING_TOP = 8;
@@ -162,56 +163,30 @@ const AccountSetup = () => {
 
   /**
    * Register a new user, by generating a keyPairge
-   * @param values from form containing user data
+   * @param user from form containing user data
    */
-  function registerUser(values: IUserProfile) {
+  function registerUser(user: IUserProfile) {
     if (!db) throw Error('No DB');
-    generateKeyPair().then((keyPair) => {
-      if (!keyPair) {
-        return;
+    enrollUser(user);
+    // Save to database
+
+    //only 1 user, for now
+    db.userProfile.put(user, 1).then(() => {
+      dispatch(setCreated());
+      if (formik.values.security.isSecured) {
+        dispatch(setIsSecure());
       }
-      const publicCryptoKey: CryptoKey = keyPair.publicKey;
-      if (publicCryptoKey === undefined) return;
-      exportCryptoKey(publicCryptoKey).then((pubKey) => {
-        //convert pubKey to peerid (base64 encoded json.tostring)
-        values.peerid = peerIdFromPublicKey(pubKey);
-        console.log('Peerid: ' + values.peerid);
+      setUser(user);
 
-        exportCryptoKey(keyPair.privateKey).then((jsonPrivateKey) => {
-          console.log(
-            'exportCryptoKey(keyPair.privateKey).then((jsonPrivateKey) => ',
-            jsonPrivateKey
-          );
+      setAuthenticated(true);
 
-          values.security.privateKey = JSON.stringify(jsonPrivateKey);
-
-          // Save to database
-
-          //only 1 user, for now
-          db.userProfile
-            .put(values, 1)
-            .then(() => {
-              dispatch(setCreated());
-              if (formik.values.security.isSecured) {
-                dispatch(setIsSecure());
-              }
-              setUser(values);
-
-              setAuthenticated(true);
-
-              if (values.usePush) {
-                //reload the app to activate service worker
-                //  document.location = document.location.origin;
-              }
-              //dont need reload for service worker activation, go directly
-              //else
-              navigate('/');
-            })
-            .catch((err) => {
-              console.error(err);
-            });
-        });
-      });
+      if (user.usePush) {
+        //reload the app to activate service worker
+        //  document.location = document.location.origin;
+      }
+      //dont need reload for service worker activation, go directly
+      //else
+      navigate('/');
     });
   }
 

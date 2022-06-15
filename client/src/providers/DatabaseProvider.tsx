@@ -7,11 +7,13 @@ interface IDatabaseProviderProps {
 }
 
 export const DatabaseContext = createContext<AppDatabase | null>(null);
+
 export const useDatabase = () => useContext(DatabaseContext);
 
 const DatabaseProvider = ({ children }: IDatabaseProviderProps) => {
-  const [database, setDatabase] = useState<AppDatabase | null>(null);
+  const [database, setDatabase] = useState<AppDatabase>();
   const setupDatabase = () => {
+    console.log('Setting up DB');
     // Creates the initial database
     const db = new AppDatabase();
 
@@ -27,12 +29,13 @@ const DatabaseProvider = ({ children }: IDatabaseProviderProps) => {
     // NON_INDEXED_FIELDS tells the middleware to encrypt every field NOT indexed
     // in this case the pin, first question, second question,
     // first answer and second answer will be encrypted
-    // TODO: As you add more tables edit this
     applyEncryptionMiddleware(
       db,
       cryptoKey,
       {
         userProfile: NON_INDEXED_FIELDS,
+        contacts: NON_INDEXED_FIELDS,
+        messages: NON_INDEXED_FIELDS,
       },
       (db2) => clearAllTables(db2)
     );
@@ -41,10 +44,14 @@ const DatabaseProvider = ({ children }: IDatabaseProviderProps) => {
   };
 
   useEffect(() => {
-    setupDatabase();
+    if (!database) setupDatabase();
   }, []);
 
-  return <DatabaseContext.Provider value={database}>{children}</DatabaseContext.Provider>;
+  return !database ? (
+    <>No Database...</>
+  ) : (
+    <DatabaseContext.Provider value={database}>{children}</DatabaseContext.Provider>
+  );
 };
 
 export default DatabaseProvider;

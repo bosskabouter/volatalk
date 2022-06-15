@@ -14,7 +14,7 @@ test('eula', () => {
     </BrowserRouter>
   );
 
-  expect(getByText(/Private, Direct Video, Calling and Messenging./i)).toBeInTheDocument();
+  expect(getByText(/Private, Direct Video, Calling and Messenger./i)).toBeInTheDocument();
 });
 
 test('Home', () => {

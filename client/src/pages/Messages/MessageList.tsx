@@ -44,7 +44,6 @@ const MessageList = () => {
 
       db.selectContactMessages(ctc).then((allmsgs) => {
         setMessageList(allmsgs);
-        console.info(listElement);
         if (listElement?.current) {
           listElement.current.scrollTop = 100 * allmsgs.length;
         }

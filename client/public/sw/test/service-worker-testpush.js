@@ -15,8 +15,11 @@ self.addEventListener('push', (pushEvent) => {
   let payload /* IMessage JSON */ = pushEvent.data.text();
 
   console.info('Unencrypted test push data.text', payload);
-  //payload = decryptString(payload, generateKeyFromString(VOLA_SECRET_PUSH));
-  //console.info('Decrypted push', data);
+  // payload = decryptString(
+  //   payload,
+  //   generateKeyFromString(VOLA_SECRET_PUSH)
+  // );
+  // console.info('Decrypted push', data);
 
   const message = JSON.parse(payload);
 

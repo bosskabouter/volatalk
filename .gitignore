@@ -378,3 +378,4 @@ MigrationBackup/
 server/www/index.html
 *.pem
 remote-debug-profile
+test/*

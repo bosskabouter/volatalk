@@ -9,7 +9,7 @@ import { Dialog } from '@mui/material';
 type ProviderContext = readonly [(option: DialogOption) => void, () => void];
 
 let EMPTY_FUNC = () => {
-  /* TODO document why this arrow function is empty */
+  /*  */
 };
 const DialogContext = createContext<ProviderContext>([EMPTY_FUNC, EMPTY_FUNC]);
 export const useDialog = () => useContext(DialogContext);

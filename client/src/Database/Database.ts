@@ -15,7 +15,6 @@ export class AppDatabase extends Dexie {
 
   constructor() {
     super('appDatabase');
-    //TODO REVIEW DB ENCRYPTION all indexed fields are visible. avoid including identifying info in indexes.. (contact.nickname, msg.payload etc.)
     this.version(1).stores({
       userProfile: '++id',
       contacts: 'peerid , dateAccepted, dateDelined',

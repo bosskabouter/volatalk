@@ -1,43 +1,53 @@
-import { BufferSource } from 'stream/web';
-import { convertHexToString, convertStringToHex } from './Generic';
+import {
+  convertBase58ToBuf,
+  convertBase58ToObject,
+  convertHexToString,
+  convertStringToHex,
+} from './Generic';
 
 const ENC_FORMAT_JWK = 'jwk';
 const ENC_ALGORITHM_ECDSA = 'ECDSA';
 const ENC_ALGORITHM_ECDSA_HASH = 'SHA-384';
 const ENC_ALGORITHM_ECDSA_NAMEDCURVE = 'P-384';
 
-function generateSignature(peerid: string, userJsonPrivateKey: string) {
+export function generateSignature(peerid: string, userJsonPrivateKey: string) {
   return importPrivateKey(JSON.parse(userJsonPrivateKey)).then((privKey) => {
     return signMessage(peerid, privKey);
   });
 }
 
-/**
- * hex encoded the public key to be used as peerid
- * @returns peerid; hex encoded stringified given publicKey
- */
-function peerIdFromPublicKey(publicKey: JsonWebKey): string {
-  const hexPeerid = convertStringToHex(JSON.stringify(publicKey));
-  console.debug('Converted PublicKey->PeerID', publicKey, hexPeerid);
-  return hexPeerid;
-}
-
+const SEPARATOR = '_';
 /**
  *
  * @param {*} peerid
  * @returns
  */
-function peerIdToPublicKey(peerid: string) {
-  const cryptoKey = JSON.parse(convertHexToString(peerid));
-  console.debug('Converted PeerID->PublicKey', cryptoKey, peerid);
-  return cryptoKey;
+export async function peerIdToPublicKey(peerid: string): Promise<CryptoKey | null> {
+  if (!peerid || peerid.trim().length < 20 || !peerid.includes('_')) return null;
+  const peerSplit: string[] = peerid.split(SEPARATOR);
+
+  const pubKeyB58 = peerSplit[0];
+  const pubJsonWebKey: JsonWebKey | null = convertBase58ToObject(pubKeyB58);
+
+  if (!pubJsonWebKey) return null;
+  const sigB58 = peerSplit[1];
+  const sig = sigB58 ? convertBase58ToBuf(sigB58) : null;
+
+  if (!sig) return null;
+  const pubKey = await importPublicKey(pubJsonWebKey);
+  if (!pubKey) return null;
+
+  //check if valid
+  const valid = await verifyMessage(pubKeyB58, sig, pubKey);
+
+  return valid ? pubKey : null;
 }
 
 /**
  * Generate a sign/verify key pair,
  * @returns
  */
-async function generateKeyPair() {
+export async function generateKeyPair() {
   return window.crypto.subtle.generateKey(
     {
       name: ENC_ALGORITHM_ECDSA,
@@ -52,7 +62,7 @@ async function generateKeyPair() {
  *
  * @param {*} jwk
  */
-function importPrivateKey(jwk: JsonWebKey) {
+export function importPrivateKey(jwk: JsonWebKey) {
   return importCryptoKey(jwk, true);
 }
 
@@ -60,7 +70,7 @@ function importPrivateKey(jwk: JsonWebKey) {
  *
  * @param {*} jwk
  */
-function importPublicKey(jwk: JsonWebKey) {
+export function importPublicKey(jwk: JsonWebKey) {
   return importCryptoKey(jwk, false);
 }
 /**
@@ -90,7 +100,7 @@ function importCryptoKey(jwk: JsonWebKey, isPrivate: boolean) {
  * @param {*} key
  * @returns
  */
-function exportCryptoKey(key: CryptoKey) {
+export function exportCryptoKey(key: CryptoKey) {
   return window.crypto.subtle.exportKey(ENC_FORMAT_JWK, key);
 }
 
@@ -100,15 +110,21 @@ function exportCryptoKey(key: CryptoKey) {
  * @param {*} signingKey
  * @returns
  */
-function signMessage(message: string, signingKey: CryptoKey) {
-  return window.crypto.subtle.sign(
-    {
-      name: ENC_ALGORITHM_ECDSA,
-      hash: ENC_ALGORITHM_ECDSA_HASH,
-    },
-    signingKey,
-    new TextEncoder().encode(message)
-  );
+export function signMessage(message: string, signingKey: CryptoKey) {
+  const encodedMessage = new TextEncoder().encode(message);
+  return window.crypto.subtle
+    .sign(
+      {
+        name: ENC_ALGORITHM_ECDSA,
+        hash: ENC_ALGORITHM_ECDSA_HASH,
+      },
+      signingKey,
+      encodedMessage
+    )
+    .catch((error) => {
+      console.error('Error signing message with key: ', message, signMessage, error);
+      throw error;
+    });
 }
 
 /**
@@ -116,7 +132,7 @@ function signMessage(message: string, signingKey: CryptoKey) {
  * @param {*} message
  * @param {*} publicKey
  */
-function verifyMessage(message: string, signature: BufferSource, publicKey: CryptoKey) {
+export function verifyMessage(message: string, signature: BufferSource, publicKey: CryptoKey) {
   return window.crypto.subtle.verify(
     {
       name: ENC_ALGORITHM_ECDSA,
@@ -127,15 +143,3 @@ function verifyMessage(message: string, signature: BufferSource, publicKey: Cryp
     new TextEncoder().encode(message)
   );
 }
-
-export {
-  generateSignature as genSignature,
-  peerIdFromPublicKey,
-  peerIdToPublicKey,
-  generateKeyPair,
-  importPrivateKey,
-  importPublicKey,
-  exportCryptoKey,
-  signMessage,
-  verifyMessage,
-};

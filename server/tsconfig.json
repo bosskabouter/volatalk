@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "target": "es6",
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "outDir": "dist",
+    "sourceMap": true
+  },
+  "files": ["./node_modules/@types/mocha/index.d.ts"],
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"],
+
+  "lib": ["es2015"]
+}

@@ -9,7 +9,7 @@ export type IAuthContext = {
 };
 
 const noop = () => {
-  /* TODO document why this arrow function is empty */
+  /*  */
 };
 export const AuthContext = React.createContext<IAuthContext>({
   authenticated: false,

@@ -1,6 +1,6 @@
 /* eslint-disable */
 // @ts-nocheck
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { IUserProfile } from 'types';
 import { useSessionStorage } from '../util/useSessionStorage';
 
@@ -8,9 +8,29 @@ export type IUserContext = {
   user: IUserProfile;
   setUser: (getUser: IUserProfile) => void;
 };
+const defaultUser2: IUserProfile = {
+  security: {
+    privateKey: '',
+    isSecured: false,
+    pin: '123',
+    question1: '',
+    answer1: '',
+    question2: '',
+    answer2: '',
+  },
+  usePush: false,
+  useGps: false,
+  peerid: '',
+  dateRegistered: new Date(0),
+  nickname: '',
+  avatar: '',
+  avatarThumb: '',
+  position: null,
+  pushSubscription: null,
+};
 
 const noop = () => {
-  /* TODO document why this arrow function is empty */
+  /*  */
 };
 export const UserContext = React.createContext<IUserContext>({
   user: null,
@@ -31,7 +51,7 @@ export type UserProviderProps = {
   defaultUser?: { null };
   onLogin?: () => void;
   onLogout?: () => void;
-  children: unknown;
+  children: ReactNode;
 };
 
 const UserProvider: React.FC<UserProviderProps> = ({
