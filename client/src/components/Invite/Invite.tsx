@@ -25,7 +25,7 @@ export default function Invite() {
   const { user } = useContext(UserContext);
 
   const [toggleReaderScanner, setToggle] = useState(true);
-  const [inviteText, setInviteText] = useState('Invitation from ' + user.nickname);
+  const [inviteText, setInviteText] = useState('Invitation from ' + user?.nickname);
   const [inviteUrl, setInviteUrl] = useState('');
   const [isGeneratingInvite, setIsGeneratingInvite] = useState(false);
   const [isDirty, setIsDirty] = useState(true);
@@ -53,7 +53,7 @@ export default function Invite() {
     console.debug('useEffect setInterval isGeneratingInvite');
 
     const interval = setInterval(() => {
-      if (isDirty && !isGeneratingInvite && inviteText?.length > 0) {
+      if (user && isDirty && !isGeneratingInvite && inviteText?.length > 0) {
         setIsGeneratingInvite(true);
         //wait to complete writing the text to generate the heavy inv
         makeInviteURL(user, inviteText).then((inviteURL) => {

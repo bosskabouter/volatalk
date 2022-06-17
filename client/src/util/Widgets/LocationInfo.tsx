@@ -38,7 +38,8 @@ export default function LocationInfo() {
 
   //updates location info in user profile
   useEffect(() => {
-    if (position && position !== user.position) {
+    if (!user) return;
+    if (position && position !== user?.position) {
       console.debug('useEffect user.position');
 
       user.position = position;

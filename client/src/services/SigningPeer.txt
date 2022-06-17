@@ -1,18 +1,12 @@
 import { StrictEventEmitter } from 'strict-event-emitter';
 
-import { IContact, IContactResume, IMessage, IUserProfile } from '../types';
 import { AppDatabase } from '../Database/Database';
-import {
-  generateSignature,
-  importPublicKey,
-  peerIdToPublicKey,
-  verifyMessage,
-} from './CryptoService';
+import { generateSignature, peerIdToPublicKey, verifyMessage } from './CryptoService';
 
 import { default as Peer, DataConnection, MediaConnection } from 'peerjs';
 import { decryptString, encryptString, generateKeyFromString } from 'dha-encryption';
-import pushMessage from './PushMessage';
 import { verifyAddress } from './UserService';
+import { IUserProfile } from 'types';
 
 export interface PeerManagerEvents {
   statusChange: (status: boolean) => void;
@@ -33,9 +27,8 @@ interface ConnectionMetadata {
 /**
  * Stateful module class to hook into react peerprovider. React components can listen to events fired through PeerManagerEvents
  */
-export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
+export class PeerManager extends Peer {
   #user: IUserProfile;
-  #db: AppDatabase;
   #peer: Peer;
 
   /*
@@ -73,9 +66,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
   #usingSignallingServer = this.#signallingServers[2];
 
   constructor(user: IUserProfile, db: AppDatabase) {
-    if (!verifyAddress(user.peerid)) throw Error('Invalid peerID:' + user.peerid);
-
-    super();
+    super(user.peerid);
     this.#user = user;
     this.#db = db;
 
@@ -193,18 +184,19 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
   }
 
   /**
-   * New Contact connecting.
-   * Generates a signature and save info from ConnectionMetadata.
-   *
-   * User will have to accept the contact before a connection can be established.
-   *
-   * @param conn  trusted connection with valid metadata
-   * @returns the newly created contact with generated signature
+   * New user connecting. Saves Contact info from ConnectionMetadata in db
+   * @param conn
+   * @returns
    */
   async #createNewContactFromTrustedConnection(
     conn: DataConnection | MediaConnection
   ): Promise<IContact> {
+    /* New certified user trying to connect.
+     * Save for now, notify, user will decide to accept
+     */
     const sig = await generateSignature(conn.peer, this.#user.security.privateKey);
+
+    const metaData: ConnectionMetadata = conn.metadata;
 
     const newContact: IContact = Object.assign(
       {
@@ -214,7 +206,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
         dateTimeDeclined: 0,
         signature: sig,
       },
-      conn.metadata.contact
+      metaData.contact
     );
 
     this.#db.contacts.add(newContact);
@@ -313,17 +305,16 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
 
   /**
    *
-   *
    * @param contact
    * @returns
    */
-  #getConnectionMetadata(contact: IContact): ConnectionMetadata {
+  #signConnectionMetadata(contact: IContact): ConnectionMetadata {
     //create shallow copy of this user as resume to send over, without the security details
     const { security, ...myResume } = this.#user;
 
     return {
       contact: myResume,
-      signature: contact.signature,
+      signature: JSON.stringify(Array.from(new Uint8Array(contact.signature))),
     };
   }
 
@@ -351,7 +342,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
       );
       return null;
     }
-    if (!contact.signature || !contact.signature.length) {
+    if (!contact.signature || !contact.signature.byteLength) {
       console.debug('Not initiating connection without signature: ' + contact.nickname, contact);
       return null;
     }
@@ -360,7 +351,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
      * Sending (updated) personal user info (nick, avatar, etc.) in the fom of a contact within connection metadata to receiver.
      */
     const connection = this.#peer.connect(contact.peerid, {
-      metadata: this.#getConnectionMetadata(contact),
+      metadata: this.#signConnectionMetadata(contact),
     });
     connection.on('open', () => {
       console.info("connection.on('open', () =>", contact, connection);
@@ -475,7 +466,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
     return new Promise((resolve, _reject) => {
       console.debug('Calling contact', contact, localMediaStream);
       const mc = this.#peer.call(contact.peerid, localMediaStream, {
-        metadata: this.#getConnectionMetadata(contact),
+        metadata: this.#signConnectionMetadata(contact),
       });
       this.#calls.set(contact.peerid, mc);
       mc.on('stream', (rms) => {

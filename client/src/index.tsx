@@ -22,24 +22,6 @@ if (isIE)
 const baseName =
   process.env.REACT_APP_BASE_NAME !== undefined ? `/${process.env.REACT_APP_BASE_NAME}` : '/';
 
-// Moved <ServiceWorkerWrapper /> to lower level
-// for push subscription in user
-
-/*
-
-//REACT 17
-ReactDOM.render(
-  <React.StrictMode>
-    <BrowserRouter basename={baseName}>
-      <App />
-    </BrowserRouter>
-  </React.StrictMode>,
-  document.getElementById('root')
-);
-
-*/
-
-// After
 const container = document.getElementById('root');
 const root = createRoot(container!);
 root.render(

@@ -13,15 +13,11 @@ const PeerDisplay = () => {
 
   useEffect(() => {
     if (userCtx?.user?.id && !peerIdenticon) {
-      console.debug('setPeerIcon');
-
       setPeerIdenticon(PeerIdenticon({ peerid: userCtx.user.peerid }));
     }
   }, [peerIdenticon, userCtx]);
 
   useEffect(() => {
-    console.debug('useEffect statusChange');
-
     peerCtx?.on('statusChange', setStatus);
   }, [peerCtx]);
 
@@ -39,6 +35,11 @@ const PeerDisplay = () => {
           <Tooltip title={status ? 'Online' : 'Offline'}>
             <Avatar src={peerIdenticon} sx={{ width: 36, height: 36, border: 3 }} />
           </Tooltip>
+          <input
+            type="hidden"
+            name="solely_for_jesttest"
+            value={'peerstatus_' + status.toString()}
+          />
         </Badge>
       </Box>
     </>

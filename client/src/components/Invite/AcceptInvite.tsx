@@ -27,11 +27,11 @@ export default function AcceptInvite(props: { invite: string }) {
   const db = useContext(DatabaseContext);
 
   const navigate = useNavigate();
-  const userCtx = useContext(UserContext);
+  const { user } = useContext(UserContext);
   const peerCtx = useContext(PeerContext);
 
   useEffect(() => {
-    if (!db || !peerCtx || !userCtx) return;
+    if (!db || !peerCtx || !user) return;
     if (!receivedInvite && !result) {
       console.debug('useEffect extractInvite');
 
@@ -41,7 +41,7 @@ export default function AcceptInvite(props: { invite: string }) {
 
           if (await db.contacts.get(invite.peerid)) {
             setResult(`Invite already accepted.. Still waiting to connect... `);
-          } else if (invite.peerid === userCtx.user.peerid) {
+          } else if (invite.peerid === user.peerid) {
             setResult('Inviting yourself?');
           }
         } else {
@@ -57,17 +57,17 @@ export default function AcceptInvite(props: { invite: string }) {
         setSenderOnline(isOnline);
       }, timeout);
     }
-  }, [db, peerCtx, props.invite, receivedInvite, result, senderOnline, userCtx]);
+  }, [db, peerCtx, props.invite, receivedInvite, result, senderOnline, user]);
 
   //handler
   const handleAcceptContact = async () => {
-    if (!(db && receivedInvite && peerCtx)) return;
+    if (!(db && receivedInvite && peerCtx && user)) return;
 
     let contact = await db.contacts.get(receivedInvite.peerid);
     if (contact) {
       setResult(`Invite already accepted.. Still waiting to connect... `);
     } else {
-      const sig = await generateSignature(receivedInvite.peerid, userCtx.user.security.privateKey);
+      const sig = await generateSignature(receivedInvite.peerid, user.security.privateKey);
       contact = {
         peerid: receivedInvite.peerid,
         signature: sig,

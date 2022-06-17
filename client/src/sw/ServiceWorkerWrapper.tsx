@@ -18,10 +18,10 @@ const ServiceWorkerWrapper: FC = () => {
   const [showReload, setShowReload] = useState(false);
   const [registration, setRegistration] = useState<ServiceWorkerRegistration>();
 
-  const userCtx = useContext(UserContext);
+  const { user } = useContext(UserContext);
 
   const [pushSubscription, setPushSubscription] = useState<PushSubscription | null>(
-    userCtx.user?.pushSubscription
+    user?.pushSubscription ? user.pushSubscription : null
   );
 
   const db = useContext(DatabaseContext);
@@ -79,7 +79,7 @@ const ServiceWorkerWrapper: FC = () => {
    * If not usePush, clear the subscription from his profile, in case he recently was subscribed.
    */
   useEffect(() => {
-    if (!db || !userCtx.user?.id || !registration?.active || pushSubscription) return;
+    if (!db || !user?.id || !registration?.active || pushSubscription) return;
     console.debug('useEffect subscription registration');
     const subscribePush = () => {
       console.debug('Registration', registration);
@@ -96,23 +96,23 @@ const ServiceWorkerWrapper: FC = () => {
           console.error('Error subscribing push manager', e);
         });
     };
-    if (userCtx.user.usePush) {
+    if (user?.usePush) {
       subscribePush();
     } else {
       setPushSubscription(null);
     }
-  }, [db, registration, userCtx.user, registration?.active, pushSubscription]);
+  }, [db, registration, user, registration?.active, pushSubscription]);
 
   /**
    * Saves the push subscription to users profile.
    */
   useEffect(() => {
-    if (!db || !userCtx.user || !registration || !userCtx.user.id || !pushSubscription) return;
-    console.info('Overwriting previous push subscription', userCtx.user.pushSubscription);
+    if (!db || !user || !registration || !user.id || !pushSubscription) return;
+    console.info('Overwriting previous push subscription', user.pushSubscription);
     console.info('New push subscription', pushSubscription);
-    userCtx.user.pushSubscription = pushSubscription;
+    user.pushSubscription = pushSubscription;
     db.userProfile.update(1, { pushSubscription: pushSubscription });
-  }, [db, pushSubscription, registration, userCtx.user, userCtx.user?.id]);
+  }, [db, pushSubscription, registration, user, user?.id]);
 
   const reloadPage = () => {
     if ('serviceWorker' in navigator && wb.current !== null) {

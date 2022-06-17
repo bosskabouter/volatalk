@@ -9,10 +9,11 @@ export function round(value: number, precision: number): number {
   const multiplier = Math.pow(10, precision || 0);
   return Math.round(value * multiplier) / multiplier;
 }
-export function convertObjectToBase58(o: object): string {
+
+export function convertObjectToBase58(o: any): string {
   return convertStringToBase58(JSON.stringify(o));
 }
-export function convertBase58ToObject(b58: string): object | null {
+export function convertBase58ToObject(b58: string): any | null {
   return JSON.parse(convertBase58ToString(b58));
 }
 export function convertStringToBase58(s: string): string {
@@ -26,34 +27,6 @@ export function convertBufToBase58(buf: Buffer): string {
 }
 export function convertBase58ToBuf(b58: string): Buffer {
   return decode(b58);
-}
-/**
- *
- * @param
- * @returns the string in hex
- * @see https://stackoverflow.com/questions/36637146/encode-string-to-hex
- * @see convertHexToString
- */
-export function convertStringToHex(s: string) {
-  return s
-    .split('')
-    .map((c) => c.charCodeAt(0).toString(16).padStart(2, '0'))
-    .join('');
-}
-
-/**
- *
- * @param {*} hex encoded string
- * @returns the original string
- * @see https://stackoverflow.com/questions/36637146/encode-string-to-hex
- * @see convertStringToHex
- */
-export function convertHexToString(hex: string) {
-  return hex
-    .split(/(\w\w)/g)
-    .filter((p) => !!p)
-    .map((c) => String.fromCharCode(parseInt(c, 16)))
-    .join('');
 }
 
 export function convertBase64ToAb(base64: string) {

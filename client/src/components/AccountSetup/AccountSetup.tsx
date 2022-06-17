@@ -52,17 +52,15 @@ const MenuProps = {
 
 const AccountSetup = () => {
   const { authenticated, setAuthenticated } = useContext(AuthContext);
-  const { setUser } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
   const dispatch = useDispatch();
   const theme = useTheme();
   const fullScreen = isMobile ? true : false;
   const navigate = useNavigate();
   const db = useContext(DatabaseContext);
 
-  const userCtx = useContext(UserContext);
-
   const [currentPosition, setCurrentPosition] = useState<GeolocationCoordinates | null>(
-    userCtx.user?.position
+    user?.position ? user.position : null
   );
 
   const validationSchema = yup.object({
@@ -105,7 +103,7 @@ const AccountSetup = () => {
   const randImage = 'https://thispersondoesnotexist.com/image?reload=' + Math.random();
 
   const formik = useFormik<IUserProfile>({
-    initialValues: userCtx.user || {
+    initialValues: user || {
       dateRegistered: new Date(),
 
       peerid: '',
@@ -156,7 +154,6 @@ const AccountSetup = () => {
 
     //only 1 user, for now
     db.userProfile.put(values, 1);
-    console.log('Updated user', values);
     setUser(values);
     navigate('/', { replace: true });
   }
@@ -165,9 +162,9 @@ const AccountSetup = () => {
    * Register a new user, by generating a keyPairge
    * @param user from form containing user data
    */
-  function registerUser(user: IUserProfile) {
+  async function registerUser(user: IUserProfile) {
     if (!db) throw Error('No DB');
-    enrollUser(user);
+    await enrollUser(user);
     // Save to database
 
     //only 1 user, for now
@@ -305,8 +302,8 @@ const AccountSetup = () => {
    * @param e
    */
   function handleClose() {
-    console.log('User trying to close AccountSetup', userCtx.user);
-    if (userCtx.user) navigate('/');
+    console.debug('User trying to close AccountSetup', user);
+    if (user) navigate('/');
   }
 
   /**
@@ -314,11 +311,9 @@ const AccountSetup = () => {
    * Handles uncontrolled property user.position
    */
   async function handleGPS(e: ChangeEvent<HTMLInputElement>, checked: boolean) {
-    console.debug('Current position', currentPosition);
     formik.handleChange(e);
     const pos = checked ? await requestFollowMe() : null;
 
-    console.debug('Setting user position', pos);
     setCurrentPosition(pos);
 
     //formik.setTouched(formik.values.useGps);
@@ -330,15 +325,12 @@ const AccountSetup = () => {
    * @param checked
    */
   async function handlePush(e: ChangeEvent<HTMLInputElement>, checked: boolean) {
-    console.info('Notification checked ' + checked);
     formik.handleChange(e);
     if (checked)
       notifyMe(); //test notification. The actual registration of push subscription is done in ServiceWorkerWrapper
     else {
-      console.info('Clearing subscription data');
       formik.values.pushSubscription = null;
     }
-    // formik.setTouched(usePush);
   }
 
   return (
@@ -347,7 +339,7 @@ const AccountSetup = () => {
       open={true}
       onClose={handleClose}
       //only allow escape when already registered before
-      disableEscapeKeyDown={!userCtx.user}
+      disableEscapeKeyDown={!user}
       //TransitionComponent={}
       transitionDuration={{ enter: 1500 }}
       maxWidth="lg"

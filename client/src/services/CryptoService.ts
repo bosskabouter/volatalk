@@ -1,46 +1,30 @@
-import {
-  convertBase58ToBuf,
-  convertBase58ToObject,
-  convertHexToString,
-  convertStringToHex,
-} from './Generic';
+import { convertBase58ToBuf, convertBase58ToObject } from './Generic';
 
 const ENC_FORMAT_JWK = 'jwk';
 const ENC_ALGORITHM_ECDSA = 'ECDSA';
 const ENC_ALGORITHM_ECDSA_HASH = 'SHA-384';
 const ENC_ALGORITHM_ECDSA_NAMEDCURVE = 'P-384';
 
-export function generateSignature(peerid: string, userJsonPrivateKey: string) {
-  return importPrivateKey(JSON.parse(userJsonPrivateKey)).then((privKey) => {
-    return signMessage(peerid, privKey);
+/**
+ *
+ * @param peerid
+ * @param userJsonPrivateKey
+ * @returns stringified signature ArrayBuffer
+ */
+export function generateSignature(peerid: string, userJsonPrivateKey: string): Promise<string> {
+  return importPrivateKey(JSON.parse(userJsonPrivateKey)).then(async (privKey) => {
+    return JSON.stringify(Array.from(new Uint8Array(await signMessage(peerid, privKey))));
   });
 }
 
-const SEPARATOR = '_';
 /**
  *
  * @param {*} peerid
  * @returns
  */
-export async function peerIdToPublicKey(peerid: string): Promise<CryptoKey | null> {
-  if (!peerid || peerid.trim().length < 20 || !peerid.includes('_')) return null;
-  const peerSplit: string[] = peerid.split(SEPARATOR);
-
-  const pubKeyB58 = peerSplit[0];
+export async function peerIdToPublicKey(pubKeyB58: string): Promise<CryptoKey | null> {
   const pubJsonWebKey: JsonWebKey | null = convertBase58ToObject(pubKeyB58);
-
-  if (!pubJsonWebKey) return null;
-  const sigB58 = peerSplit[1];
-  const sig = sigB58 ? convertBase58ToBuf(sigB58) : null;
-
-  if (!sig) return null;
-  const pubKey = await importPublicKey(pubJsonWebKey);
-  if (!pubKey) return null;
-
-  //check if valid
-  const valid = await verifyMessage(pubKeyB58, sig, pubKey);
-
-  return valid ? pubKey : null;
+  return pubJsonWebKey && (await importPublicKey(pubJsonWebKey));
 }
 
 /**
@@ -100,7 +84,7 @@ function importCryptoKey(jwk: JsonWebKey, isPrivate: boolean) {
  * @param {*} key
  * @returns
  */
-export function exportCryptoKey(key: CryptoKey) {
+export function exportCryptoKey(key: CryptoKey): Promise<JsonWebKey> {
   return window.crypto.subtle.exportKey(ENC_FORMAT_JWK, key);
 }
 

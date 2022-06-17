@@ -3,7 +3,7 @@ import { TextEncoder, TextDecoder } from 'util';
 global.TextEncoder = TextEncoder;
 
 const aPeerId =
-  '6NZKfVuTw6KF5PqWCgzxmdzUT3n3m98tJJkqLJEoySuQLJdtPTWdyYx5csveUwadZXRf7razVn63xFxoQEG4us986ar2jGjPiyVnKndVKqhUC4Krm2495xU2SfhidykP5TwAumYhKeVobt4TCszV7TvRzUbJ2BeqT7SQDLWxBb1B42Sxqz3MJmsX2qtw8JbMKW4jv3GhZRzDSzS7AK7qxGgth3UzKEg2kp7jq7jcUBgfh3p4wyi6VAyM12yAfJuwg8e2dHEcL41nU5Yb7oDSXLs_3c56bMGKrwg4yUGUuxG641QnrtpbpQTDQEejDivohCtE26LaHNDFrTh1QqVRtiEgF8x8VNS9SYDuDBZbVFPytKFby6H9bh1ay8Ge6GxhGGErN9SmAWcGuPj326Uohfgrmva4oqWJr';
+  '6NZKfVuTw6KF5PqWCgzxmdzUT3n3m98tJJkqLJEoySuQLJdtPTWdyYx5csveUwadZXRf7razVn63xFxoQEG4us8Sk67Kp63xmjxgcbnYzCpQx42kEhj72FAfCuAfhSLeBWtNJch91KE3JJuThTwUxrVtagitmFxy2qpvxhJNmSu7WCrvj9TG6P3mspEQLkZzWoStBMy9WP7qDSKSEppWK9b6CBNRQ8RMF65NJ4b1DECJibKBMfNn5h7CFDdnspeUfQtA1hPhBfbLD9wGwRD7Lsm';
 
 import {
   exportCryptoKey,
@@ -16,7 +16,6 @@ import {
 } from './CryptoService';
 
 let keyPair: CryptoKeyPair;
-let peerid: string;
 let exportedPrivKey: JsonWebKey;
 let exportedPubKey: JsonWebKey;
 let pubKeyBackAgain: CryptoKey;
@@ -44,7 +43,7 @@ test('peerIdToPublicKey', async () => {
 });
 
 test('peerIdToPublicKey', () => {
-  expect(peerIdToPublicKey(peerid)).toBeDefined();
+  expect(peerIdToPublicKey(aPeerId)).toBeDefined();
 });
 test('importPrivateKey', async () => {
   expect(await importPrivateKey(exportedPrivKey)).toBeDefined();

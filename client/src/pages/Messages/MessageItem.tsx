@@ -20,9 +20,9 @@ export const MessageItem = ({
   message: IMessage;
 }) => {
   const peerManager = useContext(PeerContext);
-  const userCtx = useContext(UserContext);
+  const { user } = useContext(UserContext);
 
-  const isMine = message.sender === userCtx.user.peerid;
+  const isMine = message.sender === user?.peerid;
 
   const isPushed = message.dateTimePushed > 1000;
   const isPushFailed = isPushed && message.dateTimePushed < 1000; /* HTTP error code */

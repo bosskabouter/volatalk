@@ -5,7 +5,7 @@ import {
   generateKeyFromString,
 } from 'dha-encryption';
 
-export function useSessionStorage<T>(key: string, initialValue: T, ttl?: number) {
+export function useSessionStorage<T>(key: string, initialValue: T | null, ttl?: number) {
   // State to store our value
   // Pass initial state function to useState so logic is only executed once
   const [storedValue, setStoredValue] = useState<T>(() => {

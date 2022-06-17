@@ -1,11 +1,10 @@
+import { importPrivateKey, peerIdToPublicKey, signMessage, verifyMessage } from './CryptoService';
 import {
-  importPrivateKey,
-  importPublicKey,
-  peerIdToPublicKey,
-  signMessage,
-  verifyMessage,
-} from './CryptoService';
-import { convertAbToBase64, convertBase64ToAb } from './Generic';
+  convertAbToBase64,
+  convertBase58ToObject,
+  convertBase64ToAb,
+  convertObjectToBase58,
+} from './Generic';
 import { IInvite, IUserProfile } from '../types';
 
 export const INVITE_PARAMKEYS = { FROM: 'f', KEY: 'k', SIGNATURE: 's' };
@@ -13,28 +12,17 @@ export const INVITE_PARAMKEYS = { FROM: 'f', KEY: 'k', SIGNATURE: 's' };
 /**
  * TODO: add expiration date
  */
-export function makeInviteURL(user: IUserProfile, inviteText: string) {
-  return importPrivateKey(JSON.parse(user.security.privateKey)).then((privKey) => {
-    const signedMessage = user.peerid + inviteText;
-    console.debug('Signing message: ' + signedMessage);
-    return signMessage(signedMessage, privKey).then((signature) => {
-      console.debug('signature', signature);
-      const sigEncoded = convertAbToBase64(signature);
-      console.debug('sigEncoded', sigEncoded);
-      //redirect to homepage. router will save invite to localstorage in case new user / not logged in
-      const hostEnvUrl = window.location.origin + '/';
+export async function makeInviteURL(user: IUserProfile, inviteText: string): Promise<URL> {
+  const privKey = await importPrivateKey(JSON.parse(user.security.privateKey));
+  const signedMessage = user.peerid + inviteText;
+  const sig: ArrayBuffer = await signMessage(signedMessage, privKey);
+  const sigEncoded = convertAbToBase64(sig);
 
-      const realURL = new URL(hostEnvUrl);
-      realURL.searchParams.append(INVITE_PARAMKEYS.FROM, user.peerid);
-
-      realURL.searchParams.append(INVITE_PARAMKEYS.KEY, inviteText);
-
-      realURL.searchParams.append(INVITE_PARAMKEYS.SIGNATURE, sigEncoded);
-
-      console.debug('Signed invitation: ' + realURL);
-      return realURL;
-    });
-  });
+  const u = new URL(window.location.origin + '/');
+  u.searchParams.append(INVITE_PARAMKEYS.FROM, user.peerid);
+  u.searchParams.append(INVITE_PARAMKEYS.KEY, inviteText);
+  u.searchParams.append(INVITE_PARAMKEYS.SIGNATURE, sigEncoded);
+  return u;
 }
 
 /**
@@ -57,10 +45,9 @@ export async function extractInvite(params: URLSearchParams) {
     return null;
   }
 
-  console.debug('sigEncoded', sigEncoded);
-  const sig = sigEncoded ? convertBase64ToAb(sigEncoded) : new ArrayBuffer(0);
-  console.debug('signature', sig);
+  const sig: ArrayBuffer | null = sigEncoded ? convertBase64ToAb(sigEncoded) : new ArrayBuffer(0);
 
+  if (!sig) return;
   const invite: IInvite = {
     peerid: otherPeerId,
     signature: sig,
@@ -71,8 +58,6 @@ export async function extractInvite(params: URLSearchParams) {
   const verified = pk && (await verifyMessage(otherPeerId + invitationText, sig, pk));
 
   if (verified) {
-    console.info('Invitation verified.');
-
     return invite;
   } else {
     const msg = 'Invalid signature in invitation: ' + invitationText;

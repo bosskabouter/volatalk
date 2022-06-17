@@ -1,6 +1,6 @@
 /* eslint-disable */
 // @ts-nocheck
-import React from 'react';
+import React, { ReactElement, ReactNode } from 'react';
 import { useSessionStorage } from '../util/useSessionStorage';
 
 export type IAuthContext = {
@@ -30,7 +30,7 @@ export type AuthProviderProps = {
   defaultAuthenticated?: boolean;
   onLogin?: () => void;
   onLogout?: () => void;
-  children: ReactElement | Element;
+  children: ReactNode;
 };
 
 const AuthProvider: React.FC<AuthProviderProps> = ({

@@ -24,7 +24,6 @@ const CalleeComponent = () => {
 
   useEffect(() => {
     if (!peerManager) return;
-    console.debug('useEffect handleIncomingCall');
 
     async function handleIncomingCall(ctc: IContact, mc: MediaConnection) {
       setContact(ctc);
@@ -41,8 +40,6 @@ const CalleeComponent = () => {
   }, [peerManager]);
 
   useEffect(() => {
-    console.debug('useEffect answerCall');
-
     if (!remoteMediaStream && mediaConnection && localMediaStream) {
       //someone calling
       if (accepted === false && mediaConnection != null) {
@@ -55,8 +52,6 @@ const CalleeComponent = () => {
    *
    */
   useEffect(() => {
-    console.debug('useEffect acceptCall');
-
     if (!accepted || localMediaStream || !contact || !peerManager) return;
 
     navigator.mediaDevices

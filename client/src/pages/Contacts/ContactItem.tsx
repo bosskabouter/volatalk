@@ -20,7 +20,7 @@ import { UserContext } from 'providers/UserProvider';
 import Distance from 'util/geo/Distance';
 
 export const ContactItem = (props: { contact: IContact }) => {
-  const userCtx = useContext(UserContext);
+  const { user } = useContext(UserContext);
   const peerMngr = useContext(PeerContext);
   const db = useContext(DatabaseContext);
   const [contact, setContact] = useState<IContact>(props.contact);
@@ -36,12 +36,12 @@ export const ContactItem = (props: { contact: IContact }) => {
    * Calculates distance from me in km, if coords are known.
    */
   useEffect(() => {
-    if (!userCtx.user.position || !contact.position || distance) return;
+    if (!user?.position || !contact.position || distance) return;
     console.debug('useEffect distanceFromMe');
-    const distanceFromMe = Distance(userCtx.user.position, contact.position);
+    const distanceFromMe = Distance(user.position, contact.position);
     console.debug('Contact distance: ' + distanceFromMe);
     if (distanceFromMe) setDistance(`Distance from me: ${distanceFromMe} km.`);
-  }, [contact, distance, userCtx.user]);
+  }, [contact, distance, user]);
 
   /**
    * Selects unread messages;

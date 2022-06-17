@@ -18,7 +18,6 @@ function ContactRequestsButton() {
 
   useEffect(() => {
     if (!db || contactRequests) return;
-    console.debug('useEffect selectUnacceptedContacts');
     db.selectUnacceptedContacts()
       .toArray()
       .then((ctc) => {
@@ -28,7 +27,6 @@ function ContactRequestsButton() {
 
   useEffect(() => {
     if (!peerCtx) return;
-    console.debug('useEffect handleNewIncomingContactRequest');
     const handleNewIncomingContactRequest = (newContact: IContactResume) => {
       setContactRequests((prevCtcList) => [...prevCtcList, newContact]);
     };

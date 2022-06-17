@@ -27,7 +27,7 @@ export interface IUserProfile extends IContactResume {
 
 export interface Security {
   /**
-   * Private KEY for public peer id key
+   * Private KEY for public peer id key,
    */
   privateKey: string;
 
@@ -70,7 +70,10 @@ export interface IContactResume {
  *
  */
 export interface IContact extends IContactResume {
-  signature: ArrayBuffer;
+  /* was pure signature ArrayBuffer, but encryption db could not save.
+  Now is a JSON string
+  */
+  signature: string;
 
   dateTimeCreated: number;
   dateTimeAccepted: number;

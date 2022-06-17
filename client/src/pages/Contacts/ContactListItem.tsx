@@ -1,4 +1,4 @@
-import { MouseEvent, useContext, useEffect, useState } from 'react';
+import { BaseSyntheticEvent, MouseEvent, useContext, useEffect, useState } from 'react';
 
 import CallIcon from '@mui/icons-material/Call';
 import AddTaskIcon from '@mui/icons-material/AddTask';
@@ -72,7 +72,7 @@ export const ContactListItem = (props: { contact: IContact }) => {
    * @returns
    */
   const AcceptContactButton = () => {
-    const acceptContact = (e: { preventDefault: () => void }) => {
+    const acceptContact = (e: BaseSyntheticEvent) => {
       e.preventDefault();
       props.contact.dateTimeAccepted = new Date().getTime();
       db?.contacts.put(props.contact);

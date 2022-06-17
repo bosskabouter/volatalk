@@ -5,9 +5,7 @@ import {
   convertAbToBase64,
   convertBase58ToObject,
   convertBase64ToAb,
-  convertHexToString,
   convertObjectToBase58,
-  convertStringToHex,
   round,
 } from './Generic';
 
@@ -19,17 +17,6 @@ test('round to decimal', () => {
 });
 
 const aString = 'a b c 3 2 1';
-let aHex: string;
-test('convertStringToHex', () => {
-  aHex = convertStringToHex(aString);
-  expect(aHex).toBeDefined();
-  expect(aHex.length).toBeGreaterThan(aString.length);
-});
-test('convertHexToString', () => {
-  const stringBack = convertHexToString(aHex);
-  expect(stringBack).toBeDefined();
-  expect(stringBack).toEqual(aString);
-});
 
 const b64: string = 'TXVsdGliYXNlIGlzIGF3ZXNvbWUhIFxvLw==';
 let anAb: ArrayBuffer;

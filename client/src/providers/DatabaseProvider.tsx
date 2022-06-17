@@ -10,6 +10,8 @@ export const DatabaseContext = createContext<AppDatabase | null>(null);
 
 export const useDatabase = () => useContext(DatabaseContext);
 
+const inProduction = process.env.NODE_ENV === 'production';
+
 const DatabaseProvider = ({ children }: IDatabaseProviderProps) => {
   const [database, setDatabase] = useState<AppDatabase>();
   const setupDatabase = () => {
@@ -29,6 +31,7 @@ const DatabaseProvider = ({ children }: IDatabaseProviderProps) => {
     // NON_INDEXED_FIELDS tells the middleware to encrypt every field NOT indexed
     // in this case the pin, first question, second question,
     // first answer and second answer will be encrypted
+    // inProduction &&
     applyEncryptionMiddleware(
       db,
       cryptoKey,
@@ -48,7 +51,7 @@ const DatabaseProvider = ({ children }: IDatabaseProviderProps) => {
   }, []);
 
   return !database ? (
-    <>No Database...</>
+    <></>
   ) : (
     <DatabaseContext.Provider value={database}>{children}</DatabaseContext.Provider>
   );
