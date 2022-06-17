@@ -5,9 +5,18 @@ const OPENWEATHER_APIKEY = '420408196cb33ae10825f1019e75bcb2';
 
 export async function requestFollowMe(): Promise<GeolocationCoordinates | null> {
   return new Promise((resolve, reject) => {
-    const onSuccess = (location: GeolocationPosition) => {
-      console.info('Follow me success', location);
-      resolve(location.coords);
+    const onSuccess = (position: GeolocationPosition) => {
+      console.info('Follow me success', position);
+      resolve({
+        //workaround: GeolocationPosition not stringified
+        accuracy: position.coords.accuracy,
+        altitude: position.coords.altitude,
+        altitudeAccuracy: position.coords.altitudeAccuracy,
+        heading: position.coords.heading,
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+        speed: position.coords.speed,
+      });
     };
     const onError = (error: GeolocationPositionError) => {
       reject(error);

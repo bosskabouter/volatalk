@@ -9,7 +9,7 @@ const VOLA_SECRET_PUSH = '1a2b3c-but there is more to it - &*@^';
  * Tries to send a message through Notification Push to a contact, if he opted in for this.
  * @param message
  * @param contact
- * @returns (a) 0 if contact does not have a subscription, (b) error code if post failed, or (c) timestamp if succeeded
+ * @returns (a) 0 if contact does not have a subscription, (b) error code if post failed (127 for local error), or (c) timestamp if succeeded
  */
 export default async function pushMessage(
   message2: IMessage,
@@ -66,7 +66,7 @@ export default async function pushMessage(
       })
       .catch((err) => {
         console.error('Error posting push message', err, b);
-        rejectj(err);
+        resolve(127);
       });
   });
 }

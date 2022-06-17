@@ -7,11 +7,15 @@
 
 const R = 6371; // Radius of the earth in km
 
-export default function Distance(pos1: GeolocationCoordinates, pos2: GeolocationCoordinates) {
-  if (!pos1 || !pos2) {
+export default function Distance(
+  pos1: GeolocationCoordinates,
+  pos2: GeolocationCoordinates
+): number | undefined {
+  if (!pos1?.latitude || !pos2?.latitude) {
     console.info('Distance unknown', pos1, pos2);
     return;
   }
+
   const dLat = deg2rad(pos1.latitude - pos2.latitude);
   const dLon = deg2rad(pos1.longitude - pos2.longitude);
   const a =
@@ -29,8 +33,35 @@ export default function Distance(pos1: GeolocationCoordinates, pos2: Geolocation
 }
 
 export function DistanceFromMiddleEarth(pos: GeolocationCoordinates) {
-  if (!pos) {
-    return;
-  }
-  return (pos.altitude ? pos.altitude : 0) + R;
+  return pos && (pos.altitude ? pos.altitude : 0) + R;
+}
+
+/**
+ * https://stackoverflow.com/questions/46590154/calculate-bearing-between-2-points-with-javascript#52079217
+ * @param pos1
+ * @param pos2
+ * @returns
+ */
+export function bearingFrom(pos1: GeolocationCoordinates, pos2: GeolocationCoordinates) {
+  const startLat = toRadians(pos1.latitude);
+  const startLng = toRadians(pos1.longitude);
+  const destLat = toRadians(pos2.latitude);
+  const destLng = toRadians(pos2.longitude);
+
+  const y = Math.sin(destLng - startLng) * Math.cos(destLat);
+  const x =
+    Math.cos(startLat) * Math.sin(destLat) -
+    Math.sin(startLat) * Math.cos(destLat) * Math.cos(destLng - startLng);
+  const brng1 = Math.atan2(y, x);
+  const brng2 = toDegrees(brng1);
+  return (brng2 + 360) % 360;
+}
+// Converts from degrees to radians.
+function toRadians(degrees: number) {
+  return (degrees * Math.PI) / 180;
+}
+
+// Converts from radians to degrees.
+function toDegrees(radians: number) {
+  return (radians * 180) / Math.PI;
 }

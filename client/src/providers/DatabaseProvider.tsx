@@ -31,7 +31,7 @@ const DatabaseProvider = ({ children }: IDatabaseProviderProps) => {
     // NON_INDEXED_FIELDS tells the middleware to encrypt every field NOT indexed
     // in this case the pin, first question, second question,
     // first answer and second answer will be encrypted
-    // inProduction &&
+    //
     applyEncryptionMiddleware(
       db,
       cryptoKey,

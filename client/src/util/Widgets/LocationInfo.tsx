@@ -8,12 +8,12 @@ export default function LocationInfo() {
   const [position, setPosition] = useState<GeolocationCoordinates | null>(null);
   const { user } = useContext(UserContext);
 
-  const [location, setLocation] = useState({
-    city: 'Pirituba',
-    flag: '🇧🇷',
-    country: 'NL',
-    state: 'NY',
-  });
+  const [location, setLocation] = useState<{
+    city: string;
+    state: string;
+    country: string;
+    flag: string;
+  }>();
 
   /**
    * Retrieves current location from navigator, if user opted for this
@@ -46,7 +46,7 @@ export default function LocationInfo() {
     }
   }, [position, user, user?.position]);
 
-  return position ? (
+  return position && location ? (
     <Box
       sx={{
         display: 'flex',
@@ -60,9 +60,7 @@ export default function LocationInfo() {
       }}
     >
       <WeatherInfo location={position} />
-      <Tooltip
-        title={`long:${position.longitude} - lat:${position.latitude} - near ${location.city} (${location.state}-${location.country})`}
-      >
+      <Tooltip title={`near ${location.city} (${location.state}-${location.country})`}>
         <Box sx={{ display: 'flex', flexDirection: 'row', columnGap: 1 }}>
           <Box
             sx={{

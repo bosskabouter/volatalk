@@ -1,8 +1,10 @@
 import { useContext, useEffect, useState } from 'react';
 import MoreOptionsIcon from '@mui/icons-material/MoreVert';
+import { SxProps } from '@mui/system';
 
 import {
   Box,
+  css,
   Dialog,
   DialogContent,
   DialogContentText,
@@ -13,12 +15,14 @@ import {
 import { DatabaseContext } from '../../providers/DatabaseProvider';
 import { PeerContext } from '../../providers/PeerProvider';
 
-import { descriptiveTimeAgo } from '../../services/Generic';
+import { descriptiveTimeAgo, round } from '../../services/Generic';
 import { IContact, IMessage } from '../../types';
 import Identification from 'components/Identification/Identification';
 import { UserContext } from 'providers/UserProvider';
-import Distance from 'util/geo/Distance';
+import Distance, { bearingFrom } from 'util/geo/Distance';
+import { fetchLocationDescription, fetchLocationWeather } from 'services/LocationService';
 
+import BearingIcon from '@mui/icons-material/ArrowUpward';
 export const ContactItem = (props: { contact: IContact }) => {
   const { user } = useContext(UserContext);
   const peerMngr = useContext(PeerContext);
@@ -29,8 +33,25 @@ export const ContactItem = (props: { contact: IContact }) => {
 
   const [online, setOnline] = useState(peerMngr?.isConnected(props.contact) || false);
   const [distance, setDistance] = useState('');
-
+  const [bearing, setBearing] = useState(180);
+  const [location, setLocation] = useState<{
+    city: string;
+    state: string;
+    country: string;
+    flag: string;
+  }>();
+  const [weather, setWeather] = useState<{
+    description: string;
+    fahrenheit: number;
+    celcius: number;
+    icon: string;
+  }>();
   const lastTimeSeen = 'Seen: ' + descriptiveTimeAgo(new Date(contact.dateTimeResponded));
+
+  const bearingStyle = {
+    transform: 'rotate(' + bearing + 'deg)',
+    transition: 'transform 150ms ease', // smooth transition
+  };
 
   /**
    * Calculates distance from me in km, if coords are known.
@@ -39,8 +60,11 @@ export const ContactItem = (props: { contact: IContact }) => {
     if (!user?.position || !contact.position || distance) return;
     console.debug('useEffect distanceFromMe');
     const distanceFromMe = Distance(user.position, contact.position);
+    setBearing(bearingFrom(user.position, contact.position));
     console.debug('Contact distance: ' + distanceFromMe);
-    if (distanceFromMe) setDistance(`Distance from me: ${distanceFromMe} km.`);
+    if (distanceFromMe) setDistance(`${round(distanceFromMe, 1)} km away.`);
+    fetchLocationDescription(contact.position).then(setLocation);
+    fetchLocationWeather(contact.position).then(setWeather);
   }, [contact, distance, user]);
 
   /**
@@ -161,7 +185,17 @@ export const ContactItem = (props: { contact: IContact }) => {
           </Typography>
           {distance && (
             <Typography variant="subtitle2" noWrap>
-              <div>{distance}</div>
+              <span>
+                {distance}
+                <BearingIcon style={bearingStyle} />
+              </span>
+              <span>
+                near {location?.city}
+                {location?.flag}
+              </span>
+              <div>
+                {weather?.description}, {weather?.celcius} ℃
+              </div>
             </Typography>
           )}
         </Box>

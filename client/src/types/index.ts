@@ -78,7 +78,6 @@ export interface IContact extends IContactResume {
   dateTimeCreated: number;
   dateTimeAccepted: number;
   dateTimeDeclined: number;
-  //?
   dateTimeResponded: number;
 }
 

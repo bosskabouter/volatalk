@@ -27,7 +27,7 @@ export interface PeerManagerEvents {
 const RECONNECT_TIMEOUT = 60 * 1000;
 
 interface ConnectionMetadata {
-  contact: IContactResume;
+  contactStringified: string;
   signature: string;
 }
 /**
@@ -206,6 +206,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
   ): Promise<IContact> {
     const sig = await generateSignature(conn.peer, this.#user.security.privateKey);
 
+    const contactResume: IContactResume = JSON.parse(conn.metadata.contactStringified);
     const newContact: IContact = Object.assign(
       {
         dateTimeCreated: new Date().getTime(),
@@ -214,7 +215,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
         dateTimeDeclined: 0,
         signature: sig,
       },
-      conn.metadata.contact
+      contactResume
     );
 
     this.#db.contacts.add(newContact);
@@ -232,7 +233,8 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
     const md: ConnectionMetadata = conn.metadata;
     //persist updated contact info
     //merge new profile info into existing contact
-    Object.assign(contact, md.contact);
+    const contactResume: IContactResume = JSON.parse(md.contactStringified);
+    Object.assign(contact, contactResume);
 
     contact.dateTimeResponded = new Date().getTime();
 
@@ -317,12 +319,12 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
    * @param contact
    * @returns
    */
-  #getConnectionMetadata(contact: IContact): ConnectionMetadata {
+  #initConnectionMetadata(contact: IContact): ConnectionMetadata {
     //create shallow copy of this user as resume to send over, without the security details
     const { security, ...myResume } = this.#user;
 
     return {
-      contact: myResume,
+      contactStringified: JSON.stringify(myResume),
       signature: contact.signature,
     };
   }
@@ -360,7 +362,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
      * Sending (updated) personal user info (nick, avatar, etc.) in the fom of a contact within connection metadata to receiver.
      */
     const connection = this.#peer.connect(contact.peerid, {
-      metadata: this.#getConnectionMetadata(contact),
+      metadata: this.#initConnectionMetadata(contact),
     });
     connection.on('open', () => {
       console.info("connection.on('open', () =>", contact, connection);
@@ -475,7 +477,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
     return new Promise((resolve, _reject) => {
       console.debug('Calling contact', contact, localMediaStream);
       const mc = this.#peer.call(contact.peerid, localMediaStream, {
-        metadata: this.#getConnectionMetadata(contact),
+        metadata: this.#initConnectionMetadata(contact),
       });
       this.#calls.set(contact.peerid, mc);
       mc.on('stream', (rms) => {

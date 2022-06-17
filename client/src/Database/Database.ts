@@ -19,7 +19,8 @@ export class AppDatabase extends Dexie {
       userProfile: '++id',
       contacts: 'peerid , dateAccepted, dateDelined',
       messages:
-        '++id, sender, receiver, dateCreated, dateSent, dateRead, [sender+dateRead],[receiver+dateSent]',
+        '++id, sender, receiver, dateCreated, dateSent, dateRead, ' +
+        '[sender+dateRead],[receiver+dateSent]',
     });
 
     this.version(DB_CURRENT_VERSION)
@@ -45,7 +46,6 @@ export class AppDatabase extends Dexie {
             delete contact.dateAccepted;
 
             contact.dateTimeDeclined = contact.dateDelined ? contact.dateDelined.getTime() : 0;
-            delete contact.dateDelined;
 
             delete contact.accepted;
             delete contact.declined;
@@ -103,18 +103,17 @@ export class AppDatabase extends Dexie {
     return this.contacts.where({ dateTimeAccepted: 0 });
   }
 
-  selectUnsentMessages(c: IContact): IMessage[] | PromiseLike<IMessage[]> {
+  selectUnsentMessages(c: IContact) {
     return this.messages.where({ receiver: c.peerid, dateTimeSent: 0 }).sortBy('dateTimeCreated');
   }
   async selectLastMessage(contact: IContact): Promise<IMessage | null> {
-    let msg: IMessage | undefined | null = await this.messages
+    const msg: IMessage | undefined = await this.messages
       .where('sender')
       .equals(contact.peerid)
       .or('receiver')
       .equals(contact.peerid)
       .last();
 
-    if (msg === undefined) msg = null;
-    return msg;
+    return msg ? msg : null;
   }
 }
