@@ -1,27 +1,40 @@
 import axios from 'axios';
-import { round, toCelsius } from './Generic';
+import { round, kelvinToCelcius } from './Generic';
 
 const OPENWEATHER_APIKEY = '420408196cb33ae10825f1019e75bcb2';
 
+const TIMEOUT_GPS = 15 * 1000;
+
 export async function requestFollowMe(): Promise<GeolocationCoordinates | null> {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve, _reject) => {
     const onSuccess = (position: GeolocationPosition) => {
       console.info('Follow me success', position);
-      resolve({
-        //workaround: GeolocationPosition not stringified
-        accuracy: position.coords.accuracy,
-        altitude: position.coords.altitude,
-        altitudeAccuracy: position.coords.altitudeAccuracy,
-        heading: position.coords.heading,
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude,
-        speed: position.coords.speed,
-      });
+
+      resolve(
+        position?.coords?.latitude
+          ? {
+              //workaround: GeolocationPosition not stringified
+              accuracy: position.coords.accuracy,
+              altitude: position.coords.altitude,
+              altitudeAccuracy: position.coords.altitudeAccuracy,
+              heading: position.coords.heading,
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+              speed: position.coords.speed,
+            }
+          : null
+      );
     };
     const onError = (error: GeolocationPositionError) => {
-      reject(error);
+      console.warn('GeolocationPositionError', error);
+      alert('GeolocationPositionError: ' + error.code + ' - ' + error.message);
+      resolve(null);
     };
-    if (navigator.geolocation) navigator.geolocation.getCurrentPosition(onSuccess, onError);
+    if (navigator.geolocation)
+      navigator.geolocation.getCurrentPosition(onSuccess, onError, {
+        timeout: TIMEOUT_GPS,
+        enableHighAccuracy: true,
+      });
     else {
       console.warn('No location services available');
       resolve(null);
@@ -68,7 +81,6 @@ export async function fetchLocationDescription(coords: GeolocationCoordinates): 
 
 export async function fetchLocationWeather(coords: GeolocationCoordinates): Promise<{
   description: string;
-  fahrenheit: number;
   celcius: number;
   icon: string;
 }> {
@@ -82,10 +94,10 @@ export async function fetchLocationWeather(coords: GeolocationCoordinates): Prom
           const description = record.description;
           const icon = `https://openweathermap.org/img/wn/${record.icon}.png`;
 
-          const fahrenheit = res.data.main.feels_like;
+          const kelvin = res.data.main.feels_like;
 
-          const celcius = round(toCelsius(fahrenheit) / 10, 1);
-          resolve({ description, fahrenheit, celcius, icon });
+          const celcius = round(kelvinToCelcius(kelvin), 1);
+          resolve({ description, celcius, icon });
         }
       );
     })

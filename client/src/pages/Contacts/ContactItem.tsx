@@ -1,6 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
 import MoreOptionsIcon from '@mui/icons-material/MoreVert';
-import { SxProps } from '@mui/system';
 
 import {
   Box,
@@ -22,7 +21,9 @@ import { UserContext } from 'providers/UserProvider';
 import Distance, { bearingFrom } from 'util/geo/Distance';
 import { fetchLocationDescription, fetchLocationWeather } from 'services/LocationService';
 
-import BearingIcon from '@mui/icons-material/ArrowUpward';
+import BearingIcon from '@mui/icons-material/North';
+import GpsNotFixedIcon from '@mui/icons-material/GpsNotFixed';
+
 export const ContactItem = (props: { contact: IContact }) => {
   const { user } = useContext(UserContext);
   const peerMngr = useContext(PeerContext);
@@ -34,6 +35,7 @@ export const ContactItem = (props: { contact: IContact }) => {
   const [online, setOnline] = useState(peerMngr?.isConnected(props.contact) || false);
   const [distance, setDistance] = useState('');
   const [bearing, setBearing] = useState(180);
+  const [north, setNorth] = useState(0);
   const [location, setLocation] = useState<{
     city: string;
     state: string;
@@ -42,16 +44,31 @@ export const ContactItem = (props: { contact: IContact }) => {
   }>();
   const [weather, setWeather] = useState<{
     description: string;
-    fahrenheit: number;
     celcius: number;
     icon: string;
   }>();
   const lastTimeSeen = 'Seen: ' + descriptiveTimeAgo(new Date(contact.dateTimeResponded));
 
   const bearingStyle = {
-    transform: 'rotate(' + bearing + 'deg)',
-    transition: 'transform 150ms ease', // smooth transition
+    transform: 'rotate(' + bearing + north + 'deg)',
+    //transition: 'transform 1500ms ease', // smooth transition
   };
+  const compassStyle = {
+    transform: 'rotate(' + north + 'deg)',
+    //transition: 'transform 1500ms ease', // smooth transition
+  };
+  /**
+   * Watch device orientation to follow contact location
+   */
+  useEffect(() => {
+    function handleOrientation(ev: DeviceOrientationEvent) {
+      ev.alpha && setNorth(ev.alpha);
+    }
+    window.addEventListener('deviceorientation', handleOrientation);
+    return () => {
+      window.removeEventListener('deviceorientation', handleOrientation);
+    };
+  }, []);
 
   /**
    * Calculates distance from me in km, if coords are known.
@@ -162,6 +179,7 @@ export const ContactItem = (props: { contact: IContact }) => {
           status={online}
           badgeCnt={cntUnread}
         ></Identification>
+        <div>{north}</div>
         <MoreOptionsButton></MoreOptionsButton>
       </Box>
 
@@ -188,6 +206,7 @@ export const ContactItem = (props: { contact: IContact }) => {
               <span>
                 {distance}
                 <BearingIcon style={bearingStyle} />
+                <GpsNotFixedIcon style={compassStyle} />
               </span>
               <span>
                 near {location?.city}

@@ -8,7 +8,7 @@ export default function LocationInfo() {
   const [position, setPosition] = useState<GeolocationCoordinates | null>(null);
   const { user } = useContext(UserContext);
 
-  const [location, setLocation] = useState<{
+  const [locationDescription, setLocationDesciption] = useState<{
     city: string;
     state: string;
     country: string;
@@ -25,14 +25,16 @@ export default function LocationInfo() {
     } else if (user.useGps && !position) {
       console.debug('useEffect requestFollowMe');
 
-      requestFollowMe().then(setPosition);
+      requestFollowMe().then((pos) => {
+        setPosition(pos);
+      });
     }
   }, [position, user]);
 
   useEffect(() => {
-    if (position) {
+    if (position && !locationDescription) {
       console.debug('useEffect fetchLocationDescription');
-      fetchLocationDescription(position).then(setLocation);
+      fetchLocationDescription(position).then((desc) => setLocationDesciption(desc));
     }
   }, [position]);
 
@@ -46,7 +48,7 @@ export default function LocationInfo() {
     }
   }, [position, user, user?.position]);
 
-  return position && location ? (
+  return position && locationDescription ? (
     <Box
       sx={{
         display: 'flex',
@@ -60,16 +62,18 @@ export default function LocationInfo() {
       }}
     >
       <WeatherInfo location={position} />
-      <Tooltip title={`near ${location.city} (${location.state}-${location.country})`}>
+      <Tooltip
+        title={`near ${locationDescription.city} (${locationDescription.state}-${locationDescription.country})`}
+      >
         <Box sx={{ display: 'flex', flexDirection: 'row', columnGap: 1 }}>
           <Box
             sx={{
               display: { xs: 'none', md: 'block' },
             }}
           >
-            <Typography>{location.city}</Typography>
+            <Typography>{locationDescription.city}</Typography>
           </Box>
-          <Typography variant="h5">{location.flag}</Typography>
+          <Typography variant="h5">{locationDescription.flag}</Typography>
         </Box>
       </Tooltip>
     </Box>

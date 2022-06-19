@@ -10,7 +10,6 @@ interface WeatherInfoProps {
 export const WeatherInfo = ({ location }: WeatherInfoProps) => {
   const [weatherNow, setWeatherNow] = useState<{
     description: string;
-    fahrenheit: number;
     celcius: number;
     icon: string;
   }>();
@@ -19,9 +18,7 @@ export const WeatherInfo = ({ location }: WeatherInfoProps) => {
     console.debug('useEffect weatherNow');
     if (!location?.longitude || weatherNow) return;
 
-    fetchLocationWeather(location).then((weather) => {
-      setWeatherNow(weather);
-    });
+    fetchLocationWeather(location).then(setWeatherNow);
   }, [location, location?.longitude, weatherNow]);
 
   return weatherNow ? (

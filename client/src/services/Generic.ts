@@ -148,6 +148,7 @@ export function getLocalTimeString(date: Date) {
   return timeFormat.format(date);
 }
 
+const ABS_ZERO = -273.15;
 export function toCelsius(fahrenheit: number) {
   const celcius = (fahrenheit - 32) / 1.8;
   const fahren = toFahrenheit(celcius);
@@ -157,4 +158,8 @@ export function toCelsius(fahrenheit: number) {
 
 export function toFahrenheit(celsius: number) {
   return celsius * 1.8 + 32;
+}
+
+export function kelvinToCelcius(kelvin: number) {
+  return kelvin + ABS_ZERO;
 }

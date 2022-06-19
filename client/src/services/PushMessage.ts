@@ -91,20 +91,20 @@ export function notifyMe() {
   // Normally, if the user has denied notifications, you want to be respectful there is no need to bother them any more.
   // But this function was executed by user action, so try to regain permission
 
-  Notification.requestPermission().then(function (permission) {
+  Notification.requestPermission().then((permission) => {
     // If the user accepts, let's create a notification
     if (permission === 'granted') {
       const options: NotificationOptions = {
         badge: 'https://volatalk.org/mstile-150x150.png',
-        renotify: true,
+        // renotify: true,
         image: 'https://volatalk.org/mstile-150x150.png',
-        tag: 'id' + Math.random(), //msg.id
+        //tag: 'id' + Math.random(), //msg.id
         requireInteraction: false,
         vibrate: [1000, 2000, 3000, 4000, 5000],
         silent: false,
         icon: 'https://volatalk.org/mstile-150x150.png',
-        data: 'data here',
-        body: 'body here',
+        // data: 'data here',
+        // body: 'body here',
       };
 
       const notification = new Notification('Notification working!!', options);
