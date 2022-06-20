@@ -43,8 +43,9 @@ self.addEventListener('push', (pushEvent) => {
   const notificationOptions = {
     body: message.payload,
     badge: senderInfo.avatar,
-    image: senderInfo.avatar,
-    icon: 'https://volatalk.org/mstile-150x150.png',
+    //    image: senderInfo.avatar,
+    //    icon: 'https://volatalk.org/mstile-150x150.png',
+    icon: senderInfo.avatar,
     vibrate: [1000, 2000, 3000, 4000, 5000],
     actions: [actionOpen, actionClose],
     requireInteraction: message.urgent,

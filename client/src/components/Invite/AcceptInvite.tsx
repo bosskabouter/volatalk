@@ -6,7 +6,7 @@ import { Button, Dialog, Typography, DialogContent, DialogContentText } from '@m
 import { useNavigate } from 'react-router-dom';
 import { DatabaseContext } from '../../providers/DatabaseProvider';
 import { UserContext } from '../../providers/UserProvider';
-import { IInvite } from '../../types';
+import { IContact, IInvite } from '../../types';
 import { PeerContext } from '../../providers/PeerProvider';
 import { extractInvite } from '../../services/InvitationService';
 import { Alerter } from '../StatusDisplay/Alerter';
@@ -16,6 +16,8 @@ import Identification from 'components/Identification/Identification';
 export default function AcceptInvite(props: { invite: string }) {
   const timeout = 5000;
 
+  const [open, setOpen] = useState(true);
+
   //recover invite from local storage hack
   localStorage.removeItem('invite');
 
@@ -24,6 +26,8 @@ export default function AcceptInvite(props: { invite: string }) {
 
   const [receivedInvite, setReceivedInvite] = useState<IInvite | null>(null);
 
+  const [contact, setContact] = useState<IContact | null>(null);
+
   const db = useContext(DatabaseContext);
 
   const navigate = useNavigate();
@@ -31,33 +35,28 @@ export default function AcceptInvite(props: { invite: string }) {
   const peerCtx = useContext(PeerContext);
 
   useEffect(() => {
-    if (!db || !peerCtx || !user) return;
-    if (!receivedInvite && !result) {
-      console.debug('useEffect extractInvite');
+    console.debug('useEffect extractInvite');
+    extractInvite(new URLSearchParams(props.invite)).then(setReceivedInvite);
+  }, [props.invite]);
 
-      extractInvite(new URLSearchParams(props.invite)).then(async (invite) => {
-        if (invite) {
-          setReceivedInvite(invite);
-
-          if (await db.contacts.get(invite.peerid)) {
-            setResult(`Invite already accepted.. Still waiting to connect... `);
-          } else if (invite.peerid === user.peerid) {
-            setResult('Inviting yourself?');
-          }
-        } else {
-          setResult('Invalid invitation');
-        }
+  useEffect(() => {
+    if (!receivedInvite || !user) return;
+    if (receivedInvite.peerid === user.peerid) {
+      setResult('Inviting yourself?');
+    } else
+      db?.contacts.get(receivedInvite.peerid).then((knownContact) => {
+        knownContact &&
+          setResult(
+            `Invite already accepted.. Still waiting to connect with: ` + knownContact.nickname
+          );
       });
-    } else if (receivedInvite && senderOnline === null) {
-      setSenderOnline(false);
-      // we just entered the page from url. wait for our own peer to connect
+  }, [db?.contacts, receivedInvite, user]);
 
-      setTimeout(async () => {
-        const isOnline = await peerCtx.isPeerOnline(receivedInvite.peerid);
-        setSenderOnline(isOnline);
-      }, timeout);
+  useEffect(() => {
+    if (peerCtx && peerCtx.isOnline() && receivedInvite) {
+      peerCtx?.isPeerOnline(receivedInvite.peerid).then(setSenderOnline);
     }
-  }, [db, peerCtx, props.invite, receivedInvite, result, senderOnline, user]);
+  }, [peerCtx, receivedInvite]);
 
   //handler
   const handleAcceptContact = async () => {
@@ -118,7 +117,7 @@ export default function AcceptInvite(props: { invite: string }) {
       {result ? (
         <Alerter message={result} type="error" />
       ) : (
-        <Dialog open css={styles.AcceptInviteStyle}>
+        <Dialog open={open} onClose={() => setOpen(false)} css={styles.AcceptInviteStyle}>
           <DialogContent>
             <Typography variant="subtitle2">You received an invite to connect</Typography>
             <Typography variant="subtitle1">{receivedInvite.text}</Typography>

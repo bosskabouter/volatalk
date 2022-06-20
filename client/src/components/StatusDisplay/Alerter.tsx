@@ -4,7 +4,7 @@ import React from 'react';
 
 import CloseIcon from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
-import Snackbar from '@mui/material/Snackbar';
+import Snackbar, { SnackbarOrigin } from '@mui/material/Snackbar';
 import { Button } from '@mui/material';
 
 export const Alerter = (props: { message: string; type: string }) => {
@@ -31,6 +31,7 @@ export const Alerter = (props: { message: string; type: string }) => {
   return (
     <div>
       <Snackbar
+        anchorOrigin={{ horizontal: 'center', vertical: 'bottom' }}
         open={open}
         autoHideDuration={6000}
         onClose={handleClose}

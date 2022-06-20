@@ -134,9 +134,7 @@ export const TimeInfo = () => {
         <AnalogClock />
       </Box>
       <Box sx={{ display: { sd: 'inline-flex', md: 'none' } }}>
-        <Box>
-          <DigitalClock />
-        </Box>
+        <DigitalClock />
       </Box>
     </Box>
   );

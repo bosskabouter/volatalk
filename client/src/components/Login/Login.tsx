@@ -10,12 +10,13 @@ import { useNavigate } from 'react-router-dom';
 import { DatabaseContext } from '../../providers/DatabaseProvider';
 import { AuthContext } from '../../providers/AuthProvider';
 import { UserContext } from '../../providers/UserProvider';
+import { useDispatch } from 'react-redux';
 
 const Login = () => {
   const [loggedIn, setLoggedIn] = useState(false);
   const { setAuthenticated } = useContext(AuthContext);
   const { setUser } = useContext(UserContext);
-
+  const dispatch = useDispatch();
   const theme = useTheme();
   const fullScreen = isMobile ? true : false;
   const navigate = useNavigate();
@@ -48,7 +49,6 @@ const Login = () => {
                 setAuthenticated(true);
                 console.log('Logged in user', user);
                 setUser(user);
-                //dispatch(setUser(res));
 
                 navigate('/');
               } else {

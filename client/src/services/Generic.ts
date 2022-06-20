@@ -49,50 +49,6 @@ export function convertAbToBase64(buffer: ArrayBuffer) {
   return window.btoa(binary);
 }
 
-/**
- * @see https://imagekit.io/blog/how-to-resize-image-in-javascript/
- *
- */
-export function resizeFileUpload(imageFile: File, MAX_WIDTH: number, MAX_HEIGHT: number) {
-  return new Promise((resolve, _reject) => {
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      const img = document.createElement('img');
-      img.onload = function (_event) {
-        // Dynamically create a canvas element
-        let width = img.width;
-        let height = img.height;
-
-        // Change the resizing logic
-        if (width > height) {
-          if (width > MAX_WIDTH) {
-            height = height * (MAX_WIDTH / width);
-            width = MAX_WIDTH;
-          }
-        } else {
-          if (height > MAX_HEIGHT) {
-            width = width * (MAX_HEIGHT / height);
-            height = MAX_HEIGHT;
-          }
-        }
-
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx?.drawImage(img, 0, 0, width, height);
-
-        // Show resized image in preview element, if present
-
-        const dataurl = canvas.toDataURL(imageFile.type);
-        resolve(dataurl);
-      };
-      if (e.target?.result) img.src = e.target.result.toString();
-    };
-    reader.readAsDataURL(imageFile);
-  });
-}
-
 const dateFormatShort = new Intl.DateTimeFormat(navigator.languages[0], {
   //  dateStyle: 'full',
 

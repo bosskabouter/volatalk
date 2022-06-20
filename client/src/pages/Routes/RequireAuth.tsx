@@ -12,7 +12,7 @@ export const RequireAuth = () => {
   const { authenticated } = React.useContext(AuthContext);
   const existingAccount = useSelector((state: State) => state.accountState.created);
   const isSecure = useSelector((state: State) => state.accountState.isSecure);
-
+  const { setAuthenticated } = useContext(AuthContext);
   const db = useContext(DatabaseContext);
   const userCtx = useContext(UserContext);
 
@@ -50,6 +50,7 @@ export const RequireAuth = () => {
           if (user) {
             console.info('Setting user in Context', user);
             userCtx.setUser(user);
+            setAuthenticated(true);
           }
         });
     }

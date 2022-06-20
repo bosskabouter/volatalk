@@ -28,7 +28,7 @@ export async function makeInviteURL(user: IUserProfile, inviteText: string): Pro
 /**
  * Extracts and Verifies invite parameters from URL search
  */
-export async function extractInvite(params: URLSearchParams) {
+export async function extractInvite(params: URLSearchParams): Promise<IInvite | null> {
   const otherPeerId = params.get(INVITE_PARAMKEYS.FROM);
   const sigEncoded = params.get(INVITE_PARAMKEYS.SIGNATURE);
   const invitationText = params.get(INVITE_PARAMKEYS.KEY);
@@ -47,7 +47,7 @@ export async function extractInvite(params: URLSearchParams) {
 
   const sig: ArrayBuffer | null = sigEncoded ? convertBase64ToAb(sigEncoded) : new ArrayBuffer(0);
 
-  if (!sig) return;
+  if (!sig) return null;
   const invite: IInvite = {
     peerid: otherPeerId,
     signature: sig,

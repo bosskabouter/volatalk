@@ -33,11 +33,11 @@ import { AuthContext } from '../../providers/AuthProvider';
 
 import { notifyMe } from '../../services/PushMessage';
 import { setCreated, setIsSecure } from '../../store/slices/accountSlice';
-import { resizeFileUpload } from '../../services/Generic';
 import { DistanceFromMiddleEarth } from 'util/geo/Distance';
 import { questions } from './SecurityQuestions';
 import { requestFollowMe } from 'services/LocationService';
 import enrollUser from 'services/UserService';
+import { resizeFileUpload2 } from 'services/ImageResize';
 
 const ITEM_HEIGHT = 18;
 const ITEM_PADDING_TOP = 8;
@@ -364,7 +364,11 @@ const AccountSetup = () => {
             error={formik.touched.nickname && Boolean(formik.errors.nickname)}
             //helperText={formik.touched.nickname && formik.errors.nickname}
           />
-
+          <Avatar
+            src={formik.values.avatarThumb}
+            variant={'rounded'}
+            sx={{ width: '100px', height: '100px' }}
+          ></Avatar>
           <div css={styles.avatarUploadDiv}>
             <Avatar
               src={formik.values.avatar}
@@ -380,11 +384,11 @@ const AccountSetup = () => {
               accept="image/*"
               onChange={(event) => {
                 if (!event.target.files) return;
-                resizeFileUpload(event.target.files[0], 180, 180).then((src) => {
+                resizeFileUpload2(event.target.files[0], 180, 180, 1.0).then((src) => {
                   formik.setFieldValue('avatar', src);
                 });
 
-                resizeFileUpload(event.target.files[0], 36, 36).then((src) => {
+                resizeFileUpload2(event.target.files[0], 30, 30, 0.1).then((src) => {
                   formik.setFieldValue('avatarThumb', src);
                 });
               }}

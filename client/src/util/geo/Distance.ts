@@ -52,9 +52,9 @@ export function bearingFrom(pos1: GeolocationCoordinates, pos2: GeolocationCoord
   const x =
     Math.cos(startLat) * Math.sin(destLat) -
     Math.sin(startLat) * Math.cos(destLat) * Math.cos(destLng - startLng);
-  const brng1 = Math.atan2(y, x);
-  const brng2 = toDegrees(brng1);
-  return (brng2 + 360) % 360;
+
+  const brng = toDegrees(Math.atan2(y, x));
+  return (brng + 360) % 360;
 }
 // Converts from degrees to radians.
 function toRadians(degrees: number) {

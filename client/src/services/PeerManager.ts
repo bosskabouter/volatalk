@@ -2,14 +2,9 @@ import { StrictEventEmitter } from 'strict-event-emitter';
 
 import { IContact, IContactResume, IMessage, IUserProfile } from '../types';
 import { AppDatabase } from '../Database/Database';
-import {
-  generateSignature,
-  importPublicKey,
-  peerIdToPublicKey,
-  verifyMessage,
-} from './CryptoService';
+import { generateSignature, peerIdToPublicKey, verifyMessage } from './CryptoService';
 
-import { default as Peer, DataConnection, MediaConnection } from 'peerjs';
+import { default as Peer, DataConnection, MediaConnection, AnswerOption } from 'peerjs';
 import { decryptString, encryptString, generateKeyFromString } from 'dha-encryption';
 import pushMessage from './PushMessage';
 import { verifyAddress } from './UserService';
@@ -114,6 +109,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
       console.info('Someone calling', mediaConnection);
       const contact = await this.#contactConnected(mediaConnection);
       if (contact) {
+        this.#calls.set(contact.peerid, mediaConnection);
         this.emit('onIncomingCall', contact, mediaConnection);
       } else {
         console.warn('Invalid signature, closing connection.', mediaConnection);
@@ -410,24 +406,6 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
     return msg;
   }
 
-  /**
-   * Accept the call from a waiting contact with local MediaStream.
-   * @param contact
-   * @param localMediaStream
-   */
-  async acceptCall(contact: IContact, localMediaStream: MediaStream): Promise<MediaStream> {
-    return new Promise((resolve, reject) => {
-      const mediaConnection = this.#calls.get(contact.peerid);
-      if (mediaConnection) {
-        mediaConnection.answer(localMediaStream); // Answer the call with an A/V stream.
-        mediaConnection.on('stream', (rms) => {
-          console.debug('Got remote media stream', rms);
-          resolve(rms);
-        });
-      } else reject('Cannot accept call. No remote MediaConnection (Contact not calling)');
-    });
-  }
-
   async #attemptTransmitMessage(msg: IMessage): Promise<boolean> {
     //TODO use contact sig to encrypt
     const stringToEncrypt = encryptString(msg.payload, generateKeyFromString('1234'));
@@ -473,24 +451,55 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
       });
     });
   }
-  async call(contact: IContact, localMediaStream: MediaStream): Promise<MediaStream | null> {
+  /**
+   *
+   * @param contact
+   * @param localMediaStream
+   * @returns
+   */
+  async call(
+    contact: IContact,
+    localMediaStream: MediaStream
+  ): Promise<{ ms: MediaStream | null; mc: MediaConnection | null }> {
     return new Promise((resolve, _reject) => {
       console.debug('Calling contact', contact, localMediaStream);
       const mc = this.#peer.call(contact.peerid, localMediaStream, {
         metadata: this.#initConnectionMetadata(contact),
       });
       this.#calls.set(contact.peerid, mc);
-      mc.on('stream', (rms) => {
-        console.debug('Received remote media stream for call', rms);
-        resolve(rms);
+      mc.on('stream', (ms: MediaStream) => {
+        return resolve({ ms, mc });
       });
 
-      mc.on('error', (e) => {
-        console.warn('MediaConnection error', e);
-      });
+      mc.on('error', console.warn);
     });
   }
 
+  /**
+   * Accept the call from a waiting contact with local MediaStream.
+   * @param contact
+   * @param localMediaStream
+   */
+  async acceptCall(contact: IContact, localMediaStream: MediaStream): Promise<MediaStream> {
+    return new Promise((resolve, reject) => {
+      const mediaConnection = this.#calls.get(contact.peerid);
+      if (mediaConnection) {
+        mediaConnection.answer(localMediaStream); // Answer the call with an A/V stream.
+        mediaConnection.on('stream', (rms) => {
+          console.debug('Got remote media stream', rms);
+          resolve(rms);
+        });
+      } else reject('Cannot accept call. No remote MediaConnection (Contact not calling)');
+    });
+  }
+  disconnectCall(contact: IContact): boolean {
+    const mediaConnection = this.#calls.get(contact.peerid);
+    if (mediaConnection) {
+      mediaConnection.close();
+      console.log('Closed media Connection with contact', contact, mediaConnection);
+    }
+    return mediaConnection != null;
+  }
   /**
    * Checks if connection exists and open with known contact
    * @param contact

@@ -32,9 +32,9 @@ export default function LocationInfo() {
   }, [position, user]);
 
   useEffect(() => {
-    if (position && !locationDescription) {
-      console.debug('useEffect fetchLocationDescription');
-      fetchLocationDescription(position).then((desc) => setLocationDesciption(desc));
+    if (position) {
+      console.debug('fetchLocationDescription');
+      fetchLocationDescription(position).then(setLocationDesciption);
     }
   }, [position]);
 

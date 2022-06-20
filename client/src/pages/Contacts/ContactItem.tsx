@@ -3,12 +3,10 @@ import MoreOptionsIcon from '@mui/icons-material/MoreVert';
 
 import {
   Box,
-  css,
   Dialog,
   DialogContent,
   DialogContentText,
   IconButton,
-  Tooltip,
   Typography,
 } from '@mui/material';
 import { DatabaseContext } from '../../providers/DatabaseProvider';
@@ -22,19 +20,21 @@ import Distance, { bearingFrom } from 'util/geo/Distance';
 import { fetchLocationDescription, fetchLocationWeather } from 'services/LocationService';
 
 import BearingIcon from '@mui/icons-material/North';
-import GpsNotFixedIcon from '@mui/icons-material/GpsNotFixed';
+import { madgwick } from 'services/Compass';
 
 export const ContactItem = (props: { contact: IContact }) => {
   const { user } = useContext(UserContext);
   const peerMngr = useContext(PeerContext);
   const db = useContext(DatabaseContext);
+
   const [contact, setContact] = useState<IContact>(props.contact);
 
   const [cntUnread, setCntUnread] = useState<number>();
 
   const [online, setOnline] = useState(peerMngr?.isConnected(props.contact) || false);
-  const [distance, setDistance] = useState('');
-  const [bearing, setBearing] = useState(180);
+
+  const [distance, setDistance] = useState<number>();
+  const [bearing, setBearing] = useState(0);
   const [north, setNorth] = useState(0);
   const [location, setLocation] = useState<{
     city: string;
@@ -47,10 +47,11 @@ export const ContactItem = (props: { contact: IContact }) => {
     celcius: number;
     icon: string;
   }>();
+
   const lastTimeSeen = 'Seen: ' + descriptiveTimeAgo(new Date(contact.dateTimeResponded));
 
   const bearingStyle = {
-    transform: 'rotate(' + bearing + north + 'deg)',
+    transform: 'rotate(' + (north + bearing) + 'deg)',
     //transition: 'transform 1500ms ease', // smooth transition
   };
   const compassStyle = {
@@ -58,7 +59,13 @@ export const ContactItem = (props: { contact: IContact }) => {
     //transition: 'transform 1500ms ease', // smooth transition
   };
   /**
-   * Watch device orientation to follow contact location
+   * Watch device orientation to follow contact location.
+   *
+   * The alpha angle is 0° when top of the device is
+   * pointed directly toward the Earth's north pole,
+   * and increases as the device is rotated toward the left.
+   *
+   * https://developer.mozilla.org/en-US/docs/Web/Events/Orientation_and_motion_data_explained
    */
   useEffect(() => {
     function handleOrientation(ev: DeviceOrientationEvent) {
@@ -79,7 +86,7 @@ export const ContactItem = (props: { contact: IContact }) => {
     const distanceFromMe = Distance(user.position, contact.position);
     setBearing(bearingFrom(user.position, contact.position));
     console.debug('Contact distance: ' + distanceFromMe);
-    if (distanceFromMe) setDistance(`${round(distanceFromMe, 1)} km away.`);
+    if (distanceFromMe) setDistance(distanceFromMe);
     fetchLocationDescription(contact.position).then(setLocation);
     fetchLocationWeather(contact.position).then(setWeather);
   }, [contact, distance, user]);
@@ -179,7 +186,7 @@ export const ContactItem = (props: { contact: IContact }) => {
           status={online}
           badgeCnt={cntUnread}
         ></Identification>
-        <div>{north}</div>
+
         <MoreOptionsButton></MoreOptionsButton>
       </Box>
 
@@ -197,27 +204,26 @@ export const ContactItem = (props: { contact: IContact }) => {
         <Typography variant="h6" sx={{ minWidth: 200, maxWidth: 200, border: 0 }}>
           {contact.nickname}
         </Typography>
-        <Box component="span" sx={{ display: { xs: 'none', md: 'block' } }}>
+
+        <Box component="span" sx={{ display: { xs: 'none', md: 'block' } }}></Box>
+        <Typography variant="subtitle2" noWrap>
+          <div>{lastTimeSeen}</div>
+        </Typography>
+        {distance && (
           <Typography variant="subtitle2" noWrap>
-            <div>{lastTimeSeen}</div>
+            <span>
+              {round(distance, 2)} km
+              <BearingIcon style={bearingStyle} titleAccess={'' + (north + bearing)} />
+              <BearingIcon style={compassStyle} titleAccess={'N:' + (north + '/B:' + bearing)} />
+            </span>
+
+            <span>{location?.city}</span>
+            <span> {location?.flag}</span>
+            <div>
+              {weather?.description}, {weather?.celcius} ℃
+            </div>
           </Typography>
-          {distance && (
-            <Typography variant="subtitle2" noWrap>
-              <span>
-                {distance}
-                <BearingIcon style={bearingStyle} />
-                <GpsNotFixedIcon style={compassStyle} />
-              </span>
-              <span>
-                near {location?.city}
-                {location?.flag}
-              </span>
-              <div>
-                {weather?.description}, {weather?.celcius} ℃
-              </div>
-            </Typography>
-          )}
-        </Box>
+        )}
       </Box>
     </Box>
   );

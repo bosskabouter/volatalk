@@ -1,11 +1,11 @@
 /* e2slint-disable */
 // @t2s-nocheck
 import { AppDatabase } from 'Database/Database';
-import { ReactNode, createContext, useContext, useEffect, useState, useRef } from 'react';
+import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
 
 import { PeerManager } from '../services/PeerManager';
 import { IMessage, IContact, IUserProfile } from '../types';
-import { DatabaseContext, useDatabase } from './DatabaseProvider';
+import { useDatabase } from './DatabaseProvider';
 import { UserContext } from './UserProvider';
 
 interface IPeerProviderProps {
@@ -29,6 +29,7 @@ export default function PeerProvider({ children }: IPeerProviderProps) {
   function messageHandler(message: IMessage) {
     console.log('MessageHandler PeerProvider', message);
   }
+
   function newContactHandle(contact: IContact) {
     console.log('NewContactHandler PeerProvider', contact);
     peerManager?.isConnected(contact);
@@ -38,44 +39,46 @@ export default function PeerProvider({ children }: IPeerProviderProps) {
     //peerManager?.isConnected(statchange.contact);
   }
   function handleStatusChange(status: boolean) {
+    //setPeerManager(peerManager);
     if (status)
       //getting online
       db?.contacts.each((contact) => {
         peerManager?.isConnected(contact);
       });
   }
-  const setupPeerManager = (db: AppDatabase, user: IUserProfile) => {
-    const pm = new PeerManager(user, db);
-
-    pm.on('statusChange', handleStatusChange);
-    pm.on('onMessage', messageHandler);
-    pm.on('onNewContact', newContactHandle);
-    pm.on('onContactStatusChange', contactOnlineHandle);
-
-    const beforeunloadHandler = () => {
-      peerManager?.disconnectGracefully();
-    };
-    window.addEventListener('beforeunload', beforeunloadHandler);
-
-    setPeerManager(pm);
-
-    return () => {
-      //   window.removeEventListener('beforeunload', beforeunloadHandler);
-      // console.warn('Cleaning up PeerProvider!');
-      // peerManager.removeListener('statusChange', handleStatusChange);
-      // peerManager.removeListener('onMessage', messageHandler);
-      // peerManager.removeListener('onNewContact', newContactHandle);
-      // peerManager.removeListener('onContactStatusChange', contactOnlineHandle);
-      pm.disconnectGracefully();
-      setPeerManager(null);
-    };
-  };
 
   useEffect(() => {
     if (!userContext.user || !db || peerManager) return;
 
-    setupPeerManager(db, userContext.user);
-  }, [db, userContext.user]);
+    const setupPeerManager = () => {
+      const pm = new PeerManager(userContext.user, db);
+
+      pm.on('statusChange', handleStatusChange);
+      pm.on('onMessage', messageHandler);
+      pm.on('onNewContact', newContactHandle);
+      pm.on('onContactStatusChange', contactOnlineHandle);
+
+      const beforeunloadHandler = () => {
+        pm.disconnectGracefully();
+      };
+      window.addEventListener('beforeunload', beforeunloadHandler);
+
+      setPeerManager(pm);
+
+      return () => {
+        //   window.removeEventListener('beforeunload', beforeunloadHandler);
+        // console.warn('Cleaning up PeerProvider!');
+        // peerManager.removeListener('statusChange', handleStatusChange);
+        // peerManager.removeListener('onMessage', messageHandler);
+        // peerManager.removeListener('onNewContact', newContactHandle);
+        // peerManager.removeListener('onContactStatusChange', contactOnlineHandle);
+        pm.disconnectGracefully();
+        setPeerManager(null);
+      };
+    };
+
+    setupPeerManager();
+  }, [db, handleStatusChange, newContactHandle, userContext.user]);
 
   /**
   useEffect(() => {

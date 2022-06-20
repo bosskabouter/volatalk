@@ -22,7 +22,6 @@ export type UserProviderProps = {
 };
 
 const UserProvider: React.FC<UserProviderProps> = ({ defaultUser, children }) => {
-  null;
   const [user, setUser] = useSessionStorage<IUserProfile>('user', defaultUser, 3600000);
 
   const contextValue = React.useMemo(

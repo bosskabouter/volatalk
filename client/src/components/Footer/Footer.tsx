@@ -10,11 +10,10 @@ const Footer = () => {
 
   const styles = {
     footerRoot: css`
-      position: fixed;
       bottom: 0;
       overflow: overlay;
-
-      padding: ${theme.spacing(0)} ${theme.spacing(1)};
+      min-width: 360px;
+      padding: ${theme.spacing(0)} ${theme.spacing(3)};
     `,
     logos: css`
       margin-bottom: ${theme.spacing(2)};
@@ -24,7 +23,7 @@ const Footer = () => {
   };
 
   return (
-    <AppBar css={styles.footerRoot} position="relative">
+    <AppBar css={styles.footerRoot} position="static" variant="elevation">
       <WidgetBar />
     </AppBar>
   );

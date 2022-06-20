@@ -27,7 +27,7 @@ export default async function pushMessage(
     const senderInfo = JSON.stringify({
       contactid: user.peerid,
       nickname: user.nickname,
-      avatar: user.avatarThumb, // doesn't fit in small push
+      avatar: user.avatarThumb, // doesn't fit in small push. but now it is compressed ;)
     });
 
     //copy the message, we'll shorten it with relevant info. Push max 4k
