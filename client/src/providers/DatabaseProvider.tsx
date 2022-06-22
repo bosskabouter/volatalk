@@ -1,4 +1,10 @@
-import { applyEncryptionMiddleware, clearAllTables, NON_INDEXED_FIELDS } from 'dha-dexie-encrypted';
+import Dexie from 'dexie';
+import {
+  applyEncryptionMiddleware,
+  clearAllTables,
+  ENCRYPT_LIST,
+  NON_INDEXED_FIELDS,
+} from 'dha-dexie-encrypted';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { AppDatabase, DB_CURRENT_VERSION } from '../Database/Database';
 
@@ -11,7 +17,6 @@ export const DatabaseContext = createContext<AppDatabase | null>(null);
 export const useDatabase = () => useContext(DatabaseContext);
 
 const inProduction = process.env.NODE_ENV === 'production';
-
 const DatabaseProvider = ({ children }: IDatabaseProviderProps) => {
   const [database, setDatabase] = useState<AppDatabase>();
   const setupDatabase = () => {
@@ -38,16 +43,19 @@ const DatabaseProvider = ({ children }: IDatabaseProviderProps) => {
       {
         userProfile: NON_INDEXED_FIELDS,
         contacts: NON_INDEXED_FIELDS,
-        messages: NON_INDEXED_FIELDS,
+        messages: {
+          type: ENCRYPT_LIST,
+          fields: ['payload'], // note: these cannot be indices
+        },
       },
-      (db2) => clearAllTables(db2)
+      clearAllTables
     );
     db.version(1 + DB_CURRENT_VERSION);
     setDatabase(db);
   };
 
   useEffect(() => {
-    if (!database) setupDatabase();
+    setupDatabase();
   }, []);
 
   return !database ? (

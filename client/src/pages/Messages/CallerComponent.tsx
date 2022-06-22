@@ -48,14 +48,14 @@ const CallerComponent = ({ videoOn }: { videoOn: boolean }) => {
     if (!peerManager || !db) return;
 
     db.getContact(contactId).then(setContact);
-  }, [db, peerManager]);
+  }, [contactId, db, peerManager]);
 
   /**
    * Check if user is online before making the call
    */
   useEffect(() => {
     if (contact && peerManager) setContactOnline(peerManager.isConnected(contact));
-  }, [contact]);
+  }, [contact, peerManager]);
 
   /**
    * Once contact is loaded and connected and local mediaStream is available, tries to setup call connection,

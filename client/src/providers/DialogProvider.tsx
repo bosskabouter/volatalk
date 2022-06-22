@@ -1,5 +1,4 @@
 /** @jsxImportSource @emotion/react */
-
 /* eslint-disable */
 // @ts-nocheck
 import { createContext, useContext, useRef, useState } from 'react';
@@ -8,7 +7,7 @@ import { Dialog } from '@mui/material';
 
 type ProviderContext = readonly [(option: DialogOption) => void, () => void];
 
-let EMPTY_FUNC = () => {
+const EMPTY_FUNC = () => {
   /*  */
 };
 const DialogContext = createContext<ProviderContext>([EMPTY_FUNC, EMPTY_FUNC]);
@@ -17,8 +16,8 @@ export const useDialog = () => useContext(DialogContext);
 type DialogParams = {
   children: React.ReactNode;
   open: boolean;
-  onClose?: Function;
-  onExited?: Function;
+  onClose?: typeof EMPTY_FUNC;
+  onExited?: typeof EMPTY_FUNC;
   important?: boolean;
 };
 type DialogOption = Omit<DialogParams, 'open'>;

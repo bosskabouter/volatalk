@@ -19,7 +19,7 @@ export interface PeerManagerEvents {
 }
 
 //try reconnect with peerserver/other contact every RECONNECT_TIMEOUT seconds
-const RECONNECT_TIMEOUT = 60 * 1000;
+const RECONNECT_TIMEOUT = 10 * 1000;
 
 interface ConnectionMetadata {
   contactStringified: string;
@@ -125,21 +125,20 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
       this.emit('statusChange', false);
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.#peer.on('error', (err: any) => {
       if (err.type === 'peer-unavailable') {
         console.warn('Contact unavailable. Try again later...');
       } else {
-        console.error('Peer sent error', err);
-        //severe error concerning our connection
-
         if (err.type === 'invalid-id') {
           console.error('ID Invalid. ');
         } else if (err.type === 'unavailable-id') {
           console.error('UserID occupied on signalling server. ');
+        } else {
+          console.error('peer error: ' + err.name, err);
         }
-        //       else {console.error('peer error: ' + err.name, err);}
         this.emit('statusChange', false);
-        // setTimeout(() => this.#initSignallingServer(), RECONNECT_TIMEOUT);
+        setTimeout(() => this.#initSignallingServer(), RECONNECT_TIMEOUT);
       }
     });
 
@@ -406,6 +405,11 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
     return msg;
   }
 
+  /**
+   *
+   * @param msg
+   * @returns true if receiver is connected and received the message, false otherwise
+   */
   async #attemptTransmitMessage(msg: IMessage): Promise<boolean> {
     //TODO use contact sig to encrypt
     const stringToEncrypt = encryptString(msg.payload, generateKeyFromString('1234'));
@@ -417,7 +421,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
 
         conn.send(JSON.stringify(stringToEncrypt));
         msg.dateTimeSent = new Date().getTime();
-        this.#db.messages.put(msg);
+        this.#db.messages.update(msg, ['dateTimeSent', msg.dateTimeSent]);
         this.emit('onMessageDelivered', msg);
         console.info('Message delivered.', msg);
         resolve(true);

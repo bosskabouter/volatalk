@@ -51,11 +51,8 @@ const ContactList = () => {
 
   return contactList.length > 0 ? (
     <div>
-      <CssBaseline />
       <List
         sx={{
-          mt: 7,
-          width: '90vw',
           height: 1,
           bgcolor: 'background.paper',
           //  position: 'relative',

@@ -83,10 +83,12 @@ export function descriptiveTimeAgo(date: Date) {
 
   let desc = '';
 
-  if (timeAgo < oneMin) {
-    desc = 'Just now.';
+  if (then === 0) {
+    desc = 'never.';
+  } else if (timeAgo < oneMin) {
+    desc = 'just now.';
   } else if (timeAgo < oneHour) {
-    desc = Math.round(timeAgo / oneMin) + ' minutes ago';
+    desc = Math.round(timeAgo / oneMin) + ' minutes ago.';
   } else if (timeAgo < oneDay) {
     desc = getLocalTimeString(date);
   } else {

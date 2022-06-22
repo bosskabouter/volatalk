@@ -37,7 +37,8 @@ import { DistanceFromMiddleEarth } from 'util/geo/Distance';
 import { questions } from './SecurityQuestions';
 import { requestFollowMe } from 'services/LocationService';
 import enrollUser from 'services/UserService';
-import { resizeFileUpload2 } from 'services/ImageResize';
+import { resizeFileUpload, resizeFileUpload2 } from 'services/ImageResize';
+import { useDialog } from 'providers/DialogProvider';
 
 const ITEM_HEIGHT = 18;
 const ITEM_PADDING_TOP = 8;
@@ -332,10 +333,9 @@ const AccountSetup = () => {
       formik.values.pushSubscription = null;
     }
   }
-
   return (
     <Dialog
-      css={styles.accountSetupDialogRoot}
+      // css={styles.accountSetupDialogRoot}
       open={true}
       onClose={handleClose}
       //only allow escape when already registered before
@@ -364,11 +364,7 @@ const AccountSetup = () => {
             error={formik.touched.nickname && Boolean(formik.errors.nickname)}
             //helperText={formik.touched.nickname && formik.errors.nickname}
           />
-          <Avatar
-            src={formik.values.avatarThumb}
-            variant={'rounded'}
-            sx={{ width: '100px', height: '100px' }}
-          ></Avatar>
+
           <div css={styles.avatarUploadDiv}>
             <Avatar
               src={formik.values.avatar}
@@ -384,11 +380,11 @@ const AccountSetup = () => {
               accept="image/*"
               onChange={(event) => {
                 if (!event.target.files) return;
-                resizeFileUpload2(event.target.files[0], 180, 180, 1.0).then((src) => {
+                resizeFileUpload2(event.target.files[0], 180, 180, 0.7).then((src) => {
                   formik.setFieldValue('avatar', src);
                 });
 
-                resizeFileUpload2(event.target.files[0], 30, 30, 0.1).then((src) => {
+                resizeFileUpload(event.target.files[0], 48, 48, 0.5).then((src) => {
                   formik.setFieldValue('avatarThumb', src);
                 });
               }}

@@ -23,7 +23,12 @@ const Footer = () => {
   };
 
   return (
-    <AppBar css={styles.footerRoot} position="static" variant="elevation">
+    <AppBar
+      // css={styles.footerRoot}
+      position="fixed"
+      variant="elevation"
+      sx={{ top: 'auto', bottom: 0 }}
+    >
       <WidgetBar />
     </AppBar>
   );

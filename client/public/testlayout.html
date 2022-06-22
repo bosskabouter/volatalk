@@ -6,7 +6,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Test Layout</title>
   </head>
-  <body style="border: 1">
-    hoi22
+  <style>
+    body {
+      width: 500px;
+      margin: 0 auto;
+    }
+
+    p {
+      background: aqua;
+      border: 3px solid blue;
+      padding: 10px;
+      margin: 10px;
+    }
+
+    span {
+      background: red;
+      border: 1px solid black;
+    }
+
+    .positioned {
+      position: fixed;
+      background: yellow;
+    }
+    .content {
+      background: orange;
+      padding: 10px;
+      margin: 10px;
+    }
+  </style>
+  <body class="root">
+    <p class="positioned">...</p>
+    <p class="content">
+      <br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />1<br />2
+      <span>222</span>
+    </p>
+
+    <p class="positioned">hd</p>
   </body>
 </html>

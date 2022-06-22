@@ -12,16 +12,16 @@ const VOLA_SECRET_PUSH = '1a2b3c-but there is more to it - &*@^';
  * @returns (a) 0 if contact does not have a subscription, (b) error code if post failed (127 for local error), or (c) timestamp if succeeded
  */
 export default async function pushMessage(
-  message2: IMessage,
+  message: IMessage,
   contact: IContact,
   user: IUserProfile
 ): Promise<number> {
   if (!contact.pushSubscription) {
-    console.log(`Contact without subscription. Not pushing message.`, message2, contact);
+    console.log(`Contact without subscription. Not pushing message.`, message, contact);
     return 0;
   }
 
-  return new Promise((resolve, rejectj) => {
+  return new Promise((resolve, _reject) => {
     //TODO encrypt with secret shared with contact somehow...
 
     const senderInfo = JSON.stringify({
@@ -31,12 +31,17 @@ export default async function pushMessage(
     });
 
     //copy the message, we'll shorten it with relevant info. Push max 4k
-    const copiedMessage = JSON.parse(JSON.stringify(message2));
 
+    const copiedMessage: IMessage = JSON.parse(JSON.stringify(message));
+    const TRUNCATE_PAYLOAD_LIMIT = 1440;
+    if (copiedMessage.payload.length > TRUNCATE_PAYLOAD_LIMIT) {
+      copiedMessage.payload =
+        copiedMessage.payload.substring(0, TRUNCATE_PAYLOAD_LIMIT) + '... (open to read more)';
+    }
     //temporarily put our shortened info sender not just id. test-push-sw no db to lookup name
     copiedMessage.sender = senderInfo;
 
-    copiedMessage.receiver = contact.nickname; //he knows who, save some space
+    copiedMessage.receiver = contact.nickname; //he himself is receiver. save some space
 
     //Do not encrypt in test environment with simplified service-worker.
     const unEnctyptedPayload = JSON.stringify(copiedMessage);

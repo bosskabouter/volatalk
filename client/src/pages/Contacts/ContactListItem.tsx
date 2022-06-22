@@ -139,11 +139,11 @@ export const ContactListItem = (props: { contact: IContact }) => {
       {lastMessage ? (
         <ListItemText
           id={lastMessage.sender + lastMessage.receiver}
-          primary={lastMessage?.payload}
-          secondary={`sent ${descriptiveTimeAgo(new Date(lastMessage.dateTimeSent))}`}
+          primary={lastMessage.payload}
+          secondary={`sent: ${descriptiveTimeAgo(new Date(lastMessage.dateTimeSent))}`}
         />
       ) : (
-        <ListItemText primary="No message sent yet" />
+        <ListItemText primary="No message yet" />
       )}
     </ListItem>
   );

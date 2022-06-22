@@ -1,23 +1,19 @@
 /** @jsxImportSource @emotion/react */
 
 import { css } from '@emotion/react';
-import { Container } from '@mui/material';
+import { Container, CssBaseline } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import * as React from 'react';
 import Header from '../AppBar/Header';
 import Footer from '../Footer/Footer';
 
-interface IProps {
-  children: React.ReactNode;
-}
-
-const Layout = ({ children }: IProps) => {
+const Layout = ({ children }: { children: React.ReactNode }) => {
   const theme = useTheme();
 
   const styles = {
     containerRoot: css`
-      margin-bottom: 110;
-      margin-top: 0;
+      margin-bottom: 63px;
+      margin-top: 63px;
 
       //Equivalent to [theme.breakpoints.only('xs')]: {}
       @media (width: ${theme.breakpoints.values.xs}) {
@@ -38,18 +34,19 @@ const Layout = ({ children }: IProps) => {
       }
     `,
     root: css`
-      position: fixed;
+      position: relative;
+      max-height: 90hv;
     `,
   };
 
   return (
-    <>
+    <CssBaseline>
       <Header />
       <Container css={styles.containerRoot} sx={{}}>
         <main css={styles.root}>{children}</main>
       </Container>
       <Footer />
-    </>
+    </CssBaseline>
   );
 };
 

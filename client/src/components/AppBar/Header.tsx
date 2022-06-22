@@ -54,8 +54,8 @@ export default function Header() {
   return (
     <div css={styles.root}>
       <CssBaseline />
-      <AppBar position="static" css={styles.appBar} role="banner">
-        <Toolbar disableGutters variant="dense">
+      <AppBar position="fixed" css={styles.appBar} role="banner">
+        <Toolbar variant="dense">
           <Typography variant="h6" noWrap css={styles.title}>
             <Link to="/">
               <Avatar
