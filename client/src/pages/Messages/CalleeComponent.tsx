@@ -21,8 +21,9 @@ const CalleeComponent = () => {
   const [videoOn, setVideoOn] = useState<boolean>(true);
 
   const [accepted, setAccepted] = useState<boolean>();
+
   /**
-   *
+   * Listener for incoming call
    */
   useEffect(() => {
     if (!peerManager) return;
@@ -32,8 +33,6 @@ const CalleeComponent = () => {
       console.info('Incoming call', ctc, mc);
       navigator.vibrate && navigator.vibrate([2000, 2000, 2000]);
     }
-
-    //wait for incoming call
     peerManager.on('onIncomingCall', handleIncomingCall);
     return () => {
       peerManager.removeListener('onIncomingCall', handleIncomingCall);
@@ -44,7 +43,8 @@ const CalleeComponent = () => {
    */
   useEffect(() => {
     //someone calling,
-    if (accepted === false && call?.mediaConnection) {
+    if (call?.mediaConnection && accepted === false) {
+      alert('Declining call from: ' + call.contact.nickname);
       call.mediaConnection.close();
       //setMediaConnection(null);
     }
@@ -111,7 +111,7 @@ const CalleeComponent = () => {
 
     return (
       <div>
-        {accepted === undefined || !localMediaStream || !remoteMediaStream ? ( //ask permission to answer
+        {!(accepted && call && localMediaStream && remoteMediaStream) ? ( //ask permission to answer
           <AcceptCall />
         ) : (
           <CallingComponent
@@ -129,7 +129,8 @@ const CalleeComponent = () => {
    *
    */
   return call ? (
-    <PhoneIcon color="action" /> && (
+    <>
+      <PhoneIcon color="action" />
       <Dialog open={call != null}>
         <DialogTitle>Receiving Call from</DialogTitle>
         <DialogContent>
@@ -137,7 +138,7 @@ const CalleeComponent = () => {
           <CallDialog contact={call.contact} mediaConnection={call.mediaConnection} />
         </DialogContent>
       </Dialog>
-    )
+    </>
   ) : (
     <CallEndIcon />
   );

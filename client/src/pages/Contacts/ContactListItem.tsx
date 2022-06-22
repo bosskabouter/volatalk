@@ -51,7 +51,7 @@ export const ContactListItem = (props: { contact: IContact }) => {
    */
   useEffect(() => {
     function messageHandler(message: IMessage) {
-      if (message.sender === props.contact?.peerid) {
+      if (message.sender === props.contact.peerid) {
         console.log('Message received in messageHandler', message);
         setLastMessage(message);
       }
@@ -71,7 +71,7 @@ export const ContactListItem = (props: { contact: IContact }) => {
    *
    * @returns
    */
-  const AcceptContactButton = () => {
+  const SecondaryActions = () => {
     const acceptContact = (e: BaseSyntheticEvent) => {
       e.preventDefault();
       props.contact.dateTimeAccepted = new Date().getTime();
@@ -122,10 +122,10 @@ export const ContactListItem = (props: { contact: IContact }) => {
       divider
       key={props.contact.peerid}
       onClick={handleClickMessageContact}
-      secondaryAction={<AcceptContactButton />}
+      secondaryAction={<SecondaryActions />}
       dense
       sx={{
-        borderRadius: '9px',
+        borderRadius: '6px',
         boxShadow: 2,
         '&:hover': {
           backgroundColor: 'primary.main',

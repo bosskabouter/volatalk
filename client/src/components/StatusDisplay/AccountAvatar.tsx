@@ -25,7 +25,7 @@ const AccountAvatar = () => {
 
       <Button
         onClick={() => navigate('AccountSetup')}
-        variant="contained"
+        variant="outlined"
         color="secondary"
         title={userCtx?.user?.nickname + ' Profile'}
       >

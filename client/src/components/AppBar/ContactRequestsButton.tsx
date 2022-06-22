@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { SyntheticEvent, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
@@ -37,6 +37,9 @@ function ContactRequestsButton() {
   }, [peerCtx]);
 
   const hasUnansweredRequests = contactRequests.length > 0;
+  const handleClick = (_event: SyntheticEvent) => {
+    navigate('/Invite');
+  };
   return (
     <Tooltip title="Invite People">
       <Badge
@@ -46,13 +49,7 @@ function ContactRequestsButton() {
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         badgeContent={contactRequests.length}
       >
-        <Button
-          variant="contained"
-          onClick={() => {
-            navigate('/Invite');
-          }}
-          color="secondary"
-        >
+        <Button variant="outlined" onClick={handleClick} color="secondary">
           <PersonAddIcon sx={{ width: 27, height: 27, border: 0 }} />
         </Button>
       </Badge>

@@ -1,4 +1,5 @@
 import { Stack, Toolbar } from '@mui/material';
+import { Compass } from './Compass';
 import { DateInfo } from './DateInfo';
 import LocationInfo from './LocationInfo';
 import PeerDisplay from './PeerDisplay';
@@ -14,6 +15,7 @@ export const WidgetBar = () => {
         justifyContent={'right'}
         gap={2}
       >
+        <Compass />
         <LocationInfo />
 
         <DateInfo />

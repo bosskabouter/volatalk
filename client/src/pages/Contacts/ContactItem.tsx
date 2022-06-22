@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from 'react';
 import MoreOptionsIcon from '@mui/icons-material/MoreVert';
 
 import {
+  Avatar,
   Box,
   Dialog,
   DialogContent,
@@ -54,10 +55,6 @@ export const ContactItem = (props: { contact: IContact }) => {
     transform: 'rotate(' + (north + bearing) + 'deg)',
     //transition: 'transform 1500ms ease', // smooth transition
   };
-  const compassStyle = {
-    transform: 'rotate(' + north + 'deg)',
-    //transition: 'transform 1500ms ease', // smooth transition
-  };
   /**
    * Watch device orientation to follow contact location.
    *
@@ -78,7 +75,7 @@ export const ContactItem = (props: { contact: IContact }) => {
   }, []);
 
   /**
-   * Calculates distance from me in km, if coords are known.
+   * Calculates distance between contact and user in km, if coords are known.
    */
   useEffect(() => {
     if (!user?.position || !contact.position || distance) return;
@@ -100,7 +97,7 @@ export const ContactItem = (props: { contact: IContact }) => {
   }, [db, contact, cntUnread]);
 
   /**
-   * Receives handles events from peermanager;
+   * Handles events from peermanager;
    * 1. new messages, if from peer, add +1 to count unread
    * 2. status change; if from this contact, show peer on/offline
    */
@@ -151,7 +148,13 @@ export const ContactItem = (props: { contact: IContact }) => {
         </IconButton>
         <Dialog open={showOptions} onClose={() => setShowOptions(false)}>
           <DialogContent>
-            <DialogContentText>No options yet</DialogContentText>
+            <DialogContentText>
+              <Avatar
+                variant="rounded"
+                src={contact.avatar}
+                sx={{ width: '360px', height: '360px' }}
+              />
+            </DialogContentText>
           </DialogContent>
         </Dialog>
       </>
@@ -212,9 +215,8 @@ export const ContactItem = (props: { contact: IContact }) => {
         {distance && (
           <Typography variant="subtitle2" noWrap>
             <span>
-              {round(distance, 2)} km
+              {round(distance, 1)} km
               <BearingIcon style={bearingStyle} titleAccess={'' + (north + bearing)} />
-              <BearingIcon style={compassStyle} titleAccess={'N:' + (north + '/B:' + bearing)} />
             </span>
 
             <span>{location?.city}</span>

@@ -3,7 +3,7 @@ import { Box, ListItemText, ListItemIcon, Tooltip } from '@mui/material';
 
 import PendingIcon from '@mui/icons-material/HourglassBottom';
 import DeliveredIcon from '@mui/icons-material/Check';
-import PushedIcon from '@mui/icons-material/ScheduleSend';
+import PushedIcon from '@mui/icons-material/ForwardToInbox';
 import PushFailedIcon from '@mui/icons-material/CancelScheduleSend';
 import ReadIcon from '@mui/icons-material/MarkChatRead';
 
@@ -24,27 +24,49 @@ export const MessageItem = ({
 
   const isMine = message.sender === user?.peerid;
 
-  const isPushed = message.dateTimePushed > 1000;
-  const isPushFailed = isPushed && message.dateTimePushed < 1000; /* HTTP error code */
-  const isSent = message.dateTimeSent > 0;
-  const isRead = message.dateTimeRead > 0;
-
   const senderText = isMine ? 'You' : contact.nickname;
   const secondaryText =
     (isMine ? 'Sent ' : 'Received ') + descriptiveTimeAgo(new Date(message.dateTimeCreated));
 
   const StatusIcon = () => {
-    if (!isMine) return <></>;
-    else if (isRead) return <ReadIcon />;
-    else if (isSent) return <DeliveredIcon />;
-    else if (isPushFailed) {
-      return (
+    let el;
+    const isPushed = message.dateTimePushed > 1000;
+    const isPushFailed = isPushed && message.dateTimePushed < 1000; /* HTTP error code */
+    const isSent = message.dateTimeSent > 0;
+    const isRead = message.dateTimeRead > 0;
+    if (!isMine) el = <></>;
+    else if (isRead) {
+      el = (
+        <Tooltip title={'Message was read'}>
+          <ReadIcon />
+        </Tooltip>
+      );
+    } else if (isSent) {
+      el = (
+        <Tooltip title={'Message was delivered but not yet read'}>
+          <DeliveredIcon />
+        </Tooltip>
+      );
+    } else if (isPushFailed) {
+      el = (
         <Tooltip title={'Push error: ' + message.dateTimePushed}>
           <PushFailedIcon />
         </Tooltip>
       );
-    } else if (isPushed) return <PushedIcon />;
-    else return <PendingIcon />;
+    } else if (isPushed) {
+      el = (
+        <Tooltip title={'A push message has been sent.'}>
+          <PushedIcon />
+        </Tooltip>
+      );
+    } else {
+      el = (
+        <Tooltip title={'Contact does not receive push messages. Wait the person to be online...'}>
+          <PendingIcon color="warning" />
+        </Tooltip>
+      );
+    }
+    return el;
   };
 
   useEffect(() => {

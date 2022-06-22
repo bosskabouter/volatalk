@@ -65,7 +65,7 @@ export default function LocationInfo() {
       <Tooltip
         title={`near ${locationDescription.city} (${locationDescription.state}-${locationDescription.country})`}
       >
-        <Box sx={{ display: 'flex', flexDirection: 'row', columnGap: 1 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'row', columnGap: 1, alignItems: 'center' }}>
           <Box
             sx={{
               display: { xs: 'none', md: 'block' },

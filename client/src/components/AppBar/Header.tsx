@@ -52,17 +52,32 @@ export default function Header() {
   };
 
   return (
-    <div css={styles.root}>
+    <div>
       <CssBaseline />
-      <AppBar position="fixed" css={styles.appBar} role="banner">
+      <AppBar
+        role={'banner'}
+        position="fixed"
+        variant="elevation"
+        color="primary"
+        sx={{ top: '0', bottom: 'auto' }}
+      >
         <Toolbar variant="dense">
-          <Typography variant="h6" noWrap css={styles.title}>
+          <Typography
+            variant="h6"
+            noWrap
+            css={styles.title}
+            sx={{ animation: '3s ease-in 1s infinite reverse both running slidein' }}
+          >
             <Link to="/">
               <Avatar
                 src={logo}
                 variant="rounded"
                 color="secondary"
-                sx={{ width: 36, height: 36, border: 0 }}
+                sx={{
+                  width: 36,
+                  height: 36,
+                  border: 0,
+                }}
               ></Avatar>
             </Link>
           </Typography>

@@ -216,9 +216,9 @@ const AccountSetup = () => {
       top: 0;
       right: 0;
       margin: 0;
-      padding: 27px;
-      width: 150px;
-      height: 150px;
+      padding: 18px;
+      width: 180px;
+      height: 180px;
       align: 'center';
     `,
     avatarUploadImage: css`

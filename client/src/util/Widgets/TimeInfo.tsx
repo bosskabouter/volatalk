@@ -2,7 +2,7 @@
 import { css } from '@emotion/react';
 import { RefObject, useEffect, useRef, useState } from 'react';
 
-import { Box, Tooltip, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { getLocalTimeString } from 'services/Generic';
 /**
  * Analog clock thank to:
@@ -55,7 +55,7 @@ export const TimeInfo = () => {
   const AnalogClock = () => {
     const hour = useRef<null | SVGRectElement>(null);
     const min = useRef<null | SVGRectElement>(null);
-    //const sec = useRef<null | SVGLineElement>(null);
+    const sec = useRef<null | SVGLineElement>(null);
 
     //analog clock effect
     useEffect(() => {
@@ -84,7 +84,7 @@ export const TimeInfo = () => {
     const styles = {
       clockRoot: css`
         #face {
-          stroke-width: 6px;
+          stroke-width: 3px;
           stroke: #fff;
         }
         #hour,
@@ -107,7 +107,7 @@ export const TimeInfo = () => {
         <g id="hands">
           <rect id="hour" ref={hour} x="48.5" y="12.5" width="5" height="40" rx="2.5" ry="2.55" />
           <rect id="min" ref={min} x="48" y="12.5" width="3" height="40" rx="2" ry="2" />
-          {/*<line id="sec" ref={sec} x1="50" y1="50" x2="50" y2="16" />*/}
+          <line id="sec" ref={sec} x1="50" y1="50" x2="50" y2="16" />
         </g>
       </svg>
     );
@@ -116,26 +116,16 @@ export const TimeInfo = () => {
   return (
     <Box
       sx={{
-        display: 'inline-flex',
-        flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'right',
         border: 0,
         margin: 0,
         padding: 0,
+        height: '36px',
+        width: '36px',
       }}
     >
-      <Box
-        sx={{
-          width: { sd: '0', md: '45px' },
-          display: { sd: 'none', md: 'inline-flex' },
-        }}
-      >
-        <AnalogClock />
-      </Box>
-      <Box sx={{ display: { sd: 'inline-flex', md: 'none' } }}>
-        <DigitalClock />
-      </Box>
+      <AnalogClock />
     </Box>
   );
 };

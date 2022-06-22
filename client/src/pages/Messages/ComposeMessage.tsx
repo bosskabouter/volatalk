@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react';
-import { Box, InputAdornment, TextField } from '@mui/material';
+import { AppBar, Box, InputAdornment, TextField } from '@mui/material';
 
 import EmojiPicker from 'emoji-picker-react';
 
@@ -69,43 +69,51 @@ export const ComposeMessage = ({
   return !contact ? (
     <em>No contact selected</em>
   ) : (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        flex: '',
-        minWidth: { md: 270 },
-        //overflow: 'visible',
-      }}
+    <AppBar
+      // css={styles.footerRoot}
+      position="fixed"
+      variant="elevation"
+      color="default"
+      sx={{ top: 'auto', bottom: '4rem' }}
     >
-      <TextField
-        autoFocus
-        //  ref={textfieldRef}
-        spellCheck
-        label={'Send ' + contact.nickname + ' a message'}
-        placeholder={'Hi ' + contact.nickname + '!'}
-        sx={{ width: '90%' }}
-        variant="filled"
-        onKeyPress={(e) => {
-          if (e.key === 'Enter') sendText();
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          flex: '',
+          minWidth: { md: 270 },
+          //overflow: 'visible',
         }}
-        onChange={(e) => {
-          setSndMessageText(e.target.value);
-        }}
-        value={sndMessageText}
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <ChooseEmojiButton></ChooseEmojiButton>
-            </InputAdornment>
-          ),
-        }}
-      />
+      >
+        <TextField
+          autoFocus
+          //  ref={textfieldRef}
+          spellCheck
+          label={'Send ' + contact.nickname + ' a message'}
+          placeholder={'Hi ' + contact.nickname + '!'}
+          sx={{ width: '90%' }}
+          variant="filled"
+          onKeyPress={(e) => {
+            if (e.key === 'Enter') sendText();
+          }}
+          onChange={(e) => {
+            setSndMessageText(e.target.value);
+          }}
+          value={sndMessageText}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <ChooseEmojiButton></ChooseEmojiButton>
+              </InputAdornment>
+            ),
+          }}
+        />
 
-      <IconButton onClick={sendText} size="medium" color="secondary">
-        <SendTextIcon />
-      </IconButton>
-    </Box>
+        <IconButton onClick={sendText} size="medium" color="secondary">
+          <SendTextIcon />
+        </IconButton>
+      </Box>
+    </AppBar>
   );
 };

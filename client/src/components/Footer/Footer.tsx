@@ -27,6 +27,7 @@ const Footer = () => {
       // css={styles.footerRoot}
       position="fixed"
       variant="elevation"
+      color="primary"
       sx={{ top: 'auto', bottom: 0 }}
     >
       <WidgetBar />

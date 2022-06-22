@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState, useRef } from 'react';
-import { Box, CssBaseline, List, ListItem, ListSubheader, Paper } from '@mui/material';
+import { Box, CssBaseline, List, ListItem, ListSubheader, Paper, useTheme } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import IconButton from '@mui/material/IconButton';
@@ -82,94 +82,61 @@ const MessageList = () => {
     listElement.current && (listElement.current.scrollTop = 100 * messageList.length);
   }, [messageList.length]);
 
+  const theme = useTheme();
+
   return contact ? (
     <>
       <CssBaseline />
-      <Paper
-        square
-        sx={
-          {
-            //pt: '0', mt: '1rem', pb: '150px', width: 1, maxheight: 0.9
-          }
+
+      <List
+        ref={listElement}
+        sx={{
+          mb: '5rem',
+        }}
+        dense={true}
+        subheader={
+          <ListSubheader
+            component="div"
+            id="nested-list-subheader"
+            sx={{
+              display: 'flex',
+              pt: 7,
+              bgcolor: theme.palette.primary.main,
+
+              //opacity: 0.8,
+              //border: 1,
+              borderRadius: '18px',
+              boxShadow: 9,
+            }}
+          >
+            <BackIcon onClick={() => navigate('/contacts')} />
+            <Box color={'primary'}>
+              <ContactItem contact={contact} />
+            </Box>
+
+            <IconButton onClick={() => navigate('/video/' + contactId)} size="medium">
+              <VideoCallIcon />
+            </IconButton>
+
+            <IconButton onClick={() => navigate('/call/' + contact && contactId)} size="medium">
+              <CallIcon />
+            </IconButton>
+          </ListSubheader>
         }
       >
-        <List
-          ref={listElement}
-          //disablePadding
-          sx={{
-            // mb: 2,
-            // bgcolor: 'background.paper',
-            // padding: 5,
-            // mt: 7,
-            // mb: 17,
-            //  pb: '50px',
-            // position: static | relative | absolute | sticky | fixed
-            // position: 'static',
-            // overflow: visible | hidden | clip | scroll | auto
-            //overflow: 'auto',
-            // height: auto | <length> | <percentage> | min-content | max-content | fit-content | fit-content(<length-percentage>)
-            //height: '90%',
-            // maxHeight: none | <length-percentage> | min-content | max-content | fit-content | fit-content(<length-percentage>)
-            //maxHeight: '90%',
-            //paddingLeft: 1,
-
-            scrollBehavior: 'smooth',
-          }}
-          // dense={true}
-          subheader={
-            <ListSubheader component="div" id="nested-list-subheader">
-              <Box
-                sx={{
-                  display: 'flex',
-                  //pt: 7,
-                  //pb: 0,
-                  //flexDirection: 'row',
-                  //flexDirection: 'column-reverse',
-                  // alignItems: 'flex-start',
-                  // justifyContent: 'left',
-                }}
-              >
-                <BackIcon onClick={() => navigate('/contacts')} />
-
-                <ContactItem contact={contact}></ContactItem>
-                <IconButton onClick={() => navigate('/video/' + contactId)} size="medium">
-                  <VideoCallIcon />
-                </IconButton>
-
-                <IconButton onClick={() => navigate('/call/' + contact && contactId)} size="medium">
-                  <CallIcon />
-                </IconButton>
-              </Box>
-            </ListSubheader>
-          }
-        >
-          {messageList &&
-            messageList.map((msg) => {
-              return (
-                <ListItem
-                  key={msg.id}
-                  //    disablePadding
-                  //  alignItems={'center'}
-                  divider
-                  sx={
-                    {
-                      // display: 'display-listitem',
-                      //flexDirection: !isMine ? 'row' : 'row-reverse',
-                      // alignItems: 'flex-end',
-                      // justifyContent: 'right',
-                    }
-                  }
-                >
-                  <MessageItem contact={contact} message={msg} key={msg.id} />
-                </ListItem>
-              );
-            })}
-        </List>
-        <ComposeMessage
-          contact={contact}
-          onSend={(msg) => setMessageList((prevMessageList) => [...prevMessageList, msg])}
-        />
-      </Paper>
+        {messageList &&
+          messageList.map((msg) => {
+            return (
+              <ListItem key={msg.id} divider>
+                <MessageItem contact={contact} message={msg} key={msg.id} />
+              </ListItem>
+            );
+          })}
+      </List>
+      <ComposeMessage
+        contact={contact}
+        onSend={(msg) => setMessageList((prevMessageList) => [...prevMessageList, msg])}
+      />
     </>
   ) : (
     <em>no contact?</em>

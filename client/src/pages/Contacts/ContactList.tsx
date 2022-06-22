@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
-import { Button, CssBaseline, IconButton, List, ListSubheader, Typography } from '@mui/material';
+import { Button, IconButton, List, ListSubheader, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 
 import { useNavigate } from 'react-router-dom';
@@ -53,8 +53,10 @@ const ContactList = () => {
     <div>
       <List
         sx={{
-          height: 1,
-          bgcolor: 'background.paper',
+          pt: 7,
+          //pt: '5rem',
+          //height: 1,
+          // bgcolor: 'primary',
           //  position: 'relative',
           // overflow: 'scroll',
           //maxHeight: 1,
