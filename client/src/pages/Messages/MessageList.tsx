@@ -101,10 +101,10 @@ const MessageList = () => {
             sx={{
               display: 'flex',
               pt: 7,
-              bgcolor: theme.palette.primary.main,
+              pb: 2,
+              margin: 0,
 
-              //opacity: 0.8,
-              //border: 1,
+              bgcolor: theme.palette.primary.main,
               borderRadius: '18px',
               boxShadow: 9,
             }}

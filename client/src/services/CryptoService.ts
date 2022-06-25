@@ -1,4 +1,4 @@
-import { convertBase58ToBuf, convertBase58ToObject } from './Generic';
+import { convertBase58ToObject } from './Generic';
 
 const ENC_FORMAT_JWK = 'jwk';
 const ENC_ALGORITHM_ECDSA = 'ECDSA';
@@ -24,7 +24,7 @@ export function generateSignature(peerid: string, userJsonPrivateKey: string): P
  */
 export async function peerIdToPublicKey(pubKeyB58: string): Promise<CryptoKey | null> {
   const pubJsonWebKey: JsonWebKey | null = convertBase58ToObject(pubKeyB58);
-  return pubJsonWebKey && (await importPublicKey(pubJsonWebKey));
+  return pubJsonWebKey && importPublicKey(pubJsonWebKey);
 }
 
 /**

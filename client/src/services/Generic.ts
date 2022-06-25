@@ -10,10 +10,10 @@ export function round(value: number, precision: number): number {
   return Math.round(value * multiplier) / multiplier;
 }
 
-export function convertObjectToBase58(o: any): string {
+export function convertObjectToBase58(o: never): string {
   return convertStringToBase58(JSON.stringify(o));
 }
-export function convertBase58ToObject(b58: string): any | null {
+export function convertBase58ToObject(b58: string): never | null {
   return JSON.parse(convertBase58ToString(b58));
 }
 export function convertStringToBase58(s: string): string {

@@ -1,10 +1,5 @@
 import { importPrivateKey, peerIdToPublicKey, signMessage, verifyMessage } from './CryptoService';
-import {
-  convertAbToBase64,
-  convertBase58ToObject,
-  convertBase64ToAb,
-  convertObjectToBase58,
-} from './Generic';
+import { convertAbToBase64, convertBase64ToAb } from './Generic';
 import { IInvite, IUserProfile } from '../types';
 
 export const INVITE_PARAMKEYS = { FROM: 'f', KEY: 'k', SIGNATURE: 's' };

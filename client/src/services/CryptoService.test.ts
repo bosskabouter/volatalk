@@ -1,10 +1,3 @@
-globalThis.crypto = require('crypto').webcrypto;
-import { TextEncoder, TextDecoder } from 'util';
-global.TextEncoder = TextEncoder;
-
-const aPeerId =
-  '6NZKfVuTw6KF5PqWCgzxmdzUT3n3m98tJJkqLJEoySuQLJdtPTWdyYx5csveUwadZXRf7razVn63xFxoQEG4us8Sk67Kp63xmjxgcbnYzCpQx42kEhj72FAfCuAfhSLeBWtNJch91KE3JJuThTwUxrVtagitmFxy2qpvxhJNmSu7WCrvj9TG6P3mspEQLkZzWoStBMy9WP7qDSKSEppWK9b6CBNRQ8RMF65NJ4b1DECJibKBMfNn5h7CFDdnspeUfQtA1hPhBfbLD9wGwRD7Lsm';
-
 import {
   exportCryptoKey,
   generateKeyPair,
@@ -14,6 +7,9 @@ import {
   signMessage,
   verifyMessage,
 } from './CryptoService';
+
+const aPeerId =
+  '6NZKfVuTw6KF5PqWCgzxmdzUT3n3m98tJJkqLJEoySuQLJdtPTWdyYx5csveUwadZXRf7razVn63xFxoQEG4us8Sk67Kp63xmjxgcbnYzCpQx42kEhj72FAfCuAfhSLeBWtNJch91KE3JJuThTwUxrVtagitmFxy2qpvxhJNmSu7WCrvj9TG6P3mspEQLkZzWoStBMy9WP7qDSKSEppWK9b6CBNRQ8RMF65NJ4b1DECJibKBMfNn5h7CFDdnspeUfQtA1hPhBfbLD9wGwRD7Lsm';
 
 let keyPair: CryptoKeyPair;
 let exportedPrivKey: JsonWebKey;

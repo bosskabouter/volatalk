@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react';
-import { AppBar, Box, InputAdornment, TextField } from '@mui/material';
+import { AppBar, Box, InputAdornment, TextField, Dialog } from '@mui/material';
 
 import EmojiPicker from 'emoji-picker-react';
 
@@ -8,6 +8,7 @@ import IconButton from '@mui/material/IconButton';
 import SendTextIcon from '@mui/icons-material/Send';
 
 import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
+import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 
 import { PeerContext } from '../../providers/PeerProvider';
 import { IContact, IMessage } from '../../types';
@@ -21,6 +22,8 @@ export const ComposeMessage = ({
 }) => {
   const [sndMessageText, setSndMessageText] = useState<string>('');
   const [openEmoji, setOpenEmoji] = useState(false);
+  const [openShare, setOpenShare] = useState(false);
+
   const peerManager = useContext(PeerContext);
   const sendText = async () => {
     if (peerManager && contact && sndMessageText.trim().length > 0) {
@@ -32,23 +35,38 @@ export const ComposeMessage = ({
     }
   };
 
+  const ShareButton = () => {
+    return openShare ? (
+      <Dialog
+        open={openShare}
+        onClose={() => {
+          setOpenShare(false);
+          return true;
+        }}
+      ></Dialog>
+    ) : (
+      <IconButton
+        onClick={() => {
+          setOpenShare(true);
+        }}
+      >
+        <PhotoCameraIcon />
+      </IconButton>
+    );
+  };
+
   const ChooseEmojiButton = () => {
     return openEmoji ? (
       <Box
         sx={{
-          //  overflow: 'hidden',
-          backgroundColor: 'coral',
-
-          //absolute
-          //fixed made disappear
-          //position: 'fixed',
-          bottom: 80,
+          pb: '190px',
+          bottom: 180,
           right: 20,
           border: 1,
+          zIndex: 1,
         }}
       >
         <EmojiPicker
-          preload
           native
           onEmojiClick={(_e, picked) => {
             setSndMessageText(sndMessageText + picked.emoji);
@@ -104,7 +122,8 @@ export const ComposeMessage = ({
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
-                <ChooseEmojiButton></ChooseEmojiButton>
+                <ShareButton />
+                <ChooseEmojiButton />
               </InputAdornment>
             ),
           }}
