@@ -1,5 +1,3 @@
-globalThis.crypto = require('crypto').webcrypto;
-
 import { PeerManager } from './PeerManager';
 import { AppDatabase } from 'Database/Database';
 import enrollUser from './UserService';
@@ -23,24 +21,27 @@ test('Create PeerManager', async () => {
   expect(pm).toBeDefined();
 });
 
-test('Peer', async () => {
-  return;
-  const user = await enrollUser(aUser());
-  (global as any).RTCPeerConnection = jest.fn();
+test(
+  'Peer',
+  async () => {
+    const user = await enrollUser(aUser());
+    (global as any).RTCPeerConnection = jest.fn();
 
-  const { getByText } = render(
-    <BrowserRouter>
-      <Provider store={store}>
-        <AuthProvider>
-          <UserProvider defaultUser={user}>
-            <PeerProvider>
-              <PeerDisplay />
-            </PeerProvider>
-          </UserProvider>
-        </AuthProvider>
-      </Provider>
-    </BrowserRouter>
-  );
+    const { getByText } = render(
+      <BrowserRouter>
+        <Provider store={store}>
+          <AuthProvider>
+            <UserProvider defaultUser={user}>
+              <PeerProvider>
+                <PeerDisplay />
+              </PeerProvider>
+            </UserProvider>
+          </AuthProvider>
+        </Provider>
+      </BrowserRouter>
+    );
 
-  expect(getByText(/Currently No Calls/i)).toBeInTheDocument();
-});
+    // expect(getByText(/PersonIcon/i,{selector:''})).toBeInTheDocument();
+  },
+  30 * 1000
+);

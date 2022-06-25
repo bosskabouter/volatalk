@@ -39,6 +39,7 @@ import { requestFollowMe } from 'services/LocationService';
 import enrollUser from 'services/UserService';
 import { resizeFileUpload, resizeFileUpload2 } from 'services/ImageResize';
 import { useDialog } from 'providers/DialogProvider';
+import { VTKey } from 'services/KeyService';
 
 const ITEM_HEIGHT = 18;
 const ITEM_PADDING_TOP = 8;
@@ -304,6 +305,7 @@ const AccountSetup = () => {
    */
   function handleClose() {
     console.debug('User trying to close AccountSetup', user);
+    console.log(new VTKey());
     if (user) navigate('/');
   }
 

@@ -113,7 +113,7 @@ if (DO_WEBPUSH) {
   webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBKEY, VAPID_PRIVKEY);
 
   //Blob needed to measure request size
- // const { Blob } = require("buffer");
+  // const { Blob } = require("buffer");
 
   app.post(WEBPUSH_CONTEXT, (request, response) => {
     if (DEBUG) console.log("Push request", request);
@@ -123,10 +123,7 @@ if (DO_WEBPUSH) {
     const payload = body.payload;
 
     const byteSizeHeader = Number(request.header("content-length"));
-   // const byteSizePayload = new Blob([payload]).size;
-    console.info(
-      `Push request size - header[payload]: ${byteSizeHeader}[${byteSizePayload}]`
-    );
+    console.info(`Push request size - header[payload]: ` + byteSizeHeader);
     if (byteSizeHeader >= PUSH_MAX_BYTES) {
       console.warn(
         "Message too big. Have to refuse push.",

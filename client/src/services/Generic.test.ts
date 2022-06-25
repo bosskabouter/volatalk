@@ -1,6 +1,3 @@
-import { TextEncoder, TextDecoder } from 'util';
-global.TextEncoder = TextEncoder;
-
 import {
   convertAbToBase64,
   convertBase58ToObject,
@@ -18,7 +15,7 @@ test('round to decimal', () => {
 
 const aString = 'a b c 3 2 1';
 
-const b64: string = 'TXVsdGliYXNlIGlzIGF3ZXNvbWUhIFxvLw==';
+const b64 = 'TXVsdGliYXNlIGlzIGF3ZXNvbWUhIFxvLw==';
 let anAb: ArrayBuffer;
 
 test('convertBase64ToAb', () => {
