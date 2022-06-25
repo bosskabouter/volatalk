@@ -123,7 +123,8 @@ if (DO_WEBPUSH) {
     const payload = body.payload;
 
     const byteSizeHeader = Number(request.header("content-length"));
-    console.info(`Push request size - header[payload]: ` + byteSizeHeader);
+    // const byteSizePayload = new Blob([payload]).size;
+    console.info(`Push request size: ` + byteSizeHeader);
     if (byteSizeHeader >= PUSH_MAX_BYTES) {
       console.warn(
         "Message too big. Have to refuse push.",
