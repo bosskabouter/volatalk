@@ -6,7 +6,7 @@ import { aUser } from './UserService.test';
 let url: URL;
 let user: IUserProfile;
 test('makeInvite', async () => {
-  user = await enrollUser(aUser());
+  user = await enrollUser(aUser);
   url = await makeInviteURL(user, 'Halloo');
   expect(url).toBeDefined();
   expect(url.searchParams.set.length).toBeGreaterThanOrEqual(2);

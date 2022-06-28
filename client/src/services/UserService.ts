@@ -1,5 +1,5 @@
 import { IUserProfile } from 'types';
-import { exportCryptoKey, generateKeyPair, importPublicKey, signMessage } from './CryptoService';
+import { exportCryptoKey, generateKeyPair, importPublicKey } from './CryptoService';
 import { convertBase58ToObject, convertObjectToBase58 } from './Generic';
 
 /**

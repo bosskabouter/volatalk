@@ -72,7 +72,7 @@ export default async function pushMessage(
       })
       .catch((err) => {
         console.error('Error posting push message', err, b);
-        resolve(127);
+        resolve(566);
       });
   });
 }

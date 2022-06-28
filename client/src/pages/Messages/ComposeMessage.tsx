@@ -20,7 +20,7 @@ import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 
 import { PeerContext } from '../../providers/PeerProvider';
 import { IContact, IMessage } from '../../types';
-import linkifyStr from 'linkify-string';
+import linkifyHtml from 'linkify-html';
 import { ImageUploader } from 'components/ImageUploader';
 
 export const ComposeMessage = ({
@@ -39,10 +39,10 @@ export const ComposeMessage = ({
     if (peerManager && contact && sndMessageText.trim().length > 0) {
       console.log('Sending text: ' + sndMessageText);
 
-      const linkified = linkifyStr(sndMessageText);
+      const linkified = linkifyHtml(sndMessageText);
 
       //console.debug('Linkified: ' + linkified);
-      const msg = await peerManager.sendText(sndMessageText, contact);
+      const msg = await peerManager.sendText(linkified, contact);
       setSndMessageText('');
 
       onSend(msg);

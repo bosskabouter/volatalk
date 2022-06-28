@@ -1,15 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
-import MoreOptionsIcon from '@mui/icons-material/MoreVert';
 
-import {
-  Avatar,
-  Box,
-  Dialog,
-  DialogContent,
-  DialogContentText,
-  IconButton,
-  Typography,
-} from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { DatabaseContext } from '../../providers/DatabaseProvider';
 import { PeerContext } from '../../providers/PeerProvider';
 
@@ -18,7 +9,6 @@ import { IContact, IMessage } from '../../types';
 import Identification from 'components/Identification/Identification';
 
 import { DistanceInfo } from 'components/Identification/DistanceInfo';
-import { ContactDetails } from './ContactDetails';
 
 export const ContactItem = (props: { contact: IContact }) => {
   const peerMngr = useContext(PeerContext);
@@ -118,9 +108,9 @@ export const ContactItem = (props: { contact: IContact }) => {
         <Typography variant="h6" sx={{ minWidth: 200, maxWidth: 200, border: 0 }}>
           {contact.nickname}
         </Typography>
-        <Box component="span" sx={{ display: { xs: 'none', md: 'block' } }}>
-          <Typography variant="subtitle2" noWrap>
-            <span>{lastTimeSeen}</span>
+        <Box component="span">
+          <Typography variant="subtitle2" noWrap sx={{ display: { xs: 'none', md: 'block' } }}>
+            {lastTimeSeen}
           </Typography>
         </Box>
       </Box>

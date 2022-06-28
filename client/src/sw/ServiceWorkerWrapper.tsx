@@ -4,7 +4,6 @@ import { Workbox, WorkboxLifecycleWaitingEvent, WorkboxMessageEvent } from 'work
 import { UserContext } from '../providers/UserProvider';
 import { DatabaseContext } from '../providers/DatabaseProvider';
 import { convertBase64ToAb } from '../services/Generic';
-import { encryptString, generateKeyFromString } from 'dha-encryption';
 
 const ServiceWorkerWrapper: FC = () => {
   const WEBPUSH_SERVER_PUBKEY =
@@ -96,10 +95,10 @@ const ServiceWorkerWrapper: FC = () => {
            * @link services/PushMessage:57
            */
 
-          const encryptedSubscription = encryptString(
-            JSON.stringify(subscription),
-            generateKeyFromString(WEBPUSH_SERVER_PUBKEY)
-          );
+          // const encryptedSubscription = encryptString(
+          //   JSON.stringify(subscription),
+          //   generateKeyFromString(WEBPUSH_SERVER_PUBKEY)
+          // );
           setPushSubscription(subscription);
         })
         .catch((e) => {

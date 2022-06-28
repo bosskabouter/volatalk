@@ -1,12 +1,5 @@
-import { useContext, useEffect, useRef, useState } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  Typography,
-  useMediaQuery,
-  useTheme,
-} from '@mui/material';
+import { useContext, useEffect, useState } from 'react';
+import { Dialog, DialogTitle, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import { DatabaseContext } from '../../providers/DatabaseProvider';
 import { ContactItem } from '../Contacts/ContactItem';
@@ -38,7 +31,7 @@ const CallerComponent = ({ videoOn }: { videoOn: boolean }) => {
     return () => {
       localMediaStream?.getTracks().forEach(localMediaStream.removeTrack);
     };
-  }, []);
+  }, [localMediaStream, videoOn]);
 
   /**
    * Retrieves contactId from URL param, retrieves contact and verifies if contact is online

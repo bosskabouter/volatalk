@@ -4,7 +4,7 @@ import { IContact, IContactResume, IMessage, IUserProfile } from '../types';
 import { AppDatabase } from '../Database/Database';
 import { generateSignature, peerIdToPublicKey, verifyMessage } from './CryptoService';
 
-import { default as Peer, DataConnection, MediaConnection, AnswerOption } from 'peerjs';
+import { default as Peer, DataConnection, MediaConnection } from 'peerjs';
 import { decryptString, encryptString, generateKeyFromString } from 'dha-encryption';
 import pushMessage from './PushMessage';
 import { verifyAddress } from './UserService';

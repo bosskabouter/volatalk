@@ -9,7 +9,7 @@ import { UserContext } from 'providers/UserProvider';
 import { round } from 'services/Generic';
 
 //TODO investigate better north madgwick
-import { madgwick } from 'services/Compass';
+//import { madgwick } from 'services/Compass';
 export const DistanceInfo = ({ contact }: { contact: IContact }) => {
   const { user } = useContext(UserContext);
 

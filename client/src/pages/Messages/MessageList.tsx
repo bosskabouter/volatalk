@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState, useRef } from 'react';
-import { Box, CssBaseline, List, ListItem, ListSubheader, Paper, useTheme } from '@mui/material';
+import { Box, CssBaseline, List, ListItem, ListSubheader, useTheme } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import IconButton from '@mui/material/IconButton';

@@ -4,8 +4,10 @@
 // learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom/extend-expect';
 import { TextEncoder, TextDecoder } from 'util';
-import crypto from 'crypto';
-
+//import crypto from 'crypto';
+//import fetch from 'node-fetch';
+//global.fetch = require('fetch');
+globalThis.fetch = fetch;
 require('jest-canvas-mock');
 require('crypto');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -19,7 +21,4 @@ globalThis.crypto = require('crypto').webcrypto;
 // globalThis.crypto = require('crypto').webcrypto;
 global.TextEncoder = TextEncoder;
 
-global.TextDecoder = TextDecoder;
-window.URL.createObjectURL = function (_obj) {
-  return '';
-};
+//global.TextDecoder = TextDecoder;

@@ -5,7 +5,6 @@ import AddTaskIcon from '@mui/icons-material/AddTask';
 
 import { IconButton, ListItem, ListItemText } from '@mui/material';
 import { VideoCameraFront as CallContactIcon } from '@mui/icons-material';
-import MoreOptionsIcon from '@mui/icons-material/MoreVert';
 
 import { useNavigate } from 'react-router-dom';
 
@@ -14,7 +13,6 @@ import { ContactItem } from './ContactItem';
 import { IContact, IMessage } from '../../types';
 import { PeerContext } from '../../providers/PeerProvider';
 import { DatabaseContext } from '../../providers/DatabaseProvider';
-import { descriptiveTimeAgo } from '../../services/Generic';
 import { MessageItem } from 'pages/Messages/MessageItem';
 import { ContactDetails } from './ContactDetails';
 
@@ -34,11 +32,13 @@ export const ContactListItem = (props: { contact: IContact }) => {
     navigate('/call/' + props.contact.peerid);
     //avoid onclick listitem handleClickMessageContact
     e.stopPropagation();
+    e.preventDefault();
   };
   const handleClickVideoCallContact = (e: MouseEvent) => {
     navigate('/video/' + props.contact.peerid);
     //avoid onclick listitem handleClickMessageContact
     e.stopPropagation();
+    e.preventDefault();
   };
 
   /**
@@ -85,17 +85,20 @@ export const ContactListItem = (props: { contact: IContact }) => {
         setOnline(peerMngr.isConnected(props.contact));
       }
     };
-    return <ContactDetailsButton /> && props.contact.dateTimeAccepted === 0 ? (
-      <IconButton
-        onClick={acceptContact}
-        edge="start"
-        aria-label="Accept Contact?"
-        color="success"
-        size="small"
-        title="Accept Contact"
-      >
-        <AddTaskIcon />
-      </IconButton>
+    return props.contact.dateTimeAccepted === 0 ? (
+      <div>
+        <IconButton
+          onClick={acceptContact}
+          edge="start"
+          aria-label="Accept Contact?"
+          color="success"
+          size="small"
+          title="Accept Contact"
+        >
+          <AddTaskIcon />
+        </IconButton>
+        <ContactDetails contact={props.contact} />
+      </div>
     ) : (
       <div>
         <IconButton
@@ -116,27 +119,17 @@ export const ContactListItem = (props: { contact: IContact }) => {
         >
           <CallIcon />
         </IconButton>
-      </div>
-    );
-  };
-  /**
-   *
-   * @returns
-   */
-  const ContactDetailsButton = () => {
-    const [showDetails, setShowDetails] = useState(false);
-    return (
-      <>
         <IconButton
-          onClick={(_e) => {
-            setShowDetails(!showDetails);
-          }}
+          onClick={handleClickAudioCallContact}
+          edge="end"
+          aria-label="Audio Call"
+          color="success"
+          size="small"
         >
-          <MoreOptionsIcon />
+          <CallIcon />
         </IconButton>
-
-        {showDetails && <ContactDetails contact={props.contact} />}
-      </>
+        <ContactDetails contact={props.contact} />
+      </div>
     );
   };
 

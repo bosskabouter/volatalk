@@ -77,7 +77,7 @@ const CallingComponent = ({
    *
    */
   return (
-    <Dialog open={mediaConnection != null}>
+    <Dialog open={mediaConnection != null} fullScreen={fullScreen}>
       <DialogContent>
         <ContactListItem contact={contact}></ContactListItem>
         <MediaElement />

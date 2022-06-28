@@ -4,7 +4,7 @@ import React from 'react';
 
 import CloseIcon from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
-import Snackbar, { SnackbarOrigin } from '@mui/material/Snackbar';
+import Snackbar from '@mui/material/Snackbar';
 import { Button } from '@mui/material';
 
 export const Alerter = (props: { message: string; type: string }) => {

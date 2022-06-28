@@ -1,4 +1,3 @@
-import Dexie from 'dexie';
 import {
   applyEncryptionMiddleware,
   clearAllTables,
@@ -16,7 +15,7 @@ export const DatabaseContext = createContext<AppDatabase | null>(null);
 
 export const useDatabase = () => useContext(DatabaseContext);
 
-const inProduction = process.env.NODE_ENV === 'production';
+//const inProduction = process.env.NODE_ENV === 'production';
 const DatabaseProvider = ({ children }: IDatabaseProviderProps) => {
   const [database, setDatabase] = useState<AppDatabase>();
   const setupDatabase = () => {

@@ -6,16 +6,14 @@ import { Button, Dialog, Typography, DialogContent, DialogContentText } from '@m
 import { useNavigate } from 'react-router-dom';
 import { DatabaseContext } from '../../providers/DatabaseProvider';
 import { UserContext } from '../../providers/UserProvider';
-import { IContact, IInvite } from '../../types';
 import { PeerContext } from '../../providers/PeerProvider';
 import { extractInvite } from '../../services/InvitationService';
 import { Alerter } from '../StatusDisplay/Alerter';
 import { generateSignature } from '../../services/CryptoService';
 import Identification from 'components/Identification/Identification';
+import { IInvite } from 'types';
 
 export default function AcceptInvite(props: { invite: string }) {
-  const timeout = 5000;
-
   const [open, setOpen] = useState(true);
 
   //recover invite from local storage hack
@@ -25,8 +23,6 @@ export default function AcceptInvite(props: { invite: string }) {
   const [result, setResult] = useState<string>('');
 
   const [receivedInvite, setReceivedInvite] = useState<IInvite | null>(null);
-
-  const [contact, setContact] = useState<IContact | null>(null);
 
   const db = useContext(DatabaseContext);
 

@@ -56,7 +56,7 @@ export const ImageUploader = ({
           if (!event.target.files) return;
 
           const imgSrc = await resizeFileUpload2(event.target.files[0], 180, 180, 0.7);
-          const thumbSrc = await resizeFileUpload2(event.target.files[0], 27, 27, 0.4);
+          const thumbSrc = await resizeFileUpload2(event.target.files[0], 27, 27, 0.3);
 
           uploaded(imgSrc, thumbSrc);
         }}

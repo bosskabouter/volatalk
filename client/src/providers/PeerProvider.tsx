@@ -1,10 +1,7 @@
-/* e2slint-disable */
-// @t2s-nocheck
-import { AppDatabase } from 'Database/Database';
 import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
 
 import { PeerManager } from '../services/PeerManager';
-import { IMessage, IContact, IUserProfile } from '../types';
+import { IMessage, IContact } from '../types';
 import { useDatabase } from './DatabaseProvider';
 import { UserContext } from './UserProvider';
 
@@ -30,25 +27,25 @@ export default function PeerProvider({ children }: IPeerProviderProps) {
     console.log('MessageHandler PeerProvider', message);
   }
 
-  function newContactHandle(contact: IContact) {
-    console.log('NewContactHandler PeerProvider', contact);
-    peerManager?.isConnected(contact);
-  }
-  function contactOnlineHandle(statchange: { contact: IContact; status: boolean }) {
-    console.log('ContactOnlineHandler PeerProvider', statchange);
-    //peerManager?.isConnected(statchange.contact);
-  }
-  function handleStatusChange(status: boolean) {
-    //setPeerManager(peerManager);
-    if (status)
-      //getting online
-      db?.contacts.each((contact) => {
-        peerManager?.isConnected(contact);
-      });
-  }
-
   useEffect(() => {
     if (!userContext.user || !db || peerManager) return;
+
+    function newContactHandle(contact: IContact) {
+      console.log('NewContactHandler PeerProvider', contact);
+      peerManager?.isConnected(contact);
+    }
+    function contactOnlineHandle(statchange: { contact: IContact; status: boolean }) {
+      console.log('ContactOnlineHandler PeerProvider', statchange);
+      peerManager?.isConnected(statchange.contact);
+    }
+    function handleStatusChange(status: boolean) {
+      //setPeerManager(peerManager);
+      if (status)
+        //getting online
+        db?.contacts.each((contact) => {
+          peerManager?.isConnected(contact);
+        });
+    }
 
     const setupPeerManager = () => {
       const pm = new PeerManager(userContext.user, db);
@@ -78,7 +75,7 @@ export default function PeerProvider({ children }: IPeerProviderProps) {
     };
 
     setupPeerManager();
-  }, [db, handleStatusChange, newContactHandle, userContext.user]);
+  }, [db, peerManager, userContext.user]);
 
   /**
   useEffect(() => {

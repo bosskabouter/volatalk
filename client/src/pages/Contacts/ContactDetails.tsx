@@ -1,7 +1,13 @@
 import { useContext, useEffect, useState } from 'react';
-import MoreOptionsIcon from '@mui/icons-material/MoreVert';
 
-import { Avatar, Dialog, DialogContent, DialogContentText, Typography } from '@mui/material';
+import {
+  Avatar,
+  Dialog,
+  DialogContent,
+  DialogContentText,
+  Typography,
+  IconButton,
+} from '@mui/material';
 import { DatabaseContext } from '../../providers/DatabaseProvider';
 import { PeerContext } from '../../providers/PeerProvider';
 
@@ -10,8 +16,7 @@ import { IContact, IMessage } from '../../types';
 import Identification from 'components/Identification/Identification';
 
 import { DistanceInfo } from 'components/Identification/DistanceInfo';
-import { PeerIdenticon } from 'util/Widgets/PeerIdenticon';
-import { isChromium } from 'react-device-detect';
+import MoreOptionsIcon from '@mui/icons-material/MoreVert';
 
 export const ContactDetails = (props: { contact: IContact }) => {
   const peerMngr = useContext(PeerContext);
@@ -23,10 +28,9 @@ export const ContactDetails = (props: { contact: IContact }) => {
 
   const [online, setOnline] = useState(peerMngr?.isConnected(props.contact) || false);
 
-  const lastTimeSeen = 'Seen: ' + descriptiveTimeAgo(new Date(contact.dateTimeResponded));
+  const lastTimeSeen =
+    'Last time connected: ' + descriptiveTimeAgo(new Date(contact.dateTimeResponded));
 
-  const isMob = isChromium;
-  
   /**
    * Selects unread messages;
    */
@@ -69,10 +73,20 @@ export const ContactDetails = (props: { contact: IContact }) => {
     };
   }, [peerMngr, contact, cntUnread, online]);
 
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <>
+      <IconButton
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setIsOpen(true);
+        }}
+      >
+        <MoreOptionsIcon />
+      </IconButton>
+
       <Dialog open={isOpen} onClose={() => setIsOpen(!isOpen)}>
         <DialogContent>
           <DialogContentText>
@@ -82,12 +96,14 @@ export const ContactDetails = (props: { contact: IContact }) => {
           </DialogContentText>
 
           <Avatar variant="rounded" src={contact.avatar} sx={{ width: '360px', height: '360px' }} />
-
           <Identification
             id={contact.peerid}
             name={contact.nickname}
             status={peerMngr?.isConnected(contact)}
           />
+
+          <Typography>{lastTimeSeen}</Typography>
+          <DistanceInfo contact={contact} />
         </DialogContent>
       </Dialog>
     </>

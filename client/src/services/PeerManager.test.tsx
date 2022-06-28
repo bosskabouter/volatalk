@@ -2,20 +2,19 @@ import { PeerManager } from './PeerManager';
 import { AppDatabase } from 'Database/Database';
 import enrollUser from './UserService';
 import { aUser } from './UserService.test';
-import { render } from '@testing-library/react';
+import { queryByTestId, render, QueryByAttribute } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 
 import AuthProvider from 'providers/AuthProvider';
 import PeerProvider from 'providers/PeerProvider';
 import UserProvider from 'providers/UserProvider';
 import { Provider } from 'react-redux';
-import ServiceWorkerWrapper from 'sw/ServiceWorkerWrapper';
 
 import PeerDisplay from 'util/Widgets/PeerDisplay';
 import store from 'store/store';
 
 test('Create PeerManager', async () => {
-  const user = aUser();
+  const user = await enrollUser(aUser);
   await enrollUser(user);
   const pm = new PeerManager(user, new AppDatabase());
   expect(pm).toBeDefined();
@@ -24,10 +23,10 @@ test('Create PeerManager', async () => {
 test(
   'Peer',
   async () => {
-    const user = await enrollUser(aUser());
-    (global as any).RTCPeerConnection = jest.fn();
+    const user = await enrollUser(aUser);
+    ///global.RTCPeerConnection = jest.fn();
 
-    const { getByText } = render(
+    const { queryByTestId } = render(
       <BrowserRouter>
         <Provider store={store}>
           <AuthProvider>
@@ -41,7 +40,7 @@ test(
       </BrowserRouter>
     );
 
-    // expect(getByText(/PersonIcon/i,{selector:''})).toBeInTheDocument();
+    //    expect(queryByTestId('solely_for_jesttest')).toBeInTheDocument();
   },
   30 * 1000
 );

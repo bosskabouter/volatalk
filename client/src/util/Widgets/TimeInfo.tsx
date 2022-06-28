@@ -2,8 +2,9 @@
 import { css } from '@emotion/react';
 import { RefObject, useEffect, useRef, useState } from 'react';
 
-import { Box, Typography } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import { getLocalTimeString } from 'services/Generic';
+import { isMobile } from 'react-device-detect';
 /**
  * Analog clock thank to:
  * http://thenewcode.com/943/An-SVG-Analog-Clock-In-6-Lines-of-JavaScript
@@ -23,33 +24,7 @@ export const TimeInfo = () => {
       };
     }, []);
 
-    return (
-      <Box
-        sx={{
-          display: 'inline-flex',
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'right',
-          border: 0,
-          margin: 0,
-          padding: 0,
-        }}
-      >
-        <Box
-          sx={{
-            width: { sd: '0', md: '45px' },
-            display: { sd: 'none', md: 'inline-flex' },
-          }}
-        >
-          <AnalogClock />
-        </Box>
-        <Box sx={{ display: { sd: 'inline-flex', md: 'none' } }}>
-          <Box>
-            <Typography noWrap>{time && getLocalTimeString(time)}</Typography>
-          </Box>
-        </Box>
-      </Box>
-    );
+    return <Typography noWrap>{time && getLocalTimeString(time)}</Typography>;
   };
 
   const AnalogClock = () => {
@@ -101,7 +76,7 @@ export const TimeInfo = () => {
     };
 
     return (
-      <svg id="clock" viewBox="0 0 100 100" css={styles.clockRoot}>
+      <svg id="clock" viewBox="0 0 100 100" css={styles.clockRoot} height={36} width={36}>
         <circle id="face" cx="50" cy="50" r="45" />
 
         <g id="hands">
@@ -114,18 +89,18 @@ export const TimeInfo = () => {
   };
 
   return (
-    <Box
+    <Stack
+      direction={'row'}
       sx={{
         alignItems: 'center',
         justifyContent: 'right',
         border: 0,
         margin: 0,
         padding: 0,
-        height: '36px',
-        width: '36px',
       }}
     >
+      {!isMobile && <DigitalClock />}
       <AnalogClock />
-    </Box>
+    </Stack>
   );
 };

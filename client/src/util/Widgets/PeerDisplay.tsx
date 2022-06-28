@@ -38,6 +38,7 @@ const PeerDisplay = () => {
           <input
             type="hidden"
             name="solely_for_jesttest"
+            id="solely_for_jesttest"
             value={'peerstatus_' + status.toString()}
           />
         </Badge>

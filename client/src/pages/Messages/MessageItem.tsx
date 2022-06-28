@@ -11,7 +11,6 @@ import { UserContext } from '../../providers/UserProvider';
 import { PeerContext } from '../../providers/PeerProvider';
 import { IContactResume, IMessage } from '../../types';
 import { descriptiveTimeAgo } from '../../services/Generic';
-import Linkify from 'linkify-react';
 
 export const MessageItem = ({
   contact,

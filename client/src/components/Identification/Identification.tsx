@@ -1,10 +1,8 @@
 import Badge from '@mui/material/Badge';
 import Avatar from '@mui/material/Avatar';
 import { AvatarGroup, Box } from '@mui/material';
-import { PeerIdenticon } from 'util/Widgets/PeerIdenticon';
-import { useEffect, useState } from 'react';
-import { toSvg, toPng } from 'jdenticon';
-
+import { toSvg } from 'jdenticon';
+//TODO use one identicon library :)
 //import { identicon } from 'minidenticons';
 const Identification = (props: {
   id: string;
