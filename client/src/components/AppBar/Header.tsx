@@ -62,12 +62,7 @@ export default function Header() {
         sx={{ top: '0', bottom: 'auto' }}
       >
         <Toolbar variant="dense">
-          <Typography
-            variant="h6"
-            noWrap
-            css={styles.title}
-            sx={{ animation: '3s ease-in 1s infinite reverse both running slidein' }}
-          >
+          <Typography variant="h6" noWrap css={styles.title}>
             <Link to="/">
               <Avatar
                 src={logo}
@@ -77,6 +72,8 @@ export default function Header() {
                   width: 36,
                   height: 36,
                   border: 0,
+
+                  animation: '3s ease-in 1s infinite reverse both running slidein',
                 }}
               ></Avatar>
             </Link>

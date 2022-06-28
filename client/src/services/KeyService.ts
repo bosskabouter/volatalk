@@ -1,9 +1,9 @@
 import {
   generateMnemonic,
+  entropyToMnemonic,
+  validateMnemonic,
   mnemonicToSeed,
   mnemonicToSeedSync,
-  validateMnemonic,
-  entropyToMnemonic,
   mnemonicToEntropy,
 } from 'bip39';
 
@@ -24,25 +24,26 @@ export class VTKey {
   toEntropy() {
     return mnemonicToEntropy(this.mnemonic);
   }
-  async toSeedBase64url(): Promise<string> {
-    return (await mnemonicToSeed(this.mnemonic)).toString('base64url');
-  }
-  toSeedBase64urlSync(): string {
-    return mnemonicToSeedSync(this.mnemonic).toString('base64url');
+  toSeed(password?: string): Buffer {
+    return mnemonicToSeedSync(this.mnemonic, password);
   }
 
-  validateMnemonic(aMnemonic: string): boolean {
+  toSeedBase64url(password?: string): string {
+    return this.toSeed(password).toString('base64url');
+  }
+
+  static validateMnemonic(aMnemonic: string): boolean {
     return validateMnemonic(aMnemonic);
   }
 
-  entropyToMnemonic(entropy: string | Buffer) {
+  static entropyToMnemonic(entropy: string | Buffer) {
     return entropyToMnemonic(entropy);
   }
-  mnemonicToEntropy(mnemonic: string) {
+  static mnemonicToEntropy(mnemonic: string) {
     return mnemonicToEntropy(mnemonic);
   }
 
-  async doBadStuf() {
+  async doStuf() {
     mnemonicToSeedSync('basket actual');
     // => <Buffer 5c f2 d4 a8 b0 35 5e 90 29 5b df c5 65 a0 22 a4 09 af 06 3d 53 65 bb 57 bf 74 d9 52 8f 49 4b fa 44 00 f5 3d 83 49 b8 0f da e4 40 82 d7 f9 54 1e 1d ba 2b ...>
 

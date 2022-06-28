@@ -2,7 +2,6 @@
 import { css } from '@emotion/react';
 import { ChangeEvent, useContext, useState } from 'react';
 import {
-  Avatar,
   Box,
   Button,
   Checkbox,
@@ -37,9 +36,7 @@ import { DistanceFromMiddleEarth } from 'util/geo/Distance';
 import { questions } from './SecurityQuestions';
 import { requestFollowMe } from 'services/LocationService';
 import enrollUser from 'services/UserService';
-import { resizeFileUpload, resizeFileUpload2 } from 'services/ImageResize';
-import { useDialog } from 'providers/DialogProvider';
-import { VTKey } from 'services/KeyService';
+import { ImageUploader } from 'components/ImageUploader';
 
 const ITEM_HEIGHT = 18;
 const ITEM_PADDING_TOP = 8;
@@ -162,24 +159,24 @@ const AccountSetup = () => {
 
   /**
    * Register a new user, by generating a keyPairge
-   * @param user from form containing user data
+   * @param aUser from form containing user data
    */
-  async function registerUser(user: IUserProfile) {
+  async function registerUser(aUser: IUserProfile) {
     if (!db) throw Error('No DB');
-    await enrollUser(user);
+    await enrollUser(aUser);
     // Save to database
 
     //only 1 user, for now
-    db.userProfile.put(user, 1).then(() => {
+    db.userProfile.put(aUser, 1).then(() => {
       dispatch(setCreated());
       if (formik.values.security.isSecured) {
         dispatch(setIsSecure());
       }
-      setUser(user);
+      setUser(aUser);
 
       setAuthenticated(true);
 
-      if (user.usePush) {
+      if (aUser.usePush) {
         //reload the app to activate service worker
         //  document.location = document.location.origin;
       }
@@ -211,34 +208,7 @@ const AccountSetup = () => {
         width: 38rem;
       }
     `,
-    avatarUploadDiv: css`
-      position: relative;
-      overflow: hidden;
-      top: 0;
-      right: 0;
-      margin: 0;
-      padding: 18px;
-      width: 180px;
-      height: 180px;
-      align: 'center';
-    `,
-    avatarUploadImage: css`
-      width: 100%;
-      height: 100%;
-    `,
-    avatarUploadButton: css`
-      position: absolute;
-      top: 0;
-      right: 0;
-      margin: 0;
-      padding: 0;
-      font-size: 20px;
-      cursor: pointer;
-      opacity: 0;
-      filter: alpha(opacity=0);
-      width: 100%;
-      height: 100%;
-    `,
+
     accountNickname: css`
       width: 100%;
       background-color: ${theme.palette.common.white};
@@ -305,7 +275,6 @@ const AccountSetup = () => {
    */
   function handleClose() {
     console.debug('User trying to close AccountSetup', user);
-    console.log(new VTKey());
     if (user) navigate('/');
   }
 
@@ -346,6 +315,7 @@ const AccountSetup = () => {
       transitionDuration={{ enter: 1500 }}
       maxWidth="lg"
       fullScreen={fullScreen}
+      scroll={'body'}
     >
       <DialogContent id="dialog-agreement" css={styles.accountSetupDialogContent}>
         <Typography variant="h5">Profile settings</Typography>
@@ -366,33 +336,14 @@ const AccountSetup = () => {
             error={formik.touched.nickname && Boolean(formik.errors.nickname)}
             //helperText={formik.touched.nickname && formik.errors.nickname}
           />
+          <ImageUploader
+            source={formik.values.avatar}
+            onUploaded={(base64EncodedUpload, base64EncodedUploadThumb) => {
+              formik.setFieldValue('avatar', base64EncodedUpload);
+              formik.setFieldValue('avatarThumb', base64EncodedUploadThumb);
+            }}
+          />
 
-          <div css={styles.avatarUploadDiv}>
-            <Avatar
-              src={formik.values.avatar}
-              css={styles.avatarUploadImage}
-              variant={'rounded'}
-            ></Avatar>
-            <input
-              css={styles.avatarUploadButton}
-              aria-label="avatar"
-              id="file"
-              name="avatar"
-              type="file"
-              accept="image/*"
-              onChange={(event) => {
-                if (!event.target.files) return;
-                resizeFileUpload2(event.target.files[0], 180, 180, 0.7).then((src) => {
-                  formik.setFieldValue('avatar', src);
-                });
-
-                resizeFileUpload(event.target.files[0], 48, 48, 0.5).then((src) => {
-                  formik.setFieldValue('avatarThumb', src);
-                });
-              }}
-              multiple={false}
-            />
-          </div>
           <Box>
             <FormControlLabel
               label={

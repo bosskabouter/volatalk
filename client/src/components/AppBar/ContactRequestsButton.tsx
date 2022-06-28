@@ -1,7 +1,7 @@
 import { SyntheticEvent, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import InvitationButtonIcon from '@mui/icons-material/PersonAdd';
 import Badge from '@mui/material/Badge';
 import { IContactResume } from 'types';
 import { DatabaseContext } from 'providers/DatabaseProvider';
@@ -16,6 +16,9 @@ function ContactRequestsButton() {
 
   const [contactRequests, setContactRequests] = useState<IContactResume[]>([]);
 
+  /**
+   * Loads unaccepted contacts from db
+   */
   useEffect(() => {
     if (!db || contactRequests) return;
     db.selectUnacceptedContacts()
@@ -25,6 +28,9 @@ function ContactRequestsButton() {
       });
   }, [contactRequests, db]);
 
+  /**
+   * Handles new incoming contact requests by adding them to the waiting list
+   */
   useEffect(() => {
     if (!peerCtx) return;
     const handleNewIncomingContactRequest = (newContact: IContactResume) => {
@@ -50,7 +56,7 @@ function ContactRequestsButton() {
         badgeContent={contactRequests.length}
       >
         <Button variant="outlined" onClick={handleClick} color="secondary">
-          <PersonAddIcon sx={{ width: 27, height: 27, border: 0 }} />
+          <InvitationButtonIcon sx={{ width: 27, height: 27, border: 0 }} />
         </Button>
       </Badge>
     </Tooltip>

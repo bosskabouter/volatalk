@@ -1,5 +1,5 @@
-import { KeyObject } from 'crypto';
 import { convertBase58ToObject } from './Generic';
+import { createECDH, createSign, KeyObject } from 'crypto';
 
 // const { createHmac } = await import('crypto');
 
@@ -18,9 +18,10 @@ const ENC_ALGORITHM_ECDSA_NAMEDCURVE = 'P-384';
  * @returns stringified signature ArrayBuffer
  */
 export function generateSignature(peerid: string, userJsonPrivateKey: string): Promise<string> {
-  return importPrivateKey(JSON.parse(userJsonPrivateKey)).then(async (privKey) => {
-    return JSON.stringify(Array.from(new Uint8Array(await signMessage(peerid, privKey))));
-  });
+  return Promise.resolve('');
+  // importPrivateKey(JSON.parse(userJsonPrivateKey)).then(async (privKey) => {
+  //   return JSON.stringify(Array.from(new Uint8Array(await signMessage(peerid, privKey))));
+  // });
 }
 
 /**
@@ -52,22 +53,36 @@ export async function generateSignatureKey(): Promise<KeyObject> {
  * @returns
  */
 async function generateMyKey(type: 'hmac' | 'aes'): Promise<KeyObject> {
-  const { generateKey } = await import('crypto');
+  //const { generateKey } = await import('crypto');
+  const { webcrypto, generateKey, generateKeyPair, createSign, ECDH, createECDH } = await import(
+    'crypto'
+  );
   return new Promise((res, rej) => {
     generateKey(type, { length: 128 }, (err, key) => {
       if (err) rej(err);
-      console.log(key.export().toString('hex')); // 46e..........620
+      //console.log(key.export('jwk').toString('hex')); // 46e..........620
       res(key);
     });
   });
+  // const key = await crypto.subtle.generateKey(
+  //   {
+  //     name: 'HMAC',
+  //     hash: 'SHA-256',
+  //     length: 256,
+  //   },
+  //   true,
+  //   ['sign', 'verify']
+  // );
+
+  // const keyObject = KeyObject.from(key);
 }
 
 /**
  *
  * @param {*} jwk
  */
-export function importPrivateKey(jwk: JsonWebKey) {
-  return importCryptoKey(jwk, true);
+export function importPrivateKey(ko: KeyObject) {
+  return KeyObject.from(ko);
 }
 
 /**
@@ -116,7 +131,14 @@ export function exportCryptoKey(key: CryptoKey): Promise<JsonWebKey> {
  */
 export function signMessage(message: string, signingKey: CryptoKey) {
   const encodedMessage = new TextEncoder().encode(message);
-  return window.crypto.subtle
+  const sign = createSign('RSA-SHA256');
+
+  // Generate Alice's keys...
+  const alice = createECDH('secp521r1');
+  const aliceKey = alice.generateKeys();
+
+  // sign.sign(signingKey).write(message);
+  window.crypto.subtle
     .sign(
       {
         name: ENC_ALGORITHM_ECDSA,

@@ -1,4 +1,6 @@
 {
+  //https://github.com/DefinitelyTyped/DefinitelyTyped
+  //https://www.typescriptlang.org/tsconfig#typeRoots
   "compilerOptions": {
     "target": "es2017",
     "baseUrl": "src",
@@ -16,7 +18,11 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "typeRoots": ["src/@types", "node_modules/@types"]
+    "typeRoots": [
+      "src/@types",
+      "node_modules/@types"
+      //  , "node_modules/@typings"
+    ]
   },
   "exclude": ["build", "node_modules"],
   "include": ["src"]

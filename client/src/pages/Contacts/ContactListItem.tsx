@@ -5,6 +5,8 @@ import AddTaskIcon from '@mui/icons-material/AddTask';
 
 import { IconButton, ListItem, ListItemText } from '@mui/material';
 import { VideoCameraFront as CallContactIcon } from '@mui/icons-material';
+import MoreOptionsIcon from '@mui/icons-material/MoreVert';
+
 import { useNavigate } from 'react-router-dom';
 
 import { ContactItem } from './ContactItem';
@@ -13,6 +15,8 @@ import { IContact, IMessage } from '../../types';
 import { PeerContext } from '../../providers/PeerProvider';
 import { DatabaseContext } from '../../providers/DatabaseProvider';
 import { descriptiveTimeAgo } from '../../services/Generic';
+import { MessageItem } from 'pages/Messages/MessageItem';
+import { ContactDetails } from './ContactDetails';
 
 export const ContactListItem = (props: { contact: IContact }) => {
   const peerMngr = useContext(PeerContext);
@@ -81,7 +85,7 @@ export const ContactListItem = (props: { contact: IContact }) => {
         setOnline(peerMngr.isConnected(props.contact));
       }
     };
-    return props.contact.dateTimeAccepted === 0 ? (
+    return <ContactDetailsButton /> && props.contact.dateTimeAccepted === 0 ? (
       <IconButton
         onClick={acceptContact}
         edge="start"
@@ -115,6 +119,26 @@ export const ContactListItem = (props: { contact: IContact }) => {
       </div>
     );
   };
+  /**
+   *
+   * @returns
+   */
+  const ContactDetailsButton = () => {
+    const [showDetails, setShowDetails] = useState(false);
+    return (
+      <>
+        <IconButton
+          onClick={(_e) => {
+            setShowDetails(!showDetails);
+          }}
+        >
+          <MoreOptionsIcon />
+        </IconButton>
+
+        {showDetails && <ContactDetails contact={props.contact} />}
+      </>
+    );
+  };
 
   return (
     <ListItem
@@ -135,15 +159,10 @@ export const ContactListItem = (props: { contact: IContact }) => {
       }}
     >
       <ContactItem contact={props.contact}></ContactItem>
-
       {lastMessage ? (
-        <ListItemText
-          id={lastMessage.sender + lastMessage.receiver}
-          primary={lastMessage.payload}
-          secondary={`sent: ${descriptiveTimeAgo(new Date(lastMessage.dateTimeSent))}`}
-        />
+        <MessageItem contact={props.contact} message={lastMessage} />
       ) : (
-        <ListItemText primary="No message yet" />
+        <ListItemText primary={'No message yet. Say Hi ' + props.contact.nickname} />
       )}
     </ListItem>
   );

@@ -1,5 +1,13 @@
 import { useContext, useState } from 'react';
-import { AppBar, Box, InputAdornment, TextField, Dialog } from '@mui/material';
+import {
+  AppBar,
+  Box,
+  InputAdornment,
+  TextField,
+  Dialog,
+  DialogContent,
+  DialogContentText,
+} from '@mui/material';
 
 import EmojiPicker from 'emoji-picker-react';
 
@@ -12,6 +20,8 @@ import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 
 import { PeerContext } from '../../providers/PeerProvider';
 import { IContact, IMessage } from '../../types';
+import linkifyStr from 'linkify-string';
+import { ImageUploader } from 'components/ImageUploader';
 
 export const ComposeMessage = ({
   contact,
@@ -28,6 +38,10 @@ export const ComposeMessage = ({
   const sendText = async () => {
     if (peerManager && contact && sndMessageText.trim().length > 0) {
       console.log('Sending text: ' + sndMessageText);
+
+      const linkified = linkifyStr(sndMessageText);
+
+      //console.debug('Linkified: ' + linkified);
       const msg = await peerManager.sendText(sndMessageText, contact);
       setSndMessageText('');
 
@@ -43,7 +57,18 @@ export const ComposeMessage = ({
           setOpenShare(false);
           return true;
         }}
-      ></Dialog>
+      >
+        <DialogContent>
+          <DialogContentText>Share a Photo</DialogContentText>
+          <ImageUploader
+            onUploaded={(base64EncodedImage) => {
+              setSndMessageText(`<img src='${base64EncodedImage}'/>`);
+              setOpenShare(false);
+              sendText();
+            }}
+          ></ImageUploader>
+        </DialogContent>
+      </Dialog>
     ) : (
       <IconButton
         onClick={() => {

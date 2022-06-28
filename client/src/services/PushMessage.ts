@@ -54,6 +54,7 @@ export default async function pushMessage(
     //body matches the expected server input
     //TODO truncate too long message. max 4k
     const b = JSON.stringify({
+      //TODO encrypt [contact.pushSubscription] with a server public key so only he can see the actual subscription
       subscription: contact.pushSubscription,
       payload: payload,
     });
@@ -61,7 +62,7 @@ export default async function pushMessage(
     console.log('Posting Push message', WEBPUSH_SERVER_ADDRESS, b);
     fetch(WEBPUSH_SERVER_ADDRESS, {
       method: 'POST',
-      body: b, //corresponds to pushEvent.data.text() on service-worker side
+      body: b, //corresponds to pushEvent.data.text() on service-worker (receiver) side
       headers: { 'content-type': 'application/json' },
     })
       .then((resp) => {

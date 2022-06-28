@@ -79,7 +79,7 @@ const MessageList = () => {
 
   useEffect(() => {
     console.debug('useEffect scrollDown');
-    listElement.current && (listElement.current.scrollTop = 100 * messageList.length);
+    listElement.current && (listElement.current.scrollTop = 1000 * messageList.length);
   }, [messageList.length]);
 
   const theme = useTheme();

@@ -11,6 +11,7 @@ import { UserContext } from '../../providers/UserProvider';
 import { PeerContext } from '../../providers/PeerProvider';
 import { IContactResume, IMessage } from '../../types';
 import { descriptiveTimeAgo } from '../../services/Generic';
+import Linkify from 'linkify-react';
 
 export const MessageItem = ({
   contact,
@@ -78,7 +79,10 @@ export const MessageItem = ({
         message.dateTimeRead = msg.dateTimeRead;
       }
     };
-    if (peerManager && message.dateTimeRead === 0) {
+    const pushed = message.dateTimePushed > 1000;
+    const sent = message.dateTimeSent > 0;
+
+    if (peerManager && !pushed && !sent) {
       //watch message untill read
       peerManager.addListener('onMessageDelivered', onMessageDeliverHandler);
     }
@@ -92,10 +96,15 @@ export const MessageItem = ({
       <ListItemIcon>
         <StatusIcon />
       </ListItemIcon>
-
       <ListItemText
         id={'id-' + message.id}
-        primary={senderText + ': ' + message.payload}
+        primary={
+          <p
+            dangerouslySetInnerHTML={{
+              __html: '<em>' + senderText + '</em>: ' + message.payload,
+            }}
+          />
+        }
         secondary={secondaryText}
       />
     </Box>

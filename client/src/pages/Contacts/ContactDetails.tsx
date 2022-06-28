@@ -1,15 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import MoreOptionsIcon from '@mui/icons-material/MoreVert';
 
-import {
-  Avatar,
-  Box,
-  Dialog,
-  DialogContent,
-  DialogContentText,
-  IconButton,
-  Typography,
-} from '@mui/material';
+import { Avatar, Dialog, DialogContent, DialogContentText, Typography } from '@mui/material';
 import { DatabaseContext } from '../../providers/DatabaseProvider';
 import { PeerContext } from '../../providers/PeerProvider';
 
@@ -18,9 +10,10 @@ import { IContact, IMessage } from '../../types';
 import Identification from 'components/Identification/Identification';
 
 import { DistanceInfo } from 'components/Identification/DistanceInfo';
-import { ContactDetails } from './ContactDetails';
+import { PeerIdenticon } from 'util/Widgets/PeerIdenticon';
+import { isChromium } from 'react-device-detect';
 
-export const ContactItem = (props: { contact: IContact }) => {
+export const ContactDetails = (props: { contact: IContact }) => {
   const peerMngr = useContext(PeerContext);
   const db = useContext(DatabaseContext);
 
@@ -32,6 +25,8 @@ export const ContactItem = (props: { contact: IContact }) => {
 
   const lastTimeSeen = 'Seen: ' + descriptiveTimeAgo(new Date(contact.dateTimeResponded));
 
+  const isMob = isChromium;
+  
   /**
    * Selects unread messages;
    */
@@ -74,57 +69,27 @@ export const ContactItem = (props: { contact: IContact }) => {
     };
   }, [peerMngr, contact, cntUnread, online]);
 
+  const [isOpen, setIsOpen] = useState(true);
+
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: { xs: 'column', md: 'row' },
-        ///alignItems: 'baseline',
-        //  overflow: 'hidden',
+    <>
+      <Dialog open={isOpen} onClose={() => setIsOpen(!isOpen)}>
+        <DialogContent>
+          <DialogContentText>
+            <Typography variant="h5" sx={{ minWidth: 200, maxWidth: 400, border: 0 }}>
+              {contact.nickname}
+            </Typography>
+          </DialogContentText>
 
-        //overflow: 'hidden',
-        //width: 1,
-        // height: 63,
-        //padding: (theme) => theme.spacing(1),
-      }}
-    >
-      <Box
-        component="span"
-        sx={{
-          display: 'flex',
-          flexDirection: 'row',
-        }}
-      >
-        <Identification
-          id={contact.peerid}
-          name={contact.nickname}
-          avatar={contact.avatar}
-          status={online}
-          badgeCnt={cntUnread}
-        />
-      </Box>
+          <Avatar variant="rounded" src={contact.avatar} sx={{ width: '360px', height: '360px' }} />
 
-      <Box
-        sx={{
-          //username can move to bottom
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: { xs: 'left', md: 'flex-start' },
-          //m: 3,
-          border: 0,
-          minWidth: 180,
-        }}
-      >
-        <Typography variant="h6" sx={{ minWidth: 200, maxWidth: 200, border: 0 }}>
-          {contact.nickname}
-        </Typography>
-        <Box component="span" sx={{ display: { xs: 'none', md: 'block' } }}>
-          <Typography variant="subtitle2" noWrap>
-            <span>{lastTimeSeen}</span>
-          </Typography>
-        </Box>
-      </Box>
-      <DistanceInfo contact={contact} />
-    </Box>
+          <Identification
+            id={contact.peerid}
+            name={contact.nickname}
+            status={peerMngr?.isConnected(contact)}
+          />
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
