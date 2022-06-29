@@ -33,7 +33,7 @@ test('should Push', async () => {
   process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
 
   aContact.pushSubscription = aSubscription;
-  const result = await pushMessage(aMessage, aContact, aUser);
+  const result = await pushMessage(aMessage, aContact);
   expect(result).toBeDefined();
   // expect(result).toBeLessThan(500);
   //TODO mock fetch

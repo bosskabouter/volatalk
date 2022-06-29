@@ -3,56 +3,34 @@ import { IContact, IMessage, IUserProfile } from '../types';
 
 const WEBPUSH_SERVER_ADDRESS = 'https://peered.me:432/push';
 
-const VOLA_SECRET_PUSH = '1a2b3c-but there is more to it - &*@^';
-
 /**
  * Tries to send a message through Notification Push to a contact, if he opted in for this.
  * @param message
  * @param contact
  * @returns (a) 0 if contact does not have a subscription, (b) error code if post failed (127 for local error), or (c) timestamp if succeeded
  */
-export default async function pushMessage(
-  message: IMessage,
-  contact: IContact,
-  user: IUserProfile
-): Promise<number> {
+export default async function pushMessage(message: IMessage, contact: IContact): Promise<number> {
   if (!contact.pushSubscription) {
     console.log(`Contact without subscription. Not pushing message.`, message, contact);
     return 0;
   }
 
   return new Promise((resolve, _reject) => {
-    //TODO encrypt with secret shared with contact somehow...
-
-    const senderInfo = JSON.stringify({
-      contactid: user.peerid,
-      nickname: user.nickname,
-      avatar: user.avatarThumb, // doesn't fit in small push. but now it is compressed ;)
-    });
-
-    //copy the message, we'll shorten it with relevant info. Push max 4k
-
     const copiedMessage: IMessage = JSON.parse(JSON.stringify(message));
-    const TRUNCATE_PAYLOAD_LIMIT = 1440;
+    const TRUNCATE_PAYLOAD_LIMIT = 3 * 1000;
     if (copiedMessage.payload.length > TRUNCATE_PAYLOAD_LIMIT) {
       copiedMessage.payload =
         copiedMessage.payload.substring(0, TRUNCATE_PAYLOAD_LIMIT) + '... (open to read more)';
     }
-    //temporarily put our shortened info sender not just id. test-push-sw no db to lookup name
-    copiedMessage.sender = senderInfo;
-
-    copiedMessage.receiver = contact.nickname; //he himself is receiver. save some space
 
     //Do not encrypt in test environment with simplified service-worker.
     const unEnctyptedPayload = JSON.stringify(copiedMessage);
 
-    //for now we use a global volatalk key to encrypt... TOOD write a key for each contact in unencrypted local idb for service worker to be able to find and decrypt.
     const payload =
       process.env.NODE_ENV === 'production'
-        ? encryptString(unEnctyptedPayload, generateKeyFromString(VOLA_SECRET_PUSH))
+        ? encryptString(unEnctyptedPayload, generateKeyFromString(contact.peerid))
         : unEnctyptedPayload;
     //body matches the expected server input
-    //TODO truncate too long message. max 4k
     const b = JSON.stringify({
       //TODO encrypt [contact.pushSubscription] with a server public key so only he can see the actual subscription
       subscription: contact.pushSubscription,

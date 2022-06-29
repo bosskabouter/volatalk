@@ -1,4 +1,5 @@
 import Dexie from 'dexie';
+import _ from 'lodash';
 import { IContact, IMessage, IUserProfile } from '../types';
 const tableUser = 'userProfile';
 const tableContacts = 'contacts';
@@ -33,6 +34,11 @@ export class AppDatabase extends Dexie {
 
   selectContacts() {
     return this.contacts.orderBy('dateTimeDeclined').toArray();
+  }
+  async selectContactsMap() {
+    const m = new Map<string, IContact>();
+    (await this.selectContacts()).forEach((c) => m.set(c.peerid, c));
+    return m;
   }
 
   selectUnacceptedContacts() {

@@ -7,7 +7,7 @@ import { convertBase64ToAb } from '../services/Generic';
 
 const ServiceWorkerWrapper: FC = () => {
   const WEBPUSH_SERVER_PUBKEY =
-    'BOzjBiLaa9psTJ5Nd5T8WEPQjq92HmPgzSr4Lvr53AVGsEhcQiWmjP8crRxS5CIq4KVxCbnBUl5v55axenXLjCg';
+    'BKO5xaLdDEzHQIjdm5rRT9QWUOp3SCl7VDfO3dj0LYMno6IlTZ7njpFvWYWMEWvxL2ici5FmzqrPaxAEywyB1WA';
 
   const noServiceWorkerAvailable = !('serviceWorker' in navigator);
   const serviceWorkerScript =
@@ -18,32 +18,26 @@ const ServiceWorkerWrapper: FC = () => {
   const [showReload, setShowReload] = useState(false);
   const [registration, setRegistration] = useState<ServiceWorkerRegistration>();
 
-  const { user } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
 
-  const [pushSubscription, setPushSubscription] = useState<PushSubscription | null>(
-    user?.pushSubscription ? user.pushSubscription : null
-  );
+  const [pushSubscription, setPushSubscription] = useState<PushSubscription>();
 
   const db = useContext(DatabaseContext);
 
   const wb = useRef<Workbox | null>(null);
 
   const onSWUpdate = (e: WorkboxLifecycleWaitingEvent) => {
-    console.info('onSWUpdate = (e) => ', e);
-
+    console.info('onSWUpdate = (WorkboxLifecycleWaitingEvent) => ', e);
     setShowReload(true);
   };
 
   const onMessage = (messageEvent: WorkboxMessageEvent) => {
     console.info('onMessage = (messageEvent: WorkboxMessageEvent) => ', messageEvent);
-
     console.info('messageEvent.data', messageEvent.data);
     console.info('messageEvent.target', messageEvent.target);
     console.info('messageEvent.originalEvent', messageEvent.originalEvent);
     console.info('messageEvent.ports', messageEvent.ports);
     console.info('messageEvent.isExternal', messageEvent.isExternal);
-
-    //setShowMessage(messageEvent.data);
   };
 
   useEffect(() => {
@@ -52,65 +46,43 @@ const ServiceWorkerWrapper: FC = () => {
         'No service worker in navigator available. Push messages and off-line browsing disabled.'
       );
       return;
-    } else if (registration || wb.current) {
-      //ran already
-      return;
     }
 
     wb.current = new Workbox(process.env.PUBLIC_URL + serviceWorkerScript);
+    console.info('Created Workbox', wb.current);
     wb.current.addEventListener('waiting', onSWUpdate);
     wb.current.addEventListener('message', onMessage);
     wb.current
       .register()
-      .then((reg) => {
-        if (reg) {
-          console.debug('Service worker registration', reg);
-          setRegistration(reg);
+      .then(async (reg) => {
+        if (!reg) {
+          console.log('registration failed');
+          return;
         }
+        console.info('Service worker registration', reg);
+        setRegistration(reg);
+        if (!user?.usePush) return;
+        const ps = await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: convertBase64ToAb(WEBPUSH_SERVER_PUBKEY),
+        });
+
+        setPushSubscription(ps);
+        console.log('setPushSubscription', ps);
+
+        const contacts = await db?.selectContactsMap();
+        const msg = {
+          type: 'UPDATE_CONTACTS',
+          user: JSON.parse(JSON.stringify(user)),
+          contacts: contacts,
+        };
+        console.log('messageSW', msg);
+        wb.current?.messageSW(msg);
       })
       .catch((e) => {
         console.error('Error registering service worker', e);
       });
-  }, [noServiceWorkerAvailable, registration, serviceWorkerScript]);
-
-  /**
-   * Wait for the user to register and activate the registration to activate,
-   * then Subscribe to the pushManager, if the user opted for this.
-   * If not usePush, clear the subscription from his profile, in case he recently was subscribed.
-   */
-  useEffect(() => {
-    if (!db || !user?.id || !registration?.active || pushSubscription) return;
-    console.debug('useEffect subscription registration');
-    const subscribePush = () => {
-      console.debug('Registration', registration);
-      registration.pushManager
-        .subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: convertBase64ToAb(WEBPUSH_SERVER_PUBKEY),
-        })
-        .then((subscription) => {
-          console.info('Subscription', subscription);
-          /**
-           * TODO encrypt [contact.pushSubscription] with a server public key so only he can see the actual subscription
-           * @link services/PushMessage:57
-           */
-
-          // const encryptedSubscription = encryptString(
-          //   JSON.stringify(subscription),
-          //   generateKeyFromString(WEBPUSH_SERVER_PUBKEY)
-          // );
-          setPushSubscription(subscription);
-        })
-        .catch((e) => {
-          console.error('Error subscribing push manager', e);
-        });
-    };
-    if (user?.usePush) {
-      subscribePush();
-    } else {
-      setPushSubscription(null);
-    }
-  }, [db, registration, user, registration?.active, pushSubscription]);
+  }, [db, noServiceWorkerAvailable, serviceWorkerScript, user]);
 
   /**
    * Saves the push subscription to users profile.
@@ -120,15 +92,18 @@ const ServiceWorkerWrapper: FC = () => {
     console.info('Overwriting previous push subscription', user.pushSubscription);
     console.info('New push subscription', pushSubscription);
     user.pushSubscription = pushSubscription;
+
     db.userProfile.update(1, { pushSubscription: pushSubscription });
-  }, [db, pushSubscription, registration, user, user?.id]);
+    setUser(user);
+  }, [db, pushSubscription, registration, setUser, user]);
 
   const reloadPage = () => {
+    console.info(
+      `'serviceWorker' in navigator && wb.current !== null`,
+      'serviceWorker' in navigator,
+      wb.current
+    );
     if ('serviceWorker' in navigator && wb.current !== null) {
-      wb.current.getSW().then((sw) => {
-        console.info('Posting a message to service worker...');
-        sw.postMessage('Hi SW? It is me... LeClerc!');
-      });
       wb.current.addEventListener('controlling', (event) => {
         console.info('Controlling', event);
         setShowReload(false);

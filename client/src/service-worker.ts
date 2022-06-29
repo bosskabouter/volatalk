@@ -1,23 +1,16 @@
 /// <reference lib="webworker" />
-/* eslint-disable no-restricted-globals */
 
-// This service worker can be customized!
 // See https://developers.google.com/web/tools/workbox/modules
 // for the list of available Workbox modules, or add any other
 // code you'd like.
-// You can also remove this file if you'd prefer not to use a
-// service worker, and the Workbox build step will be skipped.
 
-//TODO USE UNENCRYPTED DB FOR PUSH SECRET KEY EXCHANGE
-//import { AppDatabase } from 'Database/Database';
 import { decryptString, generateKeyFromString } from 'dha-encryption';
-import { IMessage } from './types';
+import { IContact, IMessage, IUserProfile } from './types';
 import { clientsClaim } from 'workbox-core';
 import { ExpirationPlugin } from 'workbox-expiration';
 import { createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
 import { StaleWhileRevalidate } from 'workbox-strategies';
-import { AppDatabase } from 'Database/Database';
 
 declare const self: ServiceWorkerGlobalScope;
 
@@ -74,17 +67,21 @@ registerRoute(
   })
 );
 
-// This allows the web app to trigger skipWaiting via
-// registration.waiting.postMessage({type: 'SKIP_WAITING'})
+//---------- SYNC WITH service-worker-testpush.js
+let contacts: Map<string, IContact>;
+let user: IUserProfile;
+
 self.addEventListener('message', (event) => {
+  console.info('SW received message event!', event);
   if (event.data && event.data.type === 'SKIP_WAITING') {
+    // This allows the web app to trigger skipWaiting
     self.skipWaiting();
+  } else if (event.data.type === 'UPDATE_CONTACTS') {
+    contacts = event.data.contacts;
+    user = event.data.user;
+    console.log('Got User and his contacts!', user, contacts);
   }
 });
-// Any other custom service worker logic can go here.
-
-//TODO get users secret shared with contacts from localstorage
-const VOLA_SECRET_PUSH = '1a2b3c-but there is more to it - &*@^';
 
 self.addEventListener('push', (pushEvent) => {
   console.info('Push Event received!', pushEvent);
@@ -100,20 +97,18 @@ self.addEventListener('push', (pushEvent) => {
   let payload /* encrypted string */ = pushEvent.data.text();
 
   console.info('Encrypted push data.text', payload);
-  payload = decryptString(payload, generateKeyFromString(VOLA_SECRET_PUSH));
+  payload = decryptString(payload, generateKeyFromString(user.peerid));
   console.info('Decrypted push data.text', payload);
 
   const message: IMessage = JSON.parse(payload);
 
-  //message.sender contains not only contactid, but also nickname
+  const contact = contacts.get(message.sender);
 
-  const senderInfo: {
-    contactid: string;
-    nickname: string;
-    avatar: string;
-  } = JSON.parse(message.sender); //new AppDatabase();
+  if (!contact) {
+    console.warn('Received Push from unknown contact', payload);
+    return;
+  } else console.log('Found contacts for pushmessage ', contact);
 
-  //lets try to find contact info from db
   const actionOpen = {
     title: 'Open',
     action: 'open',
@@ -125,17 +120,17 @@ self.addEventListener('push', (pushEvent) => {
 
   const notificationOptions: NotificationOptions = {
     body: message.payload,
-    badge: senderInfo.avatar,
-    //    image: senderInfo.avatar,
+    badge: contact.avatar,
+    //    image: contact.avatar,
     //    icon: 'https://volatalk.org/mstile-150x150.png',
-    icon: senderInfo.avatar,
+    icon: contact.avatar,
     vibrate: [1000, 2000, 3000, 4000, 5000],
     actions: [actionOpen, actionClose],
     requireInteraction: message.urgent,
     renotify: message.urgent,
-    data: senderInfo.contactid,
+    data: contact.peerid,
   };
-  self.registration.showNotification(senderInfo.nickname, notificationOptions);
+  self.registration.showNotification(contact.nickname, notificationOptions);
 });
 
 /**

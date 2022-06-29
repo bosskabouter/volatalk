@@ -398,7 +398,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
       //if not able to send directly, push and save
       //always push for test
       if (!sent) console.debug('Pushing anyway');
-      const pushed = await pushMessage(msg, contact, this.#user);
+      const pushed = await pushMessage(msg, contact);
       msg.dateTimePushed = pushed;
       this.#db.messages.put(msg);
     });

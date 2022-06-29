@@ -1,4 +1,28 @@
-const VOLA_SECRET_PUSH = '1a2b3c-but there is more to it - &*@^';
+// This service worker can be customized!
+// See https://developers.google.com/web/tools/workbox/modules
+// for the list of available Workbox modules, or add any other
+// code you'd like.
+// You can also remove this file if you'd prefer not to use a
+// service worker, and the Workbox build step will be skipped.
+//TODO USE UNENCRYPTED DB FOR PUSH SECRET KEY EXCHANGE
+//import { AppDatabase } from 'Database/Database';
+
+//---------- SYNC WITH service-worker.ts
+
+let contacts;
+let user;
+
+self.addEventListener('message', (event) => {
+  console.info('Test SW received message event!', event);
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    // This allows the web app to trigger skipWaiting
+    self.skipWaiting();
+  } else if (event.data && event.data.type === 'UPDATE_CONTACTS') {
+    contacts = event.data.contacts;
+    user = event.data.user;
+    console.log('Got User and his contacts!', user, contacts);
+  }
+});
 
 self.addEventListener('push', (pushEvent) => {
   console.info('Push Event received!', pushEvent);
@@ -15,21 +39,17 @@ self.addEventListener('push', (pushEvent) => {
   let payload /* IMessage JSON */ = pushEvent.data.text();
 
   console.info('Unencrypted test push data.text', payload);
-  // payload = decryptString(
-  //   payload,
-  //   generateKeyFromString(VOLA_SECRET_PUSH)
-  // );
+  // payload = decryptString(payload, generateKeyFromString(user.peerid));
   // console.info('Decrypted push', data);
 
   const message = JSON.parse(payload);
 
-  //message.sender contains not only contactid, but also nickname
-  const senderInfo = JSON.parse(message.sender);
-  // const senderInfo: {
-  //   contactid: string;
-  //   nickname: string;
-  //   avatar: string;
-  // } = JSON.parse(message.sender);
+  const contact = contacts.get(message.sender);
+
+  if (!contact) {
+    console.warn('Received Push from unknown contact', payload);
+    return;
+  } else console.log('Found contacts for pushmessage ', contact);
 
   const actionOpen = {
     title: 'Open',
@@ -42,17 +62,17 @@ self.addEventListener('push', (pushEvent) => {
 
   const notificationOptions = {
     body: message.payload,
-    badge: senderInfo.avatar,
-    //    image: senderInfo.avatar,
+    badge: contact.avatar,
+    //    image: contact.avatar,
     //    icon: 'https://volatalk.org/mstile-150x150.png',
-    icon: senderInfo.avatar,
+    icon: contact.avatar,
     vibrate: [1000, 2000, 3000, 4000, 5000],
     actions: [actionOpen, actionClose],
     requireInteraction: message.urgent,
     renotify: message.urgent,
-    data: senderInfo.contactid,
+    data: contact.contactid,
   };
-  self.registration.showNotification(senderInfo.nickname, notificationOptions);
+  self.registration.showNotification(contact.nickname, notificationOptions);
 });
 
 /**
