@@ -1,15 +1,12 @@
 import { IContact } from '../../types';
-
 import { useContext, useEffect, useState } from 'react';
 import { Button, Dialog, DialogContent, DialogTitle, Stack } from '@mui/material';
 import { PeerContext } from '../../providers/PeerProvider';
 import { MediaConnection } from 'peerjs';
+import { ContactItem } from 'pages/Contacts/ContactItem';
 import CallingComponent from './CallingComponent';
-
 import CallEndIcon from '@mui/icons-material/CallEnd';
 import PhoneIcon from '@mui/icons-material/Phone';
-
-import { ContactItem } from 'pages/Contacts/ContactItem';
 
 const CalleeComponent = () => {
   const peerManager = useContext(PeerContext);
@@ -43,7 +40,7 @@ const CalleeComponent = () => {
    */
   useEffect(() => {
     //someone calling,
-    if (call?.mediaConnection && accepted === false) {
+    if (call && accepted === false) {
       alert('Declining call from: ' + call.contact.nickname);
       call.mediaConnection.close();
       //setMediaConnection(null);
@@ -57,7 +54,7 @@ const CalleeComponent = () => {
           Accept
         </Button>
         <Button
-          hidden={videoOn}
+          //  hidden={videoOn}
           variant="contained"
           color="secondary"
           onClick={() => {
@@ -67,26 +64,14 @@ const CalleeComponent = () => {
         >
           Audio Only
         </Button>
-        <Button
-          variant="outlined"
-          color="secondary"
-          onClick={() => {
-            call?.mediaConnection.close();
-          }}
-        >
+        <Button variant="outlined" color="secondary" onClick={() => setAccepted(false)}>
           Decline
         </Button>
       </Stack>
     );
   }
 
-  const CallDialog = ({
-    contact,
-    mediaConnection,
-  }: {
-    contact: IContact;
-    mediaConnection: MediaConnection;
-  }) => {
+  const CallDialog = () => {
     const [remoteMediaStream, setRemoteMediaStream] = useState<MediaStream | null>(null);
 
     const [localMediaStream, setLocalMediaStream] = useState<MediaStream | null>(null);
@@ -105,9 +90,9 @@ const CalleeComponent = () => {
      *
      */
     useEffect(() => {
-      if (localMediaStream && contact && peerManager)
-        peerManager.acceptCall(contact, localMediaStream).then(setRemoteMediaStream);
-    }, [contact, localMediaStream]);
+      if (localMediaStream && call?.contact && peerManager)
+        peerManager.acceptCall(call.contact, localMediaStream).then(setRemoteMediaStream);
+    }, [localMediaStream]);
 
     return (
       <div>
@@ -115,9 +100,9 @@ const CalleeComponent = () => {
           <AcceptCall />
         ) : (
           <CallingComponent
-            contact={contact}
+            contact={call.contact}
             videoOn={videoOn}
-            mediaConnection={mediaConnection}
+            mediaConnection={call.mediaConnection}
             localMediaStream={localMediaStream}
             remoteMediaStream={remoteMediaStream}
           />
@@ -131,11 +116,11 @@ const CalleeComponent = () => {
   return call ? (
     <>
       <PhoneIcon color="action" />
-      <Dialog open={call != null}>
+      <Dialog open>
         <DialogTitle>Receiving Call from</DialogTitle>
         <DialogContent>
           <ContactItem contact={call.contact} />
-          <CallDialog contact={call.contact} mediaConnection={call.mediaConnection} />
+          <CallDialog />
         </DialogContent>
       </Dialog>
     </>

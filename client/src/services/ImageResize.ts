@@ -13,7 +13,6 @@ export async function resizeFileUpload2(
 
   QUALITY = 1
 ): Promise<string> {
-  const MIME_TYPE = 'image/png';
   const blobURL = URL.createObjectURL(file);
   const img = new Image();
   img.src = blobURL;
@@ -22,6 +21,17 @@ export async function resizeFileUpload2(
     // Handle the failure properly
     console.log('Cannot load image');
   };
+  return resizeImg(img, MAX_WIDTH, MAX_HEIGHT, QUALITY);
+}
+
+export async function resizeImg(
+  img: HTMLImageElement,
+  MAX_WIDTH: number,
+  MAX_HEIGHT: number,
+  QUALITY = 1
+): Promise<string> {
+  const MIME_TYPE = 'image/png';
+
   return new Promise((resolve) => {
     img.onload = function () {
       URL.revokeObjectURL(img.src);
@@ -34,7 +44,6 @@ export async function resizeFileUpload2(
       canvas.toBlob(
         (blob) => {
           // Handle the compressed image. es. upload or save in local state
-          displayInfo('Original file', file);
           blob && displayInfo('Compressed file', blob);
         },
         MIME_TYPE,
@@ -44,6 +53,7 @@ export async function resizeFileUpload2(
     };
   });
 }
+
 function calculateSize(img: HTMLImageElement, maxWidth: number, maxHeight: number) {
   let width = img.width;
   let height = img.height;

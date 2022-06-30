@@ -1,0 +1,26 @@
+import Coralogix from 'coralogix-logger';
+
+// global confing for application name, private key, subsystem name
+const config = new Coralogix.LoggerConfig({
+  applicationName: 'VolaTALK',
+  privateKey: 'da17f705-9706-64a2-41f3-66c9f835555b',
+  subsystemName: 'PWA',
+});
+
+Coralogix.CoralogixLogger.configure(config);
+
+// create a new logger with category
+const logger = new Coralogix.CoralogixLogger('My Vola Category');
+
+// create a log
+
+export function coraLogixlog(method: string, claz: string, txt: string) {
+  const log = new Coralogix.Log({
+    severity: Coralogix.Severity.info,
+    className: claz,
+    methodName: method,
+    text: txt,
+  });
+  // send log to coralogix
+  logger.addLog(log);
+}

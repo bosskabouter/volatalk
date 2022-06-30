@@ -11,8 +11,7 @@ export default function Share(u: string) {
    */
   function copyTextToClipboard() {
     if (navigator.clipboard) {
-      navigator.clipboard.writeText(u);
-      alert('Copied to clipboard!');
+      navigator.clipboard.writeText(u).then(() => alert('Invite copied to clipboard!'));
     } else {
       alert('Cannot share data without clipboard');
     }

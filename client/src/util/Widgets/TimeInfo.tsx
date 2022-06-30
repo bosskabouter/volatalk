@@ -2,7 +2,7 @@
 import { css } from '@emotion/react';
 import { RefObject, useEffect, useRef, useState } from 'react';
 
-import { Box, Stack, Typography } from '@mui/material';
+import { Stack, Typography } from '@mui/material';
 import { getLocalTimeString } from 'services/Generic';
 import { isMobile } from 'react-device-detect';
 /**

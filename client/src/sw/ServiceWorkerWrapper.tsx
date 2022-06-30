@@ -76,9 +76,13 @@ const ServiceWorkerWrapper: FC = () => {
           user: JSON.parse(JSON.stringify(user)),
           contacts: contacts,
         };
-        console.log('messageSW', msg);
-        wb.current?.messageSW(msg);
+        console.log('UPDATING_CONTACTS');
+
+        wb.current?.messageSW(msg).then((res) => {
+          console.log('UDATED', res);
+        });
       })
+
       .catch((e) => {
         console.error('Error registering service worker', e);
       });
@@ -98,18 +102,12 @@ const ServiceWorkerWrapper: FC = () => {
   }, [db, pushSubscription, registration, setUser, user]);
 
   const reloadPage = () => {
-    console.info(
-      `'serviceWorker' in navigator && wb.current !== null`,
-      'serviceWorker' in navigator,
-      wb.current
-    );
-    if ('serviceWorker' in navigator && wb.current !== null) {
+    if ('serviceWorker' in navigator && wb.current) {
       wb.current.addEventListener('controlling', (event) => {
         console.info('Controlling', event);
         setShowReload(false);
         window.location.reload();
       });
-
       wb.current.messageSkipWaiting();
     }
   };

@@ -17,7 +17,7 @@ export default async function pushMessage(message: IMessage, contact: IContact):
 
   return new Promise((resolve, _reject) => {
     const copiedMessage: IMessage = JSON.parse(JSON.stringify(message));
-    const TRUNCATE_PAYLOAD_LIMIT = 3 * 1000;
+    const TRUNCATE_PAYLOAD_LIMIT = 2 * 1000;
     if (copiedMessage.payload.length > TRUNCATE_PAYLOAD_LIMIT) {
       copiedMessage.payload =
         copiedMessage.payload.substring(0, TRUNCATE_PAYLOAD_LIMIT) + '... (open to read more)';

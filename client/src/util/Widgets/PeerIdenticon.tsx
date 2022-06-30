@@ -10,14 +10,19 @@ export const PeerIdenticon = ({ peerid }: { peerid: string }) => {
   };
 
   const idString = cyrb53(peerid); //.substring(207, 245);
-  console.log(idString);
 
   const identicon = 'data:image/svg+xml;base64,' + new Identicon(idString, options).toString();
-  console.info('identicon', identicon);
+  console.debug('identicon', idString, identicon);
   return identicon;
 };
 
-const cyrb53 = function (str: string, seed = 0): string {
+/**
+ * https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript/52171480#52171480
+ * @param str
+ * @param seed
+ * @returns
+ */
+export const cyrb53 = function (str: string, seed = 0): string {
   let h1 = 0xdeadbeef ^ seed,
     h2 = 0x41c6ce57 ^ seed;
   for (let i = 0, ch; i < str.length; i++) {

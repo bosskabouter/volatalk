@@ -38,14 +38,14 @@ const ContactList = () => {
    */
   useEffect(() => {
     if (!peerManager) return;
-    console.debug('useEffect onMessage/onContactChange');
+    console.debug('useEffect handleNewContact');
 
-    const updateContactList = (newContact: IContact) => {
+    const handleNewContact = (newContact: IContact) => {
       setContactList((prevCtcList) => [...prevCtcList, newContact]);
     };
-    peerManager.addListener('onNewContact', updateContactList);
+    peerManager.addListener('onNewContact', handleNewContact);
     return () => {
-      peerManager.removeListener('onNewContact', updateContactList);
+      peerManager.removeListener('onNewContact', handleNewContact);
     };
   }, [peerManager]);
 
@@ -65,14 +65,18 @@ const ContactList = () => {
         dense={true}
         subheader={<ContactListHeader />}
       >
-        {contactList.length > 0 &&
-          contactList.map((contact) => {
-            return <ContactListItem contact={contact} key={contact.peerid} />;
-          })}
+        {contactList.map((contact) => {
+          return <ContactListItem contact={contact} key={contact.peerid} />;
+        })}
       </List>
     </div>
   ) : (
-    <Box>
+    <Box
+      sx={{
+        pt: 7,
+        '& ul': { padding: 0 },
+      }}
+    >
       <Typography variant="h5">No contacts yet</Typography>
       <Typography variant="button"></Typography>
 

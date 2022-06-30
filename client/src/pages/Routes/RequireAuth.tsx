@@ -42,6 +42,7 @@ export const RequireAuth = () => {
     if (!existingAccount) {
       return <Navigate to="/accountSetup" replace />;
     } else if (isSecure) {
+      //pinsecured account, goto login
       return <Navigate to="/login" replace />;
     } else {
       //user didnt secure account. load user and set in context. Normally login would do this.

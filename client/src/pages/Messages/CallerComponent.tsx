@@ -1,16 +1,17 @@
 import { useContext, useEffect, useState } from 'react';
 import { Dialog, DialogTitle, Typography } from '@mui/material';
 import { useParams } from 'react-router-dom';
-import { DatabaseContext } from '../../providers/DatabaseProvider';
+import { MediaConnection } from 'peerjs';
+
+import { useDatabase } from '../../providers/DatabaseProvider';
 import { ContactItem } from '../Contacts/ContactItem';
 import { PeerContext } from '../../providers/PeerProvider';
 import { IContact } from '../../types';
 import CallingComponent from './CallingComponent';
-import { MediaConnection } from 'peerjs';
 
 const CallerComponent = ({ videoOn }: { videoOn: boolean }) => {
   const peerManager = useContext(PeerContext);
-  const db = useContext(DatabaseContext);
+  const db = useDatabase();
   const contactId = useParams().contactid;
 
   const [contact, setContact] = useState<IContact>();

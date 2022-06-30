@@ -66,14 +66,11 @@ export default function Header() {
             <Link to="/">
               <Avatar
                 src={logo}
-                variant="rounded"
-                color="secondary"
+                variant="circular"
                 sx={{
-                  width: 36,
-                  height: 36,
-                  border: 0,
-
-                  animation: '3s ease-in 1s infinite reverse both running slidein',
+                  width: 45,
+                  height: 45,
+                  border: 1,
                 }}
               ></Avatar>
             </Link>

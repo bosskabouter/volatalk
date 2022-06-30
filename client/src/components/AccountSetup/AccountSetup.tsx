@@ -66,7 +66,7 @@ const AccountSetup = () => {
     nickname: yup
       .string()
       .defined('Enter a nice nickname people will recognize')
-      .min(3, 'Nickname must be at least 6 characters')
+      .min(2, 'Nickname must be at least 2 characters')
       .trim(),
 
     security: yup.object({
