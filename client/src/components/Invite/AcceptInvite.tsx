@@ -88,9 +88,9 @@ export default function AcceptInvite(props: { invite: string }) {
 
   function isOnlineDesc() {
     if (senderOnline === null) return 'Trying to connect with invitor... ';
-    else if (senderOnline) return 'The person Invitator is online right now!';
+    else if (senderOnline) return 'Invitor is online right now!';
     else
-      return 'The person who sent the invitation appears to be offline right now. Go ahead and save the new contact for now. Once the other person accepts your connection, you will get notified!';
+      return 'The person who sent the invitation appears to be offline right now. Save the new contact for now. Once the other accepts your connection, you will get notified!';
   }
 
   if (!receivedInvite) {

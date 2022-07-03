@@ -24,18 +24,18 @@ export default function PeerProvider({ children }: IPeerProviderProps) {
   const [peerManager, setPeerManager] = useState<PeerManager | null>(null);
 
   function messageHandler(message: IMessage) {
-    console.log('MessageHandler PeerProvider', message);
+    console.debug('MessageHandler PeerProvider', message);
   }
 
   useEffect(() => {
     if (!userContext.user || !db || peerManager) return;
 
     function newContactHandle(contact: IContact) {
-      console.log('NewContactHandler PeerProvider', contact);
+      console.info('New Contact', contact);
       peerManager?.isConnected(contact);
     }
     function contactOnlineHandle(statchange: { contact: IContact; status: boolean }) {
-      console.log('ContactOnlineHandler PeerProvider', statchange);
+      console.info('Contact Online', statchange);
       peerManager?.isConnected(statchange.contact);
     }
     function handleStatusChange(status: boolean) {

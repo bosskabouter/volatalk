@@ -16,10 +16,9 @@ export const DatabaseContext = createContext<AppDatabase | null>(null);
 export const useDatabase = () => useContext(DatabaseContext);
 
 export function setupDatabase() {
-  console.log('Setting up DB');
   // Creates the initial database
   const db = new AppDatabase();
-
+  console.info('Setup DB', db);
   // creates the binary string to be used as the key
   const binaryString = process.env.REACT_APP_DB_PIN ?? 'test';
   const cryptoKey = new Uint8Array(binaryString.length);

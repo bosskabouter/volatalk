@@ -1,9 +1,7 @@
 import Badge from '@mui/material/Badge';
 import Avatar from '@mui/material/Avatar';
 import { AvatarGroup, Box } from '@mui/material';
-import { toSvg } from 'jdenticon';
-//TODO use one identicon library :)
-//import { identicon } from 'minidenticons';
+import { PeerIdenticon } from 'util/Widgets/PeerIdenticon';
 const Identification = (props: {
   id: string;
   status?: boolean;
@@ -29,7 +27,10 @@ const Identification = (props: {
         >
           {props.avatar && <Avatar src={props.avatar} sx={{ width: 54, height: 54 }}></Avatar>}
         </Badge>
-        <span dangerouslySetInnerHTML={{ __html: toSvg(props.id, 36) }} />
+        <Avatar
+          src={PeerIdenticon({ peerid: props.id })}
+          sx={{ width: 36, height: 36, border: 3 }}
+        />
       </AvatarGroup>
     </Box>
   );

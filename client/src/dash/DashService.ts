@@ -11,33 +11,28 @@ import Dash from 'dash';
  *
  */
 export class DashService {
+  client;
   constructor() {
     const clientOpts = {
       network: 'testnet',
       wallet: {
-        mnemonic:
-          'arena light cheap control apple buffalo indicate rare motor valid accident isolate',
+        //        mnemonic:          'arena light cheap control apple buffalo indicate rare motor valid accident isolate',
         unsafeOptions: {
           skipSynchronizationBeforeHeight: 650000, // only sync from early-2022
         },
       },
     };
-    const client = new Dash.Client(clientOpts);
+    this.client = new Dash.Client(); //clientOpts);
+  }
 
-    async function registerName() {
-      const { platform } = client;
+  async registerName() {
+    const { platform } = this.client;
 
-      const identity = await platform.identities.get('an identity ID goes here');
-      return platform.names.register(
-        '<identity name goes here>.dash',
-        { dashUniqueIdentityId: identity.getId() },
-        identity
-      );
-    }
-
-    registerName()
-      .then((d) => console.log('Name registered:\n', d.toJSON()))
-      .catch((e) => console.error('Something went wrong:\n', e))
-      .finally(() => client.disconnect());
+    const identity = await platform.identities.get('an identity ID goes here');
+    return platform.names.register(
+      '<identity name goes here>.dash',
+      { dashUniqueIdentityId: identity.getId() },
+      identity
+    );
   }
 }

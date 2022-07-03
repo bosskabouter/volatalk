@@ -6,7 +6,8 @@ import { generateSignature, peerIdToPublicKey, verifyMessage } from './CryptoSer
 import { default as Peer, DataConnection, MediaConnection } from 'peerjs';
 import { decryptString, encryptString, generateKeyFromString } from 'dha-encryption';
 import { verifyAddress } from './UserService';
-import { IUserProfile } from 'types';
+import { IContact, IContactResume, IMessage, IUserProfile } from 'types';
+import pushMessage from './PushMessage';
 
 export interface PeerManagerEvents {
   statusChange: (status: boolean) => void;
@@ -27,9 +28,8 @@ interface ConnectionMetadata {
 /**
  * Stateful module class to hook into react peerprovider. React components can listen to events fired through PeerManagerEvents
  */
-export class PeerManager extends Peer {
+export class SigningPeer extends Peer {
   #user: IUserProfile;
-  #peer: Peer;
 
   /*
    * https://peerjs.com/docs/#peerconnections
@@ -39,7 +39,7 @@ export class PeerManager extends Peer {
 
   #calls = new Map<string /*peerid*/, MediaConnection>();
 
-  #signallingServers = [
+ static  #signallingServers = [
     {
       host: 'peer.pm',
       port: 999,
@@ -47,8 +47,7 @@ export class PeerManager extends Peer {
       secure: true,
       key: 'volakey',
       debug: 3,
-
-      //secure signature, does it arrive?
+      token: 'secure signature, to prevent identity theft by providing a signed token to ingress on peerserver'
     },
     {
       //second volatalk instance
@@ -63,32 +62,27 @@ export class PeerManager extends Peer {
       debug: 1,
     },
   ];
-  #usingSignallingServer = this.#signallingServers[2];
+ static  #usingSignallingServer = this.#signallingServers[2];
 
-  constructor(user: IUserProfile, db: AppDatabase) {
-    super(user.peerid);
+  constructor(user: IUserProfile) {
+    super(user.peerid, SigningPeer.#usingSignallingServer);
     this.#user = user;
-    this.#db = db;
-
-    //TODO connect several peers
-    this.#peer = this.#initSignallingServer();
   }
 
   #initSignallingServer() {
-    this.#peer = new Peer(this.#user.peerid, this.#usingSignallingServer);
-    this.#peer.on('open', (pid) => {
-      console.log('Peer connected', this.#peer.id);
+    super.on('open', (pid) => {
+      console.log('Peer connected', super.id);
       if (pid !== this.#user.peerid) {
         throw Error('Signaller assigned different id: ' + pid);
       }
       console.info('Emit statusChange ONLINE');
       this.emit('statusChange', true);
-      this.#db.contacts.each((contact: IContact) => {
-        console.info('Connecting contact', contact);
-        this.connectContact(contact);
-      });
+      // this.#db.contacts.each((contact: IContact) => {
+      //   console.info('Connecting contact', contact);
+      //   this.connectContact(contact);
+      // });
     });
-    this.#peer.on('connection', async (conn: DataConnection) => {
+    super.on('connection', async (conn: DataConnection) => {
       conn.on('open', async () => {
         console.debug('Connection open', conn);
         const contact = await this.#contactConnected(conn);
@@ -100,7 +94,7 @@ export class PeerManager extends Peer {
         }
       });
     });
-    this.#peer.on('call', async (mediaConnection: MediaConnection) => {
+    super.on('call', async (mediaConnection: MediaConnection) => {
       //verify id someone legit is
       console.info('Someone calling', mediaConnection);
       const contact = await this.#contactConnected(mediaConnection);
@@ -111,16 +105,16 @@ export class PeerManager extends Peer {
         mediaConnection.close();
       }
     });
-    this.#peer.on('disconnected', () => {
+    super.on('disconnected', () => {
       console.warn(`this peer disconnected. Emit statusChange OFFLINE.`);
       this.emit('statusChange', false);
     });
-    this.#peer.on('close', () => {
+    super.on('close', () => {
       console.warn('this peer closed. Emitting statusChange OFFLINE');
       this.emit('statusChange', false);
     });
 
-    this.#peer.on('error', (err: any) => {
+    super.on('error', (err: any) => {
       if (err.type === 'peer-unavailable') {
         console.warn('Contact unavailable. Try again later...');
       } else {
@@ -255,7 +249,7 @@ export class PeerManager extends Peer {
       console.info(`received DATA:` + data);
       if (typeof data === 'string') {
         const dataDecoded = JSON.parse(data);
-        const key = generateKeyFromString('1234');
+        const key = generateKeyFromString(contact.signature);
         const decryptedString = decryptString(dataDecoded, key);
         this.#handleMessageData(decryptedString, contact);
 
@@ -350,7 +344,7 @@ export class PeerManager extends Peer {
     /**
      * Sending (updated) personal user info (nick, avatar, etc.) in the fom of a contact within connection metadata to receiver.
      */
-    const connection = this.#peer.connect(contact.peerid, {
+    const connection = super.connect(contact.peerid, {
       metadata: this.#signConnectionMetadata(contact),
     });
     connection.on('open', () => {
@@ -444,7 +438,7 @@ export class PeerManager extends Peer {
    * @returns Verifies if peer exists and is not disconnected
    */
   isOnline(): boolean {
-    return this.#peer && !this.#peer.disconnected;
+    return this.#peer && !super.disconnected;
   }
   /* Just a quick test (without signature to see if peer is online)
    * once the  invitation is accepted, we'll reconnect with a real signature.
@@ -452,7 +446,7 @@ export class PeerManager extends Peer {
    */
   isPeerOnline(peerid: string): Promise<boolean> {
     return new Promise((resolve, _reject) => {
-      const conn = this.#peer.connect(peerid);
+      const conn = super.connect(peerid);
       if (!conn) resolve(false);
 
       conn.on('open', () => {
@@ -465,7 +459,7 @@ export class PeerManager extends Peer {
   async call(contact: IContact, localMediaStream: MediaStream): Promise<MediaStream | null> {
     return new Promise((resolve, _reject) => {
       console.debug('Calling contact', contact, localMediaStream);
-      const mc = this.#peer.call(contact.peerid, localMediaStream, {
+      const mc = super.call(contact.peerid, localMediaStream, {
         metadata: this.#signConnectionMetadata(contact),
       });
       this.#calls.set(contact.peerid, mc);
@@ -507,6 +501,6 @@ export class PeerManager extends Peer {
     console.warn('Disconnecting Peer Gracefully.');
 
     this.#connectedContacts.forEach((conn) => conn.close());
-    this.#peer.destroy();
+    super.destroy();
   }
 }

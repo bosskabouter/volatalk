@@ -3,7 +3,7 @@ import { round, kelvinToCelcius } from './Generic';
 
 const OPENWEATHER_APIKEY = '420408196cb33ae10825f1019e75bcb2';
 
-const TIMEOUT_GPS = 15 * 1000;
+const TIMEOUT_GPS = 60 * 1000;
 
 export async function requestFollowMe(): Promise<GeolocationCoordinates | null> {
   return new Promise((resolve, _reject) => {

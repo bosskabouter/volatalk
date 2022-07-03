@@ -72,21 +72,21 @@ let contacts: Map<string, IContact>;
 let user: IUserProfile;
 
 self.addEventListener('message', (event) => {
-  console.info('SW received message event!', event);
+  console.debug('SW received message event!', event);
   if (event.data && event.data.type === 'SKIP_WAITING') {
     // This allows the web app to trigger skipWaiting
     self.skipWaiting();
   } else if (event.data.type === 'UPDATE_CONTACTS') {
     contacts = event.data.contacts;
     user = event.data.user;
-    console.log('Got User and his contacts!', user, contacts);
+    console.info('ServiceWorker received User and his contacts!', user, contacts);
   }
 });
 
 self.addEventListener('push', (pushEvent) => {
   console.info('Push Event received!', pushEvent);
-  console.info('pushEvent.target', pushEvent.target, pushEvent.currentTarget);
-  console.info('pushEvent.timeStamp', pushEvent.timeStamp);
+  console.debug('pushEvent.target', pushEvent.target, pushEvent.currentTarget);
+  console.debug('pushEvent.timeStamp', pushEvent.timeStamp);
 
   if (!pushEvent.data || !pushEvent.data.text()) {
     console.warn('No push data available');
@@ -96,9 +96,9 @@ self.addEventListener('push', (pushEvent) => {
   //production payload is encrypted
   let payload /* encrypted string */ = pushEvent.data.text();
 
-  console.info('Encrypted push data.text', payload);
+  console.debug('Encrypted push data.text', payload);
   payload = decryptString(payload, generateKeyFromString(user.peerid));
-  console.info('Decrypted push data.text', payload);
+  console.debug('Decrypted push data.text', payload);
 
   const message: IMessage = JSON.parse(payload);
 
@@ -141,13 +141,13 @@ self.addEventListener('push', (pushEvent) => {
 self.addEventListener(
   'notificationclick',
   function (event) {
-    console.info('Clicked pushed notification', event);
+    console.debug('Clicked pushed notification', event);
     event.notification.close();
 
     console.log('self.location.origin', self.location.origin);
     event.waitUntil(
       self.clients.matchAll({ type: 'window' }).then((clientsArr) => {
-        console.log('Open windows: ' + clientsArr);
+        console.debug('Open windows: ' + clientsArr);
         // If a Window tab matching the targeted URL already exists, focus that;
         const hadWindowToFocus = clientsArr.some((windowClient) =>
           windowClient.url.includes(self.location.origin) ? (windowClient.focus(), true) : false

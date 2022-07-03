@@ -49,7 +49,7 @@ export const RequireAuth = () => {
       if (db && !userCtx.user)
         db.userProfile.get(1).then((user) => {
           if (user) {
-            console.info('Setting user in Context', user);
+            console.info('User in Context', user);
             userCtx.setUser(user);
             setAuthenticated(true);
           }

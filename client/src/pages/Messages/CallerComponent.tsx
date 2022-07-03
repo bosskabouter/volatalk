@@ -8,6 +8,7 @@ import { ContactItem } from '../Contacts/ContactItem';
 import { PeerContext } from '../../providers/PeerProvider';
 import { IContact } from '../../types';
 import CallingComponent from './CallingComponent';
+import { RingingIcon } from './RingingIcon';
 
 const CallerComponent = ({ videoOn }: { videoOn: boolean }) => {
   const peerManager = useContext(PeerContext);
@@ -30,7 +31,7 @@ const CallerComponent = ({ videoOn }: { videoOn: boolean }) => {
         .getUserMedia({ video: videoOn, audio: true })
         .then(setLocalMediaStream);
     return () => {
-      localMediaStream?.getTracks().forEach(localMediaStream.removeTrack);
+      //localMediaStream?.getTracks().forEach(localMediaStream.removeTrack);
     };
   }, [localMediaStream, videoOn]);
 
@@ -39,10 +40,18 @@ const CallerComponent = ({ videoOn }: { videoOn: boolean }) => {
    */
   useEffect(() => {
     if (!contactId) throw Error('No contactId param');
-    if (!peerManager || !db) return;
+    if (!peerManager || !db || contact) return;
 
-    db.getContact(contactId).then(setContact);
-  }, [contactId, db, peerManager]);
+    const loadContact = async (id: string) => {
+      const ctc = await db.getContact(id);
+      if (!ctc) {
+        throw Error('Unknown contact id: ' + id);
+      } else {
+        setContact(ctc);
+      }
+    };
+    loadContact(contactId);
+  }, [contact, contactId, db, peerManager]);
 
   /**
    * Check if user is online before making the call
@@ -64,7 +73,9 @@ const CallerComponent = ({ videoOn }: { videoOn: boolean }) => {
   }, [contactId, peerManager, videoOn, remoteMediaStream, db, contact, localMediaStream]);
   return contact ? (
     <Dialog open>
-      <DialogTitle>Calling with</DialogTitle>
+      <DialogTitle>
+        <RingingIcon></RingingIcon>Calling with
+      </DialogTitle>
 
       <ContactItem contact={contact} />
 

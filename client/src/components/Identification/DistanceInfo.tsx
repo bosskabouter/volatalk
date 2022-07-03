@@ -66,16 +66,17 @@ export const DistanceInfo = ({ contact }: { contact: IContact }) => {
 
   return distance && location ? (
     <Typography variant="subtitle1" noWrap>
-      <Stack direction={{ xs: 'column', md: 'row' }}>
+      <Stack direction={{ xs: 'row', md: 'column' }}>
         <span>
           <BearingIcon
             style={bearingStyle}
             titleAccess={`north (${Math.round(north)}) + bearing (${bearing}) = ${north + bearing}`}
           />
-          {round(distance, 0)} km {location.city + ' '}
           <Box component="span" sx={{ display: { xs: 'none', md: 'block' } }}>
-            {location.flag}
+            {round(distance, 0)} km {location.city + ' '}
           </Box>
+
+          {location.flag}
         </span>
         {weather && (
           <span>

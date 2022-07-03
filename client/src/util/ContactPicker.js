@@ -5,7 +5,7 @@ const supported = 'contacts' in navigator && 'ContactsManager' in window;
 async function getContacts() {
   if (supported) {
     const contacts = await navigator.contacts.select(props, opts);
-    console.log(contacts);
+    console.debug(contacts);
     return contacts;
   }
 }

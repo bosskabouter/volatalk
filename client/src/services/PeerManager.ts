@@ -81,7 +81,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
   #initSignallingServer() {
     this.#peer = new Peer(this.#user.peerid, this.#usingSignallingServer);
     this.#peer.on('open', (pid) => {
-      console.log('Peer connected', this.#peer.id);
+      console.info('Peer connected', this.#peer.id);
       if (pid !== this.#user.peerid) {
         throw Error('Signaller assigned different id: ' + pid);
       }
@@ -109,6 +109,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
       console.info('Someone calling', mediaConnection);
       const contact = await this.#contactConnected(mediaConnection);
       if (contact) {
+        console.info(`Mom, ${contact.nickname} on the phone!`);
         this.#calls.set(contact.peerid, mediaConnection);
         this.emit('onIncomingCall', contact, mediaConnection);
       } else {
@@ -181,7 +182,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
       return newContact;
     } else {
       const updatedContact = this.#receiveRegisteredContact(contact, conn);
-      console.info('Emitting onContactStatusChange');
+      console.debug('Emitting onContactStatusChange');
       this.emit('onContactStatusChange', { contact: updatedContact, status: true });
       return updatedContact;
     }
@@ -249,7 +250,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
     } else {
       //conn.send('Hi ' + contact.nickname + ', ' + this.user.nickname + ' is online!');
 
-      console.info('Accepted connection from known peer', contact, conn);
+      console.debug('Accepted connection from known peer', contact, conn);
     }
     return contact;
   }
@@ -257,7 +258,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
   #handleConnection(connection: DataConnection, contact: IContact) {
     this.#connectedContacts.set(contact.peerid, connection);
     connection.on('data', (data) => {
-      console.info(`received DATA:` + data);
+      console.debug(`received DATA:` + data);
       if (typeof data === 'string') {
         const dataDecoded = JSON.parse(data);
         const key = generateKeyFromString('1234');
@@ -417,7 +418,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
     const conn = this.#connectedContacts.get(msg.receiver);
     return new Promise((resolve, _reject) => {
       if (conn && conn.open) {
-        console.info('Sending message', MessageEvent);
+        console.debug('Sending message', MessageEvent);
 
         conn.send(JSON.stringify(stringToEncrypt));
         msg.dateTimeSent = new Date().getTime();
@@ -488,22 +489,29 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
     return new Promise((resolve, reject) => {
       const mediaConnection = this.#calls.get(contact.peerid);
       if (mediaConnection) {
-        mediaConnection.answer(localMediaStream); // Answer the call with an A/V stream.
+        mediaConnection.answer(localMediaStream); // Answer the call with an local A and/or V stream.
         mediaConnection.on('stream', (rms) => {
-          console.debug('Got remote media stream', rms);
+          console.debug('PeerManager answered and got a remote media stream', rms);
           resolve(rms);
         });
       } else reject('Cannot accept call. No remote MediaConnection (Contact not calling)');
     });
   }
+
+  /**
+   *
+   * @param contact
+   * @returns
+   */
   disconnectCall(contact: IContact): boolean {
     const mediaConnection = this.#calls.get(contact.peerid);
     if (mediaConnection) {
       mediaConnection.close();
-      console.log('Closed media Connection with contact', contact, mediaConnection);
+      console.info('Closed media Connection with contact', contact, mediaConnection);
     }
     return mediaConnection != null;
   }
+
   /**
    * Checks if connection exists and open with known contact
    * @param contact

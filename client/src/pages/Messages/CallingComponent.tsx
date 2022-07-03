@@ -10,7 +10,7 @@ const CallingComponent = ({
   contact,
   videoOn,
   mediaConnection,
-  localMediaStream,
+  localMediaStream, //not used for now
   remoteMediaStream,
 }: {
   contact: IContact;
@@ -21,57 +21,45 @@ const CallingComponent = ({
 }) => {
   const peerManager = useContext(PeerContext);
 
-  const remoteMediaElement = useRef<HTMLVideoElement>(null);
+  const remoteVideoElement = useRef<HTMLVideoElement>(null);
+  const remoteAudioElement = useRef<HTMLAudioElement>(null);
 
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
+  const MediaElement = ({ source }: { source: MediaStream }) => {
+    /**
+     *
+     */
+    useEffect(() => {
+      //setVideoOn(remoteMediaStream.getVideoTracks().length > 0);
+
+      const media = videoOn ? remoteVideoElement.current : remoteAudioElement.current;
+      if (media) {
+        media.addEventListener('loadedmetadata', () => {
+          // Play the video as it loads
+          console.debug('media.play!');
+          media.play().then(() => console.info('Playing media'));
+        });
+        media.srcObject = source;
+      }
+    }, [source]);
+
+    return videoOn ? (
+      <video ref={remoteVideoElement} autoPlay={true} controls />
+    ) : (
+      <audio ref={remoteAudioElement} autoPlay={true} controls />
+    );
+  };
 
   /**
    * Reset an ongoing call
    */
   const hangup = () => {
     mediaConnection.close();
-    localMediaStream.getTracks().forEach(localMediaStream.removeTrack);
+    //localMediaStream.getTracks().forEach(localMediaStream.removeTrack);
     peerManager?.disconnectCall(contact);
   };
-
-  /**
-   *
-   */
-  useEffect(() => {
-    if (!remoteMediaStream || !remoteMediaElement.current) return;
-    //setVideoOn(remoteMediaStream.getVideoTracks().length > 0);
-
-    remoteMediaElement.current.srcObject = remoteMediaStream;
-    remoteMediaElement.current.play();
-  }, [remoteMediaStream]);
-
-  const MediaElement = () => {
-    return videoOn ? (
-      <video ref={remoteMediaElement} autoPlay controls />
-    ) : (
-      <audio ref={remoteMediaElement} autoPlay controls />
-    );
-  };
-
-  /**
-   *
-   */
-  useEffect(() => {
-    console.debug('useEffect remoteVideoElement');
-
-    if (remoteMediaElement.current && remoteMediaStream) {
-      remoteMediaElement.current.srcObject = remoteMediaStream;
-      remoteMediaElement.current.play();
-      console.info('Set remoteVideoElement');
-    }
-    return () => {
-      console.warn('leaving call?');
-      if (remoteMediaStream) {
-        console.info('Should Close connection now?');
-      }
-    };
-  }, [remoteMediaStream]);
 
   /**
    *
@@ -80,11 +68,11 @@ const CallingComponent = ({
     <Dialog open={mediaConnection != null} fullScreen={fullScreen}>
       <DialogContent>
         <ContactListItem contact={contact}></ContactListItem>
-        <MediaElement />
+        <MediaElement source={remoteMediaStream} />
         <Button color="secondary" onClick={hangup}>
           Hangup
         </Button>
-        <Button color="secondary" onClick={() => alert('Not yet...')}>
+        <Button color="secondary" onClick={() => alert('Not yet implemented...')}>
           Record
         </Button>
       </DialogContent>

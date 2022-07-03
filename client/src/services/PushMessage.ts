@@ -11,7 +11,7 @@ const WEBPUSH_SERVER_ADDRESS = 'https://peered.me:432/push';
  */
 export default async function pushMessage(message: IMessage, contact: IContact): Promise<number> {
   if (!contact.pushSubscription) {
-    console.log(`Contact without subscription. Not pushing message.`, message, contact);
+    console.info(`Contact without subscription. Not pushing message.`, message, contact);
     return 0;
   }
 
@@ -37,7 +37,7 @@ export default async function pushMessage(message: IMessage, contact: IContact):
       payload: payload,
     });
 
-    console.log('Posting Push message', WEBPUSH_SERVER_ADDRESS, b);
+    console.debug('Posting Push message', WEBPUSH_SERVER_ADDRESS, b);
     fetch(WEBPUSH_SERVER_ADDRESS, {
       method: 'POST',
       body: b, //corresponds to pushEvent.data.text() on service-worker (receiver) side
@@ -45,7 +45,7 @@ export default async function pushMessage(message: IMessage, contact: IContact):
     })
       .then((resp) => {
         const success = resp.ok;
-        console.log(`Post Push Message - success(${success})`, resp);
+        console.info(`Post Push Message - success(${success})`, resp);
         resolve(success ? new Date().getTime() : resp.status);
       })
       .catch((err) => {

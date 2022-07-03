@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="270" height="270" id="vtlogo">
+	<!-- Thank you https://www.freeconvert.com/svg-converter/ -->
+	<defs>
+		<style>
+			#vtlogo {
+			fill:red;
+			animation-name: example;
+			animation-duration: 20s;
+			animation-iteration-count: infinite;
+			animation-direction: alternate;
+			animation-timing-function: ease-in-out;
+			}
+			
+			@keyframes App-logo-spin {
+			from {
+			transform: rotate(0deg);
+			}
+			to {
+			transform: rotate(360deg);
+			}
+			}
+			@keyframes App-logo-rotate {
+			from {
+			transform: rotateY(180deg);
+			}
+			to {
+			transform: rotateY(360deg);
+			}
+			}
+			@media (prefers-reduced-motion: no-preference) {
+			.App-logo {
+			animation: App-logo-spin infinite 20s linear;
+			#  animation: App-logo-rotate infinite 10s;
+			# animation-direction: alternate;
+			animation-timing-function: ease-in-out;
+			}
+			}
+			@keyframes example {
+			from {background-color: red;}
+			to {background-color: yellow;}
+			}
+		</style>
+	</defs>
+	<g transform="">
+		<text class="logoClass App-logo" font-family="'Open Sans', sans-serif" font-size="180" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;">
+			V
+		</text>
+	</g>
+	<g transform="matrix(10.26 0 0 10.11 177.1 285.03)">
+		<text class="logoClass App-logo" font-family="'Open Sans', sans-serif" font-size="18" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;">
+			<tspan x="-17.55" y="-6.14">
+				ola
+			</tspan>
+		</text>
+	</g>
+</svg>

@@ -56,7 +56,7 @@ export const ContactListItem = (props: { contact: IContact }) => {
   useEffect(() => {
     function messageHandler(message: IMessage) {
       if (message.sender === props.contact.peerid) {
-        console.log('Message received in messageHandler', message);
+        console.debug('Message received in messageHandler', message);
         setLastMessage(message);
       }
     }

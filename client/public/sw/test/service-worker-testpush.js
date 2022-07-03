@@ -17,8 +17,8 @@ self.addEventListener('message', (event) => {
 
 self.addEventListener('push', (pushEvent) => {
   console.info('Push Event received!', pushEvent);
-  console.info('pushEvent.target', pushEvent.target, pushEvent.currentTarget);
-  console.info('pushEvent.timeStamp', pushEvent.timeStamp);
+  console.debug('pushEvent.target', pushEvent.target, pushEvent.currentTarget);
+  console.debug('pushEvent.timeStamp', pushEvent.timeStamp);
 
   if (!pushEvent.data || !pushEvent.data.text()) {
     console.warn('No push data available');
@@ -29,7 +29,7 @@ self.addEventListener('push', (pushEvent) => {
   // /service-worker.ts
   let payload /* IMessage JSON */ = pushEvent.data.text();
 
-  console.info('Unencrypted test push data.text', payload);
+  console.debug('Unencrypted test push data.text', payload);
   // payload = decryptString(payload, generateKeyFromString(user.peerid));
   // console.info('Decrypted push', data);
 
@@ -74,13 +74,13 @@ self.addEventListener('push', (pushEvent) => {
 self.addEventListener(
   'notificationclick',
   function (event) {
-    console.info('Clicked pushed notification', event);
+    console.debug('Clicked pushed notification', event);
     event.notification.close();
 
-    console.log('self.location.origin', self.location.origin);
+    console.debug('self.location.origin', self.location.origin);
     event.waitUntil(
       self.clients.matchAll({ type: 'window' }).then((clientsArr) => {
-        console.log('Open windows: ' + clientsArr);
+        console.debug('Open windows: ' + clientsArr);
         // If a Window tab matching the targeted URL already exists, focus that;
         const hadWindowToFocus = clientsArr.some((windowClient) =>
           windowClient.url.includes(self.location.origin) ? (windowClient.focus(), true) : false

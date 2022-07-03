@@ -57,7 +57,7 @@ export default function Invite() {
         setIsGeneratingInvite(true);
         //wait to complete writing the text to generate the heavy inv
         makeInviteURL(user, inviteText).then((inviteURL) => {
-          console.log('Generated new inviteURL', inviteURL);
+          console.info('Generated new inviteURL', inviteURL);
           setInviteUrl(inviteURL.toString());
           setIsGeneratingInvite(false);
           setIsDirty(false);

@@ -66,11 +66,11 @@ export default function Header() {
             <Link to="/">
               <Avatar
                 src={logo}
-                variant="circular"
+                variant="rounded"
                 sx={{
                   width: 45,
                   height: 45,
-                  border: 1,
+                  border: 3,
                 }}
               ></Avatar>
             </Link>

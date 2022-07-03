@@ -40,14 +40,14 @@ export const ContactItem = (props: { contact: IContact }) => {
 
     function messageHandler(message: IMessage) {
       if (message.sender === contact.peerid) {
-        console.log('Message received in messageHandler', message);
+        console.debug('Message received in messageHandler', message);
         setCntUnread((cntUnread ? cntUnread : 0) + 1);
       }
     }
 
     async function onContactStatusChangeHandle(statchange: { contact: IContact; status: boolean }) {
       if (statchange.contact.peerid === contact.peerid) {
-        console.log('contactStatusHandler', statchange);
+        console.debug('contactStatusHandler', statchange);
         setContact(statchange.contact);
         setOnline(statchange.status);
       }

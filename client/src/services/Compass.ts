@@ -51,5 +51,5 @@ madgwick.update = (
   mz?: number | undefined,
   deltaTimeSec?: number | undefined
 ) => {
-  console.log(madgwick.getEulerAngles());
+  console.debug(madgwick.getEulerAngles());
 };

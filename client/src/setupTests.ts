@@ -21,4 +21,5 @@ globalThis.crypto = require('crypto').webcrypto;
 // globalThis.crypto = require('crypto').webcrypto;
 global.TextEncoder = TextEncoder;
 
-//global.TextDecoder = TextDecoder;
+global.TextDecoder = TextDecoder;
+window.URL.createObjectURL = function () {};

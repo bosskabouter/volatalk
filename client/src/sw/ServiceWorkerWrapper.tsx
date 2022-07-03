@@ -33,11 +33,11 @@ const ServiceWorkerWrapper: FC = () => {
 
   const onMessage = (messageEvent: WorkboxMessageEvent) => {
     console.info('onMessage = (messageEvent: WorkboxMessageEvent) => ', messageEvent);
-    console.info('messageEvent.data', messageEvent.data);
-    console.info('messageEvent.target', messageEvent.target);
-    console.info('messageEvent.originalEvent', messageEvent.originalEvent);
-    console.info('messageEvent.ports', messageEvent.ports);
-    console.info('messageEvent.isExternal', messageEvent.isExternal);
+    console.debug('messageEvent.data', messageEvent.data);
+    console.debug('messageEvent.target', messageEvent.target);
+    console.debug('messageEvent.originalEvent', messageEvent.originalEvent);
+    console.debug('messageEvent.ports', messageEvent.ports);
+    console.debug('messageEvent.isExternal', messageEvent.isExternal);
   };
 
   useEffect(() => {
@@ -49,17 +49,17 @@ const ServiceWorkerWrapper: FC = () => {
     }
 
     wb.current = new Workbox(process.env.PUBLIC_URL + serviceWorkerScript);
-    console.info('Created Workbox', wb.current);
+    console.debug('Created Workbox', wb.current);
     wb.current.addEventListener('waiting', onSWUpdate);
     wb.current.addEventListener('message', onMessage);
     wb.current
       .register()
       .then(async (reg) => {
         if (!reg) {
-          console.log('registration failed');
+          console.warn('No registration returned');
           return;
         }
-        console.info('Service worker registration', reg);
+        console.debug('Service worker registration', reg);
         setRegistration(reg);
         if (!user?.usePush) return;
         const ps = await reg.pushManager.subscribe({
@@ -68,7 +68,7 @@ const ServiceWorkerWrapper: FC = () => {
         });
 
         setPushSubscription(ps);
-        console.log('setPushSubscription', ps);
+        console.debug('setPushSubscription', ps);
 
         const contacts = await db?.selectContactsMap();
         const msg = {
@@ -76,10 +76,10 @@ const ServiceWorkerWrapper: FC = () => {
           user: JSON.parse(JSON.stringify(user)),
           contacts: contacts,
         };
-        console.log('UPDATING_CONTACTS');
+        console.debug('UPDATING_CONTACTS', msg);
 
         wb.current?.messageSW(msg).then((res) => {
-          console.log('UDATED', res);
+          console.info('UDATED CONTACTS IN SERVICE WORKER', res);
         });
       })
 
@@ -93,8 +93,7 @@ const ServiceWorkerWrapper: FC = () => {
    */
   useEffect(() => {
     if (!db || !user || !registration || !user.id || !pushSubscription) return;
-    console.info('Overwriting previous push subscription', user.pushSubscription);
-    console.info('New push subscription', pushSubscription);
+    console.debug('Old with New push subscription', user.pushSubscription, pushSubscription);
     user.pushSubscription = pushSubscription;
 
     db.userProfile.update(1, { pushSubscription: pushSubscription });
@@ -104,7 +103,7 @@ const ServiceWorkerWrapper: FC = () => {
   const reloadPage = () => {
     if ('serviceWorker' in navigator && wb.current) {
       wb.current.addEventListener('controlling', (event) => {
-        console.info('Controlling', event);
+        console.debug('Controlling', event);
         setShowReload(false);
         window.location.reload();
       });

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="336" height="280" id='vtlogo'>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" id='vtlogo'>
 <!--Thank you https://www.freeconvert.com/svg-converter/ -->
 <defs><style>
 #vtlogo {
@@ -43,14 +43,13 @@
 </style></defs> 
 
 
-<g transform="matrix(18.54 0 0 18.54 236.52 146.55)" style=""  >
-		<text  class="logoClass App-logo"  xml:space="preserve" font-family="'Open Sans', sans-serif" font-size="18" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-11.07" y="5.65" >V</tspan></text>
+<g transform="matrix(18.54 0 0 18.54 90.52 45.55)" style=""  >
+		<text  class=" App-logo"  xml:space="preserve" font-family="'Yrsa'" font-size="63" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-11.07" y="5.65" dx="6" dy="36">V</tspan></text>
 </g>
-<g transform="matrix(10.26 0 0 10.11 177.1 285.03)" style=""  >
-		<text  class="logoClass App-logo"  xml:space="preserve" font-family="'Open Sans', sans-serif" font-size="18" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-17.55" y="-6.14" >ola</tspan></text>
+<g transform="matrix(10.26 0 0 10.11 45.1 90.03)" style=""  >
+		<text  class="logoClass App-logo"  xml:space="preserve" font-family="'Quicksand'" font-size="45" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-17.55" y="-6.14" dx="6" dy="36">o L a</tspan></text>
 </g>
 
 
 
-<!-- <path class="logoClass App-logo" style="fill:#fffff; stroke:none;" d="M82 76C69.5786 74.6952 59.1813 73.3806 47 77.6667C37.766 80.9156 29.5907 86.9225 24 95C5.77471 121.332 15.6709 162.31 47 173.333C68.0054 180.724 104.376 175.843 111 150L113 150C119.915 178.874 136.758 207.413 147.806 235C151.606 244.49 154.478 259.28 167 259.889C179.03 260.474 182.466 244.724 186 236C193.315 217.943 200.86 199.969 208.389 182C212.703 171.702 218.742 160.966 221 150L222 150C229.63 174.213 265.888 181.968 287 173.611C295.608 170.204 299.786 162.82 307 158L307 175L319 175L319 77L307 77L307 94C302.187 90.588 298.947 85.1875 294 81.6944C281.881 73.1382 266.891 73.3735 253 76C255.199 66.8177 259.934 57.6315 263.75 49C266.786 42.1321 272.099 32.7238 269.5 25C265.585 13.3625 249.713 15.6157 244.889 25C229.386 55.1609 218.501 88.7059 205.389 120C201.347 129.646 197.296 139.299 193.389 149C191.904 152.687 190.448 158.892 187.528 161.667C182.381 166.557 161.049 163 154 163L168.389 85L176 42L164.333 42.7222L158.611 69L143 152C125.895 122.067 116.206 86.5646 102.25 55C97.793 44.9191 94.9843 31.9578 88.5278 23C81.131 12.7376 64.0556 16.5514 64.0556 30C64.0556 43.5962 76.0785 63.8508 82 76M61 86.2222C83.6532 83.0235 91.087 96.7664 98.3889 115C100.341 119.875 104.101 125.619 103.889 131C103.195 148.632 88.8761 162.395 72 164.778C21.6218 171.891 11.0909 93.2696 61 86.2222M263 86.2222C312.445 79.2404 322.706 157.562 274 164.778C254.677 167.64 232.237 154.496 229.722 134C229.02 128.273 232.909 122.161 235 117C241.279 101.499 244.511 88.833 263 86.2222M183 175C179.031 185.496 174.719 202.962 167 211L152 175L183 175z"/> -->
 </svg>
