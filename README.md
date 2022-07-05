@@ -45,8 +45,10 @@ VolaTALK Server delivers the following services to VolaTALK client
 2. a PeerJS server. VolaTALK's PeerJS will also guarantee authenticity of the connected clients by validating the signature in the connect token. See VolaTALK Server for more information.
 3. WebPUSH API responding to posts for push messages. Push Payload is encrypted by the sender and can only be decoded by receiver. Neither this Push Server nor the Browser Notification provider are able to read this content. 
 
+### Screenshots
+<img src="https://github.com/bosskabouter/volatalk/blob/44db4f7c438258ccbdd35e5c5f30f3b07b4df637/client/public/screenshots/Messages.png"/>
 
-
+<img src="https://github.com/bosskabouter/volatalk/blob/44db4f7c438258ccbdd35e5c5f30f3b07b4df637/client/public/screenshots/contacts.png"/>
 ## License
 
 This project is licensed under the MIT License.
