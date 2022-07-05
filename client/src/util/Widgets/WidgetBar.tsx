@@ -22,7 +22,7 @@ export const WidgetBar = () => {
         <DateInfo />
         <TimeInfo />
         <PeerDisplay />
-        <AboutVolaTalkIcon/>
+        <AboutVolaTalkIcon />
       </Stack>
     </Toolbar>
   );

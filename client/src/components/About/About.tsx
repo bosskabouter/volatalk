@@ -74,9 +74,9 @@ const About = () => {
               secondary={
                 <>
                   You can read and write messages offline. Once back online and connected with the
-                  receiver, all messages are syncronized. If the other person is offline and
-                  enabled push notifications, an icon 
-                  <PushedIcon fontSize='small'/> 
+                  receiver, all messages are syncronized. If the other person is offline and enabled
+                  push notifications, an icon
+                  <PushedIcon fontSize="small" />
                   appears next to the message.
                 </>
               }
@@ -92,10 +92,10 @@ const About = () => {
               }
               secondary={
                 <>
-                  All sensitive data is encrypted on your local device. Only connections
-                  with valid signatures are established to ensure your digital identity. All data
-                  send is encrypted with a password known only to the receiver of the message. This
-                  applies also to push messages, so the browser provider cannot know who or which
+                  All sensitive data is encrypted on your local device. Only connections with valid
+                  signatures are established to ensure your digital identity. All data send is
+                  encrypted with a password known only to the receiver of the message. This applies
+                  also to push messages, so the browser provider cannot know who or which
                   information was sent.
                 </>
               }
@@ -135,5 +135,3 @@ const About = () => {
 };
 
 export default About;
-
-

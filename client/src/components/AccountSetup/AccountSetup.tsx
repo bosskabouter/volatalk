@@ -2,7 +2,6 @@
 import { css } from '@emotion/react';
 import { ChangeEvent, useContext, useState } from 'react';
 
-
 import {
   Box,
   Button,
@@ -21,7 +20,6 @@ import {
 } from '@mui/material';
 import LockIcon from '@mui/icons-material/Lock';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
-
 
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -510,7 +508,6 @@ const AccountSetup = () => {
             {!authenticated ? 'Enter VolaTALK' : 'UPDATE PROFILE'}
           </Button>
         </form>
-
       </DialogContent>
     </Dialog>
   );
