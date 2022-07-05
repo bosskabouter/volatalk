@@ -2,11 +2,19 @@
 
 import { css } from '@emotion/react';
 import CssBaseline from '@mui/material/CssBaseline';
-import { Box, Link, List, ListItem, ListItemText } from '@mui/material';
+import { Box, Link, List, ListItem, ListItemText, IconButton } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Logo from '../../assets/svg/logo-yellow.svg';
 import packageJson from '../../../package.json';
+
+import SettingsBackupRestoreIcon from '@mui/icons-material/SettingsBackupRestore';
+import SignalCellularNodataIcon from '@mui/icons-material/SignalCellularNodata';
+import ConnectWithoutContactIcon from '@mui/icons-material/ConnectWithoutContact';
+import OpenSourceIcon from '@mui/icons-material/ImportContacts';
+import PushedIcon from '@mui/icons-material/ForwardToInbox';
+import Encrypted from '@mui/icons-material/MailLock';
+import GitHubIcon from '@mui/icons-material/GitHub';
 
 const About = () => {
   const styles = {
@@ -14,6 +22,7 @@ const About = () => {
       display: flex;
       flex-direction: column;
       width: 100%;
+      margin-top: 63px;
     `,
     logo: css`
       display: block;
@@ -34,24 +43,97 @@ const About = () => {
         <List>
           <ListItem key="1">
             <ListItemText
-              primary="Direct communication with your contacts, no central server to capture your private data needed. 
-            This means that if you lose access to your account, your identity cannot be recovered, because it is stored nowhere else."
+              primary={
+                <>
+                  <ConnectWithoutContactIcon color="secondary" />
+                  Direct communication with your contacts
+                </>
+              }
+              secondary={
+                <>
+                  Without a central server storing your private data. This means that if you lose
+                  access to your account, your identity cannot be recovered, because it is stored
+                  nowhere else.
+                  <IconButton
+                    onClick={() => alert('Not yet implemented.. Bip39 Mnemonics here')}
+                    size="small"
+                  >
+                    <SettingsBackupRestoreIcon fontSize="small" /> Backup
+                  </IconButton>
+                </>
+              }
             />
           </ListItem>
           <ListItem key="2">
-            <ListItemText primary="The application can be used offline. This means you don't need to be connected to the in" />
+            <ListItemText
+              primary={
+                <>
+                  <SignalCellularNodataIcon color="secondary" /> Installed for offline use
+                </>
+              }
+              secondary={
+                <>
+                  You can read and write messages offline. Once back online and connected with the
+                  receiver, all messages are syncronized. If the other person is offline and
+                  enabled push notifications, an icon 
+                  <PushedIcon fontSize='small'/> 
+                  appears next to the message.
+                </>
+              }
+            />
           </ListItem>
           <ListItem key="3">
-            <Link href="https://github.com/bosskabouter/volatalk">
-              <ListItemText primary="All source code is publicly available on GitHub" />
-            </Link>
+            <ListItemText
+              primary={
+                <>
+                  <Encrypted color="secondary" />
+                  Encrypted
+                </>
+              }
+              secondary={
+                <>
+                  All sensitive data is encrypted on your local device. Only connections
+                  with valid signatures are established to ensure your digital identity. All data
+                  send is encrypted with a password known only to the receiver of the message. This
+                  applies also to push messages, so the browser provider cannot know who or which
+                  information was sent.
+                </>
+              }
+            />
+          </ListItem>
+          <ListItem key="4">
+            <ListItemText
+              primary={
+                <>
+                  <OpenSourceIcon color="secondary" />
+                  Trust Open Source
+                </>
+              }
+              secondary={
+                <Link
+                  href="https://github.com/bosskabouter/volatalk"
+                  target={'_blank'}
+                  rel="noreferrer"
+                >
+                  <ListItemText
+                    secondary={
+                      <>
+                        Source code is publicly available on GitHub <GitHubIcon />
+                      </>
+                    }
+                  />
+                </Link>
+              }
+            />
           </ListItem>
         </List>
-        <Typography css={styles.version}> v{packageJson.version}</Typography>
       </Box>
       <img alt="logo" src={Logo} css={styles.logo} />
+      <Typography css={styles.version}> v{packageJson.version}</Typography>
     </Container>
   );
 };
 
 export default About;
+
+

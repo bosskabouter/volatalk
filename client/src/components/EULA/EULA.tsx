@@ -115,11 +115,14 @@ const EULA = () => {
       </DialogTitle>
       <DialogContent id="dialog-agreement" css={styles.eulaDialogContentRoot}>
         <List>
+          <ListItem key="0">
+            <ListItemText primary="Too Long, Didn't Read (TLDR); open source encrypted decentral p2p-webrtc messenger pwa." />
+          </ListItem>
           <ListItem key="1">
             <ListItemText primary="Private, Direct Video, Calling and Messenger. The new way to communicate directly with your contacts, without the need for any central authority to capture or censure your private data." />
           </ListItem>
           <ListItem key="2">
-            <ListItemText primary="All information <<will be>> encrypted on your local device and messaging and calling data is not sent to any server other than the receiving contact." />
+            <ListItemText primary="All information is encrypted on your local device and personal messaging and calling data is not sent, collected or used by anyone other than the receiving contact." />
           </ListItem>
 
           <ListItem key="3">

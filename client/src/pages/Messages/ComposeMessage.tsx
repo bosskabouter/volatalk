@@ -130,7 +130,7 @@ export const ComposeMessage = ({
         }}
       >
         <TextField
-          autoFocus
+          // autoFocus
           //  ref={textfieldRef}
           spellCheck
           label={'Send ' + contact.nickname + ' a message'}

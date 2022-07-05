@@ -1,4 +1,5 @@
 import { Stack, Toolbar } from '@mui/material';
+import { AboutVolaTalkIcon } from 'components/About/AboutVolaTalkIcon';
 import { Compass } from './Compass';
 import { DateInfo } from './DateInfo';
 import LocationInfo from './LocationInfo';
@@ -21,6 +22,7 @@ export const WidgetBar = () => {
         <DateInfo />
         <TimeInfo />
         <PeerDisplay />
+        <AboutVolaTalkIcon/>
       </Stack>
     </Toolbar>
   );

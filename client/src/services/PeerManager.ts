@@ -342,7 +342,11 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
       );
       return null;
     }
-    if (contact.dateTimeAccepted === 0) {
+
+    const acceptUnaccepted = true; //always allow connection to be established, even if user didnt accept contact yet. Maybe get rid of this prop entirely
+    if (!acceptUnaccepted && contact.dateTimeAccepted === 0) {
+      //turned off, people couldnt find the 'Accept' button
+      //TODO make new contact dialog 
       console.debug(
         'Not initiating connection with not yet accepted contact: ' + contact.nickname,
         contact
@@ -396,7 +400,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
     console.debug('New message saved', msg);
 
     this.#attemptTransmitMessage(msg).then(async (sent) => {
-      //if not able to send directly, push and save
+      //if not able to send directly, push and save for later syncing.
       //always push for test
       if (!sent) console.debug('Pushing anyway');
       const pushed = await pushMessage(msg, contact);

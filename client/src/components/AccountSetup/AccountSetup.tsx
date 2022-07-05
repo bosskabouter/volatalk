@@ -1,6 +1,8 @@
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react';
 import { ChangeEvent, useContext, useState } from 'react';
+
+
 import {
   Box,
   Button,
@@ -20,9 +22,12 @@ import {
 import LockIcon from '@mui/icons-material/Lock';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 
+
 import { useFormik } from 'formik';
 import * as yup from 'yup';
+
 import { isMobile } from 'react-device-detect';
+
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { UserContext } from '../../providers/UserProvider';
@@ -99,8 +104,16 @@ const AccountSetup = () => {
     }),
   });
 
-  const randImage = 'https://thispersondoesnotexist.com/image?reload=' + Math.random();
+  //TODO try to fetch the image, or cache the specific URL for this image in service worker
+  const randImage = () =>
+    'https://thispersondoesnotexist.com/image?justarandom=' + Math.round(Math.random() * 10000);
 
+  const [avatarData, setAvatarData] = useState(randImage);
+  const [tpdneExplainer, setTpdneExplainer] = useState(
+    <Typography variant={'overline'} onClick={() => setAvatarData(randImage)}>
+      * thispersondoesnotexist.com
+    </Typography>
+  );
   const formik = useFormik<IUserProfile>({
     initialValues: user || {
       dateRegistered: new Date(),
@@ -109,8 +122,8 @@ const AccountSetup = () => {
 
       nickname: 'Anonymous',
 
-      avatar: randImage,
-      avatarThumb: randImage,
+      avatar: avatarData,
+      avatarThumb: avatarData,
 
       security: {
         privateKey: '',
@@ -158,7 +171,7 @@ const AccountSetup = () => {
   }
 
   /**
-   * Register a new user, by generating a keyPairge
+   * Register a new user, by generating a keyPair
    * @param aUser from form containing user data
    */
   async function registerUser(aUser: IUserProfile) {
@@ -223,7 +236,7 @@ const AccountSetup = () => {
 
       min-height: 40px;
       border-radius: 20;
-      //background: black;
+      #background: black;
     `,
     accountPin: css`
       width: 100%;
@@ -293,7 +306,7 @@ const AccountSetup = () => {
 
   /**
    * Enables or disables pushsubscription notification service.
-   * @param _e
+   * @param e
    * @param checked
    */
   async function handlePush(e: ChangeEvent<HTMLInputElement>, checked: boolean) {
@@ -337,12 +350,15 @@ const AccountSetup = () => {
             //helperText={formik.touched.nickname && formik.errors.nickname}
           />
           <ImageUploader
-            source={formik.values.avatar}
+            source={avatarData}
             onUploaded={(base64EncodedUpload, base64EncodedUploadThumb) => {
               formik.setFieldValue('avatar', base64EncodedUpload);
               formik.setFieldValue('avatarThumb', base64EncodedUploadThumb);
+              setTpdneExplainer(<></>);
+              setAvatarData(base64EncodedUpload);
             }}
           />
+          {tpdneExplainer}
 
           <Box>
             <FormControlLabel
@@ -364,9 +380,7 @@ const AccountSetup = () => {
             <FormControlLabel
               label={
                 currentPosition != null
-                  ? `Your are ${DistanceFromMiddleEarth(
-                      currentPosition
-                    )} km. away from Middle Earth`
+                  ? `Your are ${DistanceFromMiddleEarth(currentPosition)} km from Middle Earth`
                   : 'Enable Location Sharing'
               }
               control={
@@ -496,6 +510,7 @@ const AccountSetup = () => {
             {!authenticated ? 'Enter VolaTALK' : 'UPDATE PROFILE'}
           </Button>
         </form>
+
       </DialogContent>
     </Dialog>
   );

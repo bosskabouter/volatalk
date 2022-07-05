@@ -1,7 +1,7 @@
 {
   "short_name": "VolaTALK",
   "name": "VolaTALK - Direct Messenger",
-  "description": "Direct Private Messenger. Communicate directly with your contacts, No need for a central authority to capture or censure your private data.",
+  "description": "Direct Private Messenger. Communicate directly with your contacts, without a central server to capture or censure your private data.",
 
   "icons": [
     {
@@ -43,14 +43,14 @@
 
   "screenshots": [
     {
-      "src": "assets/volatalk-logo-336x280.webp",
+      "src": "screenshots/contacts.png",
       "type": "image/png",
-      "sizes": "540x720"
+      "sizes": "862x894"
     },
     {
-      "src": "assets/volatalk-logo-336x280.webp",
-      "type": "image/jpg",
-      "sizes": "540x720"
+      "src": "screenshots/Messages.png",
+      "type": "image/png",
+      "sizes": "487x983"
     }
   ]
 }

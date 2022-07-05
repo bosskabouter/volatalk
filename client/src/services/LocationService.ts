@@ -5,7 +5,7 @@ const OPENWEATHER_APIKEY = '420408196cb33ae10825f1019e75bcb2';
 
 const TIMEOUT_GPS = 60 * 1000;
 
-export async function requestFollowMe(): Promise<GeolocationCoordinates | null> {
+export async function requestFollowMe(highAccuracy = true): Promise<GeolocationCoordinates | null> {
   return new Promise((resolve, _reject) => {
     const onSuccess = (position: GeolocationPosition) => {
       console.info('Follow me success', position);
@@ -27,13 +27,13 @@ export async function requestFollowMe(): Promise<GeolocationCoordinates | null> 
     };
     const onError = (error: GeolocationPositionError) => {
       console.warn('GeolocationPositionError', error);
-      alert('GeolocationPositionError: ' + error.code + ' - ' + error.message);
-      resolve(null);
+      //alert('GeolocationPositionError: ' + error.code + ' - ' + error.message);
+      resolve(highAccuracy ? requestFollowMe(!highAccuracy) : null);
     };
     if (navigator.geolocation)
       navigator.geolocation.getCurrentPosition(onSuccess, onError, {
         timeout: TIMEOUT_GPS,
-        enableHighAccuracy: true,
+        enableHighAccuracy: highAccuracy,
       });
     else {
       console.warn('No location services available');

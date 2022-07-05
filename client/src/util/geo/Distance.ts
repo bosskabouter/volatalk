@@ -32,8 +32,9 @@ export default function Distance(
   }
 }
 
-export function DistanceFromMiddleEarth(pos: GeolocationCoordinates) {
-  return pos && (pos.altitude ? pos.altitude : 0) + R;
+export function DistanceFromMiddleEarth(pos: GeolocationCoordinates): number | null {
+  const exactAltitude = pos.altitude ? pos.altitude : 0;
+  return pos ? Math.round(exactAltitude + R) : null;
 }
 
 /**
