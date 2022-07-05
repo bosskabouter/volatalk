@@ -52,7 +52,7 @@ As long as the contact was not accepted yet, or declined later on, no connection
 
 VolaTALK Server delivers the following services to VolaTALK client
 
-1. a static https Express Server with spdy, cors and compression capabilities. The Client PWA should be installable from any location however. There should be no reference to any static content on https:///volatalk.org. 
+1. a static https Express Server with spdy, cors and compression capabilities. The Client PWA should be installable from any location however. There should be no reference to any static content on https://volatalk.org. 
 2. a standard PeerJS server. VolaTALK's PeerJS will also guarantee (TODO) authenticity of the connected clients by validating the signature in the connect token. Currently used Peer instance is available on https://peer.pm:999 See VolaTALK Server for more information.
 3. WebPUSH API responding to posts for push messages. Push Payload is encrypted by the sender and can only be decoded by receiver. Neither this Push Server nor the Browser Notification provider are able to read this content. 
 
