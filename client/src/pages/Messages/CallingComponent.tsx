@@ -1,7 +1,9 @@
+/** @jsxImportSource @emotion/react */
+
 import { IContact } from '../../types';
 
 import { useContext, useEffect, useRef } from 'react';
-import { Button, Dialog, DialogContent, useMediaQuery, useTheme } from '@mui/material';
+import { Box, Button, Dialog, DialogContent, useMediaQuery, useTheme } from '@mui/material';
 import { PeerContext } from '../../providers/PeerProvider';
 import { ContactListItem } from '../Contacts/ContactListItem';
 import { MediaConnection } from 'peerjs';
@@ -46,7 +48,19 @@ const CallingComponent = ({
     }, [source]);
 
     return videoOn ? (
-      <video ref={remoteVideoElement} autoPlay={true} controls />
+      <Box
+        sx={{
+          width: '100%',
+          height: '100%',
+          //objectFit: 'cover',
+          //position: 'fixed',
+
+          top: 0,
+          left: 0,
+        }}
+      >
+        <video ref={remoteVideoElement} autoPlay={true} controls poster={contact.avatar} />
+      </Box>
     ) : (
       <audio ref={remoteAudioElement} autoPlay={true} controls />
     );
