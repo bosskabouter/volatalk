@@ -39,22 +39,17 @@ VolaTALK describes a way for browsers to establish a trusted connection between 
 
 Once a Peer found another Peer, no other servers are needed for their communication during the existence of their WebRTC session.
 
-In order to find each other and establish these sessions, peers register on a [WebRTC Signaling server](https://webrtc.org/). PeerJS (https://peerjs.com/) is a reference implementation server and can be installed anywhere. They also offer the default instance https://0.peerjs.com/.
+In order to find each other and establish these sessions, peers register on a [WebRTC Signaling server, or Peer Server] (https://webrtc.org/). PeerJS (https://peerjs.com/) is a reference implementation server and can be installed anywhere. They also offer the [default instance](https://0.peerjs.com/).
 
-The Signaling server used in VolaTALK client is available on https://peer.pm:999. Currently the client does not allow the client to choose between available signaling servers. 
+Currently the client only uses [VolaTALK Peer Server](https://peer.pm:999).
 
-    Future Feature: The Client will choose automatically (and randomly) from a pool of available signaling servers registered in the application and maintains a 'sticky' relation with that instance during his subscription to VolaTALK. This preferred instance is sent out in connection metadata with other contacts. 
+Future Feature: The Client will choose automatically (and randomly) from a pool of available Peer Servers registered in the application and maintains a 'sticky' relation with that instance during his subscription to VolaTALK. This preferred instance is sent out in connection metadata with other contacts. The user could choose a preferred server or add their own private instance.
+VolaTALK Peer Servers with added identity theft prevention (#volatalk-server) are indicated with a lock and are marked as preferred inside this pool.
+A user trying to find his contact will first try at the preferred server of that contact, but will try at other instances too if this fails. Once an session with the contact is established, the connection with that Peer Server is eliminated. This could potentially resolve (partly) the scalability issue with PeerJS.
+If a user decides to change his preferred signaling server instance, new connection metadata is sent out to all its contacts containing the new sticky relation with the newly chosen Peer Server.
+This process could be triggered automatically at set intervals, or degraded response times for establishing connections.
 
-        Eventually the user could be able to edit this list to add their own private server instance. 
-        
-        VolaTALK peerservers with added identity theft prevention (#volatalk-server) be indicated with a lock. These peerserver instances will be indicates as preferred inside this pool. 
-
-    A user trying to find his contact will first try at the preferred server of that contact, but will try at other instances too if this fails. Once an session with the contact is established, the connection with that peerserver is eliminated. This could potentially resolve partly the non-scalability issue with PeerJS.
-    If a user decides to change his prefered signaling server instance, new connection metadata is sent out to all its contacts containing the new sticky relation with the newly choosen peerserver.
-
-    This process could be triggered automatically at set intervals, or degraded response times for establishing connections.
-
-    If a contact is not online nor pushed at given moment to be informed about the change, this contact will not be able to find the user at its old preferred signaling server. In that case the contact continues looking on other signaling servers, or wait untill user comes back online and contacts him. 
+If a contact is not online nor pushed at given moment to be informed about the change, this contact will not be able to find the user at its old preferred signaling server. In that case the contact continues looking on other signaling servers, or wait until user comes back online and contacts him.
 
 #### Peer ID
 
@@ -64,36 +59,35 @@ Peer IDs are shared between users in 'copy-and-paste' invites. The application i
 
 The private key is stored in a Dexie encrypted IndexedDB.
 
-    Future Feature: Create a Mnemonic BIP39 private key (12 word recovery phrase) and display in Account Setup for easy account recovery. Contacts or messages would not be recovered but once a contact comes back online his address will reveal again and connection can be reestablished. That's like a recoverable phone number.
+Future Feature: Create a Mnemonic BIP39 private key (12 word recovery phrase) and display in Account Setup for easy account recovery. Contacts or messages would not be recovered but once a contact comes back online his address will reveal again and connection can be reestablished. That's like a recoverable phone number.
 
 ### VolaTALK Client
 
 A Progressive Web App as reference of the VolaTALK protocol, bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app) using the the `pwa-starter` template.
 
-    Future Feature: An Angular reference implementation, possibly trying out cloud storage https://Back4App.com.
+Future Feature: An Angular reference implementation, possibly trying out cloud storage https://Back4App.com.
 
 #### Registration
 
 A user can register by simply accepting Anonymous as its nickname. A default avatar (thanks http://thispersondosnotexist.com) is loaded but will appear for every contact differently (no CORS - no fetch).
 
-A user can save a base64 encoded image into his profile. The picture is downsized because it is send on very connection request within the connection metadata.
+A user can save a base64 encoded image into his profile. The picture is downsized because it is send on every connection request within the connection metadata.
 
 ##### Geo-location
 
 The application permits "Follow Me" functionality. Users who both opt-in are able to see their own and other's estimated physical location, distance and bearing from each other, alongside local and remote weather conditions (thanks https://openweathermap.org/). By having several contacts using this feature the request information send to this service will render useless for identification/location tracking purposes.
 
-    Future Feature: A future version allows this visibility to certain contacts only.
+    Future Feature: Allows this visibility to certain contacts only.
 
 #### Push notifications
 
-Allows users to receive messages through Push notification API of the browser. The Push subscription registered in the service worker is saved in user's profile and send out to accepted contacts. A contact, trying to send a message while user is offline, will send user's subscription to the Push Server together with a payload. The payload is the message encrypted with the public key of the receiver. The push server does not know the ID of the receiver so cannot decrypt. It just received a URL (subscription endpoint) to resend the encrypted payload to.
+Users can receive messages through the Push notification API of the browser. The Push subscription registered in the service worker is saved not on the server, but in the user's profile and send out to accepted contacts. A contact, trying to send a message while a user is offline, will send the user's subscription to the Push Server together with an encrypted payload. The push server does not know the ID of the receiver so cannot decrypt with the 'secret' Peer ID. It just received a URL (subscription endpoint) to resend the encrypted payload to.
 
-    Drawing here
+Drawing here
 
-The client uses it's own peer ID as secret key to unencrypt any message it receives through push notifications. Not so secret, but since the Push Server does not know who is the receiver (only who is the sender) it cannot decrypt the message. The Browser's Push Provider does not know the user's peerid so they cannot decypher either.
+The client uses it's own peer ID as secret key to decrypt any message it receives through push notifications. Not so secret, but since the Push Server does not know who is the receiver (only who is the sender) it cannot decrypt the message. The Browser's Push Provider does not know the user's Peer ID so they cannot decipher either.
 
-    Future Feature: 
-    Encrypt user's subscription endpoint with a secret shared only between the user and the pushserver responsible for sending the push request (possibly using the same connection token for PeerServer authentication). Other contacts do not need to know the user's endpoint, just give them a cypher which the pushserver knows how to handle.
+    Future Feature: Encrypt user's subscription endpoint with a secret shared only between the user and the push server responsible for sending the push request (possibly using the same connection token for Peer Server authentication). Contacts do not need to know the user's endpoint, just give a cipher which the push server knows how to handle.
 
 #### Invitation
 
@@ -115,19 +109,18 @@ When a peer requests a connection to another peer, a signature is sent in the co
 
 ### Connection Acceptance
 
-As long as the contact is not accepted, or declined later on, no connection will be permitted. Once a connection is permitted, all up-to-date user metadata `IContactResume` is syncronized between the two contacts and data can be send and A/V calls established.
+As long as the contact is not accepted, or declined later on, no connection will be permitted. Once a connection is permitted, all up-to-date user metadata `IContactResume` is synchronized between the two contacts and data can be send and A/V calls established.
 
 ## VolaTALK Server
 
 VolaTALK Server runs on NodeJS and three main packages deliver basic services needed for VolaTALK clients;
 
 1. a static HTTPS Express Server with SPDY, Cors and compression capabilities. The Client PWA can be installed from any location, no reference to static content on https://volatalk.org.
-2. a PeerJS server instance (https://peer.pm:999). VolaTALK's PeerServer will extend the default PeerServer to guarantee authenticity of the connected clients by validating a signature in the connection token. Not yet implemented. Depends on BIP39 key.
-3. a Web-PUSH API responding to posts for push messages (https://peered.me:432/push). Push Payload is encrypted by the sender and can only be decoded by receiver. Neither this Push Server nor the Browser Notification provider (endpoint) are able to read this content. Requests with too large `content-length` in their post request header (max 4Kb.) receive `HTTP status 507`. The body of the request contains the subscription endpoint and the encrypted payload. The server passes the endpoint and the payload on to the WebPush API (https://github.com/web-push-libs/web-push).
+2. a PeerJS server instance (https://peer.pm:999). VolaTALK's Peer Server will extend the default Peer Server to guarantee authenticity of the connected clients by validating a signature in the connection token. Not yet implemented. Depends on BIP39 key.
+3. a Web-PUSH API responding to posts for push messages (https://peered.me:432/push). Push Payload is encrypted by the sender and can only be decoded by receiver. Neither this Push Server nor the Browser Notification provider (endpoint) are able to read this content. Requests with too large `content-length` in their post request header (max 4Kb.) receive `HTTP status 507`. The body of the request contains the subscription endpoint and the encrypted payload. The server passes the endpoint and the payload on to the Web-Push API (https://github.com/web-push-libs/web-push).
 
-    TODO: Investigate possibility to create a VAPI keypair for each client subscription, so that VAPID public key isn't a global static and pertains only to the given client. This Vapid Keypair should however be generated on the Push Server, so clients registering for push notifications should request their Vapid Key pair from this server.
+    Future Feature: Investigate possibility to create a VAPID key pair for each client subscription, so that VAPID public key isn't a global static and pertains only to the given client. This Vapid key pair should however be generated on the Push Server, so clients registering for push notifications should request their VAPID key pair from this server.
 
 ## License
 
 This project is licensed under the MIT License.
-
