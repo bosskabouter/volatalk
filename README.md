@@ -43,7 +43,7 @@ In order to find each other and establish these sessions, peers register on a [W
 
 The Signaling server used in VolaTALK client is available on https://peer.pm:999. Currently the client does not allow the client to choose between available signaling servers. 
 
-    TODO: The Client will choose automatically (and randomly) from a pool of available signaling servers registered in the application and maintains a 'sticky' relation with that instance during his subscription to VolaTALK. This preferred instance is sent out in connection metadata with other contacts. 
+    Future Feature: The Client will choose automatically (and randomly) from a pool of available signaling servers registered in the application and maintains a 'sticky' relation with that instance during his subscription to VolaTALK. This preferred instance is sent out in connection metadata with other contacts. 
 
         Eventually the user could be able to edit this list to add their own private server instance. 
         
@@ -64,13 +64,13 @@ Peer IDs are shared between users in 'copy-and-paste' invites. The application i
 
 The private key is stored in a Dexie encrypted IndexedDB.
 
-    TODO: Create a Mnemonic BIP39 private key (12 word recovery phrase) and display in Account Setup for easy account recovery. Contacts or messages would not be recovered but once a contact comes back online his address will reveal again and connection can be reestablished. That's like a recoverable phone number.
+    Future Feature: Create a Mnemonic BIP39 private key (12 word recovery phrase) and display in Account Setup for easy account recovery. Contacts or messages would not be recovered but once a contact comes back online his address will reveal again and connection can be reestablished. That's like a recoverable phone number.
 
 ### VolaTALK Client
 
 A Progressive Web App as reference of the VolaTALK protocol, bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app) using the the `pwa-starter` template.
 
-    TODO: An Angular reference implementation, possibly trying out cloud storage https://Back4App.com.
+    Future Feature: An Angular reference implementation, possibly trying out cloud storage https://Back4App.com.
 
 #### Registration
 
@@ -82,31 +82,32 @@ A user can save a base64 encoded image into his profile. The picture is downsize
 
 The application permits "Follow Me" functionality. Users who both opt-in are able to see their own and other's estimated physical location, distance and bearing from each other, alongside local and remote weather conditions (thanks https://openweathermap.org/). By having several contacts using this feature the request information send to this service will render useless for identification/location tracking purposes.
 
-    TODO: A future version allows this visibility to certain contacts only.
+    Future Feature: A future version allows this visibility to certain contacts only.
 
 #### Push notifications
 
 Allows users to receive messages through Push notification API of the browser. The Push subscription registered in the service worker is saved in user's profile and send out to accepted contacts. A contact, trying to send a message while user is offline, will send user's subscription to the Push Server together with a payload. The payload is the message encrypted with the public key of the receiver. The push server does not know the ID of the receiver so cannot decrypt. It just received a URL (subscription endpoint) to resend the encrypted payload to.
 
-    TODO: Drawing here
+    Drawing here
 
 The client uses it's own peer ID as secret key to unencrypt any message it receives through push notifications. Not so secret, but since the Push Server does not know who is the receiver (only who is the sender) it cannot decrypt the message. The Browser's Push Provider does not know the user's peerid so they cannot decypher either.
 
-    TODO: encrypt user's subscription endpoint with a secret shared only between the user and the pushserver responsible for sending the push request (possibly using the same connection token for PeerServer authentication). Other contacts do not need to know the user's endpoint, just give them a cypher which the pushserver knows how to handle.
+    Future Feature: 
+    Encrypt user's subscription endpoint with a secret shared only between the user and the pushserver responsible for sending the push request (possibly using the same connection token for PeerServer authentication). Other contacts do not need to know the user's endpoint, just give them a cypher which the pushserver knows how to handle.
 
 #### Invitation
 
 Users can invite others by sharing an invitation. This invite is a URL pointing to the origin of the location where the sender installed the PWA from (https://volatalk.org), concatenated (?) with the following parameters;
 
-1. f - The Peer ID of the sender
-2. k - An additional invitation text
-3. s - The signature based on (1 + 2), signed with sender’s private key
+    1. The Peer ID of the sender (f)
+    2. An additional invitation text (k)
+    3. [1 + 2] signed with sender’s private key (s)
 
 A signed invitation prevents people from creating invites in name of someone else. Only the user can create a signed invite. Others can however resend an invitation the user sent out earlier, or try to establish a connection to an otherwise known Peer ID.
 
-The URL can be shown and read with the QR Show/Read functionality.
+    Future Feature: Share Peer ID directly. You can always block someone.
 
-    TODO: Rethink invite idea. Why not share Peer ID directly. You can always block someone.
+The application permits transmission of the invite through QR.
 
 #### Connection request
 
