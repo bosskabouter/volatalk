@@ -31,13 +31,15 @@ VolaTALK enables users to communicate direcly and privately. It aims not to be d
 
 ## Technical Implementation
 
+VolaTALK describes a way for browsers to communicate directly and privately while not relying on one single service for its critical functionality; sending of data. 
+
 ### Peer-to-Peer
 
-Once a Peer found another Peer, no other servers are needed for their communication, by using WebRTC sockets between the two parties.
+Once a Peer found another Peer, no other servers are needed for their communication during the existence of their WebRTC session.
 
-In order to find each other, peers register on a single PeerJS (https://peerjs.com/) signalling server, like the one they offer https://0.peerjs.com/.
+In order to find each other and establish these sessions, peers register on a Signalling server. PeerJS (https://peerjs.com/) is a reference signalling server and can be installed anywhere. They also offer the default instance https://0.peerjs.com/.
 
-The default Signalling server used is available on https://peer.pm:999. Currently the client does not allow the user to choose between available signalling servers. See VolaTALK Server for more information.
+The default Signalling server used in VolaTALK client is available on https://peer.pm:999. Currently the client does not allow the user to choose between available signalling servers. See VolaTALK Server for more information.
 
 #### Peer ID
 
@@ -47,7 +49,7 @@ The default Signalling server used is available on https://peer.pm:999. Currentl
 
     Public keys, or Peer IDs, are shared between users by 'copy-and-paste' invites. The application includes a QR generator and reader to facilicate the exchange of trusted invites.
 
-    TODO: Create a Mnemonic BIP39 private key (12 word recovery phrase) and display in Account Setup for easy account recovery. Contacts or messages wont be recovered but once a contact comes back online his address will reveal again and connection can be reestablished. This requires an overhaul of CryptoService.
+    TODO: Create a Mnemonic BIP39 private key (12 word recovery phrase) and display in Account Setup for easy account recovery. Contacts or messages would not be recovered but once a contact comes back online his address will reveal again and connection can be reestablished. This requires an overhaul of CryptoService.
 
 ### VolaTALK Client
 
