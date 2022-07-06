@@ -46,17 +46,17 @@ const About = () => {
               primary={
                 <>
                   <ConnectWithoutContactIcon color="secondary" />
-                  Direct communication with your contacts
+                  Communicate directly with your contacts
                 </>
               }
               secondary={
                 <>
-                  Without a central server storing your private data. This means that if you lose
-                  access to your account, your identity cannot be recovered, because it is stored
-                  nowhere else.
+                  Without a central server storing your private data. If you lose access to your
+                  account your identity cannot be recovered, because it is stored nowhere else.
                   <IconButton
-                    onClick={() => alert('Not yet implemented.. Bip39 Mnemonics here')}
+                    onClick={() => alert('Soon.. Bip39 Mnemonics here')}
                     size="small"
+                    color={'primary'}
                   >
                     <SettingsBackupRestoreIcon fontSize="small" /> Backup
                   </IconButton>
@@ -68,13 +68,13 @@ const About = () => {
             <ListItemText
               primary={
                 <>
-                  <SignalCellularNodataIcon color="secondary" /> Installed for offline use
+                  <SignalCellularNodataIcon color="secondary" /> Installed for offline
                 </>
               }
               secondary={
                 <>
-                  You can read and write messages offline. Once back online and connected with the
-                  receiver, all messages are syncronized. If the other person is offline and enabled
+                  You can read and write messages offline. Once back online and connected with your
+                  contact, all messages are syncronized. If the other person is offline and enabled
                   push notifications, an icon
                   <PushedIcon fontSize="small" />
                   appears next to the message.
@@ -87,16 +87,15 @@ const About = () => {
               primary={
                 <>
                   <Encrypted color="secondary" />
-                  Encrypted
+                  Securely Encrypted
                 </>
               }
               secondary={
                 <>
                   All sensitive data is encrypted on your local device. Only connections with valid
-                  signatures are established to ensure your digital identity. All data send is
-                  encrypted with a password known only to the receiver of the message. This applies
-                  also to push messages, so the browser provider cannot know who or which
-                  information was sent.
+                  signatures are allowed to connect. All data send is encrypted with a password
+                  known only to the receiver of the message. This applies also to push messages, so
+                  the browser push provider cannot know who or which information was sent.
                 </>
               }
             />
@@ -118,7 +117,7 @@ const About = () => {
                   <ListItemText
                     secondary={
                       <>
-                        Source code is publicly available on GitHub <GitHubIcon />
+                        Source code is available on GitHub <GitHubIcon />
                       </>
                     }
                   />

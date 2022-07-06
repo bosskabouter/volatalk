@@ -25,11 +25,6 @@ export const RequireAuth = () => {
     localStorage.setItem('invite', inviteParams);
   }
 
-  const receivedInvite = inviteParams || localStorage.getItem('invite');
-  if (receivedInvite && receivedInvite?.length > 0 && eulaAccepted && existingAccount) {
-    return <AcceptInvite invite={receivedInvite} />;
-  }
-
   if (!eulaAccepted) {
     return <Navigate to="/eula" replace />;
   }
@@ -57,5 +52,9 @@ export const RequireAuth = () => {
     }
   }
 
+  const receivedInvite = inviteParams || localStorage.getItem('invite');
+  if (receivedInvite && receivedInvite?.length > 0 && eulaAccepted && existingAccount) {
+    return <AcceptInvite invite={receivedInvite} />;
+  }
   return <Outlet />;
 };
