@@ -25,13 +25,13 @@ VolaTALK enables users to communicate direcly and privately. It aims not to be d
 
 ### Screenshots
 
-<img src="https://github.com/bosskabouter/volatalk/blob/44db4f7c438258ccbdd35e5c5f30f3b07b4df637/client/public/screenshots/Messages.png" width="70%"/>
+<img src="https://github.com/bosskabouter/volatalk/blob/44db4f7c438258ccbdd35e5c5f30f3b07b4df637/client/public/screenshots/Messages.png" width="50%"/>
 
 <img src="https://github.com/bosskabouter/volatalk/blob/44db4f7c438258ccbdd35e5c5f30f3b07b4df637/client/public/screenshots/contacts.png" width="50%"/>
 
 ## Technical Implementation
 
-VolaTALK describes a way for browsers to communicate directly and privately while not relying on one single service for its critical functionality; sending of data. 
+VolaTALK describes a way for browsers to communicate directly and privately while not relying on one single service for its critical functionality; sending data. 
 
 ### Peer-to-Peer
 
@@ -39,17 +39,17 @@ Once a Peer found another Peer, no other servers are needed for their communicat
 
 In order to find each other and establish these sessions, peers register on a Signalling server. PeerJS (https://peerjs.com/) is a reference signalling server and can be installed anywhere. They also offer the default instance https://0.peerjs.com/.
 
-The default Signalling server used in VolaTALK client is available on https://peer.pm:999. Currently the client does not allow the user to choose between available signalling servers. See VolaTALK Server for more information.
+The Signalling server used in VolaTALK client is available on https://peer.pm:999. Currently the client does not allow the user to choose between available signalling servers. See VolaTALK Server for more information.
 
-### Peer ID
+#### Peer ID
 
-A VolaTALK peer identifies by sending the Base58 encoded public key exponent of the ECDSA SHA-384 JSON WebKey as requested peerid.
+A VolaTALK peer registers onto the Signalling server with a Base58 encoded public key exponent of the ECDSA SHA-384 JSON WebKey.
+
+Peer IDs, are shared between users by 'copy-and-paste' invites. The application includes a QR generator and reader to facilicate the exchange of trusted invites.
 
 The private key is stored in a Dexie encrypted IndexedDB.
 
-Public keys, or Peer IDs, are shared between users by 'copy-and-paste' invites. The application includes a QR generator and reader to facilicate the exchange of trusted invites.
-
-TODO: Create a Mnemonic BIP39 private key (12 word recovery phrase) and display in Account Setup for easy account recovery. Contacts or messages would not be recovered but once a contact comes back online his address will reveal again and connection can be reestablished. This requires an overhaul of CryptoService.
+TODO: Create a Mnemonic BIP39 private key (12 word recovery phrase) and display in Account Setup for easy account recovery. Contacts or messages would not be recovered but once a contact comes back online his address will reveal again and connection can be reestablished. That's like a recoverable phone number. 
 
 ### VolaTALK Client
 
@@ -59,21 +59,23 @@ An Angular version is coming soon.
 
 #### Registration
 
-A user can register by simply accepting Anonymous as his nickname. A default avatar (thank http://thispersondosnotexist.com) is loaded but will appear for every contact differently (no cors - no fetch).
+A user can register by simply accepting Anonymous as his nickname. A default avatar (thanks http://thispersondosnotexist.com) is loaded but will appear for every contact differently (no cors - no fetch).
 
 Optionally a user can save a base64 encoded image into his profile. The picture is downsized because it is part of the connection metadata. An even smaller thumbnail is saved due to push notification message limit size (~4k)
 
 ##### GeoLocation
 
-The application permits the followMe functionality. Users who both opt-in are able to see their estimated physical location, distance and bearing, alongside local and remote weather conditions (thanks https://openweathermap.org/). By having several contacts using this feature the request information send to this service will render useless for identification/location tracking purposes. A future version allows this visibility to certain contacts only.
+The application permits the followMe functionality. Users who both opt-in are able to see their own and other's estimated physical location, distance and bearing, alongside local and remote weather conditions (thanks https://openweathermap.org/). By having several contacts using this feature the request information send to this service will render useless for identification/location tracking purposes. A future version allows this visibility to certain contacts only.
 
 #### Push notifications
 
 Allows users to receive messages through Push notification API of the browser. The Push subscription registered in the service worker is saved in user's profile and send out to accepted contacts. A contact, trying to send a message while user is offline, will send user's subscription to the Push Server together with a payload. The payload is the message encrypted with the public key of the receiver. The push server does not know the ID of the receiver so cannot decrypt. It just received a URL (subscription endpoint) to resend the encrypted payload to.
 
-For the client to unencrypt the message it uses his own peerid as secret key. Not so secret, but since the Push Server does not know who is the receiver he cannot decrypt the message. The Browser Push Provider does not know users peerid so they cannot decypher either.
+TODO Draw this
 
-TODO: encrypt endpoint with a secret shared between the user and the pushserver (possibly using the same connection token for PeerServer extension). Other contacts do not need to know my endpoint, just give them a cypher which the pushserver knows how to handle.
+For the client to unencrypt the message it uses his own peerid as secret key. Not so secret, but since the Push Server does not know who is the receiver he cannot decrypt the message. The Browser's Push Provider does not know user's peerid so they cannot decypher either.
+
+TODO: encrypt endpoint with a secret shared between the user and the pushserver (possibly using the same connection token for PeerServer authentication). Other contacts do not need to know user's endpoint, just give them a cypher which the pushserver knows how to handle.
 
 #### An invitation
 
