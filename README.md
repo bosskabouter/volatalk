@@ -39,7 +39,7 @@ VolaTALK describes a way for browsers to establish a trusted connection between 
 
 Once a Peer found another Peer, no other servers are needed for their communication during the existence of their WebRTC session.
 
-In order to find each other and establish these sessions, peers register on a [WebRTC Signalling server](https://webrtc.org/). PeerJS (https://peerjs.com/) is a reference implementation server and can be installed anywhere. They also offer the default instance https://0.peerjs.com/.
+In order to find each other and establish these sessions, peers register on a [WebRTC Signaling server](https://webrtc.org/). PeerJS (https://peerjs.com/) is a reference implementation server and can be installed anywhere. They also offer the default instance https://0.peerjs.com/.
 
 The Signaling server used in VolaTALK client is available on https://peer.pm:999. Currently the client does not allow the user to choose between available signaling servers. See [VolaTALK Server](#volatalk-server) for more information.
 

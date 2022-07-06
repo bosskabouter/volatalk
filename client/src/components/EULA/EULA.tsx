@@ -129,7 +129,7 @@ const EULA = () => {
             <ListItemText primary="Currently we are in testing phase. Unexpected things might happen." />
           </ListItem>
           <ListItem key="4">
-            <ListItemText primary="When you continue, you register your IP to a signalling server, so you can connect to other users." />
+            <ListItemText primary="When you continue, your IP is registered to a signaling server, so you can find and connect others." />
           </ListItem>
         </List>
         <DialogActions css={styles.eulaDialogAction}>

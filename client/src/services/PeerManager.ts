@@ -41,7 +41,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
 
   #calls = new Map<string /*peerid*/, MediaConnection>();
 
-  #signallingServers = [
+  #signalingServers = [
     {
       host: 'peer.pm',
       port: 999,
@@ -65,7 +65,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
       debug: 1,
     },
   ];
-  #usingSignallingServer = this.#signallingServers[2];
+  #usingSignalingServer = this.#signalingServers[2];
 
   constructor(user: IUserProfile, db: AppDatabase) {
     if (!verifyAddress(user.peerid)) throw Error('Invalid peerID:' + user.peerid);
@@ -75,11 +75,11 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
     this.#db = db;
 
     //TODO connect several peers
-    this.#peer = this.#initSignallingServer();
+    this.#peer = this.#initSignalingServer();
   }
 
-  #initSignallingServer() {
-    this.#peer = new Peer(this.#user.peerid, this.#usingSignallingServer);
+  #initSignalingServer() {
+    this.#peer = new Peer(this.#user.peerid, this.#usingSignalingServer);
     this.#peer.on('open', (pid) => {
       console.info('Peer connected', this.#peer.id);
       if (pid !== this.#user.peerid) {
@@ -134,12 +134,12 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
         if (err.type === 'invalid-id') {
           console.error('ID Invalid. ');
         } else if (err.type === 'unavailable-id') {
-          console.error('UserID occupied on signalling server. ');
+          console.error('UserID occupied on signaling server. ');
         } else {
           console.error('peer error: ' + err.name, err);
         }
         this.emit('statusChange', false);
-        setTimeout(() => this.#initSignallingServer(), RECONNECT_TIMEOUT);
+        setTimeout(() => this.#initSignalingServer(), RECONNECT_TIMEOUT);
       }
     });
 

@@ -39,7 +39,7 @@ export class SigningPeer extends Peer {
 
   #calls = new Map<string /*peerid*/, MediaConnection>();
 
- static  #signallingServers = [
+ static  #signalingServers = [
     {
       host: 'peer.pm',
       port: 999,
@@ -62,14 +62,14 @@ export class SigningPeer extends Peer {
       debug: 1,
     },
   ];
- static  #usingSignallingServer = this.#signallingServers[2];
+ static  #usingSignalingServer = this.#signalingServers[2];
 
   constructor(user: IUserProfile) {
-    super(user.peerid, SigningPeer.#usingSignallingServer);
+    super(user.peerid, SigningPeer.#usingSignalingServer);
     this.#user = user;
   }
 
-  #initSignallingServer() {
+  #initSignalingServer() {
     super.on('open', (pid) => {
       console.log('Peer connected', super.id);
       if (pid !== this.#user.peerid) {
@@ -124,11 +124,11 @@ export class SigningPeer extends Peer {
         if (err.type === 'invalid-id') {
           console.error('ID Invalid. ');
         } else if (err.type === 'unavailable-id') {
-          console.error('UserID occupied on signalling server. ');
+          console.error('UserID occupied on signaling server. ');
         }
         //       else {console.error('peer error: ' + err.name, err);}
         this.emit('statusChange', false);
-        // setTimeout(() => this.#initSignallingServer(), RECONNECT_TIMEOUT);
+        // setTimeout(() => this.#initSignalingServer(), RECONNECT_TIMEOUT);
       }
     });
 
