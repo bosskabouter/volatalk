@@ -1,8 +1,10 @@
+<img src="https://github.com/bosskabouter/volatalk/blob/162accd60808545d7a7227e8fe3f8b2e47a49477/logo/volatalk-logo-color-v1.png" width="50%"/>
+
 # VolaTALK - Direct Messenger
 
 > Nothing as volatile as the human thought.
 
-VolaTALK enables users to communicate direcly and privately. It aims not to be dependent on any one specific server or service for its basic functionality. When a service is used it should know as little as possible about the sending or receiving client and the content being sent.
+VolaTALK enables private and direct communicate. It aims to be independent on any one specific server for its basic functionality. When a thirds party service is used, it should know as little as possible about the sending or receiving client and the content being sent.
 
 > "From now on I will always turn towards someone when I call, now I know where that person stands..."
 
@@ -31,13 +33,13 @@ VolaTALK enables users to communicate direcly and privately. It aims not to be d
 
 ## Technical Implementation
 
-VolaTALK describes a way for browsers to communicate directly and privately while not relying on one single service for its critical functionality; sending data. 
+VolaTALK describes a way for browsers to establish a trusted connection between peer-to-peer clients while not relying on a single server for it's main function. 
 
 ### Peer-to-Peer
 
 Once a Peer found another Peer, no other servers are needed for their communication during the existence of their WebRTC session.
 
-In order to find each other and establish these sessions, peers register on a Signalling server. PeerJS (https://peerjs.com/) is a reference signalling server and can be installed anywhere. They also offer the default instance https://0.peerjs.com/.
+In order to find each other and establish these sessions, peers register on a [WebRTC Signalling server](https://webrtc.org/). PeerJS (https://peerjs.com/) is a reference implementation server and can be installed anywhere. They also offer the default instance https://0.peerjs.com/.
 
 The Signalling server used in VolaTALK client is available on https://peer.pm:999. Currently the client does not allow the user to choose between available signalling servers. See [VolaTALK Server](#volatalk-server) for more information.
 
