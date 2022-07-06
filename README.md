@@ -6,8 +6,6 @@
 
 VolaTALK enables private and direct communication. It aims to be independent of any one specific server for its basic functionality. When a service is used, it should know as little as possible about the sending or receiving client and the content being sent.
 
-
-
 ## Table of Contents
 
 - [VolaTALK - Introduction](#volatalk---direct-messenger)
@@ -67,7 +65,7 @@ A user can save a base64 encoded image into his profile. The picture is downsize
 
 The profile can be secured with a 6 digit access pin which can be recovered using 2 security questions.
 
-
+<img src="https://github.com/bosskabouter/volatalk/blob/6860aafcdd75c00c515598ffa33f1a25967b1a93/client/public/screenshots/AccountSetup.png" width="150px"/>
 
 ##### Geo-location
 
