@@ -55,8 +55,6 @@ The private key is stored in a Dexie encrypted IndexedDB.
 
 A Progressive Web App as reference of the VolaTALK protocol, bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app) using the `pwa-starter` template.
 
-Future Feature: An Angular reference implementation, possibly using cloud backend https://Back4App.com.
-
 #### Registration
 
 A user can register by simply accepting 'Anonymous' as its nickname. A default avatar (thanks http://thispersondosnotexist.com) is loaded but will appear for every contact differently (no CORS - no fetch).
@@ -81,11 +79,11 @@ The client uses it's own peer ID as secret key to decrypt any message it receive
 
 #### Invitation
 
-Users can invite others by sharing an invitation. This invite is a URL pointing to the origin of the location where the sender installed the PWA from (https://volatalk.org), concatenated (?) with the following parameters;
+Users can invite others by sharing an invitation. This invite is a URL pointing to the origin of the location where the sender installed the PWA from (https://volatalk.org), concatenated with the following parameters;
 
-    1. The Peer ID of the sender (f)
-    2. An additional invitation text (k)
-    3. [1 + 2] signed with sender’s private key (s)
+    a. ?f=[`sender.PeerID`] 
+    b. &k=[`An additional invitation text`]
+    c. &s=[`sign(a+b, sender.privateKey)`]
 
 A signed invitation prevents people from creating invites in name of someone else. Only the user can create a signed invite. Others can however resend an invitation the user sent out earlier, or try to establish a connection to an otherwise known Peer ID.
 
@@ -150,6 +148,10 @@ If a contact is not online nor pushed at given moment to be informed about the c
 Currenly Push Subscription endpoints are shared openly between contacts. A future version should encrypt this endpoint so that only the Push Server can decrypt it once it is sent by one of user's contacts.
 
 Ideally a VAPID key pair for each client subscription, so that VAPID public key isn't a global static and pertains only to the given client. This Vapid key pair should however be generated on the Push Server, so clients registering for push notifications must request their VAPID key pair from this server.
+
+### An Angular reference implementation
+
+AngularJS or Angular2, possibly using cloud backend https://Back4App.com.
 
 ### Allows Geo visibility to certain contacts only.
 
