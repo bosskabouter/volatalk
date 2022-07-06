@@ -25,9 +25,9 @@ VolaTALK enables users to communicate direcly and privately. It aims not to be d
 
 ### Screenshots
 
-<img src="https://github.com/bosskabouter/volatalk/blob/44db4f7c438258ccbdd35e5c5f30f3b07b4df637/client/public/screenshots/Messages.png" size="70%"/>
+<img src="https://github.com/bosskabouter/volatalk/blob/44db4f7c438258ccbdd35e5c5f30f3b07b4df637/client/public/screenshots/Messages.png" width="70%"/>
 
-<img src="https://github.com/bosskabouter/volatalk/blob/44db4f7c438258ccbdd35e5c5f30f3b07b4df637/client/public/screenshots/contacts.png" size="50%"/>
+<img src="https://github.com/bosskabouter/volatalk/blob/44db4f7c438258ccbdd35e5c5f30f3b07b4df637/client/public/screenshots/contacts.png" width="50%"/>
 
 ## Technical Implementation
 
@@ -41,15 +41,15 @@ In order to find each other and establish these sessions, peers register on a Si
 
 The default Signalling server used in VolaTALK client is available on https://peer.pm:999. Currently the client does not allow the user to choose between available signalling servers. See VolaTALK Server for more information.
 
-#### Peer ID
+### Peer ID
 
-    A VolaTALK peer identifies by sending the Base58 encoded public key exponent of the ECDSA SHA-384 JSON WebKey as requested peerid.
+A VolaTALK peer identifies by sending the Base58 encoded public key exponent of the ECDSA SHA-384 JSON WebKey as requested peerid.
 
-    The private key is stored in a Dexie encrypted IndexedDB.
+The private key is stored in a Dexie encrypted IndexedDB.
 
-    Public keys, or Peer IDs, are shared between users by 'copy-and-paste' invites. The application includes a QR generator and reader to facilicate the exchange of trusted invites.
+Public keys, or Peer IDs, are shared between users by 'copy-and-paste' invites. The application includes a QR generator and reader to facilicate the exchange of trusted invites.
 
-    TODO: Create a Mnemonic BIP39 private key (12 word recovery phrase) and display in Account Setup for easy account recovery. Contacts or messages would not be recovered but once a contact comes back online his address will reveal again and connection can be reestablished. This requires an overhaul of CryptoService.
+TODO: Create a Mnemonic BIP39 private key (12 word recovery phrase) and display in Account Setup for easy account recovery. Contacts or messages would not be recovered but once a contact comes back online his address will reveal again and connection can be reestablished. This requires an overhaul of CryptoService.
 
 ### VolaTALK Client
 
@@ -79,9 +79,9 @@ TODO: encrypt endpoint with a secret shared between the user and the pushserver 
 
 The URL inside the QR code contains;
 
-1. The Peer ID of the invitor
-2. An additional invitation text
-3. The signature based on (1 + 2), signed with invitor's private key
+    1. The Peer ID of the invitor
+    2. An additional invitation text
+    3. The signature based on (1 + 2), signed with invitor's private key
 
 This prevents others from inviting for me, only a user can create a signed invite from his account. Others could however resend an invitation the user sent out earlier.
 
