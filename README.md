@@ -55,15 +55,19 @@ The private key is stored in a Dexie encrypted IndexedDB.
 
 ### VolaTALK Client
 
-A Progressive Web App as reference of the VolaTALK protocol, bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app) using the the `pwa-starter` template.
+A Progressive Web App as reference of the VolaTALK protocol, bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app) using the `pwa-starter` template.
 
-Future Feature: An Angular reference implementation, possibly trying out cloud storage https://Back4App.com.
+Future Feature: An Angular reference implementation, possibly using cloud backend https://Back4App.com.
 
 #### Registration
 
 A user can register by simply accepting 'Anonymous' as its nickname. A default avatar (thanks http://thispersondosnotexist.com) is loaded but will appear for every contact differently (no CORS - no fetch).
 
 A user can save a base64 encoded image into his profile. The picture is downsized because it is send within the connection metadata on every connection request.
+
+The profile can be secured with a 6 digit access pin which can be recovered using 2 security questions.
+
+
 
 ##### Geo-location
 
