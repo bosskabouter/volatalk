@@ -79,15 +79,15 @@ The client uses it's own peer ID as secret key to decrypt any message it receive
 
 #### Invitation
 
-Users can invite others by sharing an invitation. This invite is a URL pointing to the origin of the location where the sender installed the PWA from (https://volatalk.org), concatenated with the following parameters;
+Users can share signed invites in URL or by QR. This invite points to the origin of the location where the sender installed the PWA from (https://volatalk.org), concatenated with the following parameters;
 
-    a. ?f=[`sender.PeerID`] 
+    a. ?f=[`sender.PeerID`]
     b. &k=[`An additional invitation text`]
     c. &s=[`sign(a+b, sender.privateKey)`]
 
-A signed invitation prevents people from creating invites in name of someone else. Only the user can create a signed invite. Others can however resend an invitation the user sent out earlier, or try to establish a connection to an otherwise known Peer ID.
+A signed invitation prevents people from creating invites in name of someone else. Only the user can create a signed invite for his account. Once the invitation is sent, it could be used by N others to connect to user. The user will receive these connection requests and decides if he wishes to connect. 
 
-The application permits transmission of the invite through QR.
+The application permits transmission of the invite through QR scanning, mobile sharing or on desktop by clipboard copy. Other ways of transmission including ultrasonic using [quiet-js](https://github.com/quiet/quiet-js) are being evaluated. 
 
 #### Connection request
 
