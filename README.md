@@ -43,13 +43,13 @@ The Signalling server used in VolaTALK client is available on https://peer.pm:99
 
 #### Peer ID
 
-A VolaTALK peer registers onto the Signalling server with a Base58 encoded public key exponent of the ECDSA SHA-384 JSON WebKey.
+A VolaTALK peer registers to a Signalling server with a Base58 encoded public key exponent of the ECDSA SHA-384 JSON WebKey.
 
-Peer IDs, are shared between users by 'copy-and-paste' invites. The application includes a QR generator and reader to facilicate the exchange of trusted invites.
+Peer IDs are shared between users in 'copy-and-paste' invites. The application includes a QR generator and reader to facilicate the exchange of trusted invites.
 
 The private key is stored in a Dexie encrypted IndexedDB.
 
-TODO: Create a Mnemonic BIP39 private key (12 word recovery phrase) and display in Account Setup for easy account recovery. Contacts or messages would not be recovered but once a contact comes back online his address will reveal again and connection can be reestablished. That's like a recoverable phone number. 
+    TODO: Create a Mnemonic BIP39 private key (12 word recovery phrase) and display in Account Setup for easy account recovery. Contacts or messages would not be recovered but once a contact comes back online his address will reveal again and connection can be reestablished. That's like a recoverable phone number. 
 
 ### VolaTALK Client
 
@@ -75,7 +75,7 @@ Draw here
 
 For the client to unencrypt the message it uses his own peerid as secret key. Not so secret, but since the Push Server does not know who is the receiver he cannot decrypt the message. The Browser's Push Provider does not know user's peerid so they cannot decypher either.
 
-TODO: encrypt endpoint with a secret shared between the user and the pushserver (possibly using the same connection token for PeerServer authentication). Other contacts do not need to know user's endpoint, just give them a cypher which the pushserver knows how to handle.
+    TODO: encrypt endpoint with a secret shared between the user and the pushserver (possibly using the same connection token for PeerServer authentication). Other contacts do not need to know user's endpoint, just give them a cypher which the pushserver knows how to handle.
 
 #### An invitation
 
@@ -87,7 +87,7 @@ The URL inside the QR code contains;
 
 This prevents others from inviting for me, only a user can create a signed invite from his account. Others could however resend an invitation the user sent out earlier.
 
-TODO: Rethink invite idea. Why not share pubids directly. You can always block someone.
+    TODO: Rethink invite idea. Why not share pubids directly. You can always block someone.
 
 #### Connection request
 
@@ -103,7 +103,8 @@ VolaTALK Server runs on NodeJS and three main packages deliver the basic service
 
 1. a static https Express Server with spdy, cors and compression capabilities. The Client PWA should be installable from any location, no reference to any static content on https://volatalk.org.
 2. a PeerJS server instance (currently https://peer.pm:999). VolaTALK's PeerServer will extend the default PeerServer to guarantee authenticity of the connected clients by validating a signature in the connection token. Not yet immplemented. Depends on BIP39 key.
-3. Web-PUSH (currently https://peered.me:432/push) API responding to posts for push messages. Push Payload is encrypted by the sender and can only be decoded by receiver. Neither this Push Server nor the Browser Notification provider are able to read this content. Large request header sizes are refused due to push limit size (~4k). Push request post contains an object only containing the stringified subscription endpoint and the encrypted payload. The server then unwraps the endpoint to pass the payload on to WebPush API. TODO possibly create a VAPI keypair for each client subscription, so that... why really?
+3. Web-PUSH (currently https://peered.me:432/push) API responding to posts for push messages. Push Payload is encrypted by the sender and can only be decoded by receiver. Neither this Push Server nor the Browser Notification provider are able to read this content. Large request header sizes are refused due to push limit size (~4k). Push request post contains an object only containing the stringified subscription endpoint and the encrypted payload. The server then unwraps the endpoint to pass the payload on to WebPush API. 
+    TODO possibly create a VAPI keypair for each client subscription, so that... why really?
 
 https://github.com/web-push-libs/web-push
 
