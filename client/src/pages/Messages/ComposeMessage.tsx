@@ -37,11 +37,9 @@ export const ComposeMessage = ({
   const peerManager = useContext(PeerContext);
   const sendText = async () => {
     if (peerManager && contact && sndMessageText.trim().length > 0) {
-      console.debug('Sending text: ' + sndMessageText);
-
       const linkified = linkifyHtml(sndMessageText);
 
-      //console.debug('Linkified: ' + linkified);
+      console.debug('Sending (Linkified) text: ' + linkified);
       const msg = await peerManager.sendText(linkified, contact);
       setSndMessageText('');
 
