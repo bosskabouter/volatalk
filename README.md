@@ -43,13 +43,22 @@ In order to find each other and establish these sessions, peers register on a [W
 
 Currently the client uses [VolaTALK Peer Server](https://peer.pm:999).
 
-    Future Feature: The Client will choose automatically (and randomly) from a pool of available Peer Servers registered in the application and maintains a 'sticky' relation with that instance during his subscription to VolaTALK. This preferred instance is sent out in connection metadata with other contacts. The user could choose a preferred server or add their own private instance.
+    Future Feature: The Client will choose automatically (and randomly) from a pool of available Peer Servers registered in the application.
+    
+    He maintains a 'sticky' relation with that instance during his subscription to VolaTALK. 
+    
+    This preferred instance is sent out in connection metadata with other contacts. 
+    
+    The user could choose a preferred server or add their own private instance.
+    
     VolaTALK Peer Servers with added identity theft prevention (#volatalk-server) are indicated with a lock and are marked as preferred inside this pool.
-    A user trying to find his contact will first try at the preferred server of that contact, but will try at other instances too if this fails. Once an session with the contact is established, the connection with that Peer Server is eliminated. This could potentially resolve (partly) the scalability issue with PeerJS.
-    If a user decides to change his preferred signaling server instance, new connection metadata is sent out to all its contacts containing the new sticky relation with the newly chosen Peer Server.
-    This process could be triggered automatically at set intervals, or degraded response times for establishing connections.
 
-If a contact is not online nor pushed at given moment to be informed about the change, this contact will not be able to find the user at its old preferred signaling server. In that case the contact continues looking on other signaling servers, or wait until user comes back online and contacts him.
+    A user trying to find his contact will first try at the preferred server of that contact, but will try at other instances too if this fails. Once an session with the contact is established, the connection with that Peer Server is eliminated, but the session with the client remains. This could potentially resolve (partly) the scalability issue with PeerJS.
+    
+    When the client decides to change his preferred signaling server instance, new connection metadata is sent out to all its contacts containing the new sticky relation with the newly chosen Peer Server.
+    This process could be triggered automatically at set intervals, or when response times for establishing connections degrade.
+    
+    If a contact is not online nor pushed at given moment to be informed about the change, this contact will not be able to find the user at its old preferred signaling server. In that case the contact continues looking on other signaling servers, or wait until the user comes back online and contacts him.
 
 #### Peer ID
 
@@ -59,7 +68,9 @@ Peer IDs are shared between users in 'copy-and-paste' invites. The application i
 
 The private key is stored in a Dexie encrypted IndexedDB.
 
-    Future Feature: Create a Mnemonic BIP39 private key (12 word recovery phrase) and display in Account Setup for easy account recovery. Contacts or messages would not be recovered but once a contact comes back online his address will reveal again and connection can be reestablished. That's like a recoverable phone number.
+    Future Feature: Create a Mnemonic BIP39 private key (12 word recovery phrase) and display in Account Setup for easy account recovery. 
+    
+    Contacts or messages would not be recovered but once a contact comes back online his address will reveal again and connection can be reestablished. That's like writing down your phone and being able to receive calls anywhere just by .
 
 ### VolaTALK Client
 
