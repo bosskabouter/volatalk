@@ -1,12 +1,12 @@
 <img src="https://github.com/bosskabouter/volatalk/blob/162accd60808545d7a7227e8fe3f8b2e47a49477/logo/volatalk-logo-color-v1.png" width="50%"/>
 
-# VolaTALK - Direct Messenger
+# VolaTALK - Direct Private Messenger
 
 > Nothing as volatile as the human thought.
 
-VolaTALK enables private and direct communicate. It aims to be independent on any one specific server for its basic functionality. When a thirds party service is used, it should know as little as possible about the sending or receiving client and the content being sent.
+VolaTALK enables private and direct communication. It aims to be independent of any one specific server for its basic functionality. When a thirds party service is used, it should know as little as possible about the sending or receiving client and the content being sent.
 
-> "From now on I will always turn towards someone when I call, now I know where that person stands..."
+> "I will always facing turn towards someone when we communicate, now I know where that person stands..."
 
 ## Table of Contents
 
@@ -57,7 +57,7 @@ The private key is stored in a Dexie encrypted IndexedDB.
 
 A Progressive Web App as reference of the VolaTALK protocol, bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app) using the the `pwa-starter` template.
 
-An Angular version is coming soon.
+    TODO: An Angular reference implementation, possibly trying out cloud storage https://Back4App.com.
 
 #### Registration
 
@@ -73,21 +73,21 @@ The application permits the followMe functionality. Users who both opt-in are ab
 
 Allows users to receive messages through Push notification API of the browser. The Push subscription registered in the service worker is saved in user's profile and send out to accepted contacts. A contact, trying to send a message while user is offline, will send user's subscription to the Push Server together with a payload. The payload is the message encrypted with the public key of the receiver. The push server does not know the ID of the receiver so cannot decrypt. It just received a URL (subscription endpoint) to resend the encrypted payload to.
 
-Draw here
+Drawing here
 
-For the client to unencrypt the message it uses his own peerid as secret key. Not so secret, but since the Push Server does not know who is the receiver he cannot decrypt the message. The Browser's Push Provider does not know user's peerid so they cannot decypher either.
+The client uses it's own peer ID as secret key to unencrypt any message it receives through push notifications. Not so secret, but since the Push Server does not know who is the receiver it cannot decrypt the message. The Browser's Push Provider does not know the user's peerid so they cannot decypher either.
 
-    TODO: encrypt endpoint with a secret shared between the user and the pushserver (possibly using the same connection token for PeerServer authentication). Other contacts do not need to know user's endpoint, just give them a cypher which the pushserver knows how to handle.
+    TODO: encrypt user's subscription endpoint with a secret shared only between the user and the pushserver responsible for sending the push request (possibly using the same connection token for PeerServer authentication). Other contacts do not need to know the user's endpoint, just give them a cypher which the pushserver knows how to handle.
 
 #### Invite
 
-Users can invite others by sharing an invitation. The invitation is a URL pointing to the origin from the invitor installed PWA (https://volatalk.org), concatenated with the following parameters;
+Users can invite others by sharing an invitation. This invitate is a URL pointing to the origin of the location where the invitor installed the PWA from (https://volatalk.org), concatenated (?) with the following parameters;
 
     1. f - The Peer ID of the invitor 
     2. k - An additional invitation text 
     3. s - The signature based on (1 + 2), signed with invitor's private key 
 
-A signed invitation prevents people from inviting for me, only a user can create a signed invite. Others could however resend an invitation the user sent out earlier.
+A signed invitation prevents people from creating invites in name of someone else. Only the user can create a signed invite. Others can however resend an invitation the user sent out earlier, or try to establish a connection to an otherwise known PeerID.
 
 The URL can be shown and read with the QR Show/Read functionality. 
 
@@ -95,7 +95,7 @@ The URL can be shown and read with the QR Show/Read functionality.
 
 #### Connection request
 
-When a peer requests a connection to another peer, a signature is sent in the connection metadata. This signature contains the peerid of the receiver and is signed with the private key of the requester. The receiver verifies the message if the signature was signed using the requester's public key before accepting the connection.
+When a peer requests a connection to another peer, a signature is sent in the connection metadata. This signature contains the peerid of the receiver and is signed with the private key of the requester. The receiver uses the requester's public to verify the signature was signed using the receiver's private key before the connection is accepted.
 
 ### Connection Acceptance
 
@@ -103,14 +103,14 @@ As long as the contact is not accepted, or declined later on, no connection will
 
 ## VolaTALK Server
 
-VolaTALK Server runs on NodeJS and three main packages deliver the basic services needed for VolaTALK clients;
+VolaTALK Server runs on NodeJS and three main packages deliver basic services needed for VolaTALK clients;
 
-1. a static https Express Server with spdy, cors and compression capabilities. The Client PWA should be installable from any location, no reference to any static content on https://volatalk.org.
-2. a PeerJS server instance (currently https://peer.pm:999). VolaTALK's PeerServer will extend the default PeerServer to guarantee authenticity of the connected clients by validating a signature in the connection token. Not yet immplemented. Depends on BIP39 key.
-3. Web-PUSH (currently https://peered.me:432/push) API responding to posts for push messages. Push Payload is encrypted by the sender and can only be decoded by receiver. Neither this Push Server nor the Browser Notification provider are able to read this content. Large request header sizes are refused due to push limit size (~4k). Push request post contains an object only containing the stringified subscription endpoint and the encrypted payload. The server then unwraps the endpoint to pass the payload on to WebPush API. 
-    TODO possibly create a VAPI keypair for each client subscription, so that... why really?
+1. a static https Express Server with spdy, cors and compression capabilities. The Client PWA should be installable from any location, no reference to static content on https://volatalk.org.
+2. a PeerJS server instance (https://peer.pm:999). VolaTALK's PeerServer will extend the default PeerServer to guarantee authenticity of the connected clients by validating a signature in the connection token. Not yet immplemented. Depends on BIP39 key.
+3. a Web-PUSH API responding to posts for push messages (https://peered.me:432/push). Push Payload is encrypted by the sender and can only be decoded by receiver. Neither this Push Server nor the Browser Notification provider (endpoint) are able to read this content. Requests with too large `content-length` in their post request header (max 4Kb.) receive `HTTP status 507`. The body of the request contains the subscription endpoint and the encrypted payload. The server passes the endpoint and the payload on to the WebPush API (https://github.com/web-push-libs/web-push).
 
-https://github.com/web-push-libs/web-push
+    TODO: possibly create a VAPI keypair for each client subscription, so that VAPID public key isn't a global static and pertains only to the given client. This Vapid Keypair should however be generated on the Push Server, so clients registering for push notifications should request their Vapid Key pair from the Server.
+
 
 ## License
 
