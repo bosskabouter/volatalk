@@ -1,10 +1,10 @@
 # VolaTALK - Direct Messenger
 
-> Nothing as volatile as the human thought. Thank the universe.
+> Nothing as volatile as the human thought.
 
 VolaTALK enables users to communicate direcly and privately. It aims not to be dependent on any one specific server or service for its basic functionality. When a service is used it should know as little as possible about the sending or receiving client and the content being sent.
 
-> "I will always turn towards someone now I know where that person stands"
+> "From now on I will always turn towards someone when I call, now I know where that person stands..."
 
 ## Table of Contents
 
