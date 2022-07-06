@@ -6,8 +6,7 @@
 
 VolaTALK enables private and direct communication. It aims to be independent of any one specific server for its basic functionality. When a service is used, it should know as little as possible about the sending or receiving client and the content being sent.
 
-> "From now on I will always face towards someone when we communicate, now I know where that person is..."
-> "- and you don't need to ask about the weather either.."
+
 
 ## Table of Contents
 
@@ -30,6 +29,9 @@ VolaTALK enables private and direct communication. It aims to be independent of 
 ### Screenshots
 
 <img src="https://github.com/bosskabouter/volatalk/blob/44db4f7c438258ccbdd35e5c5f30f3b07b4df637/client/public/screenshots/Messages.png" width="50%"/>
+
+> "From now on I will always face towards someone now I know where that person is...
+> ...and don't need to ask about the weather either..."
 
 <img src="https://github.com/bosskabouter/volatalk/blob/44db4f7c438258ccbdd35e5c5f30f3b07b4df637/client/public/screenshots/contacts.png" width="50%"/>
 

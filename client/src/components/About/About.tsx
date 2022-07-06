@@ -2,12 +2,13 @@
 
 import { css } from '@emotion/react';
 import CssBaseline from '@mui/material/CssBaseline';
-import { Box, Link, List, ListItem, ListItemText, IconButton } from '@mui/material';
+import { Box, Link, List, ListItem, ListItemText, IconButton, Stack } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Logo from '../../assets/svg/logo-yellow.svg';
 import packageJson from '../../../package.json';
 
+import PsychologyIcon from '@mui/icons-material/Psychology';
 import SettingsBackupRestoreIcon from '@mui/icons-material/SettingsBackupRestore';
 import SignalCellularNodataIcon from '@mui/icons-material/SignalCellularNodata';
 import ConnectWithoutContactIcon from '@mui/icons-material/ConnectWithoutContact';
@@ -41,12 +42,25 @@ const About = () => {
       <CssBaseline />
       <Box css={styles.box}>
         <List>
+          <ListItem key="0">
+            <ListItemText
+              sx={{ textAlign: 'center' }}
+              primary={
+                <Stack direction={'row'}>
+                  <>Nothing as volatile </>
+                  <PsychologyIcon color="secondary" />
+                  <>as the human thought </>
+                </Stack>
+              }
+            />
+          </ListItem>
+
           <ListItem key="1">
             <ListItemText
               primary={
                 <>
                   <ConnectWithoutContactIcon color="secondary" />
-                  Communicate directly with your contacts
+                  Communicate Directly
                 </>
               }
               secondary={
@@ -68,13 +82,13 @@ const About = () => {
             <ListItemText
               primary={
                 <>
-                  <SignalCellularNodataIcon color="secondary" /> Installed for offline
+                  <SignalCellularNodataIcon color="secondary" /> Installed for offline use
                 </>
               }
               secondary={
                 <>
-                  You can read and write messages offline. Once back online and connected with your
-                  contact, all messages are syncronized. If the other person is offline and enabled
+                  You can read and write messages offline, once back and connected with your
+                  contacts, all messages are syncronized. If the other person is offline and enabled
                   push notifications, an icon
                   <PushedIcon fontSize="small" />
                   appears next to the message.
@@ -95,7 +109,7 @@ const About = () => {
                   All sensitive data is encrypted on your local device. Only connections with valid
                   signatures are allowed to connect. All data send is encrypted with a password
                   known only to the receiver of the message. This applies also to push messages, so
-                  the browser push provider cannot know who or which information was sent.
+                  the browser push provider cannot know who or what information was sent.
                 </>
               }
             />
@@ -117,7 +131,7 @@ const About = () => {
                   <ListItemText
                     secondary={
                       <>
-                        Source code is available on GitHub <GitHubIcon />
+                        Source available on GitHub <GitHubIcon />
                       </>
                     }
                   />
