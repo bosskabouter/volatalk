@@ -93,7 +93,7 @@ The URL can be shown and read with the QR Show/Read functionality.
 
 #### Connection request
 
-When a peer requests a connection to another peer, a signature is sent in the metadata of this connection. This signature contains the peerid of the receiver and is signed with the requester's private key. The receiver verifies if the signature was signed using the requester's public key before accepting the connection.
+When a peer requests a connection to another peer, a signature is sent in the connection metadata. This signature contains the peerid of the receiver and is signed with the private key of the requester. The receiver verifies the message if the signature was signed using the requester's public key before accepting the connection.
 
 ### Connection Acceptance
 
