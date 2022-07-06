@@ -71,7 +71,7 @@ The application permits the followMe functionality. Users who both opt-in are ab
 
 Allows users to receive messages through Push notification API of the browser. The Push subscription registered in the service worker is saved in user's profile and send out to accepted contacts. A contact, trying to send a message while user is offline, will send user's subscription to the Push Server together with a payload. The payload is the message encrypted with the public key of the receiver. The push server does not know the ID of the receiver so cannot decrypt. It just received a URL (subscription endpoint) to resend the encrypted payload to.
 
-TODO Draw this
+Draw here
 
 For the client to unencrypt the message it uses his own peerid as secret key. Not so secret, but since the Push Server does not know who is the receiver he cannot decrypt the message. The Browser's Push Provider does not know user's peerid so they cannot decypher either.
 
@@ -91,7 +91,7 @@ TODO: Rethink invite idea. Why not share pubids directly. You can always block s
 
 #### Connection request
 
-When a client connects to someone else, he sends a signature in the metadata of this connection. This signature contains the peerid of the receiver and is signed with the requester's private key. The receiver verifies if the signature was signed using the requester's public key before accepting the connection.
+When a peer requests a connection to another peer, a signature is sent in the metadata of this connection. This signature contains the peerid of the receiver and is signed with the requester's private key. The receiver verifies if the signature was signed using the requester's public key before accepting the connection.
 
 ### Connection Acceptance
 
