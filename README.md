@@ -39,7 +39,7 @@ Once a Peer found another Peer, no other servers are needed for their communicat
 
 In order to find each other and establish these sessions, peers register on a Signalling server. PeerJS (https://peerjs.com/) is a reference signalling server and can be installed anywhere. They also offer the default instance https://0.peerjs.com/.
 
-The Signalling server used in VolaTALK client is available on https://peer.pm:999. Currently the client does not allow the user to choose between available signalling servers. See VolaTALK Server for more information.
+The Signalling server used in VolaTALK client is available on https://peer.pm:999. Currently the client does not allow the user to choose between available signalling servers. See [VolaTALK Server](#volatalk-server) for more information.
 
 #### Peer ID
 
@@ -77,15 +77,17 @@ For the client to unencrypt the message it uses his own peerid as secret key. No
 
     TODO: encrypt endpoint with a secret shared between the user and the pushserver (possibly using the same connection token for PeerServer authentication). Other contacts do not need to know user's endpoint, just give them a cypher which the pushserver knows how to handle.
 
-#### An invitation
+#### Invite
 
-The URL inside the QR code contains;
+Users can invite others by sharing an invitation. The invitation is a URL pointing to the origin from the invitor installed PWA (https://volatalk.org), concatenated with the following parameters;
 
-    1. The Peer ID of the invitor
-    2. An additional invitation text
-    3. The signature based on (1 + 2), signed with invitor's private key
+    1. f - The Peer ID of the invitor 
+    2. k - An additional invitation text 
+    3. s - The signature based on (1 + 2), signed with invitor's private key 
 
-This prevents others from inviting for me, only a user can create a signed invite from his account. Others could however resend an invitation the user sent out earlier.
+A signed invitation prevents people from inviting for me, only a user can create a signed invite. Others could however resend an invitation the user sent out earlier.
+
+The URL can be shown and read with the QR Show/Read functionality. 
 
     TODO: Rethink invite idea. Why not share pubids directly. You can always block someone.
 
