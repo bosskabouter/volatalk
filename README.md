@@ -22,13 +22,14 @@ Because I could not not find a trackerless messenger I could fully trust, I wrot
 
 Communicate directly with other contacts without a central server to buffer, capture, censure or use the data in any other way.
 
+#### Peer-to-Peer (p2p)
 Therefore it uses peer-to-peer and WebRTC technologies. There are many solutions like these, but none I could find create a long-term trusted relation between clients, as explained in [Future Versions](#future-versions).
 
 Any solution based on decentralized blockchain technologies would not fit the [Vision](#vision).
 
-#### Doesn' t anything like this exist?
+#### Doesn't anything like this exist?
 
-Since VolaTALK does not capture any data, no money can be made from it. No commercial party would be interested in building anything like this.
+Since VolaTALK does not capture any data, no money can be made with it. No commercial party would be interested in building anything like this. A Dollar for a Click...
 
 ## Table of Contents
 
