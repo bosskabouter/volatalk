@@ -14,18 +14,21 @@ Private and direct communication over trusted relations between browsers. It aim
 
 Because I could not not find a messenger I could fully trust, I wrote my own.
 
-## What's different
+## What is different
 
-VolaTALK communicates directly with other contacts without a central server to buffer the data in between.
-It uses peer-to-peer and WebRTC technologies. There are many solutions like these, but none I could find create a long-term relation between clients, as explained later in [Future Versions](#future-versions).
+VolaTALK communicates directly with other contacts without a central server to buffer, capture, censure or misuse the data send in between.
 
-Also any solution based on permanent mined block-chain technologies would not fit the [Vision](#vision).
+Therefore it uses peer-to-peer and WebRTC technologies. There are many solutions like these, but none I could find create a long-term trusted relation between clients, as explained in [Future Versions](#future-versions).
+
+Any solution based on decentralized permanent mined blockchain technologies would not fit the [Vision](#vision).
 
 ## Table of Contents
 
 - [VolaTALK - Introduction](#volatalk---direct-messenger)
 - [Vision](#vision)
 - [Mission](#mission)
+- [Why?](#why)
+- [What's different?](#what-is-different)
 - [Table of Contents](#table-of-contents)
 - [Screenshots](#screenshots)
 - [Technical Implementation](#technical-implementation)
