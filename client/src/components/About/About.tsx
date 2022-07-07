@@ -1,8 +1,9 @@
 /** @jsxImportSource @emotion/react */
 
 import { css } from '@emotion/react';
+import { useTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { Box, Link, List, ListItem, ListItemText, IconButton, Stack } from '@mui/material';
+import { Box, Link, List, ListItem, ListItemText, IconButton, Stack,Avatar } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Logo from '../../assets/svg/logo-yellow.svg';
@@ -18,6 +19,8 @@ import EncryptedIcon from '@mui/icons-material/MailLock';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import logo from '../../assets/svg/logo-black.svg';
 const About = () => {
+
+  //const theme = useTheme();
   const styles = {
     box: css`
       display: flex;
@@ -50,6 +53,8 @@ const About = () => {
                     Nothing as volatile
                     <PsychologyIcon color="secondary" />
                     as the human mind
+
+                    <em>...thank the universe...</em>
                   </Typography>
                 </Stack>
               }
@@ -65,8 +70,8 @@ const About = () => {
               }
               secondary={
                 <>
-                  Without a central server able to capture or censuring your data. If you lose
-                  access to your account your identity cannot be recovered, because it is stored
+                  Without a central server able to capture or censure your data. If you lose
+                  access to your account your identity cannot be recovered because it is stored
                   nowhere else.
                   <IconButton
                     onClick={() => alert('Soon.. Bip39 Mnemonics here')}
@@ -135,9 +140,18 @@ const About = () => {
           </ListItem>
         </List>
       </Box>
-
-      <img alt="logo" src={logo} css={styles.logo} />
-
+          
+      <Avatar
+                src={logo}
+                variant="rounded"
+                sx={{
+                  width: 45,
+                  height: 45,
+                  border: 0,
+                  // color: theme.palette.secondary.main,
+                 // bgcolor: theme.palette.secondary.main,
+                }}
+              ></Avatar>
       <Typography css={styles.version}> v{packageJson.version}</Typography>
     </Container>
   );

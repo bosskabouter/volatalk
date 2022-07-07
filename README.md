@@ -1,15 +1,31 @@
-
-# VolaTALK - Direct Private Messenger 
+# VolaTALK - Direct Private Messenger
 
 <img src="https://github.com/bosskabouter/volatalk/blob/162accd60808545d7a7227e8fe3f8b2e47a49477/logo/volatalk-logo-color-v1.png" width="99px"/>
 
-> Nothing as volatile as the human mind. Thank the universe.
+## Vision
 
-VolaTALK enables private and direct communication. It aims to be independent of any one centralized service for its basic functionality. When a service is used, it should know as little as possible about the sending or receiving client and the information sent.
+> Nothing as volatile as the human mind, thank the universe.
+
+## Mission
+
+Private and direct communication over trusted relations between browsers. It aims to be independent of any centralized service to estalish direct peer-to-peer communication. When a service is used, it should know as little as possible about the sending or receiving client and the information sent.
+
+## Why
+
+Because I could not not find a messenger I could fully trust, I wrote my own.
+
+## What's different
+
+VolaTALK communicates directly with other contacts without a central server to buffer the data in between.
+It uses peer-to-peer and WebRTC technologies. There are many solutions like these, but none I could find create a long-term relation between clients, as explained later in [Future Versions](#future-versions).
+
+Also any solution based on permanent mined block-chain technologies would not fit the [Vision](#vision).
 
 ## Table of Contents
 
 - [VolaTALK - Introduction](#volatalk---direct-messenger)
+- [Vision](#vision)
+- [Mission](#mission)
 - [Table of Contents](#table-of-contents)
 - [Screenshots](#screenshots)
 - [Technical Implementation](#technical-implementation)
@@ -36,7 +52,7 @@ VolaTALK enables private and direct communication. It aims to be independent of 
 
 ## Technical Implementation
 
-VolaTALK describes a way for browsers to establish a trusted connection while not relying on a single centralized server.
+VolaTALK describes a way for browsers to establish a trusted WebRTC connections over Peer-to-Peer while not relying on a single centralized server.
 
 ### Peer-to-Peer
 
@@ -46,7 +62,7 @@ In order to find each other and establish these sessions, peers register on a [W
 
 #### Peer ID
 
-A VolaTALK peer registers to a Signaling server with a Base58 encoded public key exponent of the ECDSA SHA-384 JSON WebKey.
+A VolaTALK peer currently registers to a Signaling server with a Base58 encoded public key exponent of the ECDSA SHA-384 JSON WebKey.
 
 Peer IDs are shared between users in 'copy-and-paste' invites. The application includes a QR generator and reader to facilitate the exchange of trusted invites.
 
@@ -58,7 +74,7 @@ A Progressive Web App as reference of the VolaTALK protocol, bootstrapped with [
 
 #### Registration
 
-A user can register by simply accepting 'Anonymous' as its nickname. A default avatar (thanks http://thispersondosnotexist.com) is loaded but will appear for every contact differently (no CORS - no fetch).
+A user can register by simply accepting 'Anonymous' as its nickname. A default avatar [thanks thanksthispersondoesnotexist.com](http://thispersondoesnotexist.com) is loaded but will appear for every contact differently (no CORS - no fetch).
 
 The user can save a base64 encoded image into his profile. The picture is downsized because it is send within the connection metadata on every connection request.
 
@@ -68,7 +84,7 @@ The profile can be secured with a 6 digit access pin which can be recovered usin
 
 ##### Geo-location
 
-The application permits "Follow Me" functionality. Users who both opt-in are able to see their own and other's estimated physical location, distance and bearing from each other, alongside local and remote weather conditions (thanks https://openweathermap.org/). By having several contacts using this feature the request information send to this service will render useless for identification of location tracking purposes.
+The application permits "Follow Me" functionality. Users who both opt-in are able to see their own and other's estimated physical location, distance and bearing from each other, alongside local and remote weather conditions (thanks [OpenWeatherMap](https://openweathermap.org/)). By having several contacts using this feature the request information send to this service will render useless for identification of location tracking purposes.
 
 #### Push notifications
 
@@ -86,9 +102,9 @@ Users can share signed invites in URL or by QR. This invite points to the origin
     b. &k=[`An additional invitation text`]
     c. &s=[`sign(a+b, sender.privateKey)`]
 
-A signed invitation prevents people from creating invites in name of someone else. Only the user can create a signed invite for his account. Once the invitation is sent, it could be used by N others to connect to user. The user will receive these connection requests and decides if he wishes to connect. 
+A signed invitation prevents people from creating invites in name of someone else. Only the user can create a signed invite for his account. Once the invitation is sent, it could be used by N others to connect to user. The user will receive these connection requests and decides if he wishes to connect.
 
-The application permits transmission of the invite through QR scanning, mobile sharing or on desktop by clipboard copy. Other ways of transmission including ultrasonic using [quiet-js](https://github.com/quiet/quiet-js) are being evaluated. 
+The application permits transmission of the invite through QR scanning, mobile sharing or on desktop by clipboard copy. Other ways of transmission including ultrasonic using [quiet-js](https://github.com/quiet/quiet-js) are being evaluated.
 
 #### Connection request
 

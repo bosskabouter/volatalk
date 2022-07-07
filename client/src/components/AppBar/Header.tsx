@@ -70,7 +70,7 @@ export default function Header() {
                   width: 45,
                   height: 45,
                   border: 0,
-                  color: theme.palette.secondary.main,
+                  // color: theme.palette.secondary.main,
                   bgcolor: theme.palette.secondary.main,
                 }}
               ></Avatar>
