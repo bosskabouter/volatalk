@@ -10,7 +10,7 @@
 
 ### Mission
 
-A way for browsers to communicate privately and direcly between trusted contacts, independent of any centralized service. When a service is used it should know as little as possible about the sending or receiving client and the information sent.
+Private and direct communication between trusted contacts, independent of any centralized service. When a service is used it should know as little as possible about the sending or receiving client and the information sent.
 
 ### Why
 
