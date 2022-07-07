@@ -1,10 +1,11 @@
-<img src="https://github.com/bosskabouter/volatalk/blob/162accd60808545d7a7227e8fe3f8b2e47a49477/logo/volatalk-logo-color-v1.png" width="180px"/>
 
-# VolaTALK - Direct Private Messenger
+# VolaTALK - Direct Private Messenger 
 
-> 'Nothing as volatile as the human thought. Thank the universe.'
+<img src="https://github.com/bosskabouter/volatalk/blob/162accd60808545d7a7227e8fe3f8b2e47a49477/logo/volatalk-logo-color-v1.png" width="99px"/>
 
-VolaTALK enables private and direct communication. It aims to be independent of any one specific server for its basic functionality. When a service is used, it should know as little as possible about the sending or receiving client and the content being sent.
+> Nothing as volatile as the human mind. Thank the universe.
+
+VolaTALK enables private and direct communication. It aims to be independent of any one centralized service for its basic functionality. When a service is used, it should know as little as possible about the sending or receiving client and the information sent.
 
 ## Table of Contents
 

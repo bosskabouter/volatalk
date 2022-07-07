@@ -5,8 +5,7 @@ import AppBar from '@mui/material/AppBar';
 import CssBaseline from '@mui/material/CssBaseline';
 import { useTheme } from '@mui/material/styles';
 import { Link } from 'react-router-dom';
-import logo from '../../assets/svg/logo-black.svg';
-
+import Logo from '../../assets/svg/logo-yellow.svg';
 import { Typography, Toolbar, Avatar } from '@mui/material';
 import AccountAvatar from '../StatusDisplay/AccountAvatar';
 
@@ -65,12 +64,14 @@ export default function Header() {
           <Typography variant="h6" noWrap css={styles.title}>
             <Link to="/">
               <Avatar
-                src={logo}
+                src={Logo}
                 variant="rounded"
                 sx={{
                   width: 45,
                   height: 45,
-                  border: 3,
+                  border: 0,
+                  color: theme.palette.secondary.main,
+                  bgcolor: theme.palette.secondary.main,
                 }}
               ></Avatar>
             </Link>

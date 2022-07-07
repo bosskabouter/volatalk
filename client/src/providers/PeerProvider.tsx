@@ -64,11 +64,11 @@ export default function PeerProvider({ children }: IPeerProviderProps) {
 
       return () => {
         //   window.removeEventListener('beforeunload', beforeunloadHandler);
-        // console.warn('Cleaning up PeerProvider!');
-        // peerManager.removeListener('statusChange', handleStatusChange);
-        // peerManager.removeListener('onMessage', messageHandler);
-        // peerManager.removeListener('onNewContact', newContactHandle);
-        // peerManager.removeListener('onContactStatusChange', contactOnlineHandle);
+        console.warn('Cleaning up PeerProvider!');
+        pm.removeListener('statusChange', handleStatusChange);
+        pm.removeListener('onMessage', messageHandler);
+        pm.removeListener('onNewContact', newContactHandle);
+        pm.removeListener('onContactStatusChange', contactOnlineHandle);
         pm.disconnectGracefully();
         setPeerManager(null);
       };

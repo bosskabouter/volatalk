@@ -317,7 +317,7 @@ const AccountSetup = () => {
   }
   return (
     <Dialog
-      // css={styles.accountSetupDialogRoot}
+      css={styles.accountSetupDialogRoot}
       open={true}
       onClose={handleClose}
       //only allow escape when already registered before
@@ -326,7 +326,7 @@ const AccountSetup = () => {
       transitionDuration={{ enter: 1500 }}
       maxWidth="lg"
       fullScreen={fullScreen}
-      scroll={'body'}
+      scroll={'paper'}
     >
       <DialogContent id="dialog-agreement" css={styles.accountSetupDialogContent}>
         <Typography variant="h5">Profile settings</Typography>

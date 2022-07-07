@@ -80,6 +80,7 @@ const ServiceWorkerWrapper: FC = () => {
 
         wb.current?.messageSW(msg).then((res) => {
           console.info('UDATED CONTACTS IN SERVICE WORKER', res);
+          alert('UDATED CONTACTS IN SERVICE WORKER' + res);
         });
       })
 

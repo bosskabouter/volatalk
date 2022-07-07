@@ -65,7 +65,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
       debug: 1,
     },
   ];
-  #usingSignalingServer = this.#signalingServers[2];
+  #usingSignalingServer = this.#signalingServers[0];
 
   constructor(user: IUserProfile, db: AppDatabase) {
     if (!verifyAddress(user.peerid)) throw Error('Invalid peerID:' + user.peerid);
@@ -239,11 +239,13 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
     console.debug('contact updated', contact);
     if (contact.dateTimeAccepted === 0) {
       console.info(
-        'Unaccepted contact trying to connect. Closing connection for now.',
+        'Unaccepted contact trying to connect. <<SHOULD BE>> Closing connection for now.',
         contact,
         conn
       );
-      conn.close();
+
+      //do not close connection while not proper accept screen
+      //conn.close();
     } else if (contact.dateTimeDeclined !== 0) {
       console.warn('Declined contact trying to connect. I said no connection.', contact, conn);
       conn.close();

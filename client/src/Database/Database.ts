@@ -1,5 +1,4 @@
 import Dexie from 'dexie';
-import _ from 'lodash';
 import { IContact, IMessage, IUserProfile } from '../types';
 const tableUser = 'userProfile';
 const tableContacts = 'contacts';

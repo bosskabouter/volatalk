@@ -14,9 +14,9 @@ import SignalCellularNodataIcon from '@mui/icons-material/SignalCellularNodata';
 import ConnectWithoutContactIcon from '@mui/icons-material/ConnectWithoutContact';
 import OpenSourceIcon from '@mui/icons-material/ImportContacts';
 import PushedIcon from '@mui/icons-material/ForwardToInbox';
-import Encrypted from '@mui/icons-material/MailLock';
+import EncryptedIcon from '@mui/icons-material/MailLock';
 import GitHubIcon from '@mui/icons-material/GitHub';
-
+import logo from '../../assets/svg/logo-black.svg';
 const About = () => {
   const styles = {
     box: css`
@@ -29,7 +29,7 @@ const About = () => {
       display: block;
       margin-left: auto;
       margin-right: auto;
-      width: 30%;
+      width: 20%;
       padding-bottom: 5%;
     `,
     version: css`
@@ -44,17 +44,17 @@ const About = () => {
         <List>
           <ListItem key="0">
             <ListItemText
-              sx={{ textAlign: 'center' }}
               primary={
                 <Stack direction={'row'}>
-                  <>Nothing as volatile </>
-                  <PsychologyIcon color="secondary" />
-                  <>as the human thought </>
+                  <Typography variant={'subtitle1'}>
+                    Nothing as volatile
+                    <PsychologyIcon color="secondary" />
+                    as the human mind
+                  </Typography>
                 </Stack>
               }
             />
           </ListItem>
-
           <ListItem key="1">
             <ListItemText
               primary={
@@ -65,8 +65,9 @@ const About = () => {
               }
               secondary={
                 <>
-                  Without a central server storing your private data. If you lose access to your
-                  account your identity cannot be recovered, because it is stored nowhere else.
+                  Without a central server able to capture or censuring your data. If you lose
+                  access to your account your identity cannot be recovered, because it is stored
+                  nowhere else.
                   <IconButton
                     onClick={() => alert('Soon.. Bip39 Mnemonics here')}
                     size="small"
@@ -82,16 +83,14 @@ const About = () => {
             <ListItemText
               primary={
                 <>
-                  <SignalCellularNodataIcon color="secondary" /> Installed for offline use
+                  <SignalCellularNodataIcon color="secondary" /> Use Offline
                 </>
               }
               secondary={
                 <>
-                  You can read and write messages offline, once back and connected with your
-                  contacts, all messages are syncronized. If the other person is offline and enabled
-                  push notifications, an icon
-                  <PushedIcon fontSize="small" />
-                  appears next to the message.
+                  Read and write messages anytime, once back and connected with your contacts all
+                  messages will be synchronized. If the other person is offline and enabled push
+                  notifications, an icon <PushedIcon fontSize="small" /> will inform you.
                 </>
               }
             />
@@ -100,16 +99,15 @@ const About = () => {
             <ListItemText
               primary={
                 <>
-                  <Encrypted color="secondary" />
+                  <EncryptedIcon color="secondary" />
                   Securely Encrypted
                 </>
               }
               secondary={
                 <>
-                  All sensitive data is encrypted on your local device. Only connections with valid
-                  signatures are allowed to connect. All data send is encrypted with a password
-                  known only to the receiver of the message. This applies also to push messages, so
-                  the browser push provider cannot know who or what information was sent.
+                  Messages are encrypted in your local storage and only trusted connections are
+                  allowed to connect. Messages are encrypted with a secret only known by you and
+                  your contact. This applies also to push messages.
                 </>
               }
             />
@@ -128,20 +126,18 @@ const About = () => {
                   target={'_blank'}
                   rel="noreferrer"
                 >
-                  <ListItemText
-                    secondary={
-                      <>
-                        Source available on GitHub <GitHubIcon />
-                      </>
-                    }
-                  />
+                  <>
+                    Source available on GitHub <GitHubIcon />
+                  </>
                 </Link>
               }
             />
           </ListItem>
         </List>
       </Box>
-      <img alt="logo" src={Logo} css={styles.logo} />
+
+      <img alt="logo" src={logo} css={styles.logo} />
+
       <Typography css={styles.version}> v{packageJson.version}</Typography>
     </Container>
   );

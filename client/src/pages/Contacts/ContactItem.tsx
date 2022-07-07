@@ -54,7 +54,6 @@ export const ContactItem = (props: { contact: IContact }) => {
     }
 
     if (!peerMngr) return;
-    console.debug('useEffect onMessage/onContactChange');
     peerMngr.on('onMessage', messageHandler);
     peerMngr.on('onContactStatusChange', onContactStatusChangeHandle);
 

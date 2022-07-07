@@ -3,11 +3,20 @@
 import { IContact } from '../../types';
 
 import { useContext, useEffect, useRef } from 'react';
-import { Box, Button, Dialog, DialogContent, useMediaQuery, useTheme } from '@mui/material';
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogContent,
+  IconButton,
+  useMediaQuery,
+  useTheme,
+} from '@mui/material';
 import { PeerContext } from '../../providers/PeerProvider';
 import { ContactListItem } from '../Contacts/ContactListItem';
 import { MediaConnection } from 'peerjs';
-
+import CallEndIcon from '@mui/icons-material/CallEnd';
+import CallRecordIcon from '@mui/icons-material/SaveAlt';
 const CallingComponent = ({
   contact,
   videoOn,
@@ -30,6 +39,13 @@ const CallingComponent = ({
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const MediaElement = ({ source }: { source: MediaStream }) => {
+    useEffect(() => {
+      mediaConnection.on('close', () => {
+        remoteVideoElement?.current?.remove();
+        remoteAudioElement?.current?.remove();
+      });
+    }, []);
+
     /**
      *
      */
@@ -79,16 +95,25 @@ const CallingComponent = ({
    *
    */
   return (
-    <Dialog open={mediaConnection != null} fullScreen={fullScreen}>
+    <Dialog
+      open={mediaConnection != null}
+      fullScreen={fullScreen}
+      onClose={() => {
+        console.log('Not closing without hangup');
+      }}
+    >
       <DialogContent>
         <ContactListItem contact={contact}></ContactListItem>
         <MediaElement source={remoteMediaStream} />
-        <Button color="secondary" onClick={hangup}>
-          Hangup
-        </Button>
-        <Button color="secondary" onClick={() => alert('Not yet implemented...')}>
+
+        <IconButton color="secondary" onClick={hangup}>
+          <CallEndIcon /> End Call
+        </IconButton>
+
+        <IconButton color="secondary" onClick={() => alert('Not yet implemented...')}>
           Record
-        </Button>
+          <CallRecordIcon />
+        </IconButton>
       </DialogContent>
     </Dialog>
   );
