@@ -1,11 +1,8 @@
 # VolaTALK - Direct Private Messenger
 
-<img src="https://github.com/bosskabouter/volatalk/blob/7ce9898b5a7d81dfe80902c88f9cb1cfa65ac999/client/src/assets/svg/logo-black.svg"/>
-
-
+<img src="https://github.com/bosskabouter/volatalk/blob/162accd60808545d7a7227e8fe3f8b2e47a49477/logo/volatalk-logo-color-v1.png" width="99px"/>
 
 ## Introduction
-<img src="https://github.com/bosskabouter/volatalk/blob/162accd60808545d7a7227e8fe3f8b2e47a49477/logo/volatalk-logo-color-v1.png" width="99px"/>
 
 ### Vision
 
@@ -13,7 +10,7 @@
 
 ### Mission
 
-Define a way for browsers to communicate privately and direcly between trusted contacts independent of any centralized service. When a service is used, it should know as little as possible about the sending or receiving client and the information sent.
+A way for browsers to communicate privately and direcly between trusted contacts, independent of any centralized service. When a service is used it should know as little as possible about the sending or receiving client and the information sent.
 
 ### Why
 
@@ -23,12 +20,13 @@ Because I could not not find a messenger I could fully trust, I wrote my own.
 
 Communicate directly with other contacts without a central server to buffer, capture, censure or use the data in any other way.
 
-Therefore it uses peer-to-peer and WebRTC. There are many solutions like these, but none I could find create a long-term trusted relation between clients, as explained in [Future Versions](#future-versions).
+Therefore it uses peer-to-peer and WebRTC technologies. There are many solutions like these, but none I could find create a long-term trusted relation between clients, as explained in [Future Versions](#future-versions).
 
-Any solution based on decentralized permanent mined blockchain technologies would not fit the [Vision](#vision).
+Any solution based on decentralized blockchain technologies would not fit the [Vision](#vision).
 
 #### Doesn' t anything like this exist?
-Since VolaTALK does not capture any data, no money can be made from it. No commercial party would ever be interested in building anything like this. 
+
+Since VolaTALK does not capture any data, no money can be made from it. No commercial party would be interested in building something like this.
 
 ## Table of Contents
 
@@ -69,7 +67,7 @@ VolaTALK describes a way for browsers to establish a trusted WebRTC connections 
 
 ### Peer-to-Peer
 
-Once a Peer found another Peer, no other services are needed for their communication during the existence of their WebRTC session.
+Once a peer found another peer, no other services are needed for their communication during the existence of their WebRTC session.
 
 In order to find each other and establish these sessions, peers register on a [WebRTC signaling server](https://webrtc.org/). A reference implementation of such Peer Server is [PeerJS](https://peerjs.com/). It can be installed anywhere and they offer a public [default instance](https://0.peerjs.com/).
 
