@@ -44,6 +44,7 @@ Since VolaTALK does not capture any data, no money can be made from it. No comme
 - [Peer ID](#peer-id)
 - [VolaTALK Client](#volatalk-client)
 - [Registration](#registration)
+- [Encrypted Local Storage](#encrypted-local-storage)
 - [Geo-location](#geo-location)
 - [Push notifications](#push-notifications)
 - [Invitation](#invitation)
@@ -77,8 +78,6 @@ A VolaTALK peer currently registers to a Peer server with a Base58 encoded publi
 
 Peer IDs are shared between users in 'copy-and-paste' invites. The application includes a QR generator and reader to facilitate the exchange of trusted invites.
 
-The private key is stored in a Dexie encrypted IndexedDB.
-
 ### VolaTALK Client
 
 A Progressive Web App as reference of the VolaTALK protocol, bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app) using the `pwa-starter` template.
@@ -88,6 +87,10 @@ A Progressive Web App as reference of the VolaTALK protocol, bootstrapped with [
 A user can register by simply accepting 'Anonymous' as its nickname. A default avatar ([thanks thispersondoesnotexist](http://thispersondoesnotexist.com)) is loaded but will appear for every contact differently (no CORS - no fetch).
 
 The user can save a base64 encoded image into his profile. The picture is downsized and send out on every connection request.
+
+##### Encrypted Local Storage
+
+The private key is stored in a Dexie encrypted IndexedDB.
 
 The profile can be secured with a 6 digit access pin which can be recovered using 2 security questions.
 
