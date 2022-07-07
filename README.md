@@ -12,7 +12,7 @@
 
 Private and direct communication between trusted contacts, independent of any centralized service.
 
-Used services should know as little as possible about the sending or receiving client and the information being sent.
+Services should know as little as possible about the sending or receiving client and the information being sent.
 
 ### Why
 
