@@ -23,6 +23,7 @@ Because I could not not find a trackerless messenger I could fully trust, I wrot
 Communicate directly with other contacts without a central server to buffer, capture, censure or use the data in any other way.
 
 #### Peer-to-Peer (p2p)
+
 Therefore it uses peer-to-peer and [WebRTC](https://webrtc.org/). There are many solutions like these, but none I could find create a long-term trusted relation between clients, as explained in [Future Versions](#future-versions).
 
 Any solution based on decentralized blockchain technologies would not fit the [Vision](#vision).
@@ -73,11 +74,11 @@ VolaTALK describes a way for browsers to establish a trusted WebRTC connections 
 
 Once a peer found another peer, no other services are needed for their communication during the existence of their WebRTC session.
 
-In order to find each other and establish these sessions, peers register on a [PeerJS](https://peerjs.com/) signaling server. It can be installed anywhere and they offer a public [default instance](https://0.peerjs.com/).
+For contacts to find each other and establish a connection, they look for each other at a [PeerJS](https://peerjs.com/) signaling server. These can be installed anywhere and they offer a public [default instance](https://0.peerjs.com/).
 
 #### Peer ID
 
-A VolaTALK peer currently registers to a Peer server with a Base58 encoded public key exponent of the ECDSA SHA-384 JSON WebKey.
+A VolaTALK peer currently identifies himself by registering to a Peer server with a Base58 encoded public key exponent of the ECDSA SHA-384 JSON WebKey.
 
 Peer IDs are shared between users in 'copy-and-paste' invites. The application includes a QR generator and reader to facilitate the exchange of trusted invites.
 
@@ -127,7 +128,7 @@ The application permits transmission of the invite through QR scanning, mobile s
 
 When a peer requests a connection to another peer, a signature is sent in the connection metadata, containing Peer ID of the receiver and is signed with the private key of the requester. The receiver uses the requester Peer ID to verify the signature before the connection is accepted.
 
-### Connection Acceptance
+#### Connection Acceptance
 
 As long as the contact is not accepted, or declined later on, no connection will be permitted. Once a connection is permitted, all up-to-date user metadata `IContactResume` is synchronized between the two contacts and data can be send and A/V calls established.
 
