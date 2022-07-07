@@ -67,13 +67,13 @@ VolaTALK describes a way for browsers to establish a trusted WebRTC connections 
 
 ### Peer-to-Peer
 
-Once a Peer found another Peer, no other services are needed for their communication during the existence of their WebRTC session.
+Once a peer found another peer, no other services are needed for their communication during the existence of their WebRTC session.
 
 In order to find each other and establish these sessions, peers register on a [WebRTC signaling server](https://webrtc.org/). A reference implementation of such Peer Server is [PeerJS](https://peerjs.com/). It can be installed anywhere and they offer a public [default instance](https://0.peerjs.com/).
 
 #### Peer ID
 
-A VolaTALK peer currently registers to a Signaling server with a Base58 encoded public key exponent of the ECDSA SHA-384 JSON WebKey.
+A VolaTALK peer currently registers to a Peer server with a Base58 encoded public key exponent of the ECDSA SHA-384 JSON WebKey.
 
 Peer IDs are shared between users in 'copy-and-paste' invites. The application includes a QR generator and reader to facilitate the exchange of trusted invites.
 
@@ -85,9 +85,9 @@ A Progressive Web App as reference of the VolaTALK protocol, bootstrapped with [
 
 #### Registration
 
-A user can register by simply accepting 'Anonymous' as its nickname. A default avatar [thanks thanksthispersondoesnotexist.com](http://thispersondoesnotexist.com) is loaded but will appear for every contact differently (no CORS - no fetch).
+A user can register by simply accepting 'Anonymous' as its nickname. A default avatar ([thanks thispersondoesnotexist](http://thispersondoesnotexist.com)) is loaded but will appear for every contact differently (no CORS - no fetch).
 
-The user can save a base64 encoded image into his profile. The picture is downsized because it is send within the connection metadata on every connection request.
+The user can save a base64 encoded image into his profile. The picture is downsized and send out on every connection request.
 
 The profile can be secured with a 6 digit access pin which can be recovered using 2 security questions.
 
@@ -95,7 +95,7 @@ The profile can be secured with a 6 digit access pin which can be recovered usin
 
 ##### Geo-location
 
-The application permits "Follow Me" functionality. Users who both opt-in are able to see their own and other's estimated physical location, distance and bearing from each other, alongside local and remote weather conditions (thanks [OpenWeatherMap](https://openweathermap.org/)). By having several contacts using this feature the request information send to this service will render useless for identification of location tracking purposes.
+The application permits "Follow Me" functionality. Users who both opt-in are able to see their own and other's estimated physical location, distance and bearing from each other, alongside local and remote weather conditions (thanks [OpenWeatherMap](https://openweathermap.org/)). By having several contacts using this feature the request information send to this service will render useless for tracking purposes.
 
 #### Push notifications
 
