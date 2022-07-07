@@ -10,11 +10,13 @@
 
 ### Mission
 
-Private and direct communication between trusted contacts, independent of any centralized service. When a service is used it should know as little as possible about the sending or receiving client and the information sent.
+Private and direct communication between trusted contacts, independent of any centralized service.
+
+Used services should know as little as possible about the sending or receiving client and the information being sent.
 
 ### Why
 
-Because I could not not find a messenger I could fully trust, I wrote my own.
+Because I could not not find a trackerless messenger I could fully trust, I wrote my own.
 
 ### What is different
 
