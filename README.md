@@ -1,6 +1,6 @@
 # VolaTALK - Direct Private Messenger
 
-<img src="https://github.com/bosskabouter/volatalk/blob/162accd60808545d7a7227e8fe3f8b2e47a49477/logo/volatalk-logo-color-v1.png" width="99px"/>
+<img src="https://github.com/bosskabouter/volatalk/raw/7ce9898b5a7d81dfe80902c88f9cb1cfa65ac999/client/src/assets/svg/logo-black.svg" style="max-width: 100%;">
 
 ## Introduction
 
@@ -26,7 +26,7 @@ Any solution based on decentralized blockchain technologies would not fit the [V
 
 #### Doesn' t anything like this exist?
 
-Since VolaTALK does not capture any data, no money can be made from it. No commercial party would be interested in building something like this.
+Since VolaTALK does not capture any data, no money can be made from it. No commercial party would be interested in building anything like this.
 
 ## Table of Contents
 
@@ -67,7 +67,7 @@ VolaTALK describes a way for browsers to establish a trusted WebRTC connections 
 
 ### Peer-to-Peer
 
-Once a peer found another peer, no other services are needed for their communication during the existence of their WebRTC session.
+Once a Peer found another Peer, no other services are needed for their communication during the existence of their WebRTC session.
 
 In order to find each other and establish these sessions, peers register on a [WebRTC signaling server](https://webrtc.org/). A reference implementation of such Peer Server is [PeerJS](https://peerjs.com/). It can be installed anywhere and they offer a public [default instance](https://0.peerjs.com/).
 
