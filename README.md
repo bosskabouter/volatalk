@@ -1,6 +1,6 @@
 # VolaTALK - Direct Private Messenger
 
-<svg src="https://github.com/bosskabouter/volatalk/blob/7ce9898b5a7d81dfe80902c88f9cb1cfa65ac999/client/src/assets/svg/logo-black.svg"/>
+<img src="https://github.com/bosskabouter/volatalk/blob/7ce9898b5a7d81dfe80902c88f9cb1cfa65ac999/client/src/assets/svg/logo-black.svg"/>
 
 
 
