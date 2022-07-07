@@ -106,11 +106,21 @@ The application permits "Follow Me" functionality. Users who both opt-in are abl
 
 #### Push notifications
 
-Users can receive messages through the Push notification API of the browser. The Push subscription registered in the service worker is saved not on the Push Server (as usual), but in the user's profile and send out only to accepted contacts. A contact, trying to send a message while a user is offline, will send the user's subscription to the Push Server together with an encrypted payload. The push server does not know the ID of the receiver so cannot decrypt with the 'secret' Peer ID. It just received a URL (subscription endpoint) to resend the encrypted payload to.
+Users can receive messages through the Push notification API of the browser. The Push subscription endpoint registered in the browsers service worker is saved not on the Push Server (as usual), but in the user's profile and send out only to accepted contacts.
+
+A contact trying to send a message while the user is offline, will send the message through the Push Service.
+
+##### Push Server
+
+The Push Server receives post requests containing 2 objects;
+
+1. user's subscription endpoint, a URL contained within the subscription while registering the browser's service worker for push notifications within this site context.
+
+2. message payload encrypted with the Peer ID of the receiving user. The push server nor the endpoint know this ID.
 
 Drawing here
 
-The client uses it's own peer ID as secret key to decrypt any message it receives through push notifications. Not so secret, but since the Push Server does not know who is the receiver (only who is the sender) it cannot decrypt the message. The Browser's Push Provider does not know the user's Peer ID so they cannot decipher either.
+The receiving client uses it's own peer ID as secret key to decrypt all incoming push message inside the service worker. Once decrypted, contact information is gathered from `contactInfo` (synced between [`ServiceWorkerWrapper.tsx`](https://github.com/bosskabouter/volatalk/blob/main/client/src/sw/ServiceWorkerWrapper.tsx) and [`service-worker.ts`](https://github.com/bosskabouter/volatalk/blob/main/client/src/service-worker.ts).
 
 #### Invitation
 
