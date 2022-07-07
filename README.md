@@ -8,7 +8,7 @@
 
 ## Mission
 
-Private and direct communication over trusted relations between browsers. It aims to be independent of any centralized service to estalish direct peer-to-peer communication. When a service is used, it should know as little as possible about the sending or receiving client and the information sent.
+Define a way for browsers to communicate privately and direcly between trusted contacts independent of any centralized service. When a service is used, it should know as little as possible about the sending or receiving client and the information sent.
 
 ## Why
 
