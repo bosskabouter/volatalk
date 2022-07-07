@@ -16,11 +16,14 @@ Because I could not not find a messenger I could fully trust, I wrote my own.
 
 ## What is different
 
-VolaTALK communicates directly with other contacts without a central server to buffer, capture, censure or misuse the data send in between.
+Communicate directly with other contacts without a central server to buffer, capture, censure or use the data in any other way.
 
-Therefore it uses peer-to-peer and WebRTC technologies. There are many solutions like these, but none I could find create a long-term trusted relation between clients, as explained in [Future Versions](#future-versions).
+Therefore it uses peer-to-peer and WebRTC. There are many solutions like these, but none I could find create a long-term trusted relation between clients, as explained in [Future Versions](#future-versions).
 
 Any solution based on decentralized permanent mined blockchain technologies would not fit the [Vision](#vision).
+
+## Doesn' t anything like this exist?
+Since VolaTALK does not capture any data, no money can be made from it. No commercial party would ever be interested in building anything like this. 
 
 ## Table of Contents
 
@@ -28,6 +31,7 @@ Any solution based on decentralized permanent mined blockchain technologies woul
 - [Vision](#vision)
 - [Mission](#mission)
 - [Why?](#why)
+- [What's different](#what-is-different)
 - [What's different?](#what-is-different)
 - [Table of Contents](#table-of-contents)
 - [Screenshots](#screenshots)
