@@ -6,13 +6,18 @@ import { DatabaseContext } from '../providers/DatabaseProvider';
 import { convertBase64ToAb } from '../services/Generic';
 
 const ServiceWorkerWrapper: FC = () => {
+
+  /**
+   * Global Web push pubKey 
+   * TODO: investigate if this 
+   */
   const WEBPUSH_SERVER_PUBKEY =
     'BKO5xaLdDEzHQIjdm5rRT9QWUOp3SCl7VDfO3dj0LYMno6IlTZ7njpFvWYWMEWvxL2ici5FmzqrPaxAEywyB1WA';
 
   const noServiceWorkerAvailable = !('serviceWorker' in navigator);
   const serviceWorkerScript =
     process.env.NODE_ENV === 'production'
-      ? '/service-worker.js'
+      ? '/sw/service-worker.js'
       : '/sw/test/service-worker-testpush.js';
 
   const [showReload, setShowReload] = useState(false);

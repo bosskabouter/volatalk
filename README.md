@@ -30,7 +30,7 @@ Any solution based on decentralized blockchain technologies would not fit the [V
 
 #### Doesn't anything like this exist?
 
-Since VolaTALK does not capture any data, no money can be made with it. No commercial party would be interested in building anything like this. A Dollar for a Click...
+Since VolaTALK does not capture any data, no money can be harvested so no commercial party would have any interest  in building anything like this. A Dollar for a Click... at least.
 
 ## Table of Contents
 
@@ -106,9 +106,9 @@ The application permits "Follow Me" functionality. Users who both opt-in are abl
 
 #### Push notifications
 
-Users can receive messages through the Push notification API of the browser. The Push subscription endpoint registered in the browsers service worker is saved not on the Push Server (as usual), but in the user's profile and send out only to accepted contacts.
-
 A contact trying to send a message while the user is offline, will send the message through the Push Service.
+
+Users can receive messages through the [Push notification API](https://developer.mozilla.org/en-US/docs/Web/API/Push_API). The subscription endpoint registered in the browsers service worker is saved not on the Push Server (as usual), but in the user's profile and send out only to accepted contacts and not the push server.
 
 ##### Push Server
 
@@ -116,9 +116,7 @@ The Push Server receives post requests containing 2 objects;
 
 1. user's subscription endpoint, a URL contained within the subscription while registering the browser's service worker for push notifications within this site context.
 
-2. message payload encrypted with the Peer ID of the receiving user. The push server nor the endpoint know this ID.
-
-Drawing here
+2. message payload encrypted with the Peer ID of the receiving user. The push server nor the endpoint know this Peer ID.
 
 The receiving client uses it's own peer ID as secret key to decrypt all incoming push message inside the service worker. Once decrypted, contact information is gathered from `contactInfo` (synced between [`ServiceWorkerWrapper.tsx`](https://github.com/bosskabouter/volatalk/blob/main/client/src/sw/ServiceWorkerWrapper.tsx) and [`service-worker.ts`](https://github.com/bosskabouter/volatalk/blob/main/client/src/service-worker.ts).
 

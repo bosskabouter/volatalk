@@ -102,16 +102,16 @@ const AccountSetup = () => {
     }),
   });
 
-  //TODO try to fetch the image, or cache the specific URL for this image in service worker
   const randImage = () =>
-    'https://thispersondoesnotexist.com/image?justarandom=' + Math.round(Math.random() * 10000);
+    'https://thispersondoesnotexist.com/image?notRandomImage=' + Math.round(Math.random() * 100);
 
-  const [avatarData, setAvatarData] = useState(randImage);
-  const [tpdneExplainer, setTpdneExplainer] = useState(
-    <Typography variant={'overline'} onClick={() => setAvatarData(randImage)}>
-      * thispersondoesnotexist.com
-    </Typography>
-  );
+  //TODO: try to (a) fetch the image and save in profile, or (b) cache the specific URL for this image in service worker
+  const userHasAvatar = user?.avatar?.length > randImage.length - 3;
+
+  //use a random image if user doesn't have one
+
+  const [avatarData, setAvatarData] = useState(userHasAvatar ? user.avatar : randImage);
+
   const formik = useFormik<IUserProfile>({
     initialValues: user || {
       dateRegistered: new Date(),
@@ -352,11 +352,19 @@ const AccountSetup = () => {
             onUploaded={(base64EncodedUpload, base64EncodedUploadThumb) => {
               formik.setFieldValue('avatar', base64EncodedUpload);
               formik.setFieldValue('avatarThumb', base64EncodedUploadThumb);
-              setTpdneExplainer(<></>);
               setAvatarData(base64EncodedUpload);
             }}
           />
-          {tpdneExplainer}
+          <Typography
+            variant={'overline'}
+            onClick={() => {
+              formik.setFieldValue('avatar', randImage);
+              formik.setFieldValue('avatarThumb', randImage);
+              setAvatarData(randImage);
+            }}
+          >
+            * thispersondoesnotexist.com
+          </Typography>
 
           <Box>
             <FormControlLabel

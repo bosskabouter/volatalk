@@ -48,7 +48,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
       path: '/',
       secure: true,
       key: 'volakey',
-      debug: 3,
+      debug: 1,
 
       //secure signature, does it arrive?
     },

@@ -8,7 +8,7 @@ import BearingIcon from '@mui/icons-material/North';
 import { UserContext } from 'providers/UserProvider';
 import { round } from 'services/Generic';
 
-//TODO investigate better north madgwick
+//TODO: investigate better north madgwick
 //import { madgwick } from 'services/Compass';
 export const DistanceInfo = ({ contact }: { contact: IContact }) => {
   const { user } = useContext(UserContext);

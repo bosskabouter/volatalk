@@ -36,5 +36,5 @@ test('should Push', async () => {
   const result = await pushMessage(aMessage, aContact);
   expect(result).toBeDefined();
   // expect(result).toBeLessThan(500);
-  //TODO mock fetch
+  //TODO: mock fetch
 });

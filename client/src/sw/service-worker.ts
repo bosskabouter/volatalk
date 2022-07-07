@@ -5,7 +5,7 @@
 // code you'd like.
 
 import { decryptString, generateKeyFromString } from 'dha-encryption';
-import { IContact, IMessage, IUserProfile } from './types';
+import { IContact, IMessage, IUserProfile } from '../types';
 import { clientsClaim } from 'workbox-core';
 import { ExpirationPlugin } from 'workbox-expiration';
 import { createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching';

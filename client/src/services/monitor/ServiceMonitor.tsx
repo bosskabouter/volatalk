@@ -1,27 +1,9 @@
 /** @jsxImportSource @emotion/react */
 import React from 'react';
 import { css } from '@emotion/react';
-import { ChangeEvent, useContext, useState } from 'react';
+import { useState } from 'react';
 
-import {
-  Box,
-  Button,
-  Checkbox,
-  Dialog,
-  IconButton,
-  DialogContent,
-  FormControl,
-  FormControlLabel,
-  MenuItem,
-  OutlinedInput,
-  Select,
-  Switch,
-  TextField,
-  Typography,
-  useTheme,
-  DialogTitle,
-} from '@mui/material';
-import MonitorHeartIcon from '@mui/icons-material/MonitorHeart';
+import { Dialog, IconButton, DialogContent, useTheme, DialogTitle } from '@mui/material';
 import { MonitorHeart } from '@mui/icons-material';
 /**
  * Thank you https://www.port-monitor.com/
@@ -45,7 +27,7 @@ const ServiceMonitor = () => {
       //   height: 60%;
 
       padding: 1rem 1rem 1rem 1rem;
-      min-height: 20rem;
+      min-height: 18rem;
       min-width: 30rem;
       // width: 18rem;
 
@@ -85,14 +67,11 @@ const ServiceMonitor = () => {
       </DialogTitle>
       <DialogContent css={styles.dialogContent}>
         <iframe
+          title="External Monitoring"
+          referrerPolicy="no-referrer"
           css={styles.monitorIframe}
-          // allowtransparency="true"
-          //  frameborder="0"
-
           src="https://www.port-monitor.com/status-pages/5Bz%2F2YAgn7pQTDQA7TOMJQ%3D%3D%0A"
           //      style={"overflow: hidden; height: 100%; width: 100%; position: absolute;"}
-          //height="100%"
-          //width="100%"
         ></iframe>
       </DialogContent>
     </Dialog>
