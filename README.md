@@ -1,56 +1,10 @@
 # VolaTALK - Direct Private Messenger
 
-<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" id='vtlogo'>
-<defs><style>
-#vtlogo {
-    fill:purple;
-    animation-name: example;
-    animation-duration: 20s;
-    animation-iteration-count: infinite;
-    animation-direction: alternate;
-    animation-timing-function: ease-in-out;
-}
+<svg src="https://github.com/bosskabouter/volatalk/blob/7ce9898b5a7d81dfe80902c88f9cb1cfa65ac999/client/src/assets/svg/logo-black.svg"/>
 
-@keyframes App-logo-spin {
-from {
-transform: rotate(0deg);
-}
-to {
-transform: rotate(360deg);
-}
-}
-@keyframes App-logo-rotate {
-from {
-transform: rotateY(180deg);
-}
-to {
-transform: rotateY(360deg);
-}
-}
-@media (prefers-reduced-motion: no-preference) {
-.App-logo {
-animation: App-logo-spin infinite 20s linear; # animation: App-logo-rotate infinite 10s; # animation-direction: alternate;
-animation-timing-function: ease-in-out;
-}
-}
-@keyframes example {
-from {background-color: red;}
-to {background-color: yellow;}
-}
 
-</style></defs>
-
-<g transform="matrix(18.54 0 0 18.54 90.52 45.55)" style=""  >
-		<text  class=" App-logo"  xml:space="preserve" font-family="'Yrsa'" font-size="63" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-11.07" y="5.65" dx="6" dy="36">V</tspan></text>
-</g>
-<g transform="matrix(10.26 0 0 10.11 45.1 90.03)" style=""  >
-		<text  class="logoClass App-logo"  xml:space="preserve" font-family="'Quicksand'" font-size="45" font-style="normal" font-weight="normal" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1; white-space: pre;" ><tspan x="-17.55" y="-6.14" dx="6" dy="36">o L a</tspan></text>
-</g>
-
-</svg>
 
 ## Introduction
-
 <img src="https://github.com/bosskabouter/volatalk/blob/162accd60808545d7a7227e8fe3f8b2e47a49477/logo/volatalk-logo-color-v1.png" width="99px"/>
 
 ### Vision
@@ -74,8 +28,7 @@ Therefore it uses peer-to-peer and WebRTC. There are many solutions like these, 
 Any solution based on decentralized permanent mined blockchain technologies would not fit the [Vision](#vision).
 
 #### Doesn' t anything like this exist?
-
-Since VolaTALK does not capture any data, no money can be made from it. No commercial party would ever be interested in building anything like this.
+Since VolaTALK does not capture any data, no money can be made from it. No commercial party would ever be interested in building anything like this. 
 
 ## Table of Contents
 
