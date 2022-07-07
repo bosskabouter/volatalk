@@ -23,7 +23,7 @@ Because I could not not find a trackerless messenger I could fully trust, I wrot
 Communicate directly with other contacts without a central server to buffer, capture, censure or use the data in any other way.
 
 #### Peer-to-Peer (p2p)
-Therefore it uses peer-to-peer and WebRTC technologies. There are many solutions like these, but none I could find create a long-term trusted relation between clients, as explained in [Future Versions](#future-versions).
+Therefore it uses peer-to-peer and [WebRTC](https://webrtc.org/). There are many solutions like these, but none I could find create a long-term trusted relation between clients, as explained in [Future Versions](#future-versions).
 
 Any solution based on decentralized blockchain technologies would not fit the [Vision](#vision).
 
@@ -73,7 +73,7 @@ VolaTALK describes a way for browsers to establish a trusted WebRTC connections 
 
 Once a peer found another peer, no other services are needed for their communication during the existence of their WebRTC session.
 
-In order to find each other and establish these sessions, peers register on a [WebRTC signaling server](https://webrtc.org/). A reference implementation of such Peer Server is [PeerJS](https://peerjs.com/). It can be installed anywhere and they offer a public [default instance](https://0.peerjs.com/).
+In order to find each other and establish these sessions, peers register on a [PeerJS](https://peerjs.com/) signaling server. It can be installed anywhere and they offer a public [default instance](https://0.peerjs.com/).
 
 #### Peer ID
 
