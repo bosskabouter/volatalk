@@ -58,7 +58,7 @@ VolaTALK describes a way for browsers to establish a trusted WebRTC connections 
 
 Once a Peer found another Peer, no other services are needed for their communication during the existence of their WebRTC session.
 
-In order to find each other and establish these sessions, peers register on a [WebRTC Signaling server, or Peer Server] (https://webrtc.org/). PeerJS (https://peerjs.com/) is a reference implementation and can be installed anywhere. They also offer a public [default instance](https://0.peerjs.com/).
+In order to find each other and establish these sessions, peers register on a [WebRTC signaling server](https://webrtc.org/). A reference implementation of such Peer Server is [PeerJS](https://peerjs.com/). It can be installed anywhere and they offer a public [default instance](https://0.peerjs.com/).
 
 #### Peer ID
 
