@@ -1,20 +1,22 @@
 # VolaTALK - Direct Private Messenger
 
+
+## Introduction
 <img src="https://github.com/bosskabouter/volatalk/blob/162accd60808545d7a7227e8fe3f8b2e47a49477/logo/volatalk-logo-color-v1.png" width="99px"/>
 
-## Vision
+### Vision
 
 > Nothing as volatile as the human mind, thank the universe.
 
-## Mission
+### Mission
 
 Define a way for browsers to communicate privately and direcly between trusted contacts independent of any centralized service. When a service is used, it should know as little as possible about the sending or receiving client and the information sent.
 
-## Why
+### Why
 
 Because I could not not find a messenger I could fully trust, I wrote my own.
 
-## What is different
+### What is different
 
 Communicate directly with other contacts without a central server to buffer, capture, censure or use the data in any other way.
 
@@ -22,12 +24,13 @@ Therefore it uses peer-to-peer and WebRTC. There are many solutions like these, 
 
 Any solution based on decentralized permanent mined blockchain technologies would not fit the [Vision](#vision).
 
-## Doesn' t anything like this exist?
+#### Doesn' t anything like this exist?
 Since VolaTALK does not capture any data, no money can be made from it. No commercial party would ever be interested in building anything like this. 
 
 ## Table of Contents
 
-- [VolaTALK - Introduction](#volatalk---direct-messenger)
+- [VolaTALK](#volatalk---direct-messenger)
+- [Introduction](#introduction)
 - [Vision](#vision)
 - [Mission](#mission)
 - [Why?](#why)
