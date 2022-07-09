@@ -116,7 +116,7 @@ The Push Server receives post requests containing 2 objects;
 
 2. message `payload` encrypted with the Peer ID of the receiving user. The push server nor the endpoint know this Peer ID.
 
-The receiving client decrypts all incoming push messages with its own peer ID as secret key inside the service worker. Once decrypted, contact information is gathered from `contactInfo` (synced between [`ServiceWorkerWrapper.tsx`](https://github.com/bosskabouter/volatalk/blob/main/client/src/sw/ServiceWorkerWrapper.tsx) and [`service-worker.ts`](https://github.com/bosskabouter/volatalk/blob/main/client/src/service-worker.ts).
+The receiving client decrypts incoming push messages with its own peer ID as secret key inside the service worker. Using contact's Peer ID within the decrypted message detailed information is pulled from `contactInfo` (synced between [`ServiceWorkerWrapper.tsx`](https://github.com/bosskabouter/volatalk/blob/main/client/src/sw/ServiceWorkerWrapper.tsx) and [`service-worker.ts`](https://github.com/bosskabouter/volatalk/blob/main/client/src/service-worker.ts).
 
 #### Invitation
 
@@ -135,15 +135,15 @@ The application permits transmission of the invite through QR scanning, [Web sha
 Every connection with a contact is initiated informing the following metadata:
 
 
-`  export interface IContactResume { `
-`    peerid: string;`
-`    dateRegistered: Date;`
-`    nickname: string;`
-`    avatar: string;`
-`    avatarThumb: string;`
-`    position: GeolocationCoordinates | null;`
-`    pushSubscription: PushSubscription | null;`
-`}`
+  `  export interface IContactResume { `
+  `    peerid: string;`
+  `    dateRegistered: Date;`
+  `    nickname: string;`
+  `    avatar: string;`
+  `    avatarThumb: string;`
+  `    position: GeolocationCoordinates | null;`
+  `    pushSubscription: PushSubscription | null;`
+  `}`
 
 The `IContactResume` is accompanied by a signature: the Peer ID of the receiver signed with the private key of the requester. The receiver uses the requester Peer ID (public key) to verify the signature before the connection is accepted.
 
