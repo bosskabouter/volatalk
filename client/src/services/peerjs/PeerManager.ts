@@ -83,7 +83,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
     this.#peer.on('open', (pid) => {
       console.info('Peer connected', this.#peer.id);
       if (pid !== this.#user.peerid) {
-        throw Error('Signaller assigned different id: ' + pid);
+        throw Error('Signaler assigned different id: ' + pid);
       }
       console.info('Emit statusChange ONLINE');
       this.emit('statusChange', true);

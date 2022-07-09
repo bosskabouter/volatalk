@@ -50,14 +50,14 @@ export default function LocationInfo() {
   }, [position, user, user?.position]);
 
   return position && locationDescription ? (
-    <Box
+    <Box 
       sx={{
+       
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'right',
-        border: 0,
-        columnGap: 1,
+        columnGap: 3,
         margin: 0,
         padding: 0,
       }}

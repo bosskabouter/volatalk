@@ -73,7 +73,7 @@ export class SigningPeer extends Peer {
     super.on('open', (pid) => {
       console.log('Peer connected', super.id);
       if (pid !== this.#user.peerid) {
-        throw Error('Signaller assigned different id: ' + pid);
+        throw Error('Signaler assigned different id: ' + pid);
       }
       console.info('Emit statusChange ONLINE');
       this.emit('statusChange', true);

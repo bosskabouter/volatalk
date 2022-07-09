@@ -16,13 +16,28 @@ export default function Header() {
       direction={'row'}
       gap={'2rem'}
       position={'fixed'}
-      alignItems={'stretch'}
+      alignContent={'center'}
       justifySelf={'center'}
+      justifyContent={'space-evenly'}
+      spacing={3}
+      sx={{ flexGrow: 1 }}
+      flexGrow={1}
     >
-      <Compass />
-      <CalleeComponent /> <DateInfo />
+      <Stack direction={'row'}
+      gap={'1rem'}
+    //  position={'fixed'}
+    alignItems={'center'}
+      alignContent={'center'}
+      justifySelf={'center'}
+      justifyContent={'space-evenly'}
+      spacing={1}
+      sx={{ flexGrow: 1 }}
+      flexGrow={1}>
+        <Compass />
+        <CalleeComponent /> <DateInfo />
+      </Stack>
       <TimeInfo />
-      <LocationInfo />
+        <LocationInfo />
     </Stack>
   );
 }

@@ -203,11 +203,15 @@ Currenly Push Subscription endpoints are shared openly between contacts. A futur
 
 Ideally a VAPID key pair for each client subscription, so that VAPID public key isn't a global static and pertains only to the given client. This Vapid key pair should however be generated on the Push Server, so clients registering for push notifications must request their VAPID key pair from this server.
 
-### An Angular reference implementation
+
+### Allows Geo visibility to certain contacts only.
+
+### Parallax AR
+
+### Another reference implementation
 
 AngularJS or Angular2, possibly using cloud backend https://Back4App.com.
 
-### Allows Geo visibility to certain contacts only.
 
 ## License
 

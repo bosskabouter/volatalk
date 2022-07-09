@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
 
 import CompassIcon from '@mui/icons-material/LocationOn';
-import Avatar from '@mui/material/Avatar';
-import theme from 'pages/App/theme';
 import { Tooltip } from '@mui/material';
 
 /**
@@ -36,7 +34,7 @@ export const Compass = () => {
     };
   }, []);
 
-  return !north ? (
+  return north ? (
     <Tooltip title={'Top of device to Magntic north'}>
       <CompassIcon style={rotateCompassStyle} color={'secondary'} />
     </Tooltip>

@@ -1,4 +1,4 @@
-import { AppBar, Fab, Stack, Toolbar } from '@mui/material';
+import { AppBar, Box, Fab, Stack, Toolbar } from '@mui/material';
 import { AboutVolaTalkIcon } from 'components/About/About';
 import AccountAvatar from 'components/StatusDisplay/AccountAvatar';
 
@@ -20,7 +20,8 @@ const Footer = () => {
   });
 
   return (
-    <AppBar position="fixed" variant="elevation" color="primary" sx={{ top: 'auto', bottom: 0 }}>
+    <Box sx={{ flexGrow: 1 }}>
+    <AppBar position="fixed" variant="elevation" color="primary" sx={{ top: 'auto', bottom: 0 }} >
       <Toolbar >
         <StyledFab
           color="secondary"
@@ -32,7 +33,7 @@ const Footer = () => {
           <AddIcon />
         </StyledFab>
 
-        <Stack direction={'row'} alignItems={'center'} justifyContent={'space-around'} spacing={0}>
+        <Stack  direction={'row'} alignItems={'center'} justifyContent={'space-evenly'} spacing={3} sx={{flexGrow: 1}}>
           <MainLogo />
 
           <PeerDisplay />
@@ -42,7 +43,7 @@ const Footer = () => {
           <AccountAvatar />
         </Stack>
       </Toolbar>
-    </AppBar>
+    </AppBar></Box>
   );
 };
 

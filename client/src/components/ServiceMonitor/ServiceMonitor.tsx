@@ -15,26 +15,26 @@ const ServiceMonitor = () => {
     dialogRoot: css`
       display: flex;
       flex-direction: column;
-      width: 100%;
+    //  width: 100%;
       height: 100%;
       color: ${theme.palette.common.white};
     `,
     dialogContent: css`
       //   overflow: hidden;
       display: flex;
-      width: 100%;
+    //  width: 100%;
       //   height: 60%;
 
       padding: 1rem 1rem 1rem 1rem;
       min-height: 18rem;
-      min-width: 30rem;
+      //min-width: 20rem;
       // width: 18rem;
 
       color: ${theme.palette.common.white};
       @media only screen and (min-width: 768px) {
         // padding: 1rem 2rem 1rem 2rem;
         // min-height: 50rem;
-        min-width: 50rem;
+       //min-width: 40rem;
         // width: 38rem;
       }
     `,
@@ -43,7 +43,7 @@ const ServiceMonitor = () => {
       overflow-y: hidden; /* Hide vertical scrollbar */
       overflow-x: hidden; /* Hide horizontal scrollbar */
       // height: 70%;
-      width: 90%;
+      //width: 90%;
       // position: absolute;
       //   min-height: 10rem;
       background-color: ${theme.palette.primary.main};
