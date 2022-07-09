@@ -134,22 +134,17 @@ The application permits transmission of the invite through QR scanning, [Web sha
 
 Every connection with a contact is initiated informing the following metadata:
 
-`/\*\*
 
-- Basic UserInfo serialized in connection metadata
-  \*/
-  export interface IContactResume {
-  peerid: string;
-  dateRegistered: Date;
-
-nickname: string;
-
-avatar: string;
-avatarThumb: string;
-
-position: GeolocationCoordinates | null;
-pushSubscription: PushSubscription | null;
-}`
+`  export interface IContactResume {
+    peerid: string;
+    dateRegistered: Date;
+    nickname: string;
+    avatar: string;
+    avatarThumb: string;
+    position: GeolocationCoordinates | null;
+    pushSubscription: PushSubscription | null;
+ }
+`
 
 The `IContactResume` is accompanied by a signature: the Peer ID of the receiver signed with the private key of the requester. The receiver uses the requester Peer ID (public key) to verify the signature before the connection is accepted.
 
