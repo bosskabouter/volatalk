@@ -10,7 +10,7 @@ import ReadIcon from '@mui/icons-material/MarkChatRead';
 import { UserContext } from '../../providers/UserProvider';
 import { PeerContext } from '../../providers/PeerProvider';
 import { IContactResume, IMessage } from '../../types';
-import { descriptiveTimeAgo } from '../../services/Generic';
+import { descriptiveTimeAgo } from '../../services/util/Generic';
 
 export const MessageItem = ({
   contact,

@@ -1,12 +1,12 @@
 import { useContext, useEffect, useState } from 'react';
-import Distance, { bearingFrom } from 'util/geo/Distance';
-import { fetchLocationDescription, fetchLocationWeather } from 'services/LocationService';
+import Distance, { bearingFrom } from 'services/geo/Distance';
+import { fetchLocationDescription, fetchLocationWeather } from 'services/geo/OpenWeatherService';
 
 import { Box, Stack, Typography } from '@mui/material';
 import { IContact } from 'types';
 import BearingIcon from '@mui/icons-material/North';
 import { UserContext } from 'providers/UserProvider';
-import { round } from 'services/Generic';
+import { round } from 'services/util/Generic';
 
 //TODO: investigate better north madgwick
 //import { madgwick } from 'services/Compass';

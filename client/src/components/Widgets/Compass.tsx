@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import CompassIcon from '@mui/icons-material/LocationOn';
 import Avatar from '@mui/material/Avatar';
 import theme from 'pages/App/theme';
+import { Tooltip } from '@mui/material';
 
 /**
  *
@@ -12,7 +13,7 @@ export const Compass = () => {
   //analog clock effect
   const [north, setNorth] = useState<number>();
 
-  const compassStyle = {
+  const rotateCompassStyle = {
     transform: 'rotate(' + north + 'deg)',
   };
 
@@ -35,17 +36,10 @@ export const Compass = () => {
     };
   }, []);
 
-  return north ? (
-    <Avatar
-      title={north + ' degrees from north'}
-      sx={{
-        border: 2,
-        borderColor: theme.palette.secondary.main,
-        backgroundColor: theme.palette.primary.main,
-      }}
-    >
-      <CompassIcon style={compassStyle} color={'secondary'} />
-    </Avatar>
+  return !north ? (
+    <Tooltip title={'Top of device to Magntic north'}>
+      <CompassIcon style={rotateCompassStyle} color={'secondary'} />
+    </Tooltip>
   ) : (
     <></>
   );

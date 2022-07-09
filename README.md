@@ -6,21 +6,21 @@
 
 ### Vision
 
-> Nothing as volatile as the human mind, thank the universe.
+> Nothing as volatile as the human mind
 
 ### Mission
 
-Private and direct communication between trusted contacts, independent of any centralized service.
+Private and direct communication between trusted browsers, independent of any centralized server.
 
-Services should know as little as possible about the sending or receiving client and the information being sent.
+Services know as little as possible about the sending or receiving client and the information being sent.
 
 ### Why
 
 I could not not find a trackerless messenger I could fully trust, so I wrote my own.
 
-### What is different
+### What's different
 
-Communicate directly in your browser with other contacts. Without centralized servers capturing your data or native applications running in your system.
+Communicate directly in your browser with other contacts, without centralized servers capturing your data or native applications running in your system.
 
 ### Peer-to-peer
 
@@ -28,9 +28,9 @@ VolaTALK uses [WebRTC] data channels (https://webrtc.org/) to establish direct p
 
 Anything based on blockchain technologies would not fit the [Vision](#vision) for this purpose.
 
-#### Doesn't anything like this exist?
+#### Does anything like this exist?
 
-Since VolaTALK does not capture any data, no money can be made from it's users. No commercial party would have interest in building anything like this. A Dollar for a Click...
+Open source, free to use, P2P, without trackers, browser based without native applications? ? Please let us know at [ideas@volatalk.org](mailto:ideas@volatalk.org)
 
 ## Table of Contents
 
@@ -40,7 +40,7 @@ Since VolaTALK does not capture any data, no money can be made from it's users. 
 - [Mission](#mission)
 - [Why?](#why)
 - [What's different](#what-is-different)
-- [What's different?](#what-is-different)
+- [What's different?](#whats-different)
 - [Table of Contents](#table-of-contents)
 - [Screenshots](#screenshots)
 - [Technical Implementation](#technical-implementation)
@@ -52,9 +52,9 @@ Since VolaTALK does not capture any data, no money can be made from it's users. 
 - [Geo-location](#geo-location)
 - [Push notifications](#push-notifications)
 - [Invitation](#invitation)
-- [Connection request](#connection-request)
-- [Connection Acceptance](#connection-acceptance)
-- [VolaTALK Server](#volatalk-server)
+- [Cotact request](#contact-request)
+- [Contact Acceptance](#contact-acceptance)
+- [VolaTALK Services](#volatalk-server)
 - [Future Versions](#future-versions)
 
 ### Screenshots

@@ -1,9 +1,10 @@
 import { Box, Tooltip, Typography } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
-import { fetchLocationDescription, requestFollowMe } from 'services/LocationService';
+import {  requestFollowMe } from 'services/geo/LocationService';
 import { UserContext } from '../../providers/UserProvider';
 import LocationOffIcon from '@mui/icons-material/LocationOff';
 import { WeatherInfo } from './WeatherInfo';
+import { fetchLocationDescription } from 'services/geo/OpenWeatherService';
 export default function LocationInfo() {
   const [position, setPosition] = useState<GeolocationCoordinates | null>(null);
   const { user } = useContext(UserContext);

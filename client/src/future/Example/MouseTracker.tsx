@@ -1,8 +1,5 @@
-import React, { MouseEventHandler } from 'react';
+import React from 'react';
 
-interface IMouseTrackerProps {
-  value: string;
-}
 interface IMouseTrackerState {
   x: number;
   y: number;

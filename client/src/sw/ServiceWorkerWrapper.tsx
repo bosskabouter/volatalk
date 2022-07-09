@@ -3,7 +3,7 @@ import { Button, Snackbar } from '@mui/material';
 import { Workbox, WorkboxLifecycleWaitingEvent, WorkboxMessageEvent } from 'workbox-window';
 import { UserContext } from '../providers/UserProvider';
 import { DatabaseContext } from '../providers/DatabaseProvider';
-import { convertBase64ToAb } from '../services/Generic';
+import { convertBase64ToAb } from '../services/util/Generic';
 
 const ServiceWorkerWrapper: FC = () => {
   /**
@@ -16,7 +16,7 @@ const ServiceWorkerWrapper: FC = () => {
   const noServiceWorkerAvailable = !('serviceWorker' in navigator);
   const serviceWorkerScript =
     process.env.NODE_ENV === 'production'
-      ? '/sw/service-worker.js'
+      ? '/service-worker.js'
       : '/sw/test/service-worker-testpush.js';
 
   const [showReload, setShowReload] = useState(false);

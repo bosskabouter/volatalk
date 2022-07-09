@@ -33,11 +33,11 @@ import { DatabaseContext } from '../../providers/DatabaseProvider';
 import { IUserProfile } from '../../types';
 import { AuthContext } from '../../providers/AuthProvider';
 
-import { notifyMe } from '../../services/PushMessage';
+import { notifyMe } from '../../services/push/PushMessage';
 import { setCreated, setIsSecure } from '../../store/slices/accountSlice';
-import { DistanceFromMiddleEarth } from 'util/geo/Distance';
+import { DistanceFromMiddleEarth } from 'services/geo/Distance';
 import { questions } from './SecurityQuestions';
-import { requestFollowMe } from 'services/LocationService';
+import { requestFollowMe } from 'services/geo/LocationService';
 import enrollUser from 'services/UserService';
 import { ImageUploader } from 'components/ImageUploader';
 

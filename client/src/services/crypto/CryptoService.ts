@@ -1,4 +1,4 @@
-import { convertBase58ToObject } from './Generic';
+import { convertBase58ToObject } from '../util/Generic';
 
 const ENC_FORMAT_JWK = 'jwk';
 const ENC_ALGORITHM_ECDSA = 'ECDSA';

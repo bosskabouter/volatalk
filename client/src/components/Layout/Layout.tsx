@@ -3,7 +3,7 @@
 import { Container, CssBaseline } from '@mui/material';
 import * as React from 'react';
 import Header from '../AppBar/Header';
-import Footer from '../Footer/Footer';
+import Footer from '../AppBar/Footer';
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   return (

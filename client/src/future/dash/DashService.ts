@@ -13,15 +13,15 @@ import Dash from 'dash';
 export class DashService {
   client;
   constructor() {
-    const clientOpts = {
-      network: 'testnet',
-      wallet: {
-        //        mnemonic:          'arena light cheap control apple buffalo indicate rare motor valid accident isolate',
-        unsafeOptions: {
-          skipSynchronizationBeforeHeight: 650000, // only sync from early-2022
-        },
-      },
-    };
+    // const clientOpts = {
+    //   network: 'testnet',
+    //   wallet: {
+    //     //        mnemonic:          'arena light cheap control apple buffalo indicate rare motor valid accident isolate',
+    //     unsafeOptions: {
+    //       skipSynchronizationBeforeHeight: 650000, // only sync from early-2022
+    //     },
+    //   },
+    // };
     this.client = new Dash.Client(); //clientOpts);
   }
 

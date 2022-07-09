@@ -1,5 +1,5 @@
-import { convertBase58ToObject } from './Generic';
 import { createECDH, createSign, KeyObject } from 'crypto';
+import { convertBase58ToObject } from 'services/util/Generic';
 
 // const { createHmac } = await import('crypto');
 

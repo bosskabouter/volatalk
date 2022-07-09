@@ -1,5 +1,5 @@
 import { encryptString, generateKeyFromString } from 'dha-encryption';
-import { IContact, IMessage, IUserProfile } from '../types';
+import { IContact, IMessage, IUserProfile } from '../../types';
 
 const WEBPUSH_SERVER_ADDRESS = 'https://peered.me:432/push';
 

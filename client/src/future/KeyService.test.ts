@@ -1,4 +1,4 @@
-import { VTKey } from './VTKey';
+import { VTKey } from "future/VTKey";
 
 let vtKey: VTKey;
 test('KeyService Default constructor', async () => {

@@ -1,6 +1,6 @@
 import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
 
-import { PeerManager } from '../services/PeerManager';
+import { PeerManager } from '../services/peerjs/PeerManager';
 import { IMessage, IContact } from '../types';
 import { useDatabase } from './DatabaseProvider';
 import { UserContext } from './UserProvider';

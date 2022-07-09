@@ -9,9 +9,9 @@ import { UserContext } from '../../providers/UserProvider';
 import { PeerContext } from '../../providers/PeerProvider';
 import { extractInvite } from '../../services/InvitationService';
 import { Alerter } from '../StatusDisplay/Alerter';
-import { generateSignature } from '../../services/CryptoService';
 import Identification from 'components/Identification/Identification';
 import { IInvite } from 'types';
+import { generateSignature } from 'services/crypto/CryptoService';
 
 export default function ReceiveInvite(props: { invite: string }) {
   const [open, setOpen] = useState(true);

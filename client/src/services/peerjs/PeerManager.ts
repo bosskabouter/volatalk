@@ -1,13 +1,13 @@
 import { StrictEventEmitter } from 'strict-event-emitter';
 
-import { IContact, IContactResume, IMessage, IUserProfile } from '../types';
-import { AppDatabase } from '../Database/Database';
-import { generateSignature, peerIdToPublicKey, verifyMessage } from './CryptoService';
+import { IContact, IContactResume, IMessage, IUserProfile } from '../../types';
+import { AppDatabase } from '../../Database/Database';
+import { generateSignature, peerIdToPublicKey, verifyMessage } from '../crypto/CryptoService';
 
 import { default as Peer, DataConnection, MediaConnection } from 'peerjs';
 import { decryptString, encryptString, generateKeyFromString } from 'dha-encryption';
-import pushMessage from './PushMessage';
-import { verifyAddress } from './UserService';
+import pushMessage from '../push/PushMessage';
+import { verifyAddress } from '../UserService';
 
 export interface PeerManagerEvents {
   statusChange: (status: boolean) => void;

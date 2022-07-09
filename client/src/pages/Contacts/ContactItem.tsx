@@ -4,7 +4,7 @@ import { Box, Typography } from '@mui/material';
 import { DatabaseContext } from '../../providers/DatabaseProvider';
 import { PeerContext } from '../../providers/PeerProvider';
 
-import { descriptiveTimeAgo } from '../../services/Generic';
+import { descriptiveTimeAgo } from '../../services/util/Generic';
 import { IContact, IMessage } from '../../types';
 import Identification from 'components/Identification/Identification';
 

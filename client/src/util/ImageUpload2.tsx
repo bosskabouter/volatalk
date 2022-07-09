@@ -1,5 +1,5 @@
 import React, { useState, useEffect, ChangeEvent } from 'react';
-import { convertAbToBase64 } from '../services/Generic';
+import { convertAbToBase64 } from '../services/util/Generic';
 
 export default function ImageUpload2(props: { value: string }) {
   const [image, setImage] = useState<File | null>();

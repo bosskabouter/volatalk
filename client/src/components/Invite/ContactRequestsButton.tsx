@@ -46,10 +46,10 @@ function ContactRequestsButton() {
   const handleClick = (_event: SyntheticEvent) => {
     navigate('/Invite');
   };
-  return (
-    <Tooltip title="Invite People">
+  return hasUnansweredRequests? (
+    <Tooltip title="Invite received">
       <Badge
-        variant={hasUnansweredRequests ? 'standard' : 'dot'}
+        variant={'standard'}
         color={'info'}
         overlap="circular"
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
@@ -60,7 +60,7 @@ function ContactRequestsButton() {
         </Button>
       </Badge>
     </Tooltip>
-  );
+  ):(<></>);
 }
 
 export default ContactRequestsButton;

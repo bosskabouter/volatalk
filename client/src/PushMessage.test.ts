@@ -1,5 +1,5 @@
 import { aContact } from 'Database/Database.test';
-import pushMessage from 'services/PushMessage';
+import pushMessage from 'services/push/PushMessage';
 import { IMessage } from 'types';
 
 export const aSubscription: PushSubscription = JSON.parse(

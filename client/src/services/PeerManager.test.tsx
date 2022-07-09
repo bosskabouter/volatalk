@@ -1,4 +1,4 @@
-import { PeerManager } from './PeerManager';
+import { PeerManager } from './peerjs/PeerManager';
 import { AppDatabase } from 'Database/Database';
 import enrollUser from './UserService';
 import { aUser } from './UserService.test';
@@ -10,7 +10,7 @@ import PeerProvider from 'providers/PeerProvider';
 import UserProvider from 'providers/UserProvider';
 import { Provider } from 'react-redux';
 
-import PeerDisplay from 'util/Widgets/PeerDisplay';
+import PeerDisplay from 'components/Widgets/PeerDisplay';
 import store from 'store/store';
 
 test('Create PeerManager', async () => {

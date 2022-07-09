@@ -3,7 +3,7 @@ import { DashService } from './DashService';
 describe('your test suite', () => {
   window.URL.createObjectURL = jest.fn();
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  function noOp() {
+  function noOp() { 
     /* TODO document why this function 'noOp' is empty */
   }
   if (typeof window.URL.createObjectURL === 'undefined') {

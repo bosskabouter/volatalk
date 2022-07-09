@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { Box, Tooltip, Typography } from '@mui/material';
-import { getLocalDateShortString, getLocalDateString } from 'services/Generic';
+import { getLocalDateShortString, getLocalDateString } from 'services/util/Generic';
 /**
  *
  * @returns

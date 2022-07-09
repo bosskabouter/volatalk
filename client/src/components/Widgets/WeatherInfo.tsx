@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { Box, Tooltip, Typography } from '@mui/material';
-import { fetchLocationWeather } from 'services/LocationService';
+import { fetchLocationWeather } from 'services/geo/OpenWeatherService';
 
 interface WeatherInfoProps {
   location: GeolocationCoordinates | null;
@@ -27,8 +27,8 @@ export const WeatherInfo = ({ location }: WeatherInfoProps) => {
         sx={{
           display: 'flex',
           flexDirection: 'row',
-          justifyContent: 'right',
-          alignItems: 'center',
+          //justifyContent: 'right',
+          //alignItems: 'center',
           border: 0,
           margin: 0,
           padding: 0,

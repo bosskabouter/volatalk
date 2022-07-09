@@ -12,11 +12,11 @@ test('encryptionKeyPair', async () => {
 
   expect(encryptionKey).toBeDefined();
 
-  const buf = encryptionKey.export();
+  const buf = encryptionKey?.export();
 
   expect(buf).toBeDefined();
   console.log('printing encryptionKey');
-  printExportedKey(buf);
+  buf && printExportedKey(buf);
 });
 
 test('signatureKeyPair', async () => {
@@ -24,11 +24,11 @@ test('signatureKeyPair', async () => {
 
   expect(signatureKey).toBeDefined();
 
-  const buf = signatureKey.export();
+  const buf = signatureKey?.export();
 
   expect(buf).toBeDefined();
   console.log('printing signatureKey: ' + buf);
-  printExportedKey(buf);
+  buf && printExportedKey(buf);
 });
 
 function printExportedKey(buf: Buffer) {

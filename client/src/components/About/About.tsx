@@ -2,7 +2,17 @@
 
 import { css } from '@emotion/react';
 import CssBaseline from '@mui/material/CssBaseline';
-import { Box, Link, List, ListItem, ListItemText, IconButton, Stack, Avatar } from '@mui/material';
+import {
+  Box,
+  Link,
+  List,
+  ListItem,
+  ListItemText,
+  IconButton,
+  Stack,
+  Avatar,
+  useTheme,
+} from '@mui/material';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import packageJson from '../../../package.json';
@@ -16,14 +26,20 @@ import PushedIcon from '@mui/icons-material/ForwardToInbox';
 import EncryptedIcon from '@mui/icons-material/MailLock';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import logo from '../../assets/svg/logo-black.svg';
+
+import { useNavigate } from 'react-router-dom';
+import InfoIcon from '@mui/icons-material/Info';
+import React, { ReactElement } from 'react';
+
 const About = () => {
-  //const theme = useTheme();
+  const theme = useTheme();
   const styles = {
     box: css`
       display: flex;
       flex-direction: column;
       width: 100%;
       margin-top: 63px;
+      justify-items: 'center';
     `,
     logo: css`
       display: block;
@@ -37,6 +53,28 @@ const About = () => {
     `,
   };
 
+  const bulletVariant = 'h6';
+
+  const Feature = (props: {
+    primaryText: React.ReactNode;
+    secondaryText: React.ReactNode;
+    icon: ReactElement;
+    idx: number | string;
+  }) => {
+    return (
+      <ListItem key={props.idx}>
+        <ListItemText
+          primary={
+            <Typography variant={bulletVariant} color={theme.palette.secondary.main} noWrap gap={52} alignContent='center'>
+              {props.icon} {props.primaryText}
+            </Typography>
+          }
+          secondary={props.secondaryText}
+        />
+      </ListItem>
+    );
+  };
+
   return (
     <Container component="main" maxWidth="xl">
       <CssBaseline />
@@ -47,97 +85,79 @@ const About = () => {
               primary={
                 <Stack direction={'column'} alignItems={'center'}>
                   <Stack direction={'row'}>
-                    <Typography variant={'subtitle2'}>
-                      Nothing as volatile
-                      <PsychologyIcon color="secondary" />
-                      as the human mind
+                    <Typography variant={'subtitle2'} noWrap alignItems={'center'}>
+                      <em>Nothing as volatile
+                      <PsychologyIcon color="secondary" fontSize={'large'} />
+                      as the human mind</em>
                     </Typography>
                   </Stack>
-                  <Typography variant={'subtitle1'}>Thank the universe </Typography>
+                  <Typography variant={'subtitle1'}> </Typography>
                 </Stack>
               }
             />
           </ListItem>
 
-          <ListItem key="1">
-            <ListItemText
-              primary={
-                <>
-                  <ConnectWithoutContactIcon color="secondary" />
-                  Communicate Directly
-                </>
-              }
-              secondary={
-                <>
-                  Without a central server to capture or censure your data. If you lose access to
-                  your account your identity cannot be recovered because it is stored nowhere else.
-                  <IconButton
-                    onClick={() => alert('Soon.. Bip39 Mnemonics here')}
-                    size="small"
-                    color={'primary'}
-                  >
-                    <SettingsBackupRestoreIcon fontSize="small" /> Backup
-                  </IconButton>
-                </>
-              }
-            />
-          </ListItem>
-          <ListItem key="2">
-            <ListItemText
-              primary={
-                <>
-                  <SignalCellularNodataIcon color="secondary" /> Use Offline
-                </>
-              }
-              secondary={
-                <>
-                  Read and write messages anytime. Back and connected with your contacts all
-                  messages are synchronized. If the other person is offline and enabled push
-                  notifications, an icon <PushedIcon fontSize="small" /> appears next to the
-                  message.
-                </>
-              }
-            />
-          </ListItem>
-          <ListItem key="3">
-            <ListItemText
-              primary={
-                <>
-                  <EncryptedIcon color="secondary" />
-                  Secure Encryption
-                </>
-              }
-              secondary={
-                <>
-                  All sensitive information is encrypted in your local storage and only trusted
-                  connections are allowed to connect. Messages are encrypted with a secret only you
-                  and your contact share. This applies also to push messages.
-                </>
-              }
-            />
-          </ListItem>
-          <ListItem key="4">
-            <ListItemText
-              primary={
-                <>
-                  <OpenSourceIcon color="secondary" />
-                  Trust Open Source
-                </>
-              }
-              secondary={
-                <>
-                  Source and technical details on{' '}
-                  <Link
-                    href="https://github.com/bosskabouter/volatalk"
-                    target={'_blank'}
-                    rel="noreferrer"
-                  >
-                    GitHub <GitHubIcon />
-                  </Link>
-                </>
-              }
-            />
-          </ListItem>
+          <Feature
+            idx={1}
+            icon={<ConnectWithoutContactIcon />}
+            primaryText={<>Communicate Directly</>}
+            secondaryText={
+              <React.Fragment>
+                Connect with your contacts without a server able to capture your messages or censure
+                your account. If you lose access to your account your identity cannot be recovered
+                because it is stored nowhere else.
+                <IconButton
+                  onClick={() => alert('Soon.. Bip39 Mnemonics here')}
+                  size="small"
+                  color={'primary'}
+                >
+                  <SettingsBackupRestoreIcon fontSize="small" /> Backup
+                </IconButton>
+              </React.Fragment>
+            }
+          />
+
+          <Feature
+            idx={2}
+            icon={<SignalCellularNodataIcon />}
+            primaryText={<>Use Offline</>}
+            secondaryText={
+              <React.Fragment>
+                Read and write messages anytime. Once connected with your contacts all messages are
+                synchronized. If the other person is offline and enabled push notifications, an icon{' '}
+                <PushedIcon fontSize="small" /> appears next to the message.
+              </React.Fragment>
+            }
+          />
+          <Feature
+            idx={3}
+            icon={<EncryptedIcon />}
+            primaryText={<>Secure Encryption</>}
+            secondaryText={
+              <React.Fragment>
+                All sensitive information is encrypted in your local storage and only trusted
+                contacts with valid signatures can connect. Encrypted messages can only be read with
+                a secret you and your contact share. This applies also to push messages.
+              </React.Fragment>
+            }
+          />
+          <Feature
+            idx={5}
+            icon={<OpenSourceIcon />}
+            primaryText={<>Trust Open Source</>}
+            secondaryText={
+              <React.Fragment>
+                <span>Source and technical details: </span>
+                <Link
+                  href="https://github.com/bosskabouter/volatalk"
+                  target={'_blank'}
+                  rel="noreferrer"
+                >
+                  GitHub <GitHubIcon />
+                </Link>
+              </React.Fragment>
+            }
+          />
         </List>
       </Box>
       <Stack direction={'column'} alignItems={'center'}>
@@ -156,6 +176,20 @@ const About = () => {
         <Typography css={styles.version}> v{packageJson.version}</Typography>
       </Stack>
     </Container>
+  );
+};
+
+export const AboutVolaTalkIcon = () => {
+  const navigate = useNavigate();
+
+  return (
+    <IconButton
+      onClick={() => {
+        navigate('/About');
+      }}
+    >
+      <InfoIcon />
+    </IconButton>
   );
 };
 

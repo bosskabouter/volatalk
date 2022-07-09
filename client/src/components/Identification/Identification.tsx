@@ -1,7 +1,7 @@
 import Badge from '@mui/material/Badge';
 import Avatar from '@mui/material/Avatar';
 import { AvatarGroup, Box } from '@mui/material';
-import { PeerIdenticon } from 'util/Widgets/PeerIdenticon';
+import { PeerIdenticon } from 'components/Widgets/PeerIdenticon';
 const Identification = (props: {
   id: string;
   status?: boolean;
