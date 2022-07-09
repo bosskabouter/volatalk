@@ -16,7 +16,7 @@ import { ContactListItem } from './ContactListItem';
  *
  * @returns List will all contacts. Enables the user to accept or decline, make a call and enter the messages page from a clicked contact.
  */
-const ContactList = () => {
+const ContactList = ({ filter }: { filter: 'new' | 'starred' | 'unread' | 'none' | undefined }) => {
   const db = useContext(DatabaseContext);
   const peerManager = useContext(PeerContext);
   const [contactList, setContactList] = useState<IContact[]>([]);
@@ -28,10 +28,12 @@ const ContactList = () => {
    */
   useEffect(() => {
     if (!db) return;
-    console.debug('useEffect selectContacts');
-
-    db.selectContacts().then(setContactList);
-  }, [db]);
+    console.debug('useEffect selectContacts' + filter);
+    if (filter === 'new') db.selectUnacceptedContacts().toArray().then(setContactList);
+    else if (filter === 'starred') db.selectFavoriteContacts().then(setContactList);
+    else if (filter === 'unread') db.selectUnreadContacts().then(setContactList);
+    else db.selectContacts().then(setContactList);
+  }, [db, filter]);
 
   /**
    * New incoming Contact Request effect

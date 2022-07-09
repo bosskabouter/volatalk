@@ -46,7 +46,7 @@ function ContactRequestsButton() {
   const handleClick = (_event: SyntheticEvent) => {
     navigate('/Invite');
   };
-  return hasUnansweredRequests? (
+  return hasUnansweredRequests ? (
     <Tooltip title="Invite received">
       <Badge
         variant={'standard'}
@@ -60,7 +60,9 @@ function ContactRequestsButton() {
         </Button>
       </Badge>
     </Tooltip>
-  ):(<></>);
+  ) : (
+    <></>
+  );
 }
 
 export default ContactRequestsButton;

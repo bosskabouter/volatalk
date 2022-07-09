@@ -40,7 +40,7 @@ export const RequireAuth = () => {
       //pinsecured account, goto login
       return <Navigate to="/login" replace />;
     } else {
-      //user didnt secure account. load user and set in context. Normally login would do this.
+      //user didnt secure account. load user and set in context. Normally done by login.
       if (db && !userCtx.user)
         db.userProfile.get(1).then((user) => {
           if (user) {

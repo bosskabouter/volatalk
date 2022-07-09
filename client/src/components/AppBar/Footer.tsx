@@ -21,29 +21,36 @@ const Footer = () => {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-    <AppBar position="fixed" variant="elevation" color="primary" sx={{ top: 'auto', bottom: 0 }} >
-      <Toolbar >
-        <StyledFab
-          color="secondary"
-          aria-label="add"
-          onClick={() => {
-            navigate('/Invite');
-          }}
-        >
-          <AddIcon />
-        </StyledFab>
+      <AppBar position="fixed" variant="elevation" color="primary" sx={{ top: 'auto', bottom: 0 }}>
+        <Toolbar>
+          <StyledFab
+            color="secondary"
+            aria-label="add"
+            onClick={() => {
+              navigate('/Invite');
+            }}
+          >
+            <AddIcon />
+          </StyledFab>
 
-        <Stack  direction={'row'} alignItems={'center'} justifyContent={'space-evenly'} spacing={3} sx={{flexGrow: 1}}>
-          <MainLogo />
+          <Stack
+            direction={'row'}
+            alignItems={'center'}
+            justifyContent={'space-evenly'}
+            spacing={3}
+            sx={{ flexGrow: 1 }}
+          >
+            <MainLogo />
 
-          <PeerDisplay />
+            <PeerDisplay />
 
-          <AboutVolaTalkIcon />
-          <ContactRequestsButton/>
-          <AccountAvatar />
-        </Stack>
-      </Toolbar>
-    </AppBar></Box>
+            <AboutVolaTalkIcon />
+            <ContactRequestsButton />
+            <AccountAvatar />
+          </Stack>
+        </Toolbar>
+      </AppBar>
+    </Box>
   );
 };
 

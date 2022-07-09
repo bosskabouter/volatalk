@@ -31,10 +31,17 @@ export const WeatherInfo = ({ location }: WeatherInfoProps) => {
         border: 0,
         margin: 0,
         padding: 0,
-        columnGap: 0,
+        // columnGap: '1rem',
       }}
     >
       <Typography noWrap sx={{ display: { xs: 'none', md: 'block' } }}>
+        {weatherNow.description}
+      </Typography>
+      <Typography
+        noWrap
+        variant="caption"
+        //sx={{ display: { xs: 'none', md: 'block' } }}
+      >
         {weatherNow.celcius + ' \u2103'}
       </Typography>
       <img

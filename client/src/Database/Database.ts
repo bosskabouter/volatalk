@@ -34,6 +34,10 @@ export class AppDatabase extends Dexie {
   selectContacts() {
     return this.contacts.orderBy('dateTimeDeclined').toArray();
   }
+  selectFavoriteContacts() {
+    return this.contacts.orderBy('dateTimeDeclined').toArray();
+  }
+
   async selectContactsMap() {
     const m = new Map<string, IContact>();
     (await this.selectContacts()).forEach((c) => m.set(c.peerid, c));
@@ -44,6 +48,14 @@ export class AppDatabase extends Dexie {
     return this.contacts.where({ dateTimeAccepted: 0 });
   }
 
+  async selectUnreadContacts() {
+    const allUnreadMessages = await this.messages.where({ dateTimeRead: 0 }).uniqueKeys((key) => {
+      console.log('key ', key);
+    });
+    console.log('allUnreadMessages ', allUnreadMessages);
+
+    return this.contacts.orderBy('dateTimeDeclined').toArray();
+  }
   selectUnreadMessages(contact: IContact) {
     return this.messages.where({ sender: contact.peerid, dateTimeRead: 0 });
   }

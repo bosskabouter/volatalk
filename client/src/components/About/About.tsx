@@ -33,6 +33,9 @@ import React, { ReactElement } from 'react';
 
 const About = () => {
   const theme = useTheme();
+
+  const navigate = useNavigate();
+
   const styles = {
     box: css`
       display: flex;
@@ -65,7 +68,13 @@ const About = () => {
       <ListItem key={props.idx}>
         <ListItemText
           primary={
-            <Typography variant={bulletVariant} color={theme.palette.secondary.main} noWrap gap={52} alignContent='center'>
+            <Typography
+              variant={bulletVariant}
+              color={theme.palette.secondary.main}
+              noWrap
+              gap={52}
+              alignContent="center"
+            >
               {props.icon} {props.primaryText}
             </Typography>
           }
@@ -86,9 +95,11 @@ const About = () => {
                 <Stack direction={'column'} alignItems={'center'}>
                   <Stack direction={'row'}>
                     <Typography variant={'subtitle2'} noWrap alignItems={'center'}>
-                      <em>Nothing as volatile
-                      <PsychologyIcon color="secondary" fontSize={'large'} />
-                      as the human mind</em>
+                      <em>
+                        Nothing as volatile
+                        <PsychologyIcon color="secondary" fontSize={'large'} />
+                        as the human mind
+                      </em>
                     </Typography>
                   </Stack>
                   <Typography variant={'subtitle1'}> </Typography>
@@ -103,14 +114,10 @@ const About = () => {
             primaryText={<>Communicate Directly</>}
             secondaryText={
               <React.Fragment>
-                Connect with your contacts without a server able to capture your messages or censure
-                your account. If you lose access to your account your identity cannot be recovered
+                Connect with your contacts without a server to capture your messages or censure your
+                account. If you lose access to your account your identity cannot be recovered
                 because it is stored nowhere else.
-                <IconButton
-                  onClick={() => alert('Soon.. Bip39 Mnemonics here')}
-                  size="small"
-                  color={'primary'}
-                >
+                <IconButton onClick={() => navigate('/backup')} size="small" color={'primary'}>
                   <SettingsBackupRestoreIcon fontSize="small" /> Backup
                 </IconButton>
               </React.Fragment>
@@ -123,7 +130,7 @@ const About = () => {
             primaryText={<>Use Offline</>}
             secondaryText={
               <React.Fragment>
-                Read and write messages anytime. Once connected with your contacts all messages are
+                Read and write messages anytime. Back connected with your contacts all messages are
                 synchronized. If the other person is offline and enabled push notifications, an icon{' '}
                 <PushedIcon fontSize="small" /> appears next to the message.
               </React.Fragment>
@@ -136,8 +143,8 @@ const About = () => {
             secondaryText={
               <React.Fragment>
                 All sensitive information is encrypted in your local storage and only trusted
-                contacts with valid signatures can connect. Encrypted messages can only be read with
-                a secret you and your contact share. This applies also to push messages.
+                contacts can connect. Encrypted messages can only be read by the receiver. This
+                applies also to push notications.
               </React.Fragment>
             }
           />

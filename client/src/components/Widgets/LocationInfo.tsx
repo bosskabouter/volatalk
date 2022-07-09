@@ -1,6 +1,6 @@
 import { Box, Tooltip, Typography } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
-import {  requestFollowMe } from 'services/geo/LocationService';
+import { requestFollowMe } from 'services/geo/LocationService';
 import { UserContext } from '../../providers/UserProvider';
 import LocationOffIcon from '@mui/icons-material/LocationOff';
 import { WeatherInfo } from './WeatherInfo';
@@ -50,14 +50,13 @@ export default function LocationInfo() {
   }, [position, user, user?.position]);
 
   return position && locationDescription ? (
-    <Box 
+    <Box
       sx={{
-       
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'right',
-        columnGap: 3,
+        columnGap: 1,
         margin: 0,
         padding: 0,
       }}

@@ -1,4 +1,9 @@
-import { importPrivateKey, peerIdToPublicKey, signMessage, verifyMessage } from './crypto/CryptoService';
+import {
+  importPrivateKey,
+  peerIdToPublicKey,
+  signMessage,
+  verifyMessage,
+} from './crypto/CryptoService';
 import { convertAbToBase64, convertBase64ToAb } from './util/Generic';
 import { IInvite, IUserProfile } from '../types';
 

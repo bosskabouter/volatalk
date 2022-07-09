@@ -3,7 +3,7 @@ import ContactList from '../Contacts/ContactList';
 const Home = () => {
   return (
     <>
-      <ContactList />
+      <ContactList filter="none" />
     </>
   );
 };

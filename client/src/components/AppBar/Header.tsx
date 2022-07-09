@@ -14,7 +14,7 @@ export default function Header() {
   return (
     <Stack
       direction={'row'}
-      gap={'2rem'}
+      // gap={'2rem'}
       position={'fixed'}
       alignContent={'center'}
       justifySelf={'center'}
@@ -23,21 +23,22 @@ export default function Header() {
       sx={{ flexGrow: 1 }}
       flexGrow={1}
     >
-      <Stack direction={'row'}
-      gap={'1rem'}
-    //  position={'fixed'}
-    alignItems={'center'}
-      alignContent={'center'}
-      justifySelf={'center'}
-      justifyContent={'space-evenly'}
-      spacing={1}
-      sx={{ flexGrow: 1 }}
-      flexGrow={1}>
+      <Stack
+        direction={'row'}
+        // gap={'1rem'}
+        //  position={'fixed'}
+        alignItems={'center'}
+        alignContent={'center'}
+        justifySelf={'center'}
+        justifyContent={'space-evenly'}
+        // spacing={1}
+        flexGrow={1}
+      >
         <Compass />
         <CalleeComponent /> <DateInfo />
       </Stack>
       <TimeInfo />
-        <LocationInfo />
+      <LocationInfo />
     </Stack>
   );
 }

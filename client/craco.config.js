@@ -10,6 +10,22 @@ module.exports = {
       ],
     },
     configure: {
+
+      module: {
+        rules: [
+          {
+            type: 'javascript/auto',
+            test: /\.mjs$/,
+            include: /node_modules/,
+            resolve: {
+              fullySpecified: false
+            },
+           // use: [],
+          },
+        ],
+      },
+
+
       resolve: {
         fallback: {
           process: 'process/browser',

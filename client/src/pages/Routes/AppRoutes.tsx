@@ -1,4 +1,5 @@
 import { CircularProgress } from '@mui/material';
+import Backup from 'Database/Backup';
 
 import { lazy, Suspense } from 'react';
 import FadeIn from 'react-fade-in';
@@ -53,6 +54,8 @@ export const AppRoutes = () => {
         <Route element={<RequireAuth />}>
           <Route element={<Home />} path="/" />
           <Route element={<About />} path="/about" />
+          <Route element={<Backup />} path="/backup" />
+
           <Route element={<Invite />} path="/invite" />
           <Route element={<Contacts />} path="/contacts" />
           <Route element={<MessageList />} path="/messages/:contactid" />

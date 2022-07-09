@@ -104,7 +104,7 @@ export const ContactItem = (props: { contact: IContact }) => {
           minWidth: 180,
         }}
       >
-        <Typography variant="h6" sx={{ minWidth: 200, maxWidth: 200, border: 0 }}>
+        <Typography variant="h6" sx={{ minWidth: 200, maxWidth: 300, border: 0 }}>
           {contact.nickname}
         </Typography>
         <Box component="span">

@@ -1,4 +1,3 @@
-
 const TIMEOUT_GPS = 60 * 1000;
 
 export async function requestFollowMe(highAccuracy = true): Promise<GeolocationCoordinates | null> {
@@ -36,4 +35,3 @@ export async function requestFollowMe(highAccuracy = true): Promise<GeolocationC
     }
   });
 }
-
