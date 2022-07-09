@@ -1,7 +1,6 @@
 /** @jsxImportSource @emotion/react */
-import React from 'react';
-import { css } from '@emotion/react';
 import { useState } from 'react';
+import { css } from '@emotion/react';
 
 import { Dialog, IconButton, DialogContent, useTheme, DialogTitle } from '@mui/material';
 import { MonitorHeart } from '@mui/icons-material';

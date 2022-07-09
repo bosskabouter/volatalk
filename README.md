@@ -16,21 +16,21 @@ Services should know as little as possible about the sending or receiving client
 
 ### Why
 
-Because I could not not find a trackerless messenger I could fully trust, I wrote my own.
+I could not not find a trackerless messenger I could fully trust, so I wrote my own.
 
 ### What is different
 
-Communicate directly with other contacts without a central server to buffer, capture, censure or use the data in any other way.
+Communicate directly in your browser with other contacts. Without centralized servers capturing your data or native applications running in your system.
 
-#### Peer-to-Peer (p2p)
+### Peer-to-peer
 
-Therefore it uses peer-to-peer and [WebRTC](https://webrtc.org/). There are many solutions like these, but none I could find create a long-term trusted relation between clients, as explained in [Future Versions](#future-versions).
+VolaTALK uses [WebRTC] data channels (https://webrtc.org/) to establish direct peer-to-peer sessions. There are many solutions like these, but none I could find create a long-term trusted relation between contacts.
 
-Any solution based on decentralized blockchain technologies would not fit the [Vision](#vision).
+Anything based on blockchain technologies would not fit the [Vision](#vision) for this purpose.
 
 #### Doesn't anything like this exist?
 
-Since VolaTALK does not capture any data, no money can be harvested so no commercial party would have any interest  in building anything like this. A Dollar for a Click... at least.
+Since VolaTALK does not capture any data, no money can be made from it's users. No commercial party would have interest in building anything like this. A Dollar for a Click...
 
 ## Table of Contents
 
@@ -74,11 +74,11 @@ VolaTALK describes a way for browsers to establish a trusted WebRTC connections 
 
 Once a peer found another peer, no other services are needed for their communication during the existence of their WebRTC session.
 
-For contacts to find each other and establish a connection, they look for each other at a [PeerJS](https://peerjs.com/) signaling server. These can be installed anywhere and they offer a public [default instance](https://0.peerjs.com/).
+For contacts to find each other and establish a connection, they look for each other at a [PeerJS](https://peerjs.com/) signaling server. These can be installed anywhere and PeerJS offers a public [default instance](https://0.peerjs.com/).
 
 #### Peer ID
 
-A VolaTALK peer currently identifies himself by registering to a Peer server with a Base58 encoded public key exponent of the ECDSA SHA-384 JSON WebKey.
+A VolaTALK peer identifies itself by registering to a Peer server with a Base58 encoded public key exponent of the ECDSA SHA-384 JSON WebKey.
 
 Peer IDs are shared between users in 'copy-and-paste' invites. The application includes a QR generator and reader to facilitate the exchange of trusted invites.
 
@@ -88,11 +88,9 @@ A Progressive Web App as reference of the VolaTALK protocol, bootstrapped with [
 
 #### Registration
 
-A user can register by simply accepting 'Anonymous' as its nickname. A default avatar ([thanks thispersondoesnotexist](http://thispersondoesnotexist.com)) is loaded but will appear for every contact differently (no CORS - no fetch).
+A user can register by simply accepting 'Anonymous' as its nickname. A default avatar ([thanks thispersondoesnotexist](http://thispersondoesnotexist.com)) is loaded but the user can save a base64 encoded image into his profile. The picture is downsized and send out on every connection request.
 
-The user can save a base64 encoded image into his profile. The picture is downsized and send out on every connection request.
-
-##### Encrypted Local Storage
+#### Encrypted Local Storage
 
 The private key is stored in a Dexie encrypted IndexedDB.
 
@@ -100,29 +98,29 @@ The profile can be secured with a 6 digit access pin which can be recovered usin
 
 <img src="https://github.com/bosskabouter/volatalk/blob/6860aafcdd75c00c515598ffa33f1a25967b1a93/client/public/screenshots/AccountSetup.png" width="200px"/>
 
-##### Geo-location
+#### Geo-location
 
 The application permits "Follow Me" functionality. Users who both opt-in are able to see their own and other's estimated physical location, distance and bearing from each other, alongside local and remote weather conditions (thanks [OpenWeatherMap](https://openweathermap.org/)). By having several contacts using this feature the request information send to this service will render useless for tracking purposes.
 
-#### Push notifications
-
-A contact trying to send a message while the user is offline, will send the message through the Push Service.
+### Push notifications
 
 Users can receive messages through the [Push notification API](https://developer.mozilla.org/en-US/docs/Web/API/Push_API). The subscription endpoint registered in the browsers service worker is saved not on the Push Server (as usual), but in the user's profile and send out only to accepted contacts and not the push server.
 
-##### Push Server
+A contact trying to send a message while the user is offline will send the message through the Push Service.
+
+#### Push Server
 
 The Push Server receives post requests containing 2 objects;
 
-1. user's subscription endpoint, a URL contained within the subscription while registering the browser's service worker for push notifications within this site context.
+1. user's subscription `endpoint`, a URL contained within the subscription while registering the browser's service worker for push notifications within this site context.
 
-2. message payload encrypted with the Peer ID of the receiving user. The push server nor the endpoint know this Peer ID.
+2. message `payload` encrypted with the Peer ID of the receiving user. The push server nor the endpoint know this Peer ID.
 
-The receiving client uses it's own peer ID as secret key to decrypt all incoming push message inside the service worker. Once decrypted, contact information is gathered from `contactInfo` (synced between [`ServiceWorkerWrapper.tsx`](https://github.com/bosskabouter/volatalk/blob/main/client/src/sw/ServiceWorkerWrapper.tsx) and [`service-worker.ts`](https://github.com/bosskabouter/volatalk/blob/main/client/src/service-worker.ts).
+The receiving client decrypts all incoming push messages with its own peer ID as secret key inside the service worker. Once decrypted, contact information is gathered from `contactInfo` (synced between [`ServiceWorkerWrapper.tsx`](https://github.com/bosskabouter/volatalk/blob/main/client/src/sw/ServiceWorkerWrapper.tsx) and [`service-worker.ts`](https://github.com/bosskabouter/volatalk/blob/main/client/src/service-worker.ts).
 
 #### Invitation
 
-Users can share signed invites in URL or by QR. This invite points to the origin of the location where the sender installed the PWA from (https://volatalk.org), concatenated with the following parameters;
+Users can share signed invites in plain URL or by QR code. This invite points to the origin of the location where the sender installed the PWA from (https://volatalk.org), concatenated with the following parameters;
 
     a. ?f=[`sender.PeerID`]
     b. &k=[`An additional invitation text`]
@@ -130,15 +128,34 @@ Users can share signed invites in URL or by QR. This invite points to the origin
 
 A signed invitation prevents people from creating invites in name of someone else. Only the user can create a signed invite for his account. Once the invitation is sent, it could be used by N others to connect to user. The user will receive these connection requests and decides if he wishes to connect.
 
-The application permits transmission of the invite through QR scanning, mobile sharing or on desktop by clipboard copy. Other ways of transmission including ultrasonic using [quiet-js](https://github.com/quiet/quiet-js) are being evaluated.
+The application permits transmission of the invite through QR scanning, [Web share API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Share_API) or on desktop by clipboard copy. Other ways of transmission including ultrasonic using [quiet-js](https://github.com/quiet/quiet-js) are being evaluated.
 
-#### Connection request
+#### Contact request
 
-When a peer requests a connection to another peer, a signature is sent in the connection metadata, containing Peer ID of the receiver and is signed with the private key of the requester. The receiver uses the requester Peer ID to verify the signature before the connection is accepted.
+Every connection with a contact is initiated informing the following metadata:
 
-#### Connection Acceptance
+`/\*\*
 
-As long as the contact is not accepted, or declined later on, no connection will be permitted. Once a connection is permitted, all up-to-date user metadata `IContactResume` is synchronized between the two contacts and data can be send and A/V calls established.
+- Basic UserInfo serialized in connection metadata
+  \*/
+  export interface IContactResume {
+  peerid: string;
+  dateRegistered: Date;
+
+nickname: string;
+
+avatar: string;
+avatarThumb: string;
+
+position: GeolocationCoordinates | null;
+pushSubscription: PushSubscription | null;
+}`
+
+The `IContactResume` is accompanied by a signature: the Peer ID of the receiver signed with the private key of the requester. The receiver uses the requester Peer ID (public key) to verify the signature before the connection is accepted.
+
+#### Contact Acceptance
+
+As long as the contact is not accepted, or declined later on, no connection will be permitted and no metadata is exchanged. Once a connection is permitted, all up-to-date user `IContactResume` is synchronized between the two contacts, data can be send and A/V calls established.
 
 ## VolaTALK Server
 
