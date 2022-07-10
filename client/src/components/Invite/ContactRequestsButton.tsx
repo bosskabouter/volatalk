@@ -4,29 +4,18 @@ import { useNavigate } from 'react-router-dom';
 import InvitationButtonIcon from '@mui/icons-material/PersonAdd';
 import Badge from '@mui/material/Badge';
 import { IContactResume } from 'types';
-import { DatabaseContext } from 'providers/DatabaseProvider';
 import { PeerContext } from 'providers/PeerProvider';
 import { Button, Tooltip } from '@mui/material';
+import { useContacts } from 'providers/ContactsProvider';
 
 function ContactRequestsButton() {
-  const db = useContext(DatabaseContext);
   const peerCtx = useContext(PeerContext);
 
   const navigate = useNavigate();
-
-  const [contactRequests, setContactRequests] = useState<IContactResume[]>([]);
-
-  /**
-   * Loads unaccepted contacts from db
-   */
-  useEffect(() => {
-    if (!db || contactRequests) return;
-    db.selectUnacceptedContacts()
-      .toArray()
-      .then((ctc) => {
-        setContactRequests(ctc);
-      });
-  }, [contactRequests, db]);
+  const newContacts = useContacts().contacts?.get('new');
+  const [contactRequests, setContactRequests] = useState<IContactResume[]>(
+    newContacts ? newContacts : []
+  );
 
   /**
    * Handles new incoming contact requests by adding them to the waiting list

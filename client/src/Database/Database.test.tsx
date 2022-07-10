@@ -1,11 +1,8 @@
 import { IContact } from 'types';
 import { AppDatabase } from './Database';
-import { queryByTestId, render, QueryByAttribute } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 
-import AuthProvider from 'providers/AuthProvider';
-import PeerProvider from 'providers/PeerProvider';
-import UserProvider from 'providers/UserProvider';
 import { Provider } from 'react-redux';
 
 import store from 'store/store';
@@ -25,6 +22,7 @@ export const aContact: IContact = {
   avatarThumb: 'rgrg',
   position: null,
   pushSubscription: null,
+  favorite: false,
 };
 
 test('should create', async () => {

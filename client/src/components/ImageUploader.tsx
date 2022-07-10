@@ -19,8 +19,7 @@ export const ImageUploader = ({
       right: 0;
       margin: 0;
       padding: 18px;
-      width: 180px;
-      height: 180px;
+      width: 90%;
       align: 'center';
     `,
     uploadImage: css`
@@ -33,7 +32,6 @@ export const ImageUploader = ({
       right: 0;
       margin: 0;
       padding: 0;
-      font-size: 20px;
       cursor: pointer;
       opacity: 0;
       filter: alpha(opacity=0);

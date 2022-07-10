@@ -14,6 +14,7 @@ import { ContactItem } from '../Contacts/ContactItem';
 import { ComposeMessage } from './ComposeMessage';
 import { MessageItem } from './MessageItem';
 import { IContact, IMessage } from '../../types';
+import { ContactDetails } from 'pages/Contacts/ContactDetails';
 
 const MessageList = () => {
   const db = useContext(DatabaseContext);
@@ -90,9 +91,11 @@ const MessageList = () => {
 
       <List
         ref={listElement}
-        sx={{
-          mb: '5rem',
-        }}
+        sx={
+          {
+            // mb: '1rem',
+          }
+        }
         dense={true}
         subheader={
           <ListSubheader
@@ -100,16 +103,19 @@ const MessageList = () => {
             id="nested-list-subheader"
             sx={{
               display: 'flex',
-              pt: 7,
-              pb: 2,
+              pt: 0,
+              pb: 0,
               margin: 0,
 
               bgcolor: theme.palette.primary.main,
-              borderRadius: '18px',
+              borderRadius: '9px',
               boxShadow: 9,
             }}
           >
-            <BackIcon onClick={() => navigate('/contacts')} />
+            <IconButton onClick={() => navigate(-1)} size="medium">
+              <BackIcon />
+            </IconButton>
+
             <Box color={'primary'}>
               <ContactItem contact={contact} />
             </Box>
@@ -121,6 +127,8 @@ const MessageList = () => {
             <IconButton onClick={() => navigate('/call/' + contact && contactId)} size="medium">
               <CallIcon />
             </IconButton>
+
+            <ContactDetails contact={contact} />
           </ListSubheader>
         }
       >

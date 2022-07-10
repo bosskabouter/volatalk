@@ -1,11 +1,7 @@
-import ContactList from '../Contacts/ContactList';
+import ContactsPage from 'pages/Contacts/ContactsPage';
 
 const Home = () => {
-  return (
-    <>
-      <ContactList filter="none" />
-    </>
-  );
+  return <ContactsPage />;
 };
 
 export default Home;

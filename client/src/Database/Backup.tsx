@@ -16,6 +16,7 @@ import {
   FormControl,
   FormControlLabel,
   IconButton,
+  Input,
   MenuItem,
   OutlinedInput,
   Select,
@@ -32,6 +33,12 @@ import FileUploadIcon from '@mui/icons-material/FileUpload';
 
 import 'dexie-export-import';
 import { exportDB, importDB } from 'dexie-export-import';
+import { encryptString, generateKeyFromString } from 'dha-encryption';
+import {
+  descriptiveTimeAgo,
+  getLocalDateShortString,
+  getLocalDateString,
+} from 'services/util/Generic';
 
 export default function Backup() {
   const db = useDatabase();
@@ -42,34 +49,65 @@ export default function Backup() {
 
   const [blob, setBlob] = useState();
 
+  const [pw1, setPw1] = useState('');
+  const [pw2, setPw2] = useState('');
+
+  const isValid = pw1 === pw2;
+  const isEncrypted = isValid && pw1.length > 0;
+
   return (
     <Dialog open={open} onClose={() => setOpen(false)}>
-      Backup
-      <DialogTitle></DialogTitle>
       <DialogContent>
-        <DialogContentText></DialogContentText>
-        <DialogActions onClick={() => db && exportDatabase(db)}>
-          <IconButton>
-            <DownloadIcon></DownloadIcon>
-          </IconButton>
+        <DialogTitle variant="h5">Data Backup</DialogTitle>
+        <DialogContentText>
+          <TextField
+            id="pw1"
+            value={pw1}
+            onChange={(e) => setPw1(e.target.value)}
+            label="Optional Password"
+            variant="filled"
+          />
+          <TextField
+            id="pw2"
+            value={pw2}
+            onChange={(e) => setPw2(e.target.value)}
+            label="Repeat Password"
+            variant="filled"
+          />
+        </DialogContentText>
 
-          <IconButton>
-            <FileUploadIcon></FileUploadIcon>
-          </IconButton>
+        <Typography variant="h5" hidden={isValid}>
+          Passwords must match
+        </Typography>
 
-          <IconButton>
-            <CloseIcon></CloseIcon>
-          </IconButton>
+        <DialogActions>
+          <Button disabled={!isValid} onClick={() => db && pw1 === pw2 && exportDatabase(db, pw1)}>
+            Download {isEncrypted ? 'password protected' : ''} backup
+            <DownloadIcon />
+          </Button>
         </DialogActions>
       </DialogContent>
     </Dialog>
   );
 }
 
-export async function exportDatabase(db: Dexie): Promise<Blob | null> {
+export function RestoreDB() {
+  return (
+    <Button variant="contained">
+      Restore Backup<FileUploadIcon></FileUploadIcon>
+    </Button>
+  );
+}
+export async function exportDatabase(db: Dexie, password = ''): Promise<Blob | null> {
   try {
     const blob = await exportDB(db, { prettyJson: true, progressCallback });
-    download(blob, 'dexie-export.json', 'application/json');
+
+    const blobEncrypted = encryptString(await blob.text(), generateKeyFromString(password));
+    download(
+      blobEncrypted,
+      getLocalDateShortString(new Date()) + '.org.volatalk',
+      'application/json'
+    );
 
     return blob;
   } catch (error) {
@@ -77,7 +115,7 @@ export async function exportDatabase(db: Dexie): Promise<Blob | null> {
     return null;
   }
 }
-export async function importDatabase(db: Dexie, f: File): Promise<Dexie | null> {
+export async function importDatabase(db: Dexie, f: File, password = ''): Promise<Dexie | null> {
   try {
     await db.delete();
     db = await importDB(f, {

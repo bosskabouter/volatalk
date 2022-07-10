@@ -14,6 +14,7 @@ import UserProvider from '../../providers/UserProvider';
 import store, { persistor } from '../../store/store';
 import AppRoutes from '../Routes/AppRoutes';
 import theme from './theme';
+import ContactsProvider from 'providers/ContactsProvider';
 
 const App = () => {
   return (
@@ -25,12 +26,14 @@ const App = () => {
               <DialogProvider>
                 <AuthProvider>
                   <UserProvider>
-                    <ServiceWorkerWrapper />
-                    <PeerProvider>
-                      <Layout>
-                        <AppRoutes />
-                      </Layout>
-                    </PeerProvider>
+                    <ContactsProvider>
+                      <ServiceWorkerWrapper />
+                      <PeerProvider>
+                        <Layout>
+                          <AppRoutes />
+                        </Layout>
+                      </PeerProvider>
+                    </ContactsProvider>
                   </UserProvider>
                 </AuthProvider>
               </DialogProvider>

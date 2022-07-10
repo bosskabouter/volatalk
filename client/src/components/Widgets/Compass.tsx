@@ -34,11 +34,9 @@ export const Compass = () => {
     };
   }, []);
 
-  return !north ? (
+  return (
     <Tooltip title={'Top of device to Magntic north'}>
       <CompassIcon style={rotateCompassStyle} color={'secondary'} />
     </Tooltip>
-  ) : (
-    <></>
   );
 };

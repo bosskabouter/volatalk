@@ -15,10 +15,14 @@ import { PeerContext } from '../../providers/PeerProvider';
 import { DatabaseContext } from '../../providers/DatabaseProvider';
 import { MessageItem } from 'pages/Messages/MessageItem';
 import { ContactDetails } from './ContactDetails';
+import { ContactsContext } from 'providers/ContactsProvider';
 
 export const ContactListItem = (props: { contact: IContact }) => {
   const peerMngr = useContext(PeerContext);
   const db = useContext(DatabaseContext);
+
+  // const [contacts, setContacts]=useContext(ContactsContext);
+
   const navigate = useNavigate();
 
   const [online, setOnline] = useState(peerMngr?.isConnected(props.contact));
@@ -97,7 +101,6 @@ export const ContactListItem = (props: { contact: IContact }) => {
         >
           <AddTaskIcon />
         </IconButton>
-        <ContactDetails contact={props.contact} />
       </div>
     ) : (
       <div>
@@ -119,16 +122,6 @@ export const ContactListItem = (props: { contact: IContact }) => {
         >
           <CallIcon />
         </IconButton>
-        <IconButton
-          onClick={handleClickAudioCallContact}
-          edge="end"
-          aria-label="Audio Call"
-          color="success"
-          size="small"
-        >
-          <CallIcon />
-        </IconButton>
-        <ContactDetails contact={props.contact} />
       </div>
     );
   };

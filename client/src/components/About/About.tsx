@@ -26,6 +26,7 @@ import PushedIcon from '@mui/icons-material/ForwardToInbox';
 import EncryptedIcon from '@mui/icons-material/MailLock';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import logo from '../../assets/svg/logo-black.svg';
+import EmojiPeopleIcon from '@mui/icons-material/EmojiPeople';
 
 import { useNavigate } from 'react-router-dom';
 import InfoIcon from '@mui/icons-material/Info';
@@ -65,18 +66,27 @@ const About = () => {
     idx: number | string;
   }) => {
     return (
-      <ListItem key={props.idx}>
+      <ListItem key={props.idx} alignItems={'center'}>
         <ListItemText
           primary={
-            <Typography
-              variant={bulletVariant}
-              color={theme.palette.secondary.main}
-              noWrap
-              gap={52}
-              alignContent="center"
-            >
-              {props.icon} {props.primaryText}
-            </Typography>
+            <Stack direction={'column'} alignItems={'center'}>
+              <Typography
+                variant={bulletVariant}
+                color={theme.palette.primary.main}
+                noWrap
+                // alignContent="center"
+              >
+                {props.primaryText}
+              </Typography>{' '}
+              <Typography
+                variant={bulletVariant}
+                color={theme.palette.secondary.main}
+                noWrap
+                // alignContent="center"
+              >
+                {props.icon}
+              </Typography>
+            </Stack>
           }
           secondary={props.secondaryText}
         />
@@ -110,34 +120,43 @@ const About = () => {
 
           <Feature
             idx={1}
+            icon={<EmojiPeopleIcon />}
+            primaryText={<>Simple</>}
+            secondaryText={
+              <React.Fragment>
+                Use only your browser. No telephone number, contact list, email, or native
+                application required.
+              </React.Fragment>
+            }
+          />
+          <Feature
+            idx={2}
             icon={<ConnectWithoutContactIcon />}
             primaryText={<>Communicate Directly</>}
             secondaryText={
               <React.Fragment>
-                Connect with your contacts without a server to capture your messages or censure your
-                account. If you lose access to your account your identity cannot be recovered
-                because it is stored nowhere else.
+                Connect directly with your contacts without a server to capture your messages or
+                censure your account. Make a
                 <IconButton onClick={() => navigate('/backup')} size="small" color={'primary'}>
                   <SettingsBackupRestoreIcon fontSize="small" /> Backup
                 </IconButton>
               </React.Fragment>
             }
           />
-
           <Feature
-            idx={2}
+            idx={3}
             icon={<SignalCellularNodataIcon />}
             primaryText={<>Use Offline</>}
             secondaryText={
               <React.Fragment>
-                Read and write messages anytime. Back connected with your contacts all messages are
-                synchronized. If the other person is offline and enabled push notifications, an icon{' '}
+                Read and write messages anytime, once connected with your contacts all messages are
+                synchronized. If the other is offline and enabled push notifications, an icon{' '}
                 <PushedIcon fontSize="small" /> appears next to the message.
               </React.Fragment>
             }
           />
           <Feature
-            idx={3}
+            idx={4}
             icon={<EncryptedIcon />}
             primaryText={<>Secure Encryption</>}
             secondaryText={
@@ -172,10 +191,12 @@ const About = () => {
           src={logo}
           variant="rounded"
           sx={{
-            width: 90,
-            height: 90,
-            border: 0,
+            width: 180,
+            height: 180,
+            border: 1,
             alignContent: 'center',
+            mt: '3rem',
+            mb: '18rem',
             // color: theme.palette.secondary.main,
             // bgcolor: theme.palette.secondary.main,
           }}

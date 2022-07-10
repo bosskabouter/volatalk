@@ -1,5 +1,5 @@
 import { useContext, useEffect } from 'react';
-import { Box, ListItemText, ListItemIcon, Tooltip } from '@mui/material';
+import { Box, ListItemText, ListItemIcon, Tooltip, Typography, Stack } from '@mui/material';
 
 import PendingIcon from '@mui/icons-material/HourglassBottom';
 import DeliveredIcon from '@mui/icons-material/Check';
@@ -82,7 +82,7 @@ export const MessageItem = ({
     const sent = message.dateTimeSent > 0;
 
     if (peerManager && !pushed && !sent) {
-      //watch message untill read
+      //watch message untill delivered (TODO implement msg.isRead)
       peerManager.addListener('onMessageDelivered', onMessageDeliverHandler);
     }
     return () => {
@@ -91,10 +91,19 @@ export const MessageItem = ({
   }, [peerManager, message.dateTimeSent, message.dateTimeRead, message]);
 
   return (
-    <Box component="span">
-      <ListItemIcon>
-        <StatusIcon />
-      </ListItemIcon>
+    <Box
+      // direction={isMine ? 'row' : 'row-reverse'}
+      //  alignItems={'flex-start'}
+      textAlign={isMine ? 'left' : 'right'}
+      //  minWidth={'100vw'}
+      // maxWidth={'100vw'}
+      sx={{
+        // display: 'flow',
+        // flexDirection: 'row-reverse',
+        border: 0,
+      }}
+    >
+      <StatusIcon />
       <ListItemText
         id={'id-' + message.id}
         primary={

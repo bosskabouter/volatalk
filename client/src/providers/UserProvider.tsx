@@ -1,35 +1,30 @@
 /* eslint-disable */
 // @ts-nocheck
-import React, { ReactNode } from 'react';
+import React, { createContext, ReactNode } from 'react';
 import { IUserProfile } from 'types';
 import { useSessionStorage } from '../util/useSessionStorage';
-
 export type IUserContext = {
-  user: IUserProfile;
+  user: IUserProfile | null;
   setUser: (getUser: IUserProfile) => void;
 };
 
 const noop = () => {
-  /*  */
+  return;
 };
-export const UserContext = React.createContext<IUserContext>({
+export const UserContext = createContext<IUserContext>({
   user: null,
   setUser: noop,
 });
-export type UserProviderProps = {
-  defaultUser?: IUserProfile | null;
-  children: ReactNode;
-};
 
-const UserProvider: React.FC<UserProviderProps> = ({ defaultUser, children }) => {
-  const [user, setUser] = useSessionStorage<IUserProfile>('user', defaultUser, 3600000);
+const UserProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useSessionStorage<IUserProfile>('user', null, 3600000);
 
   const contextValue = React.useMemo(
     () => ({
       user,
       setUser,
     }),
-    [user]
+    [setUser, user]
   );
 
   return <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>;

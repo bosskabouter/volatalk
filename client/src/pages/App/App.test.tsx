@@ -30,5 +30,5 @@ test('Home', () => {
     </BrowserRouter>
   );
 
-  expect(getByText(/Invite Someone/i)).toBeInTheDocument();
+  expect(getByText(/Contact Requests/i)).toBeInTheDocument();
 });

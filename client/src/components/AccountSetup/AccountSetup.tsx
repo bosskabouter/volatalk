@@ -13,6 +13,7 @@ import {
   MenuItem,
   OutlinedInput,
   Select,
+  Stack,
   Switch,
   TextField,
   Typography,
@@ -40,6 +41,7 @@ import { questions } from './SecurityQuestions';
 import { requestFollowMe } from 'services/geo/LocationService';
 import enrollUser from 'services/UserService';
 import { ImageUploader } from 'components/ImageUploader';
+import { RestoreDB } from 'Database/Backup';
 
 const ITEM_HEIGHT = 18;
 const ITEM_PADDING_TOP = 8;
@@ -106,7 +108,7 @@ const AccountSetup = () => {
     'https://thispersondoesnotexist.com/image?notRandomImage=' + Math.round(Math.random() * 100);
 
   //TODO: try to (a) fetch the image and save in profile, or (b) cache the specific URL for this image in service worker
-  const userHasAvatar = user?.avatar?.length > randImage.length - 3;
+  const userHasAvatar = user && user?.avatar?.length > randImage.length - 3;
 
   //use a random image if user doesn't have one
 
@@ -355,24 +357,29 @@ const AccountSetup = () => {
               setAvatarData(base64EncodedUpload);
             }}
           />
-          <Typography
-            variant={'overline'}
+          <Button
             onClick={() => {
               formik.setFieldValue('avatar', randImage);
               formik.setFieldValue('avatarThumb', randImage);
               setAvatarData(randImage);
             }}
+            color="secondary"
+            variant="text"
           >
-            * thispersondoesnotexist.com
-          </Typography>
+            thispersondoesnotexist.com
+          </Button>
+          <Typography
+            variant={'button'}
+            onClick={() => {
+              formik.setFieldValue('avatar', randImage);
+              formik.setFieldValue('avatarThumb', randImage);
+              setAvatarData(randImage);
+            }}
+          ></Typography>
 
           <Box>
             <FormControlLabel
-              label={
-                formik.values.usePush
-                  ? `Subscribed to offline messages!`
-                  : `Notify when I'm offline!`
-              }
+              label={formik.values.usePush ? `Push Subscribed` : `Notify when I'm offline`}
               control={
                 <Switch
                   checked={formik.values.usePush}
@@ -386,7 +393,7 @@ const AccountSetup = () => {
             <FormControlLabel
               label={
                 currentPosition != null
-                  ? `Your are ${DistanceFromMiddleEarth(currentPosition)} km from Middle Earth`
+                  ? `${DistanceFromMiddleEarth(currentPosition)} km from Middle Earth`
                   : 'Enable Location Sharing'
               }
               control={
@@ -415,9 +422,7 @@ const AccountSetup = () => {
                 checkedIcon={<LockIcon></LockIcon>}
               />
             }
-            label={
-              formik.values.security?.isSecured ? "I don't need security" : 'Secure my account'
-            }
+            label={formik.values.security?.isSecured ? "I don't need security" : 'Secure account'}
           />
           {formik.values.security.isSecured && (
             <Box>
@@ -512,9 +517,18 @@ const AccountSetup = () => {
             </Box>
           )}
 
-          <Button css={styles.accountSetupButton} type="submit" color="primary" variant="contained">
-            {!authenticated ? 'Enter VolaTALK' : 'UPDATE PROFILE'}
-          </Button>
+          <Stack gap={2}>
+            <Button
+              css={styles.accountSetupButton}
+              type="submit"
+              color="primary"
+              variant="contained"
+            >
+              {!authenticated ? 'Enter VolaTALK' : 'UPDATE PROFILE'}
+            </Button>
+
+            <RestoreDB />
+          </Stack>
         </form>
       </DialogContent>
     </Dialog>

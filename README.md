@@ -4,23 +4,24 @@
 
 ## Introduction
 
-### Vision
 
 > Nothing as volatile as the human mind
 
-### Mission
+### Vision
 
 Private and direct communication between trusted browsers, independent of any centralized server.
 
 Services know as little as possible about the sending or receiving client and the information being sent.
 
-### Why
+### Mission
 
-I could not not find a trackerless messenger I could fully trust, so I wrote my own.
+Create a trackerless messenger I can fully trust so I am able to speak freely with family and friends.
 
 ### What's different
 
-Communicate directly in your browser with other contacts, without centralized servers capturing your data or native applications running in your system.
+Communicate directly in your browser with invited contacts, without centralized servers capturing your data or native applications running in your system. 
+
+No email, telephone, IMEI, IP or contact list needed. 
 
 ### Peer-to-peer
 
@@ -30,7 +31,12 @@ Anything based on blockchain technologies would not fit the [Vision](#vision) fo
 
 #### Does anything like this exist?
 
-Open source, free to use, P2P, without trackers, browser based without native applications? ? Please let us know at [ideas@volatalk.org](mailto:ideas@volatalk.org)
+Open source, free to use, P2P, without trackers, browser based and without native applications, Please let us know at [ideas@volatalk.org](mailto:ideas@volatalk.org)
+
+
+#### How many people use VolaTALK
+
+The application needs trackers to find out., so I have no clue and I am not interested. I use it with my friends and family.
 
 ## Table of Contents
 

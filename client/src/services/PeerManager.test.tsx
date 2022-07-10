@@ -30,7 +30,7 @@ test(
       <BrowserRouter>
         <Provider store={store}>
           <AuthProvider>
-            <UserProvider defaultUser={user}>
+            <UserProvider>
               <PeerProvider>
                 <PeerDisplay />
               </PeerProvider>

@@ -210,6 +210,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
         dateTimeAccepted: 0,
         dateTimeDeclined: 0,
         signature: sig,
+        favorite: false,
       },
       contactResume
     );

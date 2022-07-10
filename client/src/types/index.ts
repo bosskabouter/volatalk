@@ -79,7 +79,14 @@ export interface IContact extends IContactResume {
   dateTimeAccepted: number;
   dateTimeDeclined: number;
   dateTimeResponded: number;
+
+  favorite: boolean;
 }
+
+/**
+ * A classification based on contacts current status
+ */
+export type IContactClass = 'new' | 'block' | 'fav' | 'rest';
 
 /**
  * Basic Data Message object

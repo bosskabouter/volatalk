@@ -18,7 +18,7 @@ export const PeerContext = createContext<PeerManager | null>(null);
 export const usePeerManager = () => useContext(PeerContext);
 
 export default function PeerProvider({ children }: IPeerProviderProps) {
-  const userContext = useContext(UserContext);
+  const user = useContext(UserContext).user;
   const db = useDatabase();
 
   const [peerManager, setPeerManager] = useState<PeerManager | null>(null);
@@ -28,7 +28,7 @@ export default function PeerProvider({ children }: IPeerProviderProps) {
   }
 
   useEffect(() => {
-    if (!userContext.user || !db || peerManager) return;
+    if (!user || !db || peerManager) return;
 
     function newContactHandle(contact: IContact) {
       console.info('New Contact', contact);
@@ -48,7 +48,7 @@ export default function PeerProvider({ children }: IPeerProviderProps) {
     }
 
     const setupPeerManager = () => {
-      const pm = new PeerManager(userContext.user, db);
+      const pm = new PeerManager(user, db);
 
       pm.on('statusChange', handleStatusChange);
       pm.on('onMessage', messageHandler);
@@ -75,7 +75,7 @@ export default function PeerProvider({ children }: IPeerProviderProps) {
     };
 
     setupPeerManager();
-  }, [db, peerManager, userContext.user]);
+  }, [db, peerManager, user]);
 
   /**
   useEffect(() => {

@@ -10,7 +10,7 @@ import { round } from 'services/util/Generic';
 
 //TODO: investigate better north madgwick
 //import { madgwick } from 'services/Compass';
-export const DistanceInfo = ({ contact }: { contact: IContact }) => {
+export const DistanceInfo = ({ contact, detailed }: { contact: IContact; detailed: boolean }) => {
   const { user } = useContext(UserContext);
 
   const [distance, setDistance] = useState<number>();
@@ -72,7 +72,10 @@ export const DistanceInfo = ({ contact }: { contact: IContact }) => {
             style={bearingStyle}
             titleAccess={`north (${Math.round(north)}) + bearing (${bearing}) = ${north + bearing}`}
           />
-          <Box component="span" sx={{ display: { xs: 'none', md: 'block' } }}>
+          <Box
+            component="span"
+            //sx={{ display: { xs: 'none', md: 'block' } }}
+          >
             {round(distance, 0)} km {location.city + ' '}
           </Box>
 
@@ -86,7 +89,10 @@ export const DistanceInfo = ({ contact }: { contact: IContact }) => {
               height={'27rem'}
               title={`Currently ${weather.celcius} ℃, ${weather.description} in ${location?.city}`}
             />
-            <Box component="span" sx={{ display: { xs: 'none', md: 'block' } }}>
+            <Box
+              component="span"
+              //sx={{ display: { xs: 'none', md: 'block' } }}
+            >
               <>{weather.celcius} ℃</>
             </Box>
           </span>

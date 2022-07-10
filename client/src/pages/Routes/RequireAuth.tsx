@@ -7,6 +7,7 @@ import { useLocation } from 'react-router-dom';
 import AcceptInvite from './../../components/Invite/AcceptInvite';
 import { DatabaseContext } from '../../providers/DatabaseProvider';
 import { UserContext } from '../../providers/UserProvider';
+import { ContactsContext } from 'providers/ContactsProvider';
 
 export const RequireAuth = () => {
   const { authenticated } = React.useContext(AuthContext);
@@ -15,6 +16,8 @@ export const RequireAuth = () => {
   const { setAuthenticated } = useContext(AuthContext);
   const db = useContext(DatabaseContext);
   const userCtx = useContext(UserContext);
+
+  const contactsCtx = useContext(ContactsContext);
 
   const eulaAccepted = useSelector((state: State) => state.eulaState.accepted);
 
@@ -44,8 +47,12 @@ export const RequireAuth = () => {
       if (db && !userCtx.user)
         db.userProfile.get(1).then((user) => {
           if (user) {
-            console.info('User in Context', user);
+            console.info('Setting User in context', user);
             userCtx.setUser(user);
+            db.selectCategorizedContacts().then((cts) => {
+              console.info('Setting contacts in context ', user);
+              contactsCtx.setContacts(cts);
+            });
             setAuthenticated(true);
           }
         });

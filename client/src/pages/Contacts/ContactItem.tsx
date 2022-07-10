@@ -113,7 +113,7 @@ export const ContactItem = (props: { contact: IContact }) => {
           </Typography>
         </Box>
       </Box>
-      <DistanceInfo contact={contact} />
+      <DistanceInfo contact={contact} detailed={true} />
     </Box>
   );
 };

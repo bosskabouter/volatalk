@@ -76,6 +76,7 @@ export default function ReceiveInvite(props: { invite: string }) {
         dateTimeDeclined: 0,
         position: null,
         pushSubscription: null,
+        favorite: false,
       };
       db.contacts.put(contact);
       console.info('Contact created', contact);

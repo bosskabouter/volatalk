@@ -7,6 +7,7 @@ import {
   DialogContentText,
   Typography,
   IconButton,
+  DialogActions,
 } from '@mui/material';
 import { DatabaseContext } from '../../providers/DatabaseProvider';
 import { PeerContext } from '../../providers/PeerProvider';
@@ -17,6 +18,9 @@ import Identification from 'components/Identification/Identification';
 
 import { DistanceInfo } from 'components/Identification/DistanceInfo';
 import MoreOptionsIcon from '@mui/icons-material/MoreVert';
+import BlockIcon from '@mui/icons-material/Block';
+import AddTaskIcon from '@mui/icons-material/AddTask';
+import { ContactActions } from './ContactActions';
 
 export const ContactDetails = (props: { contact: IContact }) => {
   const peerMngr = useContext(PeerContext);
@@ -86,7 +90,12 @@ export const ContactDetails = (props: { contact: IContact }) => {
         <MoreOptionsIcon />
       </IconButton>
 
-      <Dialog open={isOpen} onClose={() => setIsOpen(!isOpen)}>
+      <Dialog
+        open={isOpen}
+        onClose={(e) => {
+          setIsOpen(!isOpen);
+        }}
+      >
         <DialogContent>
           <DialogContentText>
             <Typography variant="h5" sx={{ minWidth: 200, maxWidth: 400, border: 0 }}>
@@ -102,8 +111,12 @@ export const ContactDetails = (props: { contact: IContact }) => {
           />
 
           <Typography>{lastTimeSeen}</Typography>
-          <DistanceInfo contact={contact} />
+          <DistanceInfo contact={contact} detailed={true} />
         </DialogContent>
+
+        <DialogActions>
+          <ContactActions contact={contact} detailed />
+        </DialogActions>
       </Dialog>
     </>
   );

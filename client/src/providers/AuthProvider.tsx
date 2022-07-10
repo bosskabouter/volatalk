@@ -1,6 +1,6 @@
 /* eslint-disable */
 // @ts-nocheck
-import React, { ReactElement, ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 import { useSessionStorage } from '../util/useSessionStorage';
 
 export type IAuthContext = {
@@ -64,7 +64,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({
       authenticated,
       setAuthenticated,
     }),
-    [authenticated]
+    [authenticated, setAuthenticated]
   );
 
   return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
