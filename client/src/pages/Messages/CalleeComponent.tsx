@@ -2,7 +2,7 @@
 
 import { IContact } from '../../types';
 import { useContext, useEffect, useState } from 'react';
-import { Button, Dialog, DialogContent, DialogTitle, Stack } from '@mui/material';
+import { Button, Dialog, DialogContent, DialogTitle, Stack, Tooltip } from '@mui/material';
 import { PeerContext } from '../../providers/PeerProvider';
 import { MediaConnection } from 'peerjs';
 import { ContactItem } from 'pages/Contacts/ContactItem';
@@ -125,7 +125,13 @@ const CalleeComponent = () => {
   /**
    *
    */
-  return call ? <ReceivingCallDialog call={call} /> : <CallEndIcon />;
+  return call ? (
+    <ReceivingCallDialog call={call} />
+  ) : (
+    <Tooltip title="Currenly not in a call">
+      <CallEndIcon />
+    </Tooltip>
+  );
 };
 
 export default CalleeComponent;

@@ -12,6 +12,13 @@ import {
   Stack,
   Avatar,
   useTheme,
+  ListItemIcon,
+  ListItemAvatar,
+  Card,
+  CardHeader,
+  CardMedia,
+  CardContent,
+  Grid,
 } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
@@ -19,14 +26,15 @@ import packageJson from '../../../package.json';
 
 import PsychologyIcon from '@mui/icons-material/Psychology';
 import SettingsBackupRestoreIcon from '@mui/icons-material/SettingsBackupRestore';
-import SignalCellularNodataIcon from '@mui/icons-material/SignalCellularNodata';
 import ConnectWithoutContactIcon from '@mui/icons-material/ConnectWithoutContact';
 import OpenSourceIcon from '@mui/icons-material/ImportContacts';
 import PushedIcon from '@mui/icons-material/ForwardToInbox';
 import EncryptedIcon from '@mui/icons-material/MailLock';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import logo from '../../assets/svg/logo-black.svg';
+import logo2 from '../../assets/svg/logo-yellow.svg';
 import EmojiPeopleIcon from '@mui/icons-material/EmojiPeople';
+import HikingIcon from '@mui/icons-material/Hiking';
 
 import { useNavigate } from 'react-router-dom';
 import InfoIcon from '@mui/icons-material/Info';
@@ -42,7 +50,7 @@ const About = () => {
       display: flex;
       flex-direction: column;
       width: 100%;
-      margin-top: 63px;
+      margin-top: 0px;
       justify-items: 'center';
     `,
     logo: css`
@@ -57,8 +65,6 @@ const About = () => {
     `,
   };
 
-  const bulletVariant = 'h6';
-
   const Feature = (props: {
     primaryText: React.ReactNode;
     secondaryText: React.ReactNode;
@@ -66,30 +72,26 @@ const About = () => {
     idx: number | string;
   }) => {
     return (
-      <ListItem key={props.idx} alignItems={'center'}>
-        <ListItemText
-          primary={
-            <Stack direction={'column'} alignItems={'center'}>
-              <Typography
-                variant={bulletVariant}
-                color={theme.palette.primary.main}
-                noWrap
-                // alignContent="center"
-              >
-                {props.primaryText}
-              </Typography>{' '}
-              <Typography
-                variant={bulletVariant}
-                color={theme.palette.secondary.main}
-                noWrap
-                // alignContent="center"
-              >
-                {props.icon}
+      <ListItem
+        key={props.idx}
+        //alignItems={'flex-start'}
+      >
+        <Card  sx={{ maxWidth: 270, minWidth: 270,  }}>
+          <CardHeader
+            title={
+              <Typography variant="h5">
+                {/* <Avatar sx={{ bgcolor: theme.palette.secondary.main }}>
+                  {props.icon}
+                </Avatar> */}
+                <em>{props.primaryText}</em>
               </Typography>
-            </Stack>
-          }
-          secondary={props.secondaryText}
-        />
+            }
+             avatar={<Avatar sx={{ bgcolor: theme.palette.secondary.main }}>
+             {props.icon}
+           </Avatar>}
+          />
+          <CardContent>{props.secondaryText}</CardContent>
+        </Card>
       </ListItem>
     );
   };
@@ -98,7 +100,67 @@ const About = () => {
     <Container component="main" maxWidth="xl">
       <CssBaseline />
       <Box css={styles.box}>
-        <List>
+        <Grid>
+          <Typography variant="h4" align="center" alignItems={'center'}>
+            <div>
+              <img src={logo2} alt="" height={63} />
+            </div>
+          </Typography>
+
+          <Feature
+            idx={1}
+            icon={<ConnectWithoutContactIcon />}
+            primaryText={<> Direct</>}
+            secondaryText={
+              <p>
+                <p>Connect directly with invited people, not your whole address book. </p>
+                <p>No central server to capture your messages or censure your account.</p>
+              </p>
+            }
+          />
+          <Feature
+            idx={2}
+            icon={<EmojiPeopleIcon />}
+            primaryText={<>Private</>}
+            secondaryText={
+              <p>
+                <p>No telephone, email, or native application required, just a browser.</p>
+                <p>Encrypted messages can only be read by you and the receiver.</p>
+              </p>
+            }
+          />
+
+          <Feature
+            idx={3}
+            icon={<HikingIcon />}
+            primaryText={<>Anytime</>}
+            secondaryText={
+              <p>
+                <p>
+                  Write messages anytime, receive push notications <PushedIcon fontSize="small" />{' '}
+                  when offline.
+                </p>
+              </p>
+            }
+          />
+
+          <Feature
+            idx={5}
+            icon={<OpenSourceIcon />}
+            primaryText={<>Open Source</>}
+            secondaryText={
+              <p>
+                <Link
+                  href="https://github.com/bosskabouter/volatalk"
+                  target={'_blank'}
+                  rel="noreferrer"
+                >
+                  GitHub <GitHubIcon />
+                </Link>
+              </p>
+            }
+          />
+
           <ListItem key="0">
             <ListItemText
               primary={
@@ -107,7 +169,7 @@ const About = () => {
                     <Typography variant={'subtitle2'} noWrap alignItems={'center'}>
                       <em>
                         Nothing as volatile
-                        <PsychologyIcon color="secondary" fontSize={'large'} />
+                        <PsychologyIcon color="secondary" />
                         as the human mind
                       </em>
                     </Typography>
@@ -117,76 +179,11 @@ const About = () => {
               }
             />
           </ListItem>
-
-          <Feature
-            idx={1}
-            icon={<EmojiPeopleIcon />}
-            primaryText={<>Simple</>}
-            secondaryText={
-              <React.Fragment>
-                Use only your browser. No telephone number, contact list, email, or native
-                application required.
-              </React.Fragment>
-            }
-          />
-          <Feature
-            idx={2}
-            icon={<ConnectWithoutContactIcon />}
-            primaryText={<>Communicate Directly</>}
-            secondaryText={
-              <React.Fragment>
-                Connect directly with your contacts without a server to capture your messages or
-                censure your account. Make a
-                <IconButton onClick={() => navigate('/backup')} size="small" color={'primary'}>
-                  <SettingsBackupRestoreIcon fontSize="small" /> Backup
-                </IconButton>
-              </React.Fragment>
-            }
-          />
-          <Feature
-            idx={3}
-            icon={<SignalCellularNodataIcon />}
-            primaryText={<>Use Offline</>}
-            secondaryText={
-              <React.Fragment>
-                Read and write messages anytime, once connected with your contacts all messages are
-                synchronized. If the other is offline and enabled push notifications, an icon{' '}
-                <PushedIcon fontSize="small" /> appears next to the message.
-              </React.Fragment>
-            }
-          />
-          <Feature
-            idx={4}
-            icon={<EncryptedIcon />}
-            primaryText={<>Secure Encryption</>}
-            secondaryText={
-              <React.Fragment>
-                All sensitive information is encrypted in your local storage and only trusted
-                contacts can connect. Encrypted messages can only be read by the receiver. This
-                applies also to push notications.
-              </React.Fragment>
-            }
-          />
-          <Feature
-            idx={5}
-            icon={<OpenSourceIcon />}
-            primaryText={<>Trust Open Source</>}
-            secondaryText={
-              <React.Fragment>
-                <span>Source and technical details: </span>
-                <Link
-                  href="https://github.com/bosskabouter/volatalk"
-                  target={'_blank'}
-                  rel="noreferrer"
-                >
-                  GitHub <GitHubIcon />
-                </Link>
-              </React.Fragment>
-            }
-          />
-        </List>
+        </Grid>
       </Box>
       <Stack direction={'column'} alignItems={'center'}>
+        <Typography variant="caption"> v{packageJson.version}</Typography>
+
         <Avatar
           src={logo}
           variant="rounded"
@@ -196,12 +193,11 @@ const About = () => {
             border: 1,
             alignContent: 'center',
             mt: '3rem',
-            mb: '18rem',
+            mb: '3rem',
             // color: theme.palette.secondary.main,
             // bgcolor: theme.palette.secondary.main,
           }}
         ></Avatar>
-        <Typography css={styles.version}> v{packageJson.version}</Typography>
       </Stack>
     </Container>
   );
@@ -212,11 +208,12 @@ export const AboutVolaTalkIcon = () => {
 
   return (
     <IconButton
+      size="large"
       onClick={() => {
         navigate('/About');
       }}
     >
-      <InfoIcon />
+      <InfoIcon fontSize="large" />
     </IconButton>
   );
 };

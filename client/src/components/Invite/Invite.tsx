@@ -9,7 +9,16 @@ import { useNavigate } from 'react-router-dom';
 
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import { TextField, Box, Button, Dialog, useTheme, DialogContent } from '@mui/material';
+import {
+  TextField,
+  Box,
+  Button,
+  Dialog,
+  useTheme,
+  DialogContent,
+  DialogActions,
+  DialogTitle,
+} from '@mui/material';
 
 import QrCode2Icon from '@mui/icons-material/QrCode';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
@@ -19,10 +28,14 @@ import { isMobile } from 'react-device-detect';
 import { UserContext } from '../../providers/UserProvider';
 import { makeInviteURL } from '../../services/InvitationService';
 import Share from '../../util/Share';
+import { ConnectWithoutContactTwoTone } from '@mui/icons-material';
+import { usePeerManager } from 'providers/PeerProvider';
 
 export default function Invite() {
   const inputRef = useRef();
   const { user } = useContext(UserContext);
+
+  const peerManager = usePeerManager();
 
   const [toggleReaderScanner, setToggle] = useState(true);
   const [inviteText, setInviteText] = useState('Invitation from ' + user?.nickname);
@@ -49,6 +62,23 @@ export default function Invite() {
     `,
   };
 
+  /**
+   * Listens if someone makes new contact requests. Move to Home if notified.
+   */
+  useEffect(() => {
+    function onNewContactHandler() {
+      navigate('/');
+    }
+    peerManager?.addListener('onNewContact', onNewContactHandler);
+
+    return () => {
+      peerManager?.removeListener('onNewContact', onNewContactHandler);
+    };
+  }, [navigate, peerManager]);
+
+  /**
+   *
+   */
   useEffect(() => {
     console.debug('useEffect setInterval isGeneratingInvite');
 
@@ -98,22 +128,26 @@ export default function Invite() {
         </Button>
 
         {inviteUrl.length > 0 && (
-          <QRCode
-            value={inviteUrl}
-            size={320}
-            //width={'100%'}
-            //css={styles.qrCode}
-            includeMargin={true}
-            bgColor="white"
-            style={{
-              minWidth: 200,
-              minHeight: 200,
-              width: '63vw',
-              height: '63vw',
-              maxHeight: '63vh',
-              maxWidth: '63vh',
-            }}
-          />
+          <DialogContent>
+            <QRCode
+              value={inviteUrl}
+              size={640}
+              //  width={'20px'}
+              //css={styles.qrCode}
+              includeMargin={true}
+              bgColor="white"
+              style={{
+                justifyItems: 'center',
+                border: 1,
+                //minWidth: 200,
+                //minHeight: 200,
+                width: '100%',
+                height: 'auto',
+                maxWidth: '72vh',
+                // maxWidth: '63vh',
+              }}
+            />
+          </DialogContent>
         )}
       </Box>
     );
@@ -139,12 +173,13 @@ export default function Invite() {
         ViewFinder={ViewFinder}
         videoId="video"
         containerStyle={{
-          minWidth: 200,
-          minHeight: 200,
-          width: '63vw',
-          height: '63vw',
-          maxHeight: '63vh',
-          maxWidth: '63vh',
+          justifyItems: 'center',
+          border: 1,
+          //minWidth: 200,
+          //minHeight: 200,
+          width: '100%',
+          height: 'auto',
+          maxWidth: '80vh',
         }}
         // css={styles.qrReader}
         onResult={(result, error) => {
@@ -172,12 +207,24 @@ export default function Invite() {
       onClose={() => navigate('/', { replace: false })}
       transitionDuration={{ enter: 1500 }}
       //  maxWidth="md"
-      fullWidth={true}
-      style={{ minWidth: 300 }}
+      // fullWidth={true}
+      fullScreen
+      //      style={{ minWidth: 300 }}
     >
-      <DialogContent>
+      <DialogTitle>
+        <ConnectWithoutContactTwoTone />
+        Connect with Contact
+      </DialogTitle>
+      <DialogContent
+        sx={
+          {
+            //maxHeight:'40%'
+          }
+        }
+      >
         {toggleReaderScanner ? <DisplayQRCode /> : <DisplayQRScanner />}
-
+      </DialogContent>
+      <DialogActions>
         <ToggleButtonGroup value={toggleReaderScanner} fullWidth exclusive onChange={handleToggle}>
           <ToggleButton value={true}>
             <QrCode2Icon /> SHOW
@@ -187,7 +234,7 @@ export default function Invite() {
             <QrCodeScannerIcon />
           </ToggleButton>
         </ToggleButtonGroup>
-      </DialogContent>
+      </DialogActions>
     </Dialog>
   );
 }

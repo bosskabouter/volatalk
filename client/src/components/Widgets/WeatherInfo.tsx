@@ -35,11 +35,11 @@ export const WeatherInfo = ({ location }: WeatherInfoProps) => {
       }}
     >
       <Typography noWrap sx={{ display: { xs: 'none', md: 'block' } }}>
-        {weatherNow.description}
+        {weatherNow.description},
       </Typography>
       <Typography
         noWrap
-        variant="caption"
+        //  variant="caption"
         //sx={{ display: { xs: 'none', md: 'block' } }}
       >
         {weatherNow.celcius + ' \u2103'}

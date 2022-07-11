@@ -1,8 +1,4 @@
-import Dexie from 'dexie';
-
-import download from 'downloadjs';
-
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 
 import {
   Box,
@@ -30,7 +26,7 @@ import { setupDatabase, useDatabase } from 'providers/DatabaseProvider';
 import CloseIcon from '@mui/icons-material/Close';
 import DownloadIcon from '@mui/icons-material/SaveAlt';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
-
+import RestoreIcon from '@mui/icons-material/Restore';
 import 'dexie-export-import';
 import { exportDB, importDB } from 'dexie-export-import';
 import { encryptString, generateKeyFromString } from 'dha-encryption';
@@ -39,21 +35,23 @@ import {
   getLocalDateShortString,
   getLocalDateString,
 } from 'services/util/Generic';
+import { UserContext } from 'providers/UserProvider';
+import { useNavigate } from 'react-router-dom';
+import { exportDatabase, importDatabase } from './BackupService';
+import { CheckBox } from '@mui/icons-material';
 
 export default function Backup() {
   const db = useDatabase();
-
   const [open, setOpen] = useState(true);
 
   const [progress] = useState<{ totalRows: number; completedRows: number }>();
 
-  const [blob, setBlob] = useState();
+  const [file, setFile] = useState<File>();
 
   const [pw1, setPw1] = useState('');
   const [pw2, setPw2] = useState('');
 
   const isValid = pw1 === pw2;
-  const isEncrypted = isValid && pw1.length > 0;
 
   return (
     <Dialog open={open} onClose={() => setOpen(false)}>
@@ -74,6 +72,19 @@ export default function Backup() {
             label="Repeat Password"
             variant="filled"
           />
+          {/* <FormControlLabel
+            label={encrypted ? 'Encrypted Backup' : 'Plain text Backup'}
+            control={<Switch onChange={() => setEncrypted(!encrypted)} />}
+          />
+          <input
+            type="file"
+            accept="application/json"
+            onChange={async (event) => {
+              if (!event.target.files) return;
+              setFile(event.target.files[0]);
+            }}
+            multiple={false}
+          /> */}
         </DialogContentText>
 
         <Typography variant="h5" hidden={isValid}>
@@ -82,7 +93,14 @@ export default function Backup() {
 
         <DialogActions>
           <Button disabled={!isValid} onClick={() => db && pw1 === pw2 && exportDatabase(db, pw1)}>
-            Download {isEncrypted ? 'password protected' : ''} backup
+            Download backup
+            <DownloadIcon />
+          </Button>
+          <Button
+            disabled={!isValid}
+            onClick={() => file && db && pw1 === pw2 && importDatabase(db, file, pw1)}
+          >
+            Upload and Restore backup
             <DownloadIcon />
           </Button>
         </DialogActions>
@@ -91,45 +109,30 @@ export default function Backup() {
   );
 }
 
-export function RestoreDB() {
+/**
+ * A button to open Backup Dialog
+ * @returns
+ */
+export const BackupDBButton = () => {
+  const navigate = useNavigate();
+  const user = useContext(UserContext);
+
+  return user ? (
+    <Button variant="contained" onClick={() => navigate('/backup')}>
+      Backup
+      <FileUploadIcon />
+    </Button>
+  ) : (
+    <></>
+  );
+};
+export const RestoreDBButton = () => {
+  const navigate = useNavigate();
+
   return (
-    <Button variant="contained">
-      Restore Backup<FileUploadIcon></FileUploadIcon>
+    <Button variant="contained" onClick={() => navigate('/restore')}>
+      Restore
+      <FileUploadIcon />
     </Button>
   );
-}
-export async function exportDatabase(db: Dexie, password = ''): Promise<Blob | null> {
-  try {
-    const blob = await exportDB(db, { prettyJson: true, progressCallback });
-
-    const blobEncrypted = encryptString(await blob.text(), generateKeyFromString(password));
-    download(
-      blobEncrypted,
-      getLocalDateShortString(new Date()) + '.org.volatalk',
-      'application/json'
-    );
-
-    return blob;
-  } catch (error) {
-    console.error('' + error);
-    return null;
-  }
-}
-export async function importDatabase(db: Dexie, f: File, password = ''): Promise<Dexie | null> {
-  try {
-    await db.delete();
-    db = await importDB(f, {
-      progressCallback,
-    });
-
-    return db;
-  } catch (error) {
-    console.error('' + error);
-    return null;
-  }
-}
-
-function progressCallback(p: any): boolean {
-  console.log(`Progress: ${p}`);
-  return true;
-}
+};

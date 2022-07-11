@@ -3,7 +3,6 @@ import { Button, IconButton, List, ListSubheader, Typography } from '@mui/materi
 import { Box } from '@mui/system';
 
 import { useNavigate } from 'react-router-dom';
-import AddLinkIcon from '@mui/icons-material/AddLink';
 import NewContactRequestsIcon from '@mui/icons-material/AccessibilityNew';
 import FavoritesOnlyContactIcon from '@mui/icons-material/StarBorderPurple500';
 import FavoritesNotOnlyContactIcon from '@mui/icons-material/Star';
@@ -22,7 +21,7 @@ const ContactList = ({
   contacts: IContact[] | undefined;
   subHeader: ReactNode;
 }) => {
-  return (
+  return contacts && contacts?.length > 0 ? (
     <div>
       <List
         sx={{
@@ -42,6 +41,8 @@ const ContactList = ({
         })}
       </List>
     </div>
+  ) : (
+    <></>
   );
 };
 

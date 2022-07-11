@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 
 import CompassIcon from '@mui/icons-material/LocationOn';
-import { Tooltip } from '@mui/material';
-
+import { Stack, Tooltip, Typography } from '@mui/material';
+import ExploreIcon from '@mui/icons-material/Explore';
+import ExploreOffIcon from '@mui/icons-material/ExploreOff';
 /**
  *
  * @returns
@@ -26,7 +27,7 @@ export const Compass = () => {
    */
   useEffect(() => {
     function handleOrientation(ev: DeviceOrientationEvent) {
-      ev.alpha && setNorth(ev.alpha + 180);
+      ev.alpha && setNorth(ev.alpha);
     }
     window.addEventListener('deviceorientation', handleOrientation);
     return () => {
@@ -34,9 +35,17 @@ export const Compass = () => {
     };
   }, []);
 
-  return (
-    <Tooltip title={'Top of device to Magntic north'}>
-      <CompassIcon style={rotateCompassStyle} color={'secondary'} />
+  return north ? (
+    <Tooltip title={'Magntic north'}>
+      <Stack direction="row" alignItems={'center'} gap="1">
+        <ExploreIcon style={rotateCompassStyle} color={'secondary'} fontSize={'large'} />
+
+        <Typography>{north && Math.round(north)}</Typography>
+      </Stack>
+    </Tooltip>
+  ) : (
+    <Tooltip title={'No motion sensor'}>
+      <ExploreOffIcon />
     </Tooltip>
   );
 };

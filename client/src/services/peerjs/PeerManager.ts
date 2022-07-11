@@ -192,7 +192,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
    * New Contact connecting.
    * Generates a signature and save info from ConnectionMetadata.
    *
-   * User will have to accept the contact before a connection can be established.
+   * User will have to accept the contact before a connection will be allowed.
    *
    * @param conn  trusted connection with valid metadata
    * @returns the newly created contact with generated signature
@@ -245,8 +245,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
         conn
       );
 
-      //do not close connection while not proper accept screen
-      //conn.close();
+      conn.close();
     } else if (contact.dateTimeDeclined !== 0) {
       console.warn('Declined contact trying to connect. I said no connection.', contact, conn);
       conn.close();
@@ -346,8 +345,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
       return null;
     }
 
-    const acceptUnaccepted = true; //always allow connection to be established, even if user didnt accept contact yet. Maybe get rid of this prop entirely
-    if (!acceptUnaccepted && contact.dateTimeAccepted === 0) {
+    if (contact.dateTimeAccepted === 0) {
       //turned off, people couldnt find the 'Accept' button
       //TODO make new contact dialog
       console.debug(

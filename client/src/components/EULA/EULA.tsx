@@ -8,9 +8,11 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Link,
   List,
   ListItem,
   ListItemText,
+  Typography,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { MobileView } from 'react-device-detect';
@@ -18,6 +20,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { State } from '../../store/rootReducer';
 import { acceptEula } from '../../store/slices/eulaSlice';
+import GitHubIcon from '@mui/icons-material/GitHub';
+import About from 'components/About/About';
 
 const EULA = () => {
   const accepted = useSelector((state: State) => state.eulaState.accepted);
@@ -64,8 +68,9 @@ const EULA = () => {
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: ${theme.spacing(3)};
+      padding: ${theme.spacing(9)};
       min-height: 8rem;
+      pb: 63px;
     `,
     eulaAgreeButton: css`
       width: 20rem;
@@ -108,34 +113,19 @@ const EULA = () => {
         </MobileView>
       </div>
 
-      <img src={'safari-pinned-tab.svg'} alt="logo" height={50}></img>
+      <DialogTitle
+        id="dialog-title"
+        css={styles.eulaTitleBackground}
+        sx={{ alignItems: 'center', textAlign: 'center' }}
+      >
+        <img src={'safari-pinned-tab.svg'} alt="logo" height={90} />
 
-      <DialogTitle id="dialog-title" css={styles.eulaTitleBackground}>
-        Welcome to VolaTALK
+        <Typography variant={'subtitle1'}>VolaTALK - Direct Private Messenger</Typography>
       </DialogTitle>
       <DialogContent id="dialog-agreement" css={styles.eulaDialogContentRoot}>
-        <List>
-          <ListItem key="0">
-            <ListItemText primary="Too Long, Didn't Read (TLDR); open source encrypted decentral p2p-webrtc messenger pwa." />
-          </ListItem>
-          <ListItem key="1">
-            <ListItemText primary="Private, Direct Video, Calling and Messenger. The new way to communicate directly with your contacts, without the need for any central authority to capture or censure your private data." />
-          </ListItem>
-          <ListItem key="2">
-            <ListItemText primary="All information is encrypted on your local device and personal messaging and calling data is not sent, collected or used by anyone other than the receiving contact." />
-          </ListItem>
+        <About />
 
-          <ListItem key="3">
-            <ListItemText primary="Currently we are in testing phase. Unexpected things might happen." />
-          </ListItem>
-          <ListItem key="4">
-            <ListItemText primary="When you continue, your IP is registered to a signaling server, so you can find and connect others." />
-          </ListItem>
-        </List>
         <DialogActions css={styles.eulaDialogAction}>
-          <DialogContentText color={'primary'}>
-            VolaTALK does not store any data of your data.
-          </DialogContentText>
           <Button
             css={styles.eulaAgreeButton}
             color="primary"

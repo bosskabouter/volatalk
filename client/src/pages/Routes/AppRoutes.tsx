@@ -49,7 +49,7 @@ export const AppRoutes = () => {
         <Route element={<EULA />} path={'/eula'} />
         <Route element={<Login />} path={'/login'} />
         <Route element={<AccountSetup />} path={'/accountSetup'} />
-
+        <Route element={<Backup />} path="/restore" />
         {/* The RequireAuth component is a wrapper for all the routes that require authentication */}
         <Route element={<RequireAuth />}>
           <Route element={<Home />} path="/" />

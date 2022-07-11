@@ -4,7 +4,6 @@
 
 ## Introduction
 
-
 > Nothing as volatile as the human mind
 
 ### Vision
@@ -15,28 +14,37 @@ Services know as little as possible about the sending or receiving client and th
 
 ### Mission
 
-Create a trackerless messenger I can fully trust so I am able to speak freely with family and friends.
+Create a trackerless messenger I so I can speak freely with family and friends.
 
 ### What's different
 
-Communicate directly in your browser with invited contacts, without centralized servers capturing your data or native applications running in your system. 
+Communicate directly in your browser with invited contacts, without centralized servers capturing your data or native applications running in your system.
 
-No email, telephone, IMEI, IP or contact list needed. 
+No email, telephone, address book or native applications required.
 
-### Peer-to-peer
+### WebRTC
 
-VolaTALK uses [WebRTC] data channels (https://webrtc.org/) to establish direct peer-to-peer sessions. There are many solutions like these, but none I could find create a long-term trusted relation between contacts.
+VolaTALK uses [WebRTC](https://webrtc.org/) to establish direct peer-to-peer connections with known trusted contacts.
 
-Anything based on blockchain technologies would not fit the [Vision](#vision) for this purpose.
+Contacts can be found by their public key and invited through a signed 'copy-and-paste' invite mechanism.
+
+Signaling servers used to find other contacts do no validate authenticity of the users, instead clients themselves are responsible for handling all encryption/authentication/authorization between them.
 
 #### Does anything like this exist?
 
-Open source, free to use, P2P, without trackers, browser based and without native applications, Please let us know at [ideas@volatalk.org](mailto:ideas@volatalk.org)
+There are many solutions like these, but none I could find create a long-term trusted relation between contacts.
 
+Anything based on blockchain technologies would not fit the [Vision](#vision) for this purpose.
+
+Trackerless free software is hard to find, but if you think you found a better alternative, please let us know at [ideas@volatalk.org](mailto:ideas@volatalk.org)
+
+#### Are there drawbacks?
+
+Centralized communication servers buffer and replicate streams for large conference with many participants. Imagine a conference where 1 user presents to 10 different connected contacts similtaneously. In a direct peer-to-peer architecture, this stream needs to be send out 10 times to all 10 independent contacts, so required bandwith for the user would multiply with the amount of users participating. Currently we do not support multi participants calling.
 
 #### How many people use VolaTALK
 
-The application needs trackers to find out., so I have no clue and I am not interested. I use it with my friends and family.
+The application would need trackers to find out, so I don't know.
 
 ## Table of Contents
 
@@ -74,19 +82,20 @@ The application needs trackers to find out., so I have no clue and I am not inte
 
 ## Technical Implementation
 
-VolaTALK describes a way for browsers to establish a trusted WebRTC connections over Peer-to-Peer while not relying on a single centralized server.
+VolaTALK describes a way for browsers to establish trusted WebRTC connections over Peer-to-Peer while not relying on a single centralized signaling server.
 
 ### Peer-to-Peer
 
-Once a peer found another peer, no other services are needed for their communication during the existence of their WebRTC session.
-
 For contacts to find each other and establish a connection, they look for each other at a [PeerJS](https://peerjs.com/) signaling server. These can be installed anywhere and PeerJS offers a public [default instance](https://0.peerjs.com/).
+
+Once a peer found another peer on a signaling server, the established WebRTC session does not rely on this server for their communication during the existence of this session.
 
 #### Peer ID
 
 A VolaTALK peer identifies itself by registering to a Peer server with a Base58 encoded public key exponent of the ECDSA SHA-384 JSON WebKey.
 
 Peer IDs are shared between users in 'copy-and-paste' invites. The application includes a QR generator and reader to facilitate the exchange of trusted invites.
+
 
 ### VolaTALK Client
 
@@ -140,16 +149,15 @@ The application permits transmission of the invite through QR scanning, [Web sha
 
 Every connection with a contact is initiated informing the following metadata:
 
-
-  `  export interface IContactResume { `
-  `    peerid: string;`
-  `    dateRegistered: Date;`
-  `    nickname: string;`
-  `    avatar: string;`
-  `    avatarThumb: string;`
-  `    position: GeolocationCoordinates | null;`
-  `    pushSubscription: PushSubscription | null;`
-  `}`
+` export interface IContactResume {`
+` peerid: string;`
+` dateRegistered: Date;`
+` nickname: string;`
+` avatar: string;`
+` avatarThumb: string;`
+` position: GeolocationCoordinates | null;`
+` pushSubscription: PushSubscription | null;`
+`}`
 
 The `IContactResume` is accompanied by a signature: the Peer ID of the receiver signed with the private key of the requester. The receiver uses the requester Peer ID (public key) to verify the signature before the connection is accepted.
 
@@ -209,7 +217,6 @@ Currenly Push Subscription endpoints are shared openly between contacts. A futur
 
 Ideally a VAPID key pair for each client subscription, so that VAPID public key isn't a global static and pertains only to the given client. This Vapid key pair should however be generated on the Push Server, so clients registering for push notifications must request their VAPID key pair from this server.
 
-
 ### Allows Geo visibility to certain contacts only.
 
 ### Parallax AR
@@ -217,7 +224,6 @@ Ideally a VAPID key pair for each client subscription, so that VAPID public key 
 ### Another reference implementation
 
 AngularJS or Angular2, possibly using cloud backend https://Back4App.com.
-
 
 ## License
 

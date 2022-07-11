@@ -18,7 +18,7 @@ test('eula', () => {
     </BrowserRouter>
   );
 
-  expect(getByText(/Private, Direct Video, Calling and Messenger./i)).toBeInTheDocument();
+  expect(getByText(/Nothing as volatile/i)).toBeInTheDocument();
 });
 
 test('Home', () => {
@@ -30,5 +30,5 @@ test('Home', () => {
     </BrowserRouter>
   );
 
-  expect(getByText(/Contact Requests/i)).toBeInTheDocument();
+  expect(getByText(/No contacts yet/i)).toBeInTheDocument();
 });

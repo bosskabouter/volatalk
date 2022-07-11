@@ -55,7 +55,7 @@ export class AppDatabase extends Dexie {
     (await this.selectContacts()).forEach((c) => {
       if (c.dateTimeAccepted === 0) {
         m.get('new')?.push(c);
-      } else if (c.dateTimeDeclined >= 0) {
+      } else if (c.dateTimeDeclined > 0) {
         m.get('block')?.push(c);
       } else if (c.favorite) {
         m.get('fav')?.push(c);

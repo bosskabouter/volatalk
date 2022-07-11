@@ -8,7 +8,12 @@ import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
 import { useNavigate } from 'react-router-dom';
 import ContactRequestsButton from 'components/Invite/ContactRequestsButton';
+import { useSelector } from 'react-redux';
+import { State } from 'store/rootReducer';
 const Footer = () => {
+  // Hide bar while eula not accepted
+  const eulaAccepted = useSelector((state: State) => state.eulaState.accepted);
+
   const navigate = useNavigate();
   const StyledFab = styled(Fab)({
     position: 'absolute',
@@ -19,7 +24,7 @@ const Footer = () => {
     margin: '0 auto',
   });
 
-  return (
+  return eulaAccepted ? (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="fixed" variant="elevation" color="primary" sx={{ top: 'auto', bottom: 0 }}>
         <Toolbar>
@@ -51,6 +56,8 @@ const Footer = () => {
         </Toolbar>
       </AppBar>
     </Box>
+  ) : (
+    <></>
   );
 };
 

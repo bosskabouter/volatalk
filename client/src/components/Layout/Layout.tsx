@@ -9,9 +9,9 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <CssBaseline>
       <Header />
-      <Container sx={{ pt: '0rem', pb: '5rem', mt: 0, mb: 0 }}>
+      <Container sx={{ pt: '0px', pb: '5rem', mt: 0, mb: 0 }}>
         <main>{children}</main>
-      </Container>{' '}
+      </Container>
       <Footer />
     </CssBaseline>
   );
