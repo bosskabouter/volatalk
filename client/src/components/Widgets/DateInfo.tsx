@@ -41,9 +41,7 @@ export const DateInfo = () => {
         }}
       >
         <Tooltip title={time && getLocalDateString(time)}>
-          <Typography noWrap >
-            {time && getLocalDateShortString(time)}
-          </Typography>
+          <Typography noWrap>{time && getLocalDateShortString(time)}</Typography>
         </Tooltip>
       </Box>
     </Box>

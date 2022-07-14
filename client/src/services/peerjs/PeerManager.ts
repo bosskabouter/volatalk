@@ -119,11 +119,11 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
     });
     this.#peer.on('disconnected', () => {
       console.warn(`this peer disconnected. Emit statusChange OFFLINE.`);
-    //  this.emit('statusChange', false, 'Uknown reason');
+      //  this.emit('statusChange', false, 'Uknown reason');
     });
     this.#peer.on('close', () => {
       console.warn('this peer closed. Emitting statusChange OFFLINE');
-     // this.emit('statusChange', false, 'Uknown reason');
+      // this.emit('statusChange', false, 'Uknown reason');
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

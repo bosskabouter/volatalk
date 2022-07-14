@@ -81,9 +81,8 @@ const About = () => {
           width: { xs: '100%', md: '20%' },
         }}
       >
-        <CardHeader 
-        color={theme.palette.secondary.main}
-        
+        <CardHeader
+          color={theme.palette.secondary.main}
           title={
             <Typography variant="h6">
               <em>{props.primaryText}</em>

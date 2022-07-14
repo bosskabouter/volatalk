@@ -100,17 +100,24 @@ export const ContactItem = (props: { contact: IContact }) => {
           flexDirection: 'column',
           alignItems: { xs: 'left', md: 'flex-start' },
           //m: 3,
-          width:'100%',
-          border: 1,
-          minWidth: 180,
+          //width: '100%',
+          border: 0,
+         // minWidth: 180,
         }}
-      >      
-
-        <Typography variant="h6" sx={{ maxWidth:  { xs: '200px', md: '400px' }, minWidth: 150, border: 1 }}>
+      >
+        <Typography
+          variant="subtitle1"
+          sx={{ 
+            
+            //maxWidth: { xs: '150px', md: '600px' }, 
+            //minWidth: 150,
+             border: 0 }}
+        >
           {contact.nickname}
         </Typography>
         <Box component="span">
-          <Typography variant="subtitle2" noWrap sx={{ display: { xs: 'none', md: 'block' } }}>
+          <Typography variant="subtitle2" noWrap 
+          sx={{ display: { xs: 'none', md: 'block' } }}>
             {lastTimeSeen}
           </Typography>
         </Box>

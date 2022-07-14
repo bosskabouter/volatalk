@@ -9,7 +9,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <CssBaseline>
       <Header />
-      <Container sx={{ pt: '3rem', pb: '5rem', mt: 0, mb: 100 }}>
+      <Container sx={{ pt: '3rem', pb: '1rem', mt: 0, mb: 18 }}>
         <main>{children}</main>
       </Container>
       <Footer />
