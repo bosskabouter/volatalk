@@ -42,6 +42,7 @@ import { requestFollowMe } from 'services/geo/LocationService';
 import enrollUser from 'services/UserService';
 import { ImageUploader } from 'components/ImageUploader';
 import Backup, { BackupDBButton, RestoreDBButton } from 'Database/Backup';
+import { reloadApp } from 'pages/Routes/AppRoutes';
 
 const ITEM_HEIGHT = 18;
 const ITEM_PADDING_TOP = 8;
@@ -120,7 +121,7 @@ const AccountSetup = () => {
 
       peerid: '',
 
-      nickname: '',
+      nickname: 'Anonymous',
 
       avatar: avatarData,
       avatarThumb: avatarData,
@@ -167,6 +168,9 @@ const AccountSetup = () => {
     //only 1 user, for now
     db.userProfile.put(values, 1);
     setUser(values);
+
+    //reinit all connection to broadcast profile update
+    reloadApp();
     navigate('/', { replace: true });
   }
 

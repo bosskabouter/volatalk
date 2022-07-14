@@ -10,7 +10,7 @@ import pushMessage from '../push/PushMessage';
 import { verifyAddress } from '../UserService';
 
 export interface PeerManagerEvents {
-  statusChange: (status: boolean) => void;
+  statusChange: (status: boolean, reason: string) => void;
   onContactStatusChange: (statchange: { contact: IContact; status: boolean }) => void;
   onMessage: (message: IMessage) => void;
   onNewContact: (contact: IContact) => void;
@@ -86,7 +86,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
         throw Error('Signaler assigned different id: ' + pid);
       }
       console.info('Emit statusChange ONLINE');
-      this.emit('statusChange', true);
+      this.emit('statusChange', true, 'OK');
       this.#db.contacts.each((contact: IContact) => {
         console.info('Connecting contact', contact);
         this.connectContact(contact);
@@ -119,11 +119,11 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
     });
     this.#peer.on('disconnected', () => {
       console.warn(`this peer disconnected. Emit statusChange OFFLINE.`);
-      this.emit('statusChange', false);
+    //  this.emit('statusChange', false, 'Uknown reason');
     });
     this.#peer.on('close', () => {
       console.warn('this peer closed. Emitting statusChange OFFLINE');
-      this.emit('statusChange', false);
+     // this.emit('statusChange', false, 'Uknown reason');
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -138,7 +138,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
         } else {
           console.error('peer error: ' + err.name, err);
         }
-        this.emit('statusChange', false);
+        this.emit('statusChange', false, err.type);
         setTimeout(() => this.#initSignalingServer(), RECONNECT_TIMEOUT);
       }
     });

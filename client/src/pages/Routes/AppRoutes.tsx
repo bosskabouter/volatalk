@@ -26,6 +26,13 @@ const MessageList = lazy(() => import('../../pages/Messages/MessageList'));
 const Contacts = lazy(() => import('../../pages/Contacts/ContactsPage'));
 const CallerComponent = lazy(() => import('../../pages/Messages/CallerComponent'));
 
+/**
+ * General hook to reload App and reinit (after db restore or profile update)
+ */
+export function reloadApp() {
+  console.info('Reloading App');
+  document.location = './';
+}
 export const AppRoutes = () => {
   return (
     // Suspense tells React that the data a component is reading

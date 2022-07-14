@@ -6,12 +6,7 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
-  Link,
-  List,
-  ListItem,
-  ListItemText,
   Typography,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
@@ -20,7 +15,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { State } from '../../store/rootReducer';
 import { acceptEula } from '../../store/slices/eulaSlice';
-import GitHubIcon from '@mui/icons-material/GitHub';
 import About from 'components/About/About';
 
 const EULA = () => {
@@ -63,17 +57,17 @@ const EULA = () => {
       } ;
     `,
     eulaDialogAction: css`
-      background-color: ${theme.palette.primary.light};
+      background-color: ${theme.palette.primary.main};
       color: ${theme.palette.primary.main};
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: ${theme.spacing(9)};
-      min-height: 8rem;
-      pb: 63px;
+      padding: ${theme.spacing(2)};
+      #min-height: 8rem;
+      #mb: 220px;
     `,
     eulaAgreeButton: css`
-      width: 20rem;
+      width: 18rem;
       min-height: 20px;
       justify-content: center;
       size: large;
@@ -104,7 +98,7 @@ const EULA = () => {
       aria-labelledby="dialog-title"
       aria-describedby="dialog-agreement"
       disableEscapeKeyDown
-      maxWidth="lg"
+      maxWidth="sm"
       open={!accepted}
     >
       <div css={styles.eulaMobileRoot}>
@@ -119,22 +113,21 @@ const EULA = () => {
         sx={{ alignItems: 'center', textAlign: 'center' }}
       >
         <img src={'safari-pinned-tab.svg'} alt="logo" height={90} />
-
-        <Typography variant={'subtitle1'}>VolaTALK - Direct Private Messenger</Typography>
+        <Typography>VolaTALK - Direct Private Messenger</Typography>
       </DialogTitle>
+      <DialogActions css={styles.eulaDialogAction}>
+        <Button
+          css={styles.eulaAgreeButton}
+          color="secondary"
+          onClick={onClose}
+          variant="contained"
+        >
+          Let&apos;s have a look!
+        </Button>
+      </DialogActions>
+
       <DialogContent id="dialog-agreement" css={styles.eulaDialogContentRoot}>
         <About />
-
-        <DialogActions css={styles.eulaDialogAction}>
-          <Button
-            css={styles.eulaAgreeButton}
-            color="primary"
-            onClick={onClose}
-            variant="contained"
-          >
-            Let&apos;s have a look !
-          </Button>
-        </DialogActions>
       </DialogContent>
     </Dialog>
   );

@@ -4,9 +4,11 @@ import { exportDB, importDB } from 'dexie-export-import';
 import { decryptString, encryptString, generateKeyFromString } from 'dha-encryption';
 
 import download from 'downloadjs';
+import { reloadApp } from 'pages/Routes/AppRoutes';
 import { getLocalDateShortString } from 'services/util/Generic';
+import { AppDatabase } from './Database';
 
-export async function exportDatabase(db: Dexie, password?: string): Promise<Blob | null> {
+export async function exportDatabase(db: AppDatabase, password?: string): Promise<Blob | null> {
   try {
     const blob = await exportDB(db, { prettyJson: true, progressCallback });
     const plainText = await blob.text();
@@ -26,16 +28,27 @@ export async function exportDatabase(db: Dexie, password?: string): Promise<Blob
   }
 }
 
-export async function importDatabase(db: Dexie, f: File, password?: string): Promise<Dexie | null> {
+export async function importDatabase(
+  db: AppDatabase,
+  f: File,
+  password?: string
+): Promise<Dexie | null> {
   let json = await f.text();
-  json = password ? decryptString(json, generateKeyFromString(password)) : json;
-
+  try {
+    json = password ? decryptString(json, generateKeyFromString(password)) : json;
+    JSON.parse(json);
+  } catch (e) {
+    console.error('Problem decrypting/parsing backup', e);
+    return null;
+  }
   try {
     await db.delete();
-    db = await importDB(new Blob([json]), {
+    const restoredDB = await importDB(new Blob([json]), {
       progressCallback,
     });
-    console.info('Restored DB', db);
+    console.info('Restored DB', restoredDB);
+
+    reloadApp();
     return db;
   } catch (error) {
     console.error('' + error);

@@ -23,6 +23,7 @@ const PeerDisplay = () => {
   const peerCtx = useContext(PeerContext);
   const userCtx = useContext(UserContext);
   const [status, setStatus] = useState(false);
+  const [reason, setReason] = useState('');
   const [peerIdenticon, setPeerIdenticon] = useState('');
   const [open, setOpen] = useState(false);
 
@@ -33,7 +34,10 @@ const PeerDisplay = () => {
   }, [peerIdenticon, userCtx]);
 
   useEffect(() => {
-    peerCtx?.on('statusChange', setStatus);
+    peerCtx?.on('statusChange', (s, r) => {
+      setStatus(s);
+      setReason(r);
+    });
   }, [peerCtx]);
   const theme = useTheme();
   const styles = {
@@ -80,7 +84,7 @@ const PeerDisplay = () => {
   };
   return (
     <>
-      <Tooltip title={status ? 'Online' : 'Currently Offline :('}>
+      <Tooltip title={(status ? 'Online ' : 'Offline - reason: ') + reason}>
         <IconButton onClick={() => setOpen(true)}>
           <Badge
             variant={'dot'}

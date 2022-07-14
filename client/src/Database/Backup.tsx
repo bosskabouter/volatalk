@@ -57,39 +57,34 @@ export default function Backup() {
     <Dialog open={open} onClose={() => setOpen(false)}>
       <DialogContent>
         <DialogTitle variant="h5">Data Backup</DialogTitle>
-        <DialogContentText>
-          <TextField
-            id="pw1"
-            value={pw1}
-            onChange={(e) => setPw1(e.target.value)}
-            label="Optional Password"
-            variant="filled"
-          />
-          <TextField
-            id="pw2"
-            value={pw2}
-            onChange={(e) => setPw2(e.target.value)}
-            label="Repeat Password"
-            variant="filled"
-          />
-          {/* <FormControlLabel
-            label={encrypted ? 'Encrypted Backup' : 'Plain text Backup'}
-            control={<Switch onChange={() => setEncrypted(!encrypted)} />}
-          />
-          <input
-            type="file"
-            accept="application/json"
-            onChange={async (event) => {
-              if (!event.target.files) return;
-              setFile(event.target.files[0]);
-            }}
-            multiple={false}
-          /> */}
-        </DialogContentText>
+        <TextField
+          id="pw1"
+          value={pw1}
+          onChange={(e) => setPw1(e.target.value)}
+          label="Optional Password"
+          variant="filled"
+        />
+        <TextField
+          id="pw2"
+          value={pw2}
+          onChange={(e) => setPw2(e.target.value)}
+          label="Repeat Password"
+          variant="filled"
+        />
 
+        <input
+          type="file"
+          accept="application/json"
+          onChange={async (event) => {
+            if (!event.target.files) return;
+            setFile(event.target.files[0]);
+          }}
+          multiple={false}
+        />
         <Typography variant="h5" hidden={isValid}>
           Passwords must match
         </Typography>
+        <DialogContentText></DialogContentText>
 
         <DialogActions>
           <Button disabled={!isValid} onClick={() => db && pw1 === pw2 && exportDatabase(db, pw1)}>
@@ -118,9 +113,9 @@ export const BackupDBButton = () => {
   const user = useContext(UserContext);
 
   return user ? (
-    <Button variant="contained" onClick={() => navigate('/backup')}>
+    <Button variant="outlined" onClick={() => navigate('/backup')}>
       Backup
-      <FileUploadIcon />
+      <DownloadIcon />
     </Button>
   ) : (
     <></>
@@ -132,7 +127,7 @@ export const RestoreDBButton = () => {
   return (
     <Button variant="contained" onClick={() => navigate('/restore')}>
       Restore
-      <FileUploadIcon />
+      <RestoreIcon />
     </Button>
   );
 };
