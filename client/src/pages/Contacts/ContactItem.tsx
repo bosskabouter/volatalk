@@ -100,11 +100,13 @@ export const ContactItem = (props: { contact: IContact }) => {
           flexDirection: 'column',
           alignItems: { xs: 'left', md: 'flex-start' },
           //m: 3,
-          border: 0,
+          width:'100%',
+          border: 1,
           minWidth: 180,
         }}
-      >
-        <Typography variant="h6" sx={{ minWidth: 200, maxWidth: 300, border: 0 }}>
+      >      
+
+        <Typography variant="h6" sx={{ maxWidth:  { xs: '200px', md: '400px' }, minWidth: 150, border: 1 }}>
           {contact.nickname}
         </Typography>
         <Box component="span">

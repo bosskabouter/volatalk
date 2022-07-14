@@ -76,9 +76,12 @@ export const DistanceInfo = ({ contact, detailed }: { contact: IContact; detaile
             component="span"
             //sx={{ display: { xs: 'none', md: 'block' } }}
           >
-            {round(distance, 0)} km {location.city + ' '}
+            {' '}
+            {round(distance, 0)} km
+          </Box>{' '}
+          <Box component="span" sx={{ display: { xs: 'none', md: 'block' } }}>
+            {location.city + ' '}
           </Box>
-
           {location.flag}
         </span>
         {weather && (

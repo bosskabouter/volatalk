@@ -10,13 +10,11 @@ import pushMessage from '../push/PushMessage';
 import { verifyAddress } from '../UserService';
 import { PeerManager } from './PeerManager';
 
-
 /**
  * Stateful module class to hook into react peerprovider. React components can listen to events fired through PeerManagerEvents
  */
 export class MultiPeerManager extends PeerManager {
-
   constructor(user: IUserProfile, db: AppDatabase) {
-  super(user,db)
+    super(user, db);
   }
 }

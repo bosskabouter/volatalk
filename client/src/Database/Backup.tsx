@@ -56,7 +56,7 @@ export default function Backup() {
   return (
     <Dialog open={open} onClose={() => setOpen(false)}>
       <DialogContent>
-        <DialogTitle variant="h5">Data Backup</DialogTitle>
+        <DialogTitle variant="h5">Data Backup /  Restore</DialogTitle>
         <TextField
           id="pw1"
           value={pw1}
@@ -88,16 +88,19 @@ export default function Backup() {
 
         <DialogActions>
           <Button disabled={!isValid} onClick={() => db && pw1 === pw2 && exportDatabase(db, pw1)}>
-            Download backup
+            Create backup
             <DownloadIcon />
           </Button>
+
+          <div>
           <Button
             disabled={!isValid}
             onClick={() => file && db && pw1 === pw2 && importDatabase(db, file, pw1)}
           >
-            Upload and Restore backup
+            Upload and Restore
             <DownloadIcon />
           </Button>
+          </div>
         </DialogActions>
       </DialogContent>
     </Dialog>
@@ -110,21 +113,14 @@ export default function Backup() {
  */
 export const BackupDBButton = () => {
   const navigate = useNavigate();
-  const user = useContext(UserContext);
+  const userCtx = useContext(UserContext);
 
-  return user ? (
-    <Button variant="outlined" onClick={() => navigate('/backup')}>
-      Backup
+  return userCtx?.user ? (
+    <Button variant="contained"  onClick={() => navigate('/backup')}>
+      Backup / Restore
       <DownloadIcon />
     </Button>
   ) : (
-    <></>
-  );
-};
-export const RestoreDBButton = () => {
-  const navigate = useNavigate();
-
-  return (
     <Button variant="contained" onClick={() => navigate('/restore')}>
       Restore
       <RestoreIcon />

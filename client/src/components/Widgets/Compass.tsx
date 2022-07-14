@@ -1,14 +1,19 @@
 import { useEffect, useState } from 'react';
 
-import CompassIcon from '@mui/icons-material/LocationOn';
+import CompassIcon from '@mui/icons-material/DoubleArrow';
+
+import CompassIcon2 from '@mui/icons-material/LocationOn';
+import CompassIcon3 from '@mui/icons-material/Explore';
+
 import { Stack, Tooltip, Typography } from '@mui/material';
-import ExploreIcon from '@mui/icons-material/Explore';
+
 import ExploreOffIcon from '@mui/icons-material/ExploreOff';
+
+const ICONCORRECTION = -90;
 /**
  *
  * @returns
- */
-export const Compass = () => {
+ */ export const Compass = () => {
   //analog clock effect
   const [north, setNorth] = useState<number>();
 
@@ -27,7 +32,7 @@ export const Compass = () => {
    */
   useEffect(() => {
     function handleOrientation(ev: DeviceOrientationEvent) {
-      ev.alpha && setNorth(ev.alpha);
+      setNorth(ICONCORRECTION + 0 ?? ev?.alpha);
     }
     window.addEventListener('deviceorientation', handleOrientation);
     return () => {
@@ -35,17 +40,9 @@ export const Compass = () => {
     };
   }, []);
 
-  return north ? (
-    <Tooltip title={'Magntic north'}>
-      <Stack direction="row" alignItems={'center'} gap="1">
-        <ExploreIcon style={rotateCompassStyle} color={'secondary'} fontSize={'large'} />
-
-        <Typography>{north && Math.round(north)}</Typography>
-      </Stack>
-    </Tooltip>
-  ) : (
-    <Tooltip title={'No motion sensor'}>
-      <ExploreOffIcon />
+  return (
+    <Tooltip title={'North'}>
+      <CompassIcon style={rotateCompassStyle} color={'secondary'} fontSize={'large'} />
     </Tooltip>
   );
 };

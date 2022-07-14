@@ -41,7 +41,7 @@ import { questions } from './SecurityQuestions';
 import { requestFollowMe } from 'services/geo/LocationService';
 import enrollUser from 'services/UserService';
 import { ImageUploader } from 'components/ImageUploader';
-import Backup, { BackupDBButton, RestoreDBButton } from 'Database/Backup';
+import { BackupDBButton } from 'Database/Backup';
 import { reloadApp } from 'pages/Routes/AppRoutes';
 
 const ITEM_HEIGHT = 18;
@@ -531,7 +531,6 @@ const AccountSetup = () => {
               {!authenticated ? 'Enter VolaTALK' : 'UPDATE PROFILE'}
             </Button>
             <BackupDBButton />
-            <RestoreDBButton />
           </Stack>
         </form>
       </DialogContent>

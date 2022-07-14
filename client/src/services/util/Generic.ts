@@ -94,7 +94,7 @@ export function descriptiveTimeAgo(date: Date) {
   } else if (timeAgo < oneDay) {
     desc = getLocalTimeString(date);
   } else {
-    desc = getLocalDateString(date);
+    desc = getLocalTimeString(date)+ " " +getLocalDateString(date) ;
   }
   return desc;
 }

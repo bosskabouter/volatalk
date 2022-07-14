@@ -25,6 +25,9 @@ import ConnectWithoutContactIcon from '@mui/icons-material/ConnectWithoutContact
 import OpenSourceIcon from '@mui/icons-material/ImportContacts';
 import PushedIcon from '@mui/icons-material/ForwardToInbox';
 import EncryptedIcon from '@mui/icons-material/MailLock';
+import PrivateIcon from '@mui/icons-material/Security';
+import NoSignalIcon from '@mui/icons-material/SignalCellularNodata';
+
 import GitHubIcon from '@mui/icons-material/GitHub';
 import logo from '../../assets/svg/logo-black.svg';
 import logo2 from '../../assets/svg/logo-yellow.svg';
@@ -71,22 +74,25 @@ const About = () => {
     idx: number | string;
   }) => {
     return (
-      <ListItem
-        key={props.idx}
-        //alignItems={'flex-start'}
+      <Card
+        elevation={9}
+        // role={'listitem'}
+        sx={{
+          width: { xs: '100%', md: '20%' },
+        }}
       >
-        <Card elevation={9} role={'listitem'} sx={{ width: '100%', minWidth: 'sd' }}>
-          <CardHeader
-            title={
-              <Typography variant="h6">
-                <em>{props.primaryText}</em>
-              </Typography>
-            }
-            avatar={<Avatar sx={{ bgcolor: theme.palette.secondary.main }}>{props.icon}</Avatar>}
-          />
-          <CardContent>{props.secondaryText}</CardContent>
-        </Card>
-      </ListItem>
+        <CardHeader 
+        color={theme.palette.secondary.main}
+        
+          title={
+            <Typography variant="h6">
+              <em>{props.primaryText}</em>
+            </Typography>
+          }
+          avatar={<Avatar sx={{ bgcolor: theme.palette.secondary.main }}>{props.icon}</Avatar>}
+        />
+        <CardContent>{props.secondaryText}</CardContent>
+      </Card>
     );
   };
 
@@ -94,70 +100,70 @@ const About = () => {
     <Container component="main" maxWidth="lg">
       <CssBaseline />
       <Box css={styles.box}>
-        <Grid>
-          <ListItem key="0">
-            <ListItemText
-              primary={
-                <Stack direction={'column'} alignItems={'center'}>
-                  <Stack sx={{ flexDirection: { xs: 'column', md: 'row' } }}>
-                    <Typography variant={'subtitle1'} noWrap alignItems={'center'}>
-                      <em>
-                        Nothing as volatile
-                        <PsychologyIcon color="secondary" />
-                        as the human mind
-                      </em>
-                    </Typography>
-                  </Stack>
-                  <Typography variant={'subtitle1'}> </Typography>
-                </Stack>
-              }
-            />
-          </ListItem>
+        <>
+          <Stack direction={'column'} alignItems={'center'} gap={3}>
+            <Stack sx={{ flexDirection: { xs: 'column', md: 'row' } }}>
+              <Typography variant={'subtitle1'} noWrap alignItems={'center'}>
+                <em>
+                  Nothing as volatile
+                  <PsychologyIcon color="secondary" />
+                  as the human mind
+                </em>
+              </Typography>
+            </Stack>
+            <Typography variant={'subtitle1'}> </Typography>
+          </Stack>
+
           <Feature
             idx={1}
-            icon={<ConnectWithoutContactIcon />}
-            primaryText={<>Direct Communication</>}
+            icon={<VideoCameraFrontIcon />}
+            primaryText={<>Messenger</>}
             secondaryText={
-              <div>
-                <p>
-                  Connect directly with invited contacts, without a central authority to capture or
-                  censure your messages.
-                </p>
-              </div>
+              <Typography>Stream audio and video calls. You can send 😉 too.</Typography>
             }
           />
           <Feature
             idx={2}
-            icon={<EncryptedIcon />}
-            primaryText={<>Private Encryption</>}
+            icon={<ConnectWithoutContactIcon />}
+            primaryText={<>Direct</>}
             secondaryText={
-              <div>
-                <p>No telephone, email or contact list required, just a browser.</p>
-                <p>Messages can only be read by you and the receiver.</p>
-              </div>
+              <Typography>
+                Connect directly (peer-to-peer) with invited contacts, without a central authority
+                able to capture or censure your messages.
+              </Typography>
+            }
+          />
+          <Feature
+            idx={3}
+            icon={<PrivateIcon />}
+            primaryText={<>Private</>}
+            secondaryText={
+              <Typography>
+                Use only your browser. No telephone, email, contact list or native apps required.
+              </Typography>
             }
           />
 
           <Feature
-            idx={3}
-            icon={<VideoCameraFrontIcon />}
-            primaryText={<>Streaming Calls</>}
+            idx={4}
+            icon={<EncryptedIcon />}
+            primaryText={<>Encrypted</>}
             secondaryText={
-              <div>
-                <p>
-                  Stream audio and videocalls. <p>You can send 😉 too.</p>{' '}
-                </p>
-              </div>
+              <Typography>
+                Messages and contact request are signed and encrypted and can only be read by you
+                and your accepted contacts.
+              </Typography>
             }
           />
+
           <Feature
-            idx={4}
-            icon={<HikingIcon />}
+            idx={5}
+            icon={<NoSignalIcon />}
             primaryText={<>Available Anywhere</>}
             secondaryText={
               <div>
                 <p>
-                  Write messages anytime and receive push notications{' '}
+                  Write messages anytime and receive push notifications{' '}
                   <PushedIcon fontSize="small" color={'primary'} /> when offline.
                 </p>
               </div>
@@ -165,25 +171,21 @@ const About = () => {
           />
 
           <Feature
-            idx={3}
+            idx={6}
             icon={<RadarIcon />}
             primaryText={<>Location Sharing</>}
             secondaryText={
               <div>
-                <p>
-                  Share your location so friends know at what distance, bearing and weather you are.
-                  Nice conversation starter!
-                </p>
+                <p>Show your place, distance, bearing and weather to your contacts.</p>
               </div>
             }
           />
           <Feature
-            idx={5}
+            idx={7}
             icon={<OpenSourceIcon />}
             primaryText={<>Open Source</>}
             secondaryText={
               <div>
-                {}
                 <p>
                   Source code on GitHub{' '}
                   <Link
@@ -194,15 +196,14 @@ const About = () => {
                     <GitHubIcon />
                   </Link>
                 </p>
-                <p>
-                  <a href={contactPaul}>
-                    <Typography variant={'button'}>Contact Creator</Typography>
-                  </a>
-                </p>
+
+                <Typography variant={'subtitle2'}>
+                  contact <a href={contactPaul}>me</a>
+                </Typography>
               </div>
             }
           />
-        </Grid>
+        </>
       </Box>
       <Stack direction={'column'} alignItems={'center'}>
         <Avatar

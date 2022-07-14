@@ -103,7 +103,7 @@ export const MessageItem = ({
         border: 0,
       }}
     >
-      <StatusIcon />
+     
       <ListItemText
         id={'id-' + message.id}
         primary={
@@ -113,7 +113,7 @@ export const MessageItem = ({
             }}
           />
         }
-        secondary={secondaryText}
+        secondary={ <><StatusIcon /> <>{secondaryText}</></>}
       />
     </Box>
   );
