@@ -39,7 +39,6 @@ export default function PeerProvider({ children }: IPeerProviderProps) {
       peerManager?.isConnected(statchange.contact);
     }
     function handleStatusChange(status: boolean) {
-      //setPeerManager(peerManager);
       if (status)
         //getting online
         db?.contacts.each((contact) => {

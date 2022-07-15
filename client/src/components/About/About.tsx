@@ -78,7 +78,7 @@ const About = () => {
         elevation={9}
         // role={'listitem'}
         sx={{
-          width: { xs: '100%', md: '20%' },
+         // width: { xs: '100%', md: '20%' },
         }}
       >
         <CardHeader

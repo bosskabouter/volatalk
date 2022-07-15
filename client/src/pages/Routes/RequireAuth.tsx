@@ -49,10 +49,10 @@ export const RequireAuth = () => {
           if (user) {
             console.info('Setting User in context', user);
             userCtx.setUser(user);
-            db.selectCategorizedContacts().then((cts) => {
-              console.info('Setting contacts in context ', user);
-              contactsCtx.setContacts(cts);
-            });
+            // db.selectCategorizedContacts().then((cts) => {
+            //   console.info('Setting contacts in context ', user);
+            //   contactsCtx.setContacts(cts);
+            // });
             setAuthenticated(true);
           }
         });

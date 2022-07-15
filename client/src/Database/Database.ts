@@ -1,5 +1,5 @@
 import Dexie from 'dexie';
-import { IContact, IContactClass, IMessage, IUserProfile } from '../types';
+import { IContact, IMessage, IUserProfile } from '../types';
 const tableUser = 'userProfile';
 const tableContacts = 'contacts';
 const tableMessages = 'messages';
@@ -39,33 +39,6 @@ export class AppDatabase extends Dexie {
     return this.contacts.orderBy('dateTimeDeclined').toArray();
   }
 
-  /**
-   * All registered contacts categorized in four:
-   * `'new' | 'block' | 'fav' | 'rest'`
-   * @returns
-   */
-  async selectCategorizedContacts() {
-    const m = new Map<IContactClass, IContact[]>();
-
-    m.set('new', []);
-    m.set('block', []);
-    m.set('fav', []);
-    m.set('rest', []);
-
-    (await this.selectContacts()).forEach((c) => {
-      if (c.dateTimeAccepted === 0) {
-        m.get('new')?.push(c);
-      } else if (c.dateTimeDeclined > 0) {
-        m.get('block')?.push(c);
-      } else if (c.favorite) {
-        m.get('fav')?.push(c);
-      } else {
-        m.get('rest')?.push(c);
-      }
-    });
-    console.debug('selectCategorizedContacts', m);
-    return m;
-  }
   /**
    *
    * @returns

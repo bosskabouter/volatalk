@@ -86,7 +86,7 @@ export interface IContact extends IContactResume {
 /**
  * A classification based on contacts current status
  */
-export type IContactClass = 'new' | 'block' | 'fav' | 'rest';
+export type IContactClass = 'new' | 'block' | 'fav' | 'unread' | 'rest';
 
 /**
  * Basic Data Message object

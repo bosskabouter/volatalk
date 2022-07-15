@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import { MediaConnection } from 'peerjs';
 
 import { useDatabase } from '../../providers/DatabaseProvider';
-import { ContactItem } from '../Contacts/ContactItem';
+import { ContactItem } from '../../pages/Contacts/ContactItem';
 import { PeerContext } from '../../providers/PeerProvider';
 import { IContact } from '../../types';
 import CallingComponent from './CallingComponent';

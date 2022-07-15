@@ -26,14 +26,14 @@ const App = () => {
               <DialogProvider>
                 <AuthProvider>
                   <UserProvider>
-                    <ContactsProvider>
-                      <ServiceWorkerWrapper />
-                      <PeerProvider>
+                    <ServiceWorkerWrapper />
+                    <PeerProvider>
+                      <ContactsProvider>
                         <Layout>
                           <AppRoutes />
                         </Layout>
-                      </PeerProvider>
-                    </ContactsProvider>
+                      </ContactsProvider>
+                    </PeerProvider>
                   </UserProvider>
                 </AuthProvider>
               </DialogProvider>

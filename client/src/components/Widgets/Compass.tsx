@@ -32,7 +32,7 @@ const ICONCORRECTION = -90;
    */
   useEffect(() => {
     function handleOrientation(ev: DeviceOrientationEvent) {
-      setNorth(ICONCORRECTION + 0 ?? ev?.alpha);
+      setNorth(ev?.alpha ? ICONCORRECTION + ev.alpha : ICONCORRECTION);
     }
     window.addEventListener('deviceorientation', handleOrientation);
     return () => {

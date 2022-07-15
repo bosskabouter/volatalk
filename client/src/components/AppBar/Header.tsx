@@ -3,7 +3,7 @@ import { Compass } from 'components/Widgets/Compass';
 import LocationInfo from 'components/Widgets/LocationInfo';
 import { DateInfo } from 'components/Widgets/DateInfo';
 import { TimeInfo } from 'components/Widgets/TimeInfo';
-import CalleeComponent from 'pages/Messages/CalleeComponent';
+import CalleeComponent from 'components/Call/CalleeComponent';
 
 /**
  *

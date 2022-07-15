@@ -104,15 +104,17 @@ export const MessageItem = ({
       }}
     >
       <ListItemText
-        id={'id-' + message.id} 
+        id={'id-' + message.id}
         primary={
-          <Box  border={'1'} sx={{overflow: 'hidden', textOverflow:'-', width:'100%', maxWidth:'100%'
-            }}>
-          <p  
-            dangerouslySetInnerHTML={{
-              __html: '<em>' + senderText + '</em>: ' + message.payload,
-            }}
-          /></Box>
+          <Box
+            sx={{ overflow: 'hidden', textOverflow: '-', width: '100%', maxWidth: '100%' }}
+          >
+            <p
+              dangerouslySetInnerHTML={{
+                __html: '<em>' + senderText + '</em>: ' + message.payload,
+              }}
+            />
+          </Box>
         }
         secondary={
           <>

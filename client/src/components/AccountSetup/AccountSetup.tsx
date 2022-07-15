@@ -331,8 +331,8 @@ const AccountSetup = () => {
       //TransitionComponent={}
       transitionDuration={{ enter: 1500 }}
       maxWidth="lg"
-      fullScreen={fullScreen}
-      scroll={'paper'}
+      //fullScreen={fullScreen}
+      scroll={'body'}
     >
       <DialogContent id="dialog-agreement" css={styles.accountSetupDialogContent}>
         <Typography variant="h5">Profile settings</Typography>

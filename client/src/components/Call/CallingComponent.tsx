@@ -13,7 +13,7 @@ import {
   useTheme,
 } from '@mui/material';
 import { PeerContext } from '../../providers/PeerProvider';
-import { ContactListItem } from '../Contacts/ContactListItem';
+import { ContactListItem } from '../../pages/Contacts/ContactListItem';
 import { MediaConnection } from 'peerjs';
 import CallEndIcon from '@mui/icons-material/CallEnd';
 import CallRecordIcon from '@mui/icons-material/SaveAlt';

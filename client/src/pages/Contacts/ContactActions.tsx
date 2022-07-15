@@ -3,15 +3,15 @@ import { BaseSyntheticEvent, MouseEvent, useContext, useEffect, useState } from 
 import CallIcon from '@mui/icons-material/Call';
 import AddTaskIcon from '@mui/icons-material/AddTask';
 
-import { IconButton, ListItem, ListItemText } from '@mui/material';
+import { IconButton } from '@mui/material';
 import { VideoCameraFront as CallContactIcon } from '@mui/icons-material';
 
 import { useNavigate } from 'react-router-dom';
 
-import { IContact, IMessage } from '../../types';
+import { IContact } from '../../types';
 import { PeerContext } from '../../providers/PeerProvider';
 import { DatabaseContext } from '../../providers/DatabaseProvider';
-import { MessageItem } from 'pages/Messages/MessageItem';
+import { MessageItem } from 'pages/Message/MessageItem';
 import { ContactDetails } from './ContactDetails';
 import BlockIcon from '@mui/icons-material/Block';
 
@@ -59,7 +59,7 @@ export const ContactActions = ({ contact, detailed }: { contact: IContact; detai
         size="small"
         title="Accept Contact"
       >
-        Add Contact!!
+        Add Contact!
         <AddTaskIcon />
       </IconButton>
     ) : (

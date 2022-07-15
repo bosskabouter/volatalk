@@ -1,18 +1,18 @@
-/* eslint-disable */
-// @ts-nocheck
+/* eslint2-disable */
+// @ts2-nocheck
 import React, { ReactNode, useContext, useEffect, useState } from 'react';
 import { IContact, IContactClass } from 'types';
 import { useDatabase } from './DatabaseProvider';
 import { usePeerManager } from './PeerProvider';
 
 export type IContactContext = {
-  contacts: Map<IContactClass, IContact[]>;
-  setContacts: (getContacts: Map<IContactClass, IContact[]>) => void;
+  sortedContacts: Map<IContactClass, IContact[]>;
+  setSortedContacts: (getContacts: Map<IContactClass, IContact[]>) => void;
 };
 
 export const ContactsContext = React.createContext<IContactContext>({
-  contacts: new Map(),
-  setContacts: () => {
+  sortedContacts: new Map(),
+  setSortedContacts: () => {
     return;
   },
 });
@@ -21,44 +21,80 @@ export type ContactsProviderProps = {
   children: ReactNode;
 };
 
-export const useContacts = () => useContext(ContactsContext);
+export const useContactsContext = () => useContext(ContactsContext);
 
 const ContactsProvider: React.FC<ContactsProviderProps> = ({ children }) => {
   const db = useDatabase();
-  const peerManager = usePeerManager();
+  const pm = usePeerManager();
 
-  const [contacts, setContacts] = useState<Map<IContactClass, IContact[]>>();
+  const [contacts, setContacts] = useState<IContact[]>([]);
+
+  const [sortedContacts, setSortedContacts] = useState<Map<IContactClass, IContact[]>>(new Map());
+
+  const contextValue = React.useMemo(
+    () => ({
+      sortedContacts,
+      setSortedContacts,
+    }),
+    [sortedContacts, setSortedContacts]
+  );
+
+  /**
+   * Load all contacts
+   */
+  useEffect(() => {
+    db && db.selectContacts().then(setContacts);
+  }, [db]);
 
   /**
    * New incoming Contact Request effect
    */
   useEffect(() => {
-    if (!peerManager) return;
-    console.debug('useEffect handleNewContact');
+    if (!pm || !db) return;
 
-    const handleNewContact = (newContact: IContact) => {
-      setContactList((prevCtcList) => [...prevCtcList, newContact]);
-    };
-    peerManager.addListener('onNewContact', handleNewContact);
-    return () => {
-      peerManager.removeListener('onNewContact', handleNewContact);
-    };
-  }, [peerManager]);
-
-  const contextValue = React.useMemo(
-    () => ({
-      contacts,
-      setContacts,
-    }),
-    [contacts, setContacts]
-  );
-
-  useEffect(() => {
-    async function loadContacts() {
-      setContacts(await db?.selectCategorizedContacts());
+    function handleNewContact (contact: IContact){
+      console.debug("New Contact Connected!",contact);
+      db?.selectContacts().then(setContacts);
     }
-    loadContacts();
-  }, [db]);
+    const handleContactStatusChange = (statchange: { contact: IContact; status: boolean }) => {
+      db.selectContacts().then(setContacts);
+    };
+
+    pm.addListener('onNewContact', handleNewContact);
+    pm.addListener('onContactStatusChange', handleContactStatusChange);
+    return () => {
+      pm.removeListener('onNewContact', handleNewContact);
+      pm.removeListener('onContactStatusChange', handleContactStatusChange);
+    };
+  }, [db, pm]);
+
+  /**
+   * Order contacts by current status
+   */
+  useEffect(() => {
+    if (!contacts) return;
+    const m = new Map<IContactClass, IContact[]>();
+
+    m.set('new', []);
+    m.set('block', []);
+    m.set('fav', []);
+    m.set('rest', []);
+
+    contacts.forEach((c) => {
+      if (c.dateTimeAccepted === 0 || c.dateTimeResponded === 0) {
+        m.get('new')?.push(c);
+      } else if (c.dateTimeDeclined > 0) {
+        m.get('block')?.push(c);
+      } else if (c.favorite) {
+        m.get('fav')?.push(c);
+      } else {
+        m.get('rest')?.push(c);
+      }
+    });
+    console.debug('selectCategorizedContacts', m);
+
+    setSortedContacts(m);
+  }, [contacts]);
 
   return <ContactsContext.Provider value={contextValue}>{children}</ContactsContext.Provider>;
 };

@@ -1,5 +1,6 @@
 import { CircularProgress } from '@mui/material';
 import Backup from 'Database/Backup';
+import CallerComponent from 'components/Call/CallerComponent';
 
 import { lazy, Suspense } from 'react';
 import FadeIn from 'react-fade-in';
@@ -7,7 +8,7 @@ import { Route, Routes } from 'react-router-dom';
 import { EULA } from '../../components';
 import AccountSetup from '../../components/AccountSetup/AccountSetup';
 import Home from '../Home/Home';
-import { RequireAuth } from './RequireAuth';
+import { RequireAuth } from './RequireAuth'; 
 
 // We load each route, when lazy loading, only as they're
 // called by the user. The Home page is not lazily loaded
@@ -22,9 +23,8 @@ const PageNotFound = lazy(() => import('../../components/PageNotFound/PageNotFou
 const NewPin = lazy(() => import('../../components/NewPin/NewPin'));
 const PinReset = lazy(() => import('../../components/PinReset/PinReset'));
 const Invite = lazy(() => import('../../components/Invite/Invite'));
-const MessageList = lazy(() => import('../../pages/Messages/MessageList'));
+const MessageList = lazy(() => import('../Message/MessageList'));
 const Contacts = lazy(() => import('../../pages/Contacts/ContactsPage'));
-const CallerComponent = lazy(() => import('../../pages/Messages/CallerComponent'));
 
 /**
  * General hook to reload App and reinit (after db restore or profile update)

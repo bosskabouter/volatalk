@@ -3,7 +3,7 @@ import { BaseSyntheticEvent, MouseEvent, useContext, useEffect, useState } from 
 import CallIcon from '@mui/icons-material/Call';
 import AddTaskIcon from '@mui/icons-material/AddTask';
 
-import { IconButton, ListItem, ListItemText } from '@mui/material';
+import { Box, IconButton, ListItem, ListItemText } from '@mui/material';
 import { VideoCameraFront as CallContactIcon } from '@mui/icons-material';
 
 import { useNavigate } from 'react-router-dom';
@@ -13,9 +13,7 @@ import { ContactItem } from './ContactItem';
 import { IContact, IMessage } from '../../types';
 import { PeerContext } from '../../providers/PeerProvider';
 import { DatabaseContext } from '../../providers/DatabaseProvider';
-import { MessageItem } from 'pages/Messages/MessageItem';
-import { ContactDetails } from './ContactDetails';
-import { ContactsContext } from 'providers/ContactsProvider';
+import { MessageItem } from 'pages/Message/MessageItem';
 
 export const ContactListItem = (props: { contact: IContact }) => {
   const peerMngr = useContext(PeerContext);
@@ -103,7 +101,7 @@ export const ContactListItem = (props: { contact: IContact }) => {
         </IconButton>
       </div>
     ) : (
-      <div>
+      <Box hidden={props.contact.dateTimeResponded === 0}>
         <IconButton
           onClick={handleClickVideoCallContact}
           edge="end"
@@ -122,7 +120,7 @@ export const ContactListItem = (props: { contact: IContact }) => {
         >
           <CallIcon />
         </IconButton>
-      </div>
+      </Box>
     );
   };
 

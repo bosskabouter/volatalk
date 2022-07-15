@@ -17,6 +17,7 @@ import SendTextIcon from '@mui/icons-material/Send';
 
 import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
 
 import { PeerContext } from '../../providers/PeerProvider';
 import { IContact, IMessage } from '../../types';
@@ -57,7 +58,7 @@ export const ComposeMessage = ({
         }}
       >
         <DialogContent>
-          <DialogContentText>Share a Photo</DialogContentText>
+          <DialogContentText>Share Something</DialogContentText>
           <ImageUploader
             onUploaded={(base64EncodedImage) => {
               setSndMessageText(`<img src='${base64EncodedImage}'/>`);
@@ -73,7 +74,7 @@ export const ComposeMessage = ({
           setOpenShare(true);
         }}
       >
-        <PhotoCameraIcon />
+        <AttachFileIcon />
       </IconButton>
     );
   };

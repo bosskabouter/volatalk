@@ -6,13 +6,13 @@ import Badge from '@mui/material/Badge';
 import { IContactResume } from 'types';
 import { PeerContext } from 'providers/PeerProvider';
 import { Button, Tooltip } from '@mui/material';
-import { useContacts } from 'providers/ContactsProvider';
+import { useContactsContext } from 'providers/ContactsProvider';
 
 function ContactRequestsButton() {
   const peerCtx = useContext(PeerContext);
 
   const navigate = useNavigate();
-  const newContacts = useContacts().contacts?.get('new');
+  const newContacts = useContactsContext().sortedContacts.get('new');
   const [contactRequests, setContactRequests] = useState<IContactResume[]>(
     newContacts ? newContacts : []
   );

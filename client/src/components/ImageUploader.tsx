@@ -18,8 +18,8 @@ export const ImageUploader = ({
       top: 0;
       right: 0;
       margin: 0;
-      padding: 18px;
-      width: 90%;
+      padding: 9px;
+      width: 63%;
       align: 'center';
     `,
     uploadImage: css`

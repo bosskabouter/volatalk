@@ -12,6 +12,7 @@ import { Alerter } from '../StatusDisplay/Alerter';
 import Identification from 'components/Identification/Identification';
 import { IInvite } from 'types';
 import { generateSignature } from 'services/crypto/CryptoService';
+import { useContactsContext } from 'providers/ContactsProvider';
 
 export default function AcceptInvite(props: { invite: string }) {
   const [open, setOpen] = useState(true);
@@ -21,6 +22,8 @@ export default function AcceptInvite(props: { invite: string }) {
 
   const [senderOnline, setSenderOnline] = useState<boolean | null>(null);
   const [result, setResult] = useState<string>('');
+
+  const ContactsContext = useContactsContext();
 
   const [receivedInvite, setReceivedInvite] = useState<IInvite | null>(null);
 
@@ -79,6 +82,7 @@ export default function AcceptInvite(props: { invite: string }) {
         favorite: false,
       };
       db.contacts.put(contact);
+      ContactsContext.sortedContacts.get('new')?.push(contact);
       console.info('Contact created', contact);
       setResult('Contact added!');
     }

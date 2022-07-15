@@ -1,23 +1,19 @@
 import { Box, Button, ListSubheader, Stack, Typography } from '@mui/material';
-import { useContacts } from 'providers/ContactsProvider';
-import { useEffect, useState } from 'react';
+import {  useContactsContext } from 'providers/ContactsProvider';
 import { useNavigate } from 'react-router-dom';
 import ContactList from './ContactList';
 import AddLinkIcon from '@mui/icons-material/AddLink';
+import { IContact, IContactClass } from 'types';
 
 const ContactsPage = () => {
-  const contacts = useContacts().contacts;
+  const contacts = useContactsContext()?.sortedContacts;
 
   const navigate = useNavigate();
 
-  // useEffect(() => {
-  // }, [])
-
-  const newContacts = contacts ? contacts.get('new') : [];
-  const favoriteContacts = contacts ? contacts.get('fav') : [];
-  const restContacts = contacts ? contacts.get('rest') : [];
-  const blockedContacts = contacts ? contacts.get('block') : [];
-
+  function getContactsInCategory(cat: IContactClass): IContact[] {
+    const cts = contacts?.get(cat);
+    return cts ? cts : [];
+  }
   return (
     contacts && (
       <Stack
@@ -27,16 +23,23 @@ const ContactsPage = () => {
         }}
       >
         <ContactList
-          contacts={newContacts}
-          subHeader={<ListSubheader>New Contact Requests</ListSubheader>}
+          contacts={getContactsInCategory('new')}
+          subHeader={<ListSubheader>New Contact Requests!</ListSubheader>}
         />
         <ContactList
-          contacts={favoriteContacts}
+          contacts={getContactsInCategory('unread')}
+          subHeader={<ListSubheader>Unread</ListSubheader>}
+        />
+        <ContactList
+          contacts={getContactsInCategory('fav')}
           subHeader={<ListSubheader>Favorites</ListSubheader>}
         />
-        <ContactList contacts={restContacts} subHeader={<ListSubheader>Contacts</ListSubheader>} />
         <ContactList
-          contacts={blockedContacts}
+          contacts={getContactsInCategory('rest')}
+          subHeader={<ListSubheader>Contacts</ListSubheader>}
+        />
+        <ContactList
+          contacts={getContactsInCategory('block')}
           subHeader={<ListSubheader>Blocked</ListSubheader>}
         />
 
