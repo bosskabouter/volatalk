@@ -318,6 +318,9 @@ const AccountSetup = () => {
     if (checked)
       notifyMe(); //test notification. The actual registration of push subscription is done in ServiceWorkerWrapper
     else {
+      //      user &&  (user.pushSubscription  = null);
+      formik.values.usePush = false;
+
       formik.values.pushSubscription = null;
     }
   }
@@ -383,7 +386,11 @@ const AccountSetup = () => {
 
           <Box>
             <FormControlLabel
-              label={formik.values.usePush ? `Push Subscribed` : `Notify when I'm offline`}
+              label={
+                formik.values.usePush
+                  ? `Push Subscribed` + (user?.pushSubscription ? ' (and got subscription)' : '')
+                  : `Notify when I'm offline`
+              }
               control={
                 <Switch
                   checked={formik.values.usePush}

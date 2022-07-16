@@ -207,8 +207,8 @@ export default function Invite() {
       onClose={() => navigate('/', { replace: false })}
       transitionDuration={{ enter: 1500 }}
       //  maxWidth="md"
-       fullWidth={true}
-     // fullScreen
+      fullWidth={true}
+      // fullScreen
       //      style={{ minWidth: 300 }}
     >
       <DialogTitle>

@@ -52,8 +52,8 @@ const ContactsProvider: React.FC<ContactsProviderProps> = ({ children }) => {
   useEffect(() => {
     if (!pm || !db) return;
 
-    function handleNewContact (contact: IContact){
-      console.debug("New Contact Connected!",contact);
+    function handleNewContact(contact: IContact) {
+      console.debug('New Contact Connected!', contact);
       db?.selectContacts().then(setContacts);
     }
     const handleContactStatusChange = (statchange: { contact: IContact; status: boolean }) => {
@@ -76,13 +76,16 @@ const ContactsProvider: React.FC<ContactsProviderProps> = ({ children }) => {
     const m = new Map<IContactClass, IContact[]>();
 
     m.set('new', []);
+    m.set('wait', []);
     m.set('block', []);
     m.set('fav', []);
     m.set('rest', []);
 
     contacts.forEach((c) => {
-      if (c.dateTimeAccepted === 0 || c.dateTimeResponded === 0) {
+      if (c.dateTimeAccepted === 0) {
         m.get('new')?.push(c);
+      } else if (c.dateTimeResponded === 0) {
+        m.get('wait')?.push(c);
       } else if (c.dateTimeDeclined > 0) {
         m.get('block')?.push(c);
       } else if (c.favorite) {

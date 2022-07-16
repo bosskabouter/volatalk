@@ -1,5 +1,5 @@
 import { Box, Button, ListSubheader, Stack, Typography } from '@mui/material';
-import {  useContactsContext } from 'providers/ContactsProvider';
+import { useContactsContext } from 'providers/ContactsProvider';
 import { useNavigate } from 'react-router-dom';
 import ContactList from './ContactList';
 import AddLinkIcon from '@mui/icons-material/AddLink';
@@ -25,6 +25,10 @@ const ContactsPage = () => {
         <ContactList
           contacts={getContactsInCategory('new')}
           subHeader={<ListSubheader>New Contact Requests!</ListSubheader>}
+        />
+        <ContactList
+          contacts={getContactsInCategory('wait')}
+          subHeader={<ListSubheader>Awaiting Acceptance</ListSubheader>}
         />
         <ContactList
           contacts={getContactsInCategory('unread')}

@@ -1,14 +1,8 @@
-import { ReactNode, useContext, useEffect, useState } from 'react';
-import { Button, IconButton, List, ListSubheader, Typography } from '@mui/material';
-import { Box } from '@mui/system';
-
-import { useNavigate } from 'react-router-dom';
-import NewContactRequestsIcon from '@mui/icons-material/AccessibilityNew';
-import FavoritesOnlyContactIcon from '@mui/icons-material/StarBorderPurple500';
-import FavoritesNotOnlyContactIcon from '@mui/icons-material/Star';
-import { PeerContext } from '../../providers/PeerProvider';
-import { IContact, IContactClass } from '../../types';
+import { ReactNode } from 'react';
+import { List } from '@mui/material';
 import { ContactListItem } from './ContactListItem';
+import { IContact } from 'types';
+
 /**
 
  *

@@ -1,104 +1,130 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.VolaTALK = void 0;
 /**
  * First attempt to convert to ts server. Not working yet.
  */
 const express_1 = __importDefault(require("express"));
 const spdy_1 = __importDefault(require("spdy"));
-const web_push_1 = __importDefault(require("web-push"));
 const path_1 = __importDefault(require("path"));
-const fs_1 = __importDefault(require("fs"));
-const os_1 = __importDefault(require("os"));
+const web_push_1 = __importStar(require("web-push"));
 const peer_1 = require("peer");
 const compression_1 = __importDefault(require("compression"));
 const cors_1 = __importDefault(require("cors"));
-class App {
+const CryptoService_1 = require("./CryptoService");
+const Generic_1 = require("./Generic");
+const HTTPS_OPTIONS_1 = require("./HTTPS_OPTIONS");
+class VolaTALK {
+    /**
+     *
+     */
     constructor() {
-        this.DEBUG = ENV_VARB("DEBUG");
-        //HTTPS REQUIRED
-        this.PORT_HTTPS = ENV_VARN("PORT_HTTPS", 8443);
-        this.HOSTNAME = os_1.default.hostname();
-        this.KEY_FILENAME = ENV_VAR("KEY_FILE", "../crt/" + this.HOSTNAME + ".key");
-        this.CERT_FILENAME = ENV_VAR("CERT_FILE", "../crt/" + this.HOSTNAME + ".crt");
-        this.KEY_FILE = fs_1.default.readFileSync(path_1.default.join(__dirname, this.KEY_FILENAME), "utf8");
-        this.CERT_FILE = fs_1.default.readFileSync(path_1.default.join(__dirname, this.CERT_FILENAME), "utf8");
-        this.HTTPS_OPTIONS = {
-            key: this.KEY_FILE,
-            cert: this.CERT_FILE,
-        };
-        this.server = spdy_1.default.createServer(this.HTTPS_OPTIONS, express_1.default);
-        this.express = (0, express_1.default)();
+        this.DEBUG = (0, Generic_1.ENV_VARB)("DEBUG");
+        this.app = (0, express_1.default)();
+        this.server = spdy_1.default.createServer(HTTPS_OPTIONS_1.HTTPS_OPTIONS, express_1.default);
         this.mountRoutes();
         this.doAlways();
+        this.server.listen(HTTPS_OPTIONS_1.HTTPS_PORT);
     }
+    /**
+     *
+     */
     mountRoutes() {
         const router = express_1.default.Router();
         router.get("/", (_req, res) => {
-            res.json({ message: "Go away, world!" });
+            res.json({ message: "Hello world!" });
         });
-        this.express.use("/", router);
+        this.app.use("/", router);
     }
     doAlways() {
         //SSL KEYS
-        this.server.listen(this.PORT_HTTPS);
-        console.info("HTTPS started on port: " + this.PORT_HTTPS);
         // compress all responses
         // https://webhint.io/docs/user-guide/hints/hint-http-compression/
-        this.express.use((0, compression_1.default)());
-        ENV_VARB("DO_STATIC") && this.doStatic();
-        ENV_VARB("DO_CORS") && this.doCors();
-        ENV_VARB("DO_PEERJS") && this.doPeerServer();
-        ENV_VARB("DO_WEBPUSH") && this.doPushServer();
-        ENV_VARB("DO_SOCKETIO") && this.doSocketIO();
+        this.app.use((0, compression_1.default)());
+        (0, Generic_1.ENV_VARB)("DO_STATIC") && this.doStatic();
+        (0, Generic_1.ENV_VARB)("DO_CORS") && this.doCors();
+        (0, Generic_1.ENV_VARB)("DO_PEERJS") && this.doPeerServer();
+        (0, Generic_1.ENV_VARB)("DO_WEBPUSH") && this.doPushServer();
+        (0, Generic_1.ENV_VARB)("DO_SOCKETIO") && this.doSocketIO();
+        //this.server.listen(HTTPS_PORT);
+        console.info("HTTPS started on port: " + HTTPS_OPTIONS_1.HTTPS_PORT);
     }
     doStatic() {
-        const DIR_PUB_STATIC = ENV_VAR("DIR_PUB_STATIC", "public");
+        const DIR_PUB_STATIC = (0, Generic_1.ENV_VAR)("DIR_PUB_STATIC", "public");
         //serve static
-        this.express.use(express_1.default.static(path_1.default.join(__dirname, DIR_PUB_STATIC)));
+        this.app.use(express_1.default.static(path_1.default.join(__dirname, DIR_PUB_STATIC)));
         // https://webhint.io/docs/user-guide/hints/hint-no-disallowed-headers/?source=devtools
     }
     doCors() {
         console.log("Using cors", cors_1.default);
-        this.express.use((0, cors_1.default)());
+        this.app.use((0, cors_1.default)());
     }
     /**
      *
      */
     doPeerServer() {
-        const PEERJS_CONTEXT = ENV_VAR("PEER_CONTEXT", "/vtpeer");
-        const PEERJS_KEY = ENV_VAR("PEERJS_KEY", "pmkey");
+        const PEERJS_CONTEXT = (0, Generic_1.ENV_VAR)("PEER_CONTEXT", "/vtpeer");
+        const PEERJS_KEY = (0, Generic_1.ENV_VAR)("PEERJS_KEY", "pmkey");
         //serve peerjs
         const PEERJS_OPTIONS = {
-            port: this.PORT_HTTPS,
+            port: HTTPS_OPTIONS_1.HTTPS_PORT,
             path: PEERJS_CONTEXT,
             key: PEERJS_KEY,
             debug: this.DEBUG,
-            ssl: {
-                key: this.KEY_FILE,
-                cert: this.CERT_FILE,
-            },
+            ssl: HTTPS_OPTIONS_1.HTTPS_OPTIONS
         };
         const peerServer = (0, peer_1.ExpressPeerServer)(this.server, PEERJS_OPTIONS);
         console.info("Starting peerserver with options", PEERJS_OPTIONS);
-        this.express.use(PEERJS_CONTEXT, peerServer);
-        ENV_VARB("DO_PEERJS_SECURE") && this.doPeerSecure(peerServer);
+        this.app.use(PEERJS_CONTEXT, peerServer);
+        (0, Generic_1.ENV_VARB)("DO_PEERJS_SECURE") &&
+            this.doPeerSecure(peerServer, PEERJS_CONTEXT);
     }
     /**
      *
      * @param peerServer
      */
-    doPeerSecure(peerServer) {
-        //console.info("Making peerServer secure", peerServer);
+    doPeerSecure(peerServer, context) {
+        console.info("Making peerServer secure" + peerServer);
         peerServer.on("connection", (client) => {
             console.log("Client connecting", client);
             const peerid = client.getId();
             console.info("client id/token", peerid);
-            //verify
-            const fishy = false;
-            if (fishy)
+            !isTokenValid(context, client.token, peerid) &&
                 client.getSocket().close();
         });
     }
@@ -109,19 +135,36 @@ class App {
         const HTTP_ERROR_Insufficient_Storage_Push_tooBig = 507;
         const HTTP_ERROR_PUSH_SERVICE_ERROR_Bad_Gateway = 502;
         const PUSH_MAX_BYTES = 4 * 1024;
-        const WEBPUSH_CONTEXT = ENV_VAR("WEBPUSH_CONTEXT", "/web-push");
-        const VAPID_SUBJECT = ENV_VAR("VAPID_SUBJECT", "mailto:push@volatalk.org");
+        const WEBPUSH_CONTEXT = (0, Generic_1.ENV_VAR)("WEBPUSH_CONTEXT", "/web-push");
+        const VAPID_SUBJECT = (0, Generic_1.ENV_VAR)("VAPID_SUBJECT", "mailto:push@volatalk.org");
         //WEB-PUSH VAPID KEYS; generate USING ./node_modules/.bin/web-push generate-vapid-keys
-        const VAPID_PUBKEY = ENV_VAR("VAPID_PUBKEY", "BChZg2Ky1uKIDRdYWapWKZXZ19VvFedmK0bjqir9kMsyUK42cguvoAr4Pau4yQr2aY4IWGIsr3W1lWK5okZ6O84");
-        const VAPID_PRIVKEY = ENV_VAR("VAPID_PRIVKEY", "CvQGYBs-AzSHF55J7mqTR8VE7l-qwiBiSslqeaMfx8o");
-        this.express.use(express_1.default.json());
+        const VAPID_PUBKEY = (0, Generic_1.ENV_VAR)("VAPID_PUBKEY", "BChZg2Ky1uKIDRdYWapWKZXZ19VvFedmK0bjqir9kMsyUK42cguvoAr4Pau4yQr2aY4IWGIsr3W1lWK5okZ6O84");
+        const VAPID_PRIVKEY = (0, Generic_1.ENV_VAR)("VAPID_PRIVKEY", "CvQGYBs-AzSHF55J7mqTR8VE7l-qwiBiSslqeaMfx8o");
+        this.app.use(express_1.default.json());
         web_push_1.default.setVapidDetails(VAPID_SUBJECT, VAPID_PUBKEY, VAPID_PRIVKEY);
         //Blob needed to measure request size
         const { Blob } = require("buffer");
-        this.express.post(WEBPUSH_CONTEXT, (request, response) => {
+        /**
+         * Generate a VAPID key for requester
+         */
+        this.app.get(WEBPUSH_CONTEXT, (request, response) => {
+            //TODO Validate token in request
+            const VAPIDKeys = (0, web_push_1.generateVAPIDKeys)();
+            console.info("QueryParams", request.query);
+            response.write(JSON.stringify(VAPIDKeys));
+        });
+        /**
+         * Respond to Push Posts
+         */
+        this.app.post(WEBPUSH_CONTEXT, (request, response) => {
             if (this.DEBUG)
                 console.log("Push request", request);
             const body = request.body;
+            const peerid = body.peerid;
+            const token = body.token;
+            if (!isTokenValid(WEBPUSH_CONTEXT, token, peerid)) {
+                console.warn("Token Invalid: not pushing", request);
+            }
             const subscription = body.subscription;
             const payload = body.payload;
             const byteSizeHeader = Number(request.header("content-length"));
@@ -169,29 +212,20 @@ class App {
         });
     }
 }
-exports.default = new App().express;
-function ENV_VARN(varName, defaults) {
-    return Number(ENV_VAR(varName, "" + defaults));
-}
-function ENV_VARB(varName) {
-    return ENV_VAR(varName, "true") === "true";
-}
-function ENV_VAR(varName, defaults) {
-    let val = process.env[varName];
-    val = val === null || val === void 0 ? void 0 : val.trim();
-    console.log(varName + (!val ? " [UNDEFINED] Using default: " + defaults : ": " + val));
-    return (val === null || val === void 0 ? void 0 : val.trim()) || defaults;
-}
-function peerIdToPublicKey(peerid) {
-    const cryptoKey = JSON.parse(convertHexToString(peerid));
-    console.debug("Converted PeerID->PublicKey", cryptoKey, peerid);
-    return cryptoKey;
-}
-function convertHexToString(hex) {
-    return hex
-        .split(/(\w\w)/g)
-        .filter((p) => !!p)
-        .map((c) => String.fromCharCode(parseInt(c, 16)))
-        .join("");
+exports.VolaTALK = VolaTALK;
+/**
+ *
+ * @param context
+ * @param token
+ * @param peerid
+ * @returns
+ */
+function isTokenValid(context, token, peerid) {
+    return __awaiter(this, void 0, void 0, function* () {
+        console.info("Verify domain/token/peerid", context, token, peerid);
+        const pubKey = yield (0, CryptoService_1.peerIdToPublicKey)(peerid);
+        console.info("pubkey", pubKey);
+        return pubKey && (0, CryptoService_1.verifyMessage)(context, new TextEncoder().encode(token), pubKey);
+    });
 }
 //# sourceMappingURL=Server.js.map

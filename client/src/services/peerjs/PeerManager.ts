@@ -64,8 +64,17 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
       //default peerserver peerjs.org
       debug: 1,
     },
+    {
+      //second volatalk instance
+      host: 'localhost',
+      port: 8443,
+      path: '/',
+      secure: true,
+      key: 'pmkey',
+      debug: 1,
+    },
   ];
-  #usingSignalingServer = this.#signalingServers[0];
+  #usingSignalingServer = this.#signalingServers[3 /*3*/];
 
   constructor(user: IUserProfile, db: AppDatabase) {
     if (!verifyAddress(user.peerid)) throw Error('Invalid peerID:' + user.peerid);

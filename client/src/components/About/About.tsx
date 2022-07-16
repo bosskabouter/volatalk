@@ -77,9 +77,11 @@ const About = () => {
       <Card
         elevation={9}
         // role={'listitem'}
-        sx={{
-         // width: { xs: '100%', md: '20%' },
-        }}
+        sx={
+          {
+            // width: { xs: '100%', md: '20%' },
+          }
+        }
       >
         <CardHeader
           color={theme.palette.secondary.main}

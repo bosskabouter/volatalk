@@ -8,7 +8,7 @@ import { convertBase64ToAb } from '../services/util/Generic';
 const ServiceWorkerWrapper: FC = () => {
   /**
    * Global Web push pubKey
-   * TODO: investigate if this
+   * TODO: Create private push server keys for each subscription, if possible
    */
   const WEBPUSH_SERVER_PUBKEY =
     'BKO5xaLdDEzHQIjdm5rRT9QWUOp3SCl7VDfO3dj0LYMno6IlTZ7njpFvWYWMEWvxL2ici5FmzqrPaxAEywyB1WA';
@@ -51,6 +51,7 @@ const ServiceWorkerWrapper: FC = () => {
       );
       return;
     }
+    if (registration) return;
 
     wb.current = new Workbox(process.env.PUBLIC_URL + serviceWorkerScript);
     console.debug('Created Workbox', wb.current);
@@ -58,40 +59,41 @@ const ServiceWorkerWrapper: FC = () => {
     wb.current.addEventListener('message', onMessage);
     wb.current
       .register()
-      .then(async (reg) => {
-        if (!reg) {
+      .then(async (rgstrn) => {
+        if (!rgstrn) {
           console.warn('No registration returned');
           return;
         }
-        console.debug('Service worker registration', reg);
-        setRegistration(reg);
+        console.debug('Service worker registration', rgstrn);
+        setRegistration(rgstrn);
         if (!user?.usePush) return;
-        const ps = await reg.pushManager.subscribe({
+        const ps = await rgstrn.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey: convertBase64ToAb(WEBPUSH_SERVER_PUBKEY),
         });
 
         setPushSubscription(ps);
-        console.debug('setPushSubscription', ps);
+        console.debug('Got PushSubscription', ps);
 
+        //send updated user and contacts info to service worker. Otherwise SW needs access to db
         const contacts = await db?.selectContactsMap();
         const msg = {
           type: 'UPDATE_CONTACTS',
           user: JSON.parse(JSON.stringify(user)),
           contacts: contacts,
         };
-        console.debug('UPDATING_CONTACTS', msg);
 
         wb.current?.messageSW(msg).then((res) => {
           console.info('UDATED CONTACTS IN SERVICE WORKER', res);
-          alert('UDATED CONTACTS IN SERVICE WORKER' + res);
         });
       })
 
       .catch((e) => {
+        alert('Error registering service worker' + e);
+
         console.error('Error registering service worker', e);
       });
-  }, [db, noServiceWorkerAvailable, serviceWorkerScript, user]);
+  }, [db, noServiceWorkerAvailable, registration, serviceWorkerScript, user]);
 
   /**
    * Saves the push subscription to users profile.
@@ -99,9 +101,10 @@ const ServiceWorkerWrapper: FC = () => {
   useEffect(() => {
     if (!db || !user || !registration || !user.id || !pushSubscription) return;
     console.debug('Old with New push subscription', user.pushSubscription, pushSubscription);
+    alert('Got pushSubscription:' + pushSubscription);
     user.pushSubscription = pushSubscription;
 
-    db.userProfile.update(1, { pushSubscription: pushSubscription });
+    db.userProfile.put(user);
     setUser(user);
   }, [db, pushSubscription, registration, setUser, user]);
 

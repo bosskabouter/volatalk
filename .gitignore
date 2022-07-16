@@ -380,3 +380,4 @@ server/www/index.html
 remote-debug-profile
 test/*
 vt_*
+server/dist/*

@@ -5,81 +5,83 @@ import express from "express";
 import spdy from "spdy";
 
 import https from "https";
-
-import webpush from "web-push";
 import path from "path";
 
-import fs from "fs";
-import os from "os";
-import Socket from "socket.io";
+
+
+import webpush, { generateVAPIDKeys } from "web-push";
+
+
 import { ExpressPeerServer } from "peer";
 import compression from "compression";
 import cors from "cors";
 
-import io from "socket.io";
+import { peerIdToPublicKey, verifyMessage } from "./CryptoService";
+import { ENV_VAR, ENV_VARB } from "./Generic";
+import { HTTPS_OPTIONS, HTTPS_PORT as HTTPS_PORT } from "./HTTPS_OPTIONS";
 
-class App {
-  public express;
+export class VolaTALK {
+  public app;
 
   DEBUG = ENV_VARB("DEBUG");
 
-  //HTTPS REQUIRED
-  PORT_HTTPS = ENV_VARN("PORT_HTTPS", 8443);
 
-  HOSTNAME = os.hostname();
-
-  KEY_FILENAME = ENV_VAR("KEY_FILE", "../crt/" + this.HOSTNAME + ".key");
-  CERT_FILENAME = ENV_VAR("CERT_FILE", "../crt/" + this.HOSTNAME + ".crt");
-
-  KEY_FILE = fs.readFileSync(path.join(__dirname, this.KEY_FILENAME), "utf8");
-  CERT_FILE = fs.readFileSync(path.join(__dirname, this.CERT_FILENAME), "utf8");
-
-  HTTPS_OPTIONS = {
-    key: this.KEY_FILE,
-    cert: this.CERT_FILE,
-  };
-  server = spdy.createServer(this.HTTPS_OPTIONS, express);
+  server;
+  /**
+   * 
+   */
   constructor() {
-    this.express = express();
+    this.app = express();
+    this.server = spdy.createServer(HTTPS_OPTIONS, express);
+
     this.mountRoutes();
 
     this.doAlways();
+    this.server.listen(HTTPS_PORT);
+
   }
+
+  /**
+   * 
+   */
   private mountRoutes(): void {
     const router = express.Router();
     router.get("/", (_req, res) => {
-      res.json({ message: "Go away, world!" });
+      res.json({ message: "Hello world!" });
     });
-    this.express.use("/", router);
+    this.app.use("/", router);
   }
 
   private doAlways() {
     //SSL KEYS
 
-    this.server.listen(this.PORT_HTTPS);
-    console.info("HTTPS started on port: " + this.PORT_HTTPS);
-
     // compress all responses
     // https://webhint.io/docs/user-guide/hints/hint-http-compression/
-    this.express.use(compression());
+    this.app.use(compression());
 
     ENV_VARB("DO_STATIC") && this.doStatic();
     ENV_VARB("DO_CORS") && this.doCors();
     ENV_VARB("DO_PEERJS") && this.doPeerServer();
 
     ENV_VARB("DO_WEBPUSH") && this.doPushServer();
-    ENV_VARB("DO_SOCKETIO") && this.doSocketIO();
+    ENV_VARB("DO_SOCKETIO") && this.doSocketIO(); 
+ 
+ 
+    //this.server.listen(HTTPS_PORT);
+    console.info("HTTPS started on port: " + HTTPS_PORT);
+
+
   }
   private doStatic() {
     const DIR_PUB_STATIC = ENV_VAR("DIR_PUB_STATIC", "public");
     //serve static
-    this.express.use(express.static(path.join(__dirname, DIR_PUB_STATIC)));
+    this.app.use(express.static(path.join(__dirname, DIR_PUB_STATIC)));
 
     // https://webhint.io/docs/user-guide/hints/hint-no-disallowed-headers/?source=devtools
   }
   private doCors() {
     console.log("Using cors", cors);
-    this.express.use(cors());
+    this.app.use(cors());
   }
 
   /**
@@ -90,39 +92,39 @@ class App {
     const PEERJS_KEY = ENV_VAR("PEERJS_KEY", "pmkey");
     //serve peerjs
     const PEERJS_OPTIONS = {
-      port: this.PORT_HTTPS,
+      port: HTTPS_PORT,
       path: PEERJS_CONTEXT,
       key: PEERJS_KEY,
       debug: this.DEBUG,
-      ssl: {
-        key: this.KEY_FILE,
-        cert: this.CERT_FILE,
-      },
+      ssl: HTTPS_OPTIONS
     };
 
     const peerServer = ExpressPeerServer(this.server, PEERJS_OPTIONS);
     console.info("Starting peerserver with options", PEERJS_OPTIONS);
-    this.express.use(PEERJS_CONTEXT, peerServer);
+    this.app.use(PEERJS_CONTEXT, peerServer);
 
-    ENV_VARB("DO_PEERJS_SECURE") && this.doPeerSecure(peerServer);
+    ENV_VARB("DO_PEERJS_SECURE") &&
+      this.doPeerSecure(peerServer, PEERJS_CONTEXT);
+
+
+
   }
   /**
    *
    * @param peerServer
    */
-  private doPeerSecure(peerServer: any) {
-    //console.info("Making peerServer secure", peerServer);
+  private doPeerSecure(peerServer: any, context: string) {
+    console.info("Making peerServer secure" + peerServer);
     peerServer.on("connection", (client: any) => {
       console.log("Client connecting", client);
       const peerid = client.getId();
       console.info("client id/token", peerid);
-      //verify
 
-      const fishy = false;
-
-      if (fishy) client.getSocket().close();
+      !isTokenValid(context, client.token, peerid) &&
+        client.getSocket().close();
     });
   }
+
   /**
    *
    */
@@ -145,17 +147,38 @@ class App {
       "CvQGYBs-AzSHF55J7mqTR8VE7l-qwiBiSslqeaMfx8o"
     );
 
-    this.express.use(express.json());
+    this.app.use(express.json());
 
     webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBKEY, VAPID_PRIVKEY);
 
     //Blob needed to measure request size
     const { Blob } = require("buffer");
 
-    this.express.post(WEBPUSH_CONTEXT, (request, response) => {
+    /**
+     * Generate a VAPID key for requester
+     */
+    this.app.get(WEBPUSH_CONTEXT, (request, response) => {
+      //TODO Validate token in request
+      const VAPIDKeys = generateVAPIDKeys();
+      console.info("QueryParams", request.query);
+
+      response.write(JSON.stringify(VAPIDKeys));
+    });
+
+    /**
+     * Respond to Push Posts
+     */
+    this.app.post(WEBPUSH_CONTEXT, (request, response) => {
       if (this.DEBUG) console.log("Push request", request);
 
       const body = request.body;
+
+      const peerid = body.peerid;
+      const token = body.token;
+
+      if (!isTokenValid(WEBPUSH_CONTEXT, token, peerid)) {
+        console.warn("Token Invalid: not pushing", request);
+      }
       const subscription = body.subscription;
       const payload = body.payload;
 
@@ -217,33 +240,20 @@ class App {
   }
 }
 
-export default new App().express;
-function ENV_VARN(varName: string, defaults: number): number {
-  return Number(ENV_VAR(varName, "" + defaults));
-}
-function ENV_VARB(varName: string): boolean {
-  return ENV_VAR(varName, "true") === "true";
-}
-function ENV_VAR(varName: string, defaults: string): string {
-  let val = process.env[varName];
-  val = val?.trim();
 
-  console.log(
-    varName + (!val ? " [UNDEFINED] Using default: " + defaults : ": " + val)
-  );
+/**
+ *
+ * @param context
+ * @param token
+ * @param peerid
+ * @returns
+ */
+async function isTokenValid(context: string, token: string, peerid: string) {
+  console.info("Verify domain/token/peerid", context, token, peerid);
 
-  return val?.trim() || defaults;
+  const pubKey = await peerIdToPublicKey(peerid);
+  console.info("pubkey", pubKey);
+
+  return pubKey && verifyMessage(context, new TextEncoder().encode(token), pubKey);
 }
 
-function peerIdToPublicKey(peerid: string) {
-  const cryptoKey = JSON.parse(convertHexToString(peerid));
-  console.debug("Converted PeerID->PublicKey", cryptoKey, peerid);
-  return cryptoKey;
-}
-function convertHexToString(hex: string) {
-  return hex
-    .split(/(\w\w)/g)
-    .filter((p) => !!p)
-    .map((c) => String.fromCharCode(parseInt(c, 16)))
-    .join("");
-}

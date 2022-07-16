@@ -8,7 +8,7 @@ import { Route, Routes } from 'react-router-dom';
 import { EULA } from '../../components';
 import AccountSetup from '../../components/AccountSetup/AccountSetup';
 import Home from '../Home/Home';
-import { RequireAuth } from './RequireAuth'; 
+import { RequireAuth } from './RequireAuth';
 
 // We load each route, when lazy loading, only as they're
 // called by the user. The Home page is not lazily loaded
