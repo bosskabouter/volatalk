@@ -1,10 +1,10 @@
-import BIP32Factory, { BIP32Interface } from 'bip32';
-import * as ecc from 'tiny-secp256k1';
-import * as bip39 from 'bip39';
-//import bip32 from 'bip32';
-//import * as bitcoin from 'bitcoinjs-lib';
-
+import BIP32Factory from 'bip32';
+import { BIP32Interface } from 'bip32';
+//import * as ecc from 'tiny-secp256k1';
 import { entropyToMnemonic } from 'bip39';
+// You must wrap a tiny-secp256k1 compatible implementation
+
+import * as bip39 from 'bip39';
 
 export class VTKey {
   mnemonic: string;
@@ -13,9 +13,13 @@ export class VTKey {
     // Generate a random mnemonic (uses crypto.randomBytes under the hood), defaults to 128-bits of entropy
     this.mnemonic = entropy ? entropyToMnemonic(entropy) : bip39.generateMnemonic();
 
-    const mnemonic = bip39.generateMnemonic();
-    const bitcoin = import('bitcoinjs-lib');
-    const seed = bip39.mnemonicToSeedSync(mnemonic);
+    // const bip32 = BIP32Factory(ecc);
+
+    // const node: BIP32Interface = bip32.fromBase58(
+    //   'xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi'
+    // );
+
+    //const child: BIP32Interface = node.derivePath('m/0/0');
 
     // const b32 = BIP32Factory(ecc);
     //const restored = bitcoin.then(btc=>{btc.Psbt.fromBuffer(this.toSeed())} );

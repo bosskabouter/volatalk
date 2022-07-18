@@ -1,4 +1,4 @@
-import { FC, useContext, useEffect, useRef, useState } from 'react';
+import { FC, SetStateAction, useContext, useEffect, useRef, useState } from 'react';
 import { Button, Snackbar } from '@mui/material';
 import { Workbox, WorkboxLifecycleWaitingEvent, WorkboxMessageEvent } from 'workbox-window';
 import { UserContext } from '../providers/UserProvider';
@@ -24,7 +24,7 @@ const ServiceWorkerWrapper: FC = () => {
 
   const { user, setUser } = useContext(UserContext);
 
-  const [pushSubscription, setPushSubscription] = useState<PushSubscription>();
+  const [pushSubscription, setPushSubscription] = useState<PushSubscription | null>(null);
 
   const db = useContext(DatabaseContext);
 
@@ -45,6 +45,7 @@ const ServiceWorkerWrapper: FC = () => {
   };
 
   useEffect(() => {
+    if (!user) return;
     if (noServiceWorkerAvailable) {
       console.warn(
         'No service worker in navigator available. Push messages and off-line browsing disabled.'
@@ -57,43 +58,66 @@ const ServiceWorkerWrapper: FC = () => {
     console.debug('Created Workbox', wb.current);
     wb.current.addEventListener('waiting', onSWUpdate);
     wb.current.addEventListener('message', onMessage);
+
+    const handleRegistration = async (rgstrn?: ServiceWorkerRegistration) => {
+      if (!rgstrn) {
+        console.warn('No registration returned');
+        return;
+      }
+      console.debug('Service worker registration', rgstrn);
+      setRegistration(rgstrn);
+
+      let ps = await rgstrn.pushManager.getSubscription().catch((e) => {
+        alert('Could not find existing subscription: ' + e);
+        ps = null;
+      });
+
+      if (user.usePush) {
+        !ps &&
+          (ps = await rgstrn.pushManager
+            .subscribe({
+              userVisibleOnly: true,
+              applicationServerKey: convertBase64ToAb(WEBPUSH_SERVER_PUBKEY),
+            })
+            .catch((e) => {
+              alert('Subscribe failed: ' + e);
+            }));
+      } else {
+        if (ps) {
+          ps.unsubscribe().then((ok) => alert('unsubscribed: ' + ok));
+          ps = null;
+        }
+      }
+
+      setPushSubscription(ps ? ps : null);
+      //alert('Got PushSubscription: ' + ps);
+
+      //send updated user and contacts info to service worker. Otherwise SW needs access to db
+      const contacts = await db?.selectContactsMap();
+      const msg = {
+        type: 'UPDATE_CONTACTS',
+        user: JSON.parse(JSON.stringify(user)),
+        contacts: contacts,
+      };
+
+      wb.current?.messageSW(msg).then((res) => {
+        console.info('UDATED CONTACTS IN SERVICE WORKER', res);
+      });
+    };
+
     wb.current
       .register()
-      .then(async (rgstrn) => {
-        if (!rgstrn) {
-          console.warn('No registration returned');
-          return;
-        }
-        console.debug('Service worker registration', rgstrn);
-        setRegistration(rgstrn);
-        if (!user?.usePush) return;
-        const ps = await rgstrn.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: convertBase64ToAb(WEBPUSH_SERVER_PUBKEY),
-        });
-
-        setPushSubscription(ps);
-        console.debug('Got PushSubscription', ps);
-
-        //send updated user and contacts info to service worker. Otherwise SW needs access to db
-        const contacts = await db?.selectContactsMap();
-        const msg = {
-          type: 'UPDATE_CONTACTS',
-          user: JSON.parse(JSON.stringify(user)),
-          contacts: contacts,
-        };
-
-        wb.current?.messageSW(msg).then((res) => {
-          console.info('UDATED CONTACTS IN SERVICE WORKER', res);
-        });
-      })
-
+      .then(handleRegistration)
       .catch((e) => {
-        alert('Error registering service worker' + e);
-
+        alert('Error registering service worker: ' + e);
+        if (pushSubscription) {
+          pushSubscription
+            .unsubscribe()
+            .then((ok) => alert('unsubscribed after error: ' + ok + +' => ' + e));
+        }
         console.error('Error registering service worker', e);
       });
-  }, [db, noServiceWorkerAvailable, registration, serviceWorkerScript, user]);
+  }, [db, noServiceWorkerAvailable, pushSubscription, registration, serviceWorkerScript, user]);
 
   /**
    * Saves the push subscription to users profile.
@@ -101,7 +125,7 @@ const ServiceWorkerWrapper: FC = () => {
   useEffect(() => {
     if (!db || !user || !registration || !user.id || !pushSubscription) return;
     console.debug('Old with New push subscription', user.pushSubscription, pushSubscription);
-    alert('Got pushSubscription:' + pushSubscription);
+    //alert('Got pushSubscription:' + pushSubscription);
     user.pushSubscription = pushSubscription;
 
     db.userProfile.put(user);

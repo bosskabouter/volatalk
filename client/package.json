@@ -1,6 +1,6 @@
 {
   "name": "volatalk",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "bosskabouter@volatalk.org",
   "commentAboutSearchEngineResults": "Following field is read by DuckDuckGo",
   "description": "Direct Private Messenger. Communicate directly with your contacts, No need for a central authority to capture or censure your private data.",
@@ -109,7 +109,7 @@
     "sass": "^1.52.1",
     "secp256k1": "^4.0.3",
     "strict-event-emitter": "^0.2.4",
-    "tiny-secp256k1": "^2.2.1",
+    "tiny-secp256k1": "^1.1.6",
     "typeface-roboto": "^1.1.13",
     "yup": "^0.32.11"
   },

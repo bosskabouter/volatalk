@@ -103,7 +103,7 @@ self.addEventListener('push', (pushEvent) => {
 
   const message: IMessage = JSON.parse(payload);
 
-  const contact = contacts.get(message.sender);
+  const contact = contacts?.get(message.sender);
 
   if (!contact) {
     console.warn('Received Push from unknown contact', payload);
@@ -121,17 +121,17 @@ self.addEventListener('push', (pushEvent) => {
 
   const notificationOptions: NotificationOptions = {
     body: message.payload,
-    badge: contact.avatar,
+    badge: contact?.avatar,
     //    image: contact.avatar,
     //    icon: 'https://volatalk.org/mstile-150x150.png',
-    icon: contact.avatar,
+    icon: contact?.avatar,
     vibrate: [1000, 2000, 3000, 4000, 5000],
     actions: [actionOpen, actionClose],
     requireInteraction: message.urgent,
     renotify: message.urgent,
-    data: contact.peerid,
+    data: contact?.peerid,
   };
-  self.registration.showNotification(contact.nickname, notificationOptions);
+  self.registration.showNotification(contact?.nickname, notificationOptions);
 });
 
 /**

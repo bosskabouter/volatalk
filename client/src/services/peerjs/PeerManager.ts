@@ -74,7 +74,7 @@ export class PeerManager extends StrictEventEmitter<PeerManagerEvents> {
       debug: 1,
     },
   ];
-  #usingSignalingServer = this.#signalingServers[3 /*3*/];
+  #usingSignalingServer = this.#signalingServers[0 /*3*/];
 
   constructor(user: IUserProfile, db: AppDatabase) {
     if (!verifyAddress(user.peerid)) throw Error('Invalid peerID:' + user.peerid);

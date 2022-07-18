@@ -35,7 +35,7 @@ self.addEventListener('push', (pushEvent) => {
 
   const message = JSON.parse(payload);
 
-  const contact = contacts.get(message.sender);
+  const contact = contacts?.get(message.sender);
 
   if (!contact) {
     console.warn('Received Push from unknown contact', payload);

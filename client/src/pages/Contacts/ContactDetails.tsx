@@ -20,6 +20,8 @@ import { DistanceInfo } from 'components/Identification/DistanceInfo';
 import MoreOptionsIcon from '@mui/icons-material/MoreVert';
 import BlockIcon from '@mui/icons-material/Block';
 import AddTaskIcon from '@mui/icons-material/AddTask';
+import PushedIcon from '@mui/icons-material/ForwardToInbox';
+
 import { ContactActions } from './ContactActions';
 
 export const ContactDetails = (props: { contact: IContact }) => {
@@ -112,6 +114,8 @@ export const ContactDetails = (props: { contact: IContact }) => {
 
           <Typography>{lastTimeSeen}</Typography>
           <DistanceInfo contact={contact} detailed={true} />
+
+          {contact.pushSubscription && <PushedIcon />}
         </DialogContent>
 
         <DialogActions>
